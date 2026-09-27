@@ -25,7 +25,9 @@ class MediaFile {
   final String id;
   final MediaKind kind;
   final MediaFileStatus status;
+  @JsonKey(includeIfNull: true)
   final int? width;
+  @JsonKey(includeIfNull: true)
   final int? height;
   final int version;
 

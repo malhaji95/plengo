@@ -24,7 +24,9 @@ class SessionSummary {
   
   final String id;
   final SessionPlatform platform;
+  @JsonKey(includeIfNull: true)
   final String? appVersion;
+  @JsonKey(includeIfNull: true)
   final String? userAgent;
   final DateTime createdAt;
   final DateTime lastSeenAt;

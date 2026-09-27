@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 
 import '../models/me_envelope.dart';
+import '../models/update_profile_request.dart';
 
 part 'me_client.g.dart';
 
@@ -15,4 +16,9 @@ abstract class MeClient {
 
   @GET('/api/v1/me')
   Future<MeEnvelope> getMe();
+
+  @PATCH('/api/v1/me')
+  Future<MeEnvelope> updateMe({
+    @Body() required UpdateProfileRequest body,
+  });
 }

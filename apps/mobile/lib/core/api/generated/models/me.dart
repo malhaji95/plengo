@@ -17,6 +17,9 @@ class Me {
     required this.role,
     required this.fullName,
     required this.educationLevelId,
+    required this.universityId,
+    required this.facultyId,
+    required this.academicYearId,
   });
   
   factory Me.fromJson(Map<String, Object?> json) => _$MeFromJson(json);
@@ -26,7 +29,14 @@ class Me {
   final bool emailVerified;
   final MeRole role;
   final String fullName;
+  @JsonKey(includeIfNull: true)
   final String? educationLevelId;
+  @JsonKey(includeIfNull: true)
+  final String? universityId;
+  @JsonKey(includeIfNull: true)
+  final String? facultyId;
+  @JsonKey(includeIfNull: true)
+  final String? academicYearId;
 
   Map<String, Object?> toJson() => _$MeToJson(this);
 }

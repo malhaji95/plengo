@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/account/account_screen.dart';
+import '../features/account/placement_screen.dart';
 import '../features/account/sessions_screen.dart';
 import '../features/auth/forgot_password_screen.dart';
 import '../features/auth/login_screen.dart';
@@ -12,6 +13,8 @@ import '../features/auth/verify_email_screen.dart';
 import '../features/shell/home_shell.dart';
 import '../features/shell/placeholder_tab.dart';
 import '../features/splash/splash_screen.dart';
+import '../features/subjects/subject_screen.dart';
+import '../features/subjects/subjects_screen.dart';
 import '../features/update/force_update_screen.dart';
 import 'flags.dart';
 import 'providers.dart';
@@ -30,6 +33,7 @@ abstract final class Routes {
   static const saved = '/saved';
   static const account = '/account';
   static const sessions = '/account/sessions';
+  static const placement = '/account/placement';
   static const redeem = '/redeem';
 
   static const public = {login, register, verifyEmail, forgotPassword, resetPassword};
@@ -38,7 +42,11 @@ abstract final class Routes {
 /// Bridges Riverpod auth/update state to GoRouter's refresh mechanism.
 class _RouterRefresh extends ChangeNotifier {
   _RouterRefresh(Ref ref) {
-    ref.listen(authControllerProvider, (_, _) => notifyListeners());
+    // Only a change of signed-in status matters for redirects; profile edits must not reset the stack.
+    ref.listen(
+      authControllerProvider.select((s) => (s.isLoading, s.hasError, s.value != null)),
+      (_, _) => notifyListeners(),
+    );
     ref.listen(updateRequiredProvider, (_, _) => notifyListeners());
   }
 }
@@ -46,6 +54,8 @@ class _RouterRefresh extends ChangeNotifier {
 /// `couponRedemption` defaults to the compile-time flag. When false the redeem route is not
 /// registered at all (spec §8.7, §37.5).
 GoRouter buildRouter(Ref ref, {bool couponRedemption = AppFlags.couponRedemption}) {
+  // Web: pushed screens (e.g. register) show their own URL too (spec §24 deep links).
+  GoRouter.optionURLReflectsImperativeAPIs = true;
   return GoRouter(
     initialLocation: Routes.splash,
     refreshListenable: _RouterRefresh(ref),
@@ -54,13 +64,22 @@ GoRouter buildRouter(Ref ref, {bool couponRedemption = AppFlags.couponRedemption
       if (ref.read(updateRequiredProvider)) return location == Routes.update ? null : Routes.update;
 
       final auth = ref.read(authControllerProvider);
-      if (auth.isLoading || auth.hasError) return location == Routes.splash ? null : Routes.splash;
+      if (auth.isLoading || auth.hasError) {
+        // Remember a deep link (e.g. /subjects/<id> after a web reload) while the session restores.
+        if (location == Routes.splash) return null;
+        return Uri(path: Routes.splash, queryParameters: {'from': state.uri.toString()}).toString();
+      }
 
       final signedIn = auth.value != null;
       if (!signedIn) return Routes.public.contains(location) ? null : Routes.login;
-      if (Routes.public.contains(location) || location == Routes.splash || location == Routes.update) {
-        return Routes.home;
+      if (location == Routes.splash) {
+        final from = state.uri.queryParameters['from'];
+        final safe = from != null && from.startsWith('/') && !from.startsWith('//');
+        return safe && !Routes.public.contains(Uri.parse(from).path) && Uri.parse(from).path != Routes.splash
+            ? from
+            : Routes.home;
       }
+      if (Routes.public.contains(location) || location == Routes.update) return Routes.home;
       return null;
     },
     routes: [
@@ -87,7 +106,13 @@ GoRouter buildRouter(Ref ref, {bool couponRedemption = AppFlags.couponRedemption
             GoRoute(path: Routes.home, builder: (_, _) => const PlaceholderTab(title: 'الرئيسية')),
           ]),
           StatefulShellBranch(routes: [
-            GoRoute(path: Routes.subjects, builder: (_, _) => const PlaceholderTab(title: 'المواد')),
+            GoRoute(
+              path: Routes.subjects,
+              builder: (_, _) => const SubjectsScreen(),
+              routes: [
+                GoRoute(path: ':id', builder: (_, state) => SubjectScreen(subjectId: state.pathParameters['id']!)),
+              ],
+            ),
           ]),
           StatefulShellBranch(routes: [
             GoRoute(path: Routes.review, builder: (_, _) => const PlaceholderTab(title: 'المراجعة')),
@@ -99,7 +124,10 @@ GoRouter buildRouter(Ref ref, {bool couponRedemption = AppFlags.couponRedemption
             GoRoute(
               path: Routes.account,
               builder: (_, _) => const AccountScreen(),
-              routes: [GoRoute(path: 'sessions', builder: (_, _) => const SessionsScreen())],
+              routes: [
+                GoRoute(path: 'sessions', builder: (_, _) => const SessionsScreen()),
+                GoRoute(path: 'placement', builder: (_, _) => const PlacementScreen()),
+              ],
             ),
           ]),
         ],

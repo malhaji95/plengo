@@ -54,10 +54,16 @@ class AccountScreen extends ConsumerWidget {
           ),
           const Divider(height: 32),
           ListTile(
+            leading: const Icon(Icons.school_outlined),
+            title: const Text('المرحلة التعليمية'),
+            trailing: const Icon(Icons.chevron_left),
+            onTap: () => context.go(Routes.placement),
+          ),
+          ListTile(
             leading: const Icon(Icons.devices_outlined),
             title: const Text('الأجهزة المتصلة'),
             trailing: const Icon(Icons.chevron_left),
-            onTap: () => context.push(Routes.sessions),
+            onTap: () => context.go(Routes.sessions),
           ),
           ListTile(
             leading: Icon(Icons.logout, color: Theme.of(context).colorScheme.error),

@@ -284,24 +284,22 @@ export function createStructureService(deps: {
     ): Promise<Subject> {
       const current = await subjectOrFail(id);
       const values: Record<string, unknown> = {};
-      // The college path is replaced as a whole: when any layer is given, the new path comes from the
-      // given layers alone (the deepest wins); otherwise changing the level clears it.
+      // Sending the level or any college layer replaces the whole placement; layers not sent (or
+      // null) become empty, and the deepest given layer determines the ones above it.
       const collegeGiven =
         input.universityId !== undefined ||
         input.facultyId !== undefined ||
         input.academicYearId !== undefined;
       const levelId = input.educationLevelId ?? current.educationLevelId;
-      if (collegeGiven || levelId !== current.educationLevelId) {
+      if (collegeGiven || input.educationLevelId !== undefined) {
         const path = await resolveCollegePath(
           repo,
           levelId,
-          collegeGiven
-            ? {
-                universityId: input.universityId ?? null,
-                facultyId: input.facultyId ?? null,
-                academicYearId: input.academicYearId ?? null,
-              }
-            : {},
+          {
+            universityId: input.universityId ?? null,
+            facultyId: input.facultyId ?? null,
+            academicYearId: input.academicYearId ?? null,
+          },
           { requireActive: false },
         );
         const moved =

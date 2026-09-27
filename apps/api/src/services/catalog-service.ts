@@ -90,7 +90,10 @@ export function createCatalogService(deps: {
       return toLesson(lesson);
     },
 
-    /** Profile level and college path only set defaults; they never restrict browsing (§8.9). */
+    /**
+     * Profile level and college path only set defaults; they never restrict browsing (§8.9). Sending
+     * the level or any college layer replaces the whole placement: layers not sent become empty.
+     */
     async updateProfile(
       userId: string,
       input: CollegePathInput & { fullName?: string | undefined; educationLevelId?: string | undefined },
@@ -104,18 +107,16 @@ export function createCatalogService(deps: {
         input.facultyId !== undefined ||
         input.academicYearId !== undefined;
       const levelId = input.educationLevelId ?? me.educationLevelId;
-      if (collegeGiven || (input.educationLevelId && input.educationLevelId !== me.educationLevelId)) {
+      if (collegeGiven || input.educationLevelId !== undefined) {
         if (!levelId) throw new AppError('VALIDATION_ERROR', { details: { field: 'educationLevelId' } });
         const path = await resolveCollegePath(
           repo,
           levelId,
-          collegeGiven
-            ? {
-                universityId: input.universityId ?? null,
-                facultyId: input.facultyId ?? null,
-                academicYearId: input.academicYearId ?? null,
-              }
-            : {},
+          {
+            universityId: input.universityId ?? null,
+            facultyId: input.facultyId ?? null,
+            academicYearId: input.academicYearId ?? null,
+          },
           { requireActive: true },
         );
         Object.assign(fields, { educationLevelId: levelId, ...path });

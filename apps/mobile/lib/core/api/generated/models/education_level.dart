@@ -13,6 +13,7 @@ class EducationLevel {
     required this.code,
     required this.nameAr,
     required this.sortOrder,
+    required this.isCollege,
   });
   
   factory EducationLevel.fromJson(Map<String, Object?> json) => _$EducationLevelFromJson(json);
@@ -21,6 +22,7 @@ class EducationLevel {
   final String code;
   final String nameAr;
   final num sortOrder;
+  final bool isCollege;
 
   Map<String, Object?> toJson() => _$EducationLevelToJson(this);
 }

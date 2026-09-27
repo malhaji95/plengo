@@ -1,0 +1,28 @@
+// coverage:ignore-file
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, unused_import, invalid_annotation_target, unnecessary_import
+
+import 'package:json_annotation/json_annotation.dart';
+
+import 'lesson.dart';
+import 'subject.dart';
+import 'unit_with_lessons.dart';
+
+part 'subject_outline.g.dart';
+
+@JsonSerializable()
+class SubjectOutline {
+  const SubjectOutline({
+    required this.subject,
+    required this.units,
+    required this.lessons,
+  });
+  
+  factory SubjectOutline.fromJson(Map<String, Object?> json) => _$SubjectOutlineFromJson(json);
+  
+  final Subject subject;
+  final List<UnitWithLessons> units;
+  final List<Lesson> lessons;
+
+  Map<String, Object?> toJson() => _$SubjectOutlineToJson(this);
+}

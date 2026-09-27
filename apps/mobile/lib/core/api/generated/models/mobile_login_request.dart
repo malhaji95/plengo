@@ -22,6 +22,7 @@ class MobileLoginRequest {
   final String email;
   final String password;
   final MobileLoginRequestPlatform platform;
+  @JsonKey(includeIfNull: false)
   final String? appVersion;
 
   Map<String, Object?> toJson() => _$MobileLoginRequestToJson(this);

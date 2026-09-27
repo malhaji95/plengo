@@ -8,9 +8,17 @@ import 'package:plengo/app/providers.dart';
 import 'package:plengo/core/api/generated/export.dart';
 import 'package:plengo/core/auth/auth_repository.dart';
 import 'package:plengo/core/auth/token_store.dart';
+import 'package:plengo/core/catalog/catalog_repository.dart';
 import 'package:plengo/core/db/app_database.dart';
+import 'package:plengo/features/subjects/catalog_providers.dart';
 
 class MockAuthRepository extends Mock implements AuthRepository {}
+
+class MockCatalogRepository extends Mock implements CatalogRepository {}
+
+const grade9 = EducationLevel(id: 'l9', code: 'grade-9', nameAr: 'الصف التاسع', sortOrder: 1, isCollege: false);
+const grade12 = EducationLevel(id: 'l12', code: 'grade-12', nameAr: 'البكالوريا', sortOrder: 2, isCollege: false);
+const college = EducationLevel(id: 'lc', code: 'college', nameAr: 'الجامعة', sortOrder: 3, isCollege: true);
 
 const testMe = Me(
   id: 'u1',
@@ -18,25 +26,45 @@ const testMe = Me(
   emailVerified: true,
   role: MeRole.student,
   fullName: 'سارة أحمد',
-  educationLevelId: null,
+  educationLevelId: 'l12',
+  universityId: null,
+  facultyId: null,
+  academicYearId: null,
 );
 
-/// Pumps the real app with a mocked repository and an in-memory database. The config call made
+Subject subject(String id, String name, {String levelId = 'l12', String? description}) => Subject(
+      id: id,
+      educationLevelId: levelId,
+      universityId: null,
+      facultyId: null,
+      academicYearId: null,
+      code: id,
+      nameAr: name,
+      description: description,
+      coverMediaId: null,
+      coverUrl: null,
+      sortOrder: 0,
+      isActive: true,
+    );
+
+/// Pumps the real app with mocked repositories and an in-memory database. The config call made
 /// at start-up goes nowhere (no server); it is designed to fail silently.
-Future<({MockAuthRepository repo, ProviderContainer container})> pumpApp(
+Future<({MockAuthRepository repo, MockCatalogRepository catalog, ProviderContainer container})> pumpApp(
   WidgetTester tester, {
   Me? signedInAs,
   void Function(MockAuthRepository repo)? arrange,
+  void Function(MockCatalogRepository catalog)? arrangeCatalog,
 }) async {
+  registerFallbacks();
   final repo = MockAuthRepository();
   when(() => repo.restoreSession()).thenAnswer((_) async => signedInAs);
-  when(() => repo.levels()).thenAnswer(
-    (_) async => const [
-      EducationLevel(id: 'l9', code: 'grade-9', nameAr: 'الصف التاسع', sortOrder: 1),
-      EducationLevel(id: 'l12', code: 'grade-12', nameAr: 'البكالوريا', sortOrder: 2),
-    ],
-  );
   arrange?.call(repo);
+
+  final catalog = MockCatalogRepository();
+  when(() => catalog.levels()).thenAnswer((_) async => const [grade9, grade12, college]);
+  when(() => catalog.universities()).thenAnswer((_) async => const []);
+  when(() => catalog.subjects(any())).thenAnswer((_) async => const []);
+  arrangeCatalog?.call(catalog);
 
   final db = AppDatabase(NativeDatabase.memory());
   addTearDown(db.close);
@@ -46,13 +74,18 @@ Future<({MockAuthRepository repo, ProviderContainer container})> pumpApp(
       tokenStoreProvider.overrideWithValue(MemoryTokenStore()),
       databaseProvider.overrideWithValue(db),
       authRepositoryProvider.overrideWithValue(repo),
+      catalogRepositoryProvider.overrideWithValue(catalog),
     ],
   );
   addTearDown(container.dispose);
 
   await tester.pumpWidget(UncontrolledProviderScope(container: container, child: const PlengoApp()));
   await tester.pumpAndSettle();
-  return (repo: repo, container: container);
+  return (repo: repo, catalog: catalog, container: container);
+}
+
+void registerFallbacks() {
+  registerFallbackValue((levelId: '', universityId: null, facultyId: null, academicYearId: null));
 }
 
 Finder fieldByKey(String key) => find.byKey(Key(key));

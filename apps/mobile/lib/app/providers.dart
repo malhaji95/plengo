@@ -89,6 +89,9 @@ class AuthController extends AsyncNotifier<Me?> {
     state = const AsyncData(null);
   }
 
+  /// Replace the signed-in profile after it changed on the server (e.g. a new placement).
+  void setMe(Me me) => state = AsyncData(me);
+
   void sessionExpired() {
     if (state.value != null) state = const AsyncData(null);
   }

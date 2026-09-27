@@ -11,6 +11,7 @@ cp apps/api/.env.example apps/api/.env   # adjust DATABASE_URL if needed
 set -a; . apps/api/.env; set +a
 pnpm --filter @plengo/api migrate:dev
 ADMIN_PASSWORD='choose-one' pnpm --filter @plengo/api admin:create --email admin@example.com --name "المشرف"
+pnpm --filter @plengo/api seed           # optional: §40 levels/subjects/units/lessons for development
 pnpm --filter @plengo/api dev            # http://localhost:4000, OTP emails are printed to the log
 NEXT_PUBLIC_API_BASE_URL=http://localhost:4000 pnpm --filter @plengo/admin dev   # http://localhost:3000
 cd apps/mobile && flutter run -d chrome --web-port 3001 --dart-define=API_BASE_URL=http://localhost:4000

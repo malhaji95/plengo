@@ -5,12 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../app/providers.dart';
 import '../../app/router.dart';
 import '../../core/api/api_exception.dart';
-import '../../core/api/generated/export.dart';
 import '../../shared/widgets/form_widgets.dart';
-
-final educationLevelsProvider = FutureProvider.autoDispose<List<EducationLevel>>(
-  (ref) => ref.watch(authRepositoryProvider).levels(),
-);
+import '../subjects/placement_picker.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -25,7 +21,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _email = TextEditingController();
   final _password = TextEditingController();
   final _confirm = TextEditingController();
-  String? _levelId;
+  PlacementDraft _placement = emptyPlacement;
   bool _busy = false;
   String? _error;
 
@@ -49,7 +45,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             fullName: _name.text.trim(),
             email: email,
             password: _password.text,
-            educationLevelId: _levelId,
+            educationLevelId: _placement.levelId,
+            universityId: _placement.universityId,
+            facultyId: _placement.facultyId,
+            academicYearId: _placement.academicYearId,
           );
       if (mounted) context.go(Uri(path: Routes.verifyEmail, queryParameters: {'email': email}).toString());
     } on ApiException catch (e) {
@@ -61,7 +60,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final levels = ref.watch(educationLevelsProvider);
     return AuthScaffold(
       title: 'إنشاء حساب',
       subtitle: 'سنرسل رمز تحقق إلى بريدك الإلكتروني لتفعيل الحساب.',
@@ -108,21 +106,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               validator: (v) => v != _password.text ? 'كلمتا المرور غير متطابقتين' : null,
             ),
             const SizedBox(height: 16),
-            levels.when(
-              data: (items) => DropdownButtonFormField<String>(
-                key: const Key('register.level'),
-                initialValue: _levelId,
-                decoration: const InputDecoration(labelText: 'المرحلة التعليمية'),
-                items: [for (final l in items) DropdownMenuItem(value: l.id, child: Text(l.nameAr))],
-                onChanged: (v) => setState(() => _levelId = v),
-                validator: (v) => v == null ? 'اختر المرحلة التعليمية' : null,
-              ),
-              loading: () => const LinearProgressIndicator(),
-              error: (_, _) => TextButton(
-                onPressed: () => ref.invalidate(educationLevelsProvider),
-                child: const Text('تعذر تحميل المراحل التعليمية، إعادة المحاولة'),
-              ),
-            ),
+            PlacementPicker(value: _placement, onChanged: (v) => setState(() => _placement = v)),
             const SizedBox(height: 16),
             ErrorBanner(_error),
             const SizedBox(height: 16),

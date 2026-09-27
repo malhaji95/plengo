@@ -12,6 +12,7 @@ EducationLevel _$EducationLevelFromJson(Map<String, dynamic> json) =>
       code: json['code'] as String,
       nameAr: json['nameAr'] as String,
       sortOrder: json['sortOrder'] as num,
+      isCollege: json['isCollege'] as bool,
     );
 
 Map<String, dynamic> _$EducationLevelToJson(EducationLevel instance) =>
@@ -20,4 +21,5 @@ Map<String, dynamic> _$EducationLevelToJson(EducationLevel instance) =>
       'code': instance.code,
       'nameAr': instance.nameAr,
       'sortOrder': instance.sortOrder,
+      'isCollege': instance.isCollege,
     };

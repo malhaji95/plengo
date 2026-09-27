@@ -302,9 +302,9 @@ describe('levels', () => {
 });
 
 describe('student browsing', () => {
-  it('requires sign-in', async () => {
-    const res = await t.app.inject({ method: 'GET', url: '/api/v1/subjects' });
-    expect(res.statusCode).toBe(401);
+  it('requires sign-in for subjects but not for the college reference lists', async () => {
+    expect((await t.app.inject({ method: 'GET', url: '/api/v1/subjects' })).statusCode).toBe(401);
+    expect((await t.app.inject({ method: 'GET', url: '/api/v1/universities' })).statusCode).toBe(200);
   });
 
   it('shows every level, but only active subjects under active college layers', async () => {
@@ -397,6 +397,14 @@ describe('profile level (spec §8.9)', () => {
       facultyId: fac.id,
       academicYearId: year.id,
     });
+
+    // Sending only the level replaces the placement: the college layers become empty.
+    const cleared = body(await patchMe({ educationLevelId: await levelId(t, 'college') }));
+    expect(cleared.data).toMatchObject({ universityId: null, facultyId: null, academicYearId: null });
+    // A name-only change leaves the placement alone.
+    await patchMe({ educationLevelId: await levelId(t, 'college'), academicYearId: year.id });
+    const renamed = body(await patchMe({ fullName: 'اسم جديد' }));
+    expect(renamed.data).toMatchObject({ fullName: 'اسم جديد', academicYearId: year.id });
 
     const toSchool = body(await patchMe({ educationLevelId: await levelId(t, 'grade-9') }));
     expect(toSchool.data).toMatchObject({ universityId: null, facultyId: null, academicYearId: null });

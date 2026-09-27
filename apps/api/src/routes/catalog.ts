@@ -19,14 +19,12 @@ import type { Container } from '../container.js';
 const idParams = z.object({ id: z.uuid() });
 
 /**
- * Student browsing of the education structure (spec §8.9, §30.2). Requires sign-in: content is
- * behind login (§24). Bounded reference lists are returned whole (ADR-011).
+ * Public reference lists of the college hierarchy: registration offers them before sign-in, like
+ * `/levels`. They carry names only, no content.
  */
-export function catalogRoutes(c: Container): FastifyPluginAsyncZod {
+export function collegeReferenceRoutes(c: Container): FastifyPluginAsyncZod {
   const tags = ['structure'];
   return async (app) => {
-    app.addHook('onRequest', c.guards.requireUser);
-
     app.get(
       '/universities',
       {
@@ -64,6 +62,17 @@ export function catalogRoutes(c: Container): FastifyPluginAsyncZod {
       },
       async (request) => ok(await c.catalog.academicYears(request.query.facultyId)),
     );
+  };
+}
+
+/**
+ * Student browsing of subjects and their outline (spec §8.9, §30.2). Requires sign-in: content is
+ * behind login (§24). Bounded reference lists are returned whole (ADR-011).
+ */
+export function catalogRoutes(c: Container): FastifyPluginAsyncZod {
+  const tags = ['structure'];
+  return async (app) => {
+    app.addHook('onRequest', c.guards.requireUser);
 
     app.get(
       '/subjects',

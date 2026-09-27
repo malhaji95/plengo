@@ -70,7 +70,10 @@ swagger_parser:
   put_clients_in_folder: true
   enums_to_json: false
   unknown_enum_value: false
+  # Omit unset optional fields instead of sending null (the API treats null as "clear").
+  include_if_null: true
   # The student app never calls admin endpoints.
   exclude_tags:
     - admin-auth
     - admin-uploads
+    - admin-structure

@@ -17,6 +17,24 @@ Flutter student app (Android · iOS · Web)      Next.js admin (browser)
    (Neon)          `pgboss`)            public + private buckets
 ```
 
+## Phase 2 status (education structure)
+
+Done:
+
+- Schema: universities, faculties, academic years, subjects, units, lessons. Soft delete, codes unique
+  among live rows, composite foreign keys for the college chain and for unit/lesson subject ownership
+  (§6.1), a check constraint that a year implies its faculty and a faculty its university.
+- Admin API + UI: rename/reorder levels; CRUD, show/hide, reorder and delete for every node; audit log
+  entries for every change.
+- Student API + Flutter: all levels browsable, the profile placement only picks the default tab and
+  college filter (§8.9); subject outline with units, lessons and general lessons; placement editable
+  in settings and optionally at registration; web deep links survive reloads.
+- Dev seed (`pnpm --filter @plengo/api seed`) with the §40 structure.
+
+Known issue: on Flutter web in RTL, the accessibility (semantics) boxes of the bottom navigation bar
+and chips are reported at mirrored/scaled positions. Visual rendering and taps are correct; screen
+readers on web may misplace focus. Re-check with the next Flutter release (Phase 12 web work).
+
 ## Phase 1 status
 
 Done:
@@ -130,3 +148,25 @@ Plan B changes it to `standalone`.
 
 The three levels are inserted by migration `0001_reference_data` because registration needs them
 from Phase 1; Phase 2 adds the college hierarchy and admin CRUD.
+
+### ADR-011 — Education structure rules
+
+- **Deletes are refused while live children exist** (`RESOURCE_IN_USE`): a university with faculties
+  or subjects, a faculty with years or subjects, a year or subject with children, a unit with lessons.
+  No cascades, so an admin can never remove a whole subtree by accident. Rows are soft-deleted and a
+  deleted code can be reused.
+- **Ordering is per sibling set.** Subjects are ordered within one level + college path; lessons within
+  their unit, or among the lessons directly under the subject. Reorder requests must list exactly the
+  live siblings of one set; moving a node to another set appends it at the end.
+- **Placement updates replace the whole placement.** Sending the level or any college layer (for a
+  subject or a student profile) sets the placement to exactly what was sent: the deepest layer given
+  determines the ones above it, and layers not sent become empty. The Dart client omits unset fields
+  (`include_if_null`), and sending only the level clears the college layers.
+- **Visibility cascades down.** A subject is visible to students only if it and every college layer
+  above it are active and not deleted; students may only pick active layers for their placement.
+- **Reference lists are public, content is not.** `/levels`, `/universities`, `/faculties` and
+  `/academic-years` are public because registration offers them before sign-in; subjects and their
+  outlines require sign-in. These bounded lists are returned whole; cursor pagination (§30.1) is used
+  for unbounded lists from Phase 5 on.
+- **CORS** must list every method the admin uses (`GET, HEAD, POST, PUT, PATCH, DELETE`); the plugin
+  default omits `PUT/PATCH/DELETE`, which silently blocks browser edits. Covered by a preflight test.

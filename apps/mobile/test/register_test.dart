@@ -36,6 +36,9 @@ void main() {
           email: any(named: 'email'),
           password: any(named: 'password'),
           educationLevelId: any(named: 'educationLevelId'),
+          universityId: any(named: 'universityId'),
+          facultyId: any(named: 'facultyId'),
+          academicYearId: any(named: 'academicYearId'),
         ),
       ).thenAnswer((_) async {}),
     );
@@ -44,8 +47,8 @@ void main() {
     await tester.enterText(fieldByKey('register.email'), 'Ali@Example.com');
     await tester.enterText(fieldByKey('register.password'), 'long-enough-1');
     await tester.enterText(fieldByKey('register.confirm'), 'long-enough-1');
-    await tester.ensureVisible(fieldByKey('register.level'));
-    await tester.tap(fieldByKey('register.level'));
+    await tester.ensureVisible(fieldByKey('placement.level'));
+    await tester.tap(fieldByKey('placement.level'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('البكالوريا').last);
     await tester.pumpAndSettle();
@@ -58,6 +61,9 @@ void main() {
         email: 'ali@example.com',
         password: 'long-enough-1',
         educationLevelId: 'l12',
+        universityId: null,
+        facultyId: null,
+        academicYearId: null,
       ),
     ).called(1);
     expect(find.byType(VerifyEmailScreen), findsOneWidget);

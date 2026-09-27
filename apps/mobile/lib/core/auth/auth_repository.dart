@@ -68,11 +68,15 @@ class AuthRepository {
     }
   }
 
+  /// Only the deepest chosen college layer is sent; the API derives the ones above it.
   Future<void> register({
     required String fullName,
     required String email,
     required String password,
     String? educationLevelId,
+    String? universityId,
+    String? facultyId,
+    String? academicYearId,
   }) {
     return guardApi(
       () => client.api.auth.register(
@@ -81,6 +85,9 @@ class AuthRepository {
           email: email,
           password: password,
           educationLevelId: educationLevelId,
+          academicYearId: academicYearId,
+          facultyId: academicYearId == null ? facultyId : null,
+          universityId: academicYearId == null && facultyId == null ? universityId : null,
         ),
       ),
     );
@@ -102,8 +109,6 @@ class AuthRepository {
       ),
     );
   }
-
-  Future<List<EducationLevel>> levels() => guardApi(() async => (await client.api.structure.listLevels()).data);
 
   Future<List<SessionSummary>> sessions() =>
       guardApi(() async => (await client.api.sessions.listSessions()).data);
