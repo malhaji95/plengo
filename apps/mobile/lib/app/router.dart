@@ -15,6 +15,9 @@ import '../features/shell/placeholder_tab.dart';
 import '../features/splash/splash_screen.dart';
 import '../features/subjects/subject_screen.dart';
 import '../features/subjects/subjects_screen.dart';
+import '../features/teachers/teacher_screen.dart';
+import '../features/teachers/teachers_screen.dart';
+import '../features/teachers/track_screen.dart';
 import '../features/update/force_update_screen.dart';
 import 'flags.dart';
 import 'providers.dart';
@@ -34,6 +37,9 @@ abstract final class Routes {
   static const account = '/account';
   static const sessions = '/account/sessions';
   static const placement = '/account/placement';
+  static const following = '/account/following';
+  static const teachers = '/teachers';
+  static const tracks = '/tracks';
   static const redeem = '/redeem';
 
   static const public = {login, register, verifyEmail, forgotPassword, resetPassword};
@@ -102,34 +108,71 @@ GoRouter buildRouter(Ref ref, {bool couponRedemption = AppFlags.couponRedemption
       StatefulShellRoute.indexedStack(
         builder: (_, _, shell) => HomeShell(shell: shell),
         branches: [
-          StatefulShellBranch(routes: [
-            GoRoute(path: Routes.home, builder: (_, _) => const PlaceholderTab(title: 'الرئيسية')),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(
-              path: Routes.subjects,
-              builder: (_, _) => const SubjectsScreen(),
-              routes: [
-                GoRoute(path: ':id', builder: (_, state) => SubjectScreen(subjectId: state.pathParameters['id']!)),
-              ],
-            ),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(path: Routes.review, builder: (_, _) => const PlaceholderTab(title: 'المراجعة')),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(path: Routes.saved, builder: (_, _) => const PlaceholderTab(title: 'المحفوظات')),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(
-              path: Routes.account,
-              builder: (_, _) => const AccountScreen(),
-              routes: [
-                GoRoute(path: 'sessions', builder: (_, _) => const SessionsScreen()),
-                GoRoute(path: 'placement', builder: (_, _) => const PlacementScreen()),
-              ],
-            ),
-          ]),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: Routes.home,
+                builder: (_, _) => const PlaceholderTab(title: 'الرئيسية'),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: Routes.subjects,
+                builder: (_, _) => const SubjectsScreen(),
+                routes: [
+                  GoRoute(
+                    path: ':id',
+                    builder: (_, state) => SubjectScreen(subjectId: state.pathParameters['id']!),
+                  ),
+                ],
+              ),
+              GoRoute(
+                path: Routes.teachers,
+                builder: (_, _) => const TeachersScreen(),
+                routes: [
+                  GoRoute(
+                    path: ':id',
+                    builder: (_, state) => TeacherScreen(teacherId: state.pathParameters['id']!),
+                  ),
+                ],
+              ),
+              GoRoute(
+                path: '${Routes.tracks}/:id',
+                builder: (_, state) => TrackScreen(trackId: state.pathParameters['id']!),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: Routes.review,
+                builder: (_, _) => const PlaceholderTab(title: 'المراجعة'),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: Routes.saved,
+                builder: (_, _) => const PlaceholderTab(title: 'المحفوظات'),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: Routes.account,
+                builder: (_, _) => const AccountScreen(),
+                routes: [
+                  GoRoute(path: 'sessions', builder: (_, _) => const SessionsScreen()),
+                  GoRoute(path: 'placement', builder: (_, _) => const PlacementScreen()),
+                  GoRoute(path: 'following', builder: (_, _) => const FollowedTeachersScreen()),
+                ],
+              ),
+            ],
+          ),
         ],
       ),
       if (couponRedemption)

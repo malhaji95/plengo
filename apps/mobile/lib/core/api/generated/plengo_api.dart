@@ -10,6 +10,7 @@ import 'clients/auth_client.dart';
 import 'clients/me_client.dart';
 import 'clients/sessions_client.dart';
 import 'clients/uploads_client.dart';
+import 'clients/teachers_client.dart';
 
 /// Plengo API `v1.0.0`
 class PlengoApi {
@@ -30,6 +31,7 @@ class PlengoApi {
   MeClient? _me;
   SessionsClient? _sessions;
   UploadsClient? _uploads;
+  TeachersClient? _teachers;
 
   ConfigClient get config => _config ??= ConfigClient(_dio, baseUrl: _baseUrl);
 
@@ -42,4 +44,6 @@ class PlengoApi {
   SessionsClient get sessions => _sessions ??= SessionsClient(_dio, baseUrl: _baseUrl);
 
   UploadsClient get uploads => _uploads ??= UploadsClient(_dio, baseUrl: _baseUrl);
+
+  TeachersClient get teachers => _teachers ??= TeachersClient(_dio, baseUrl: _baseUrl);
 }

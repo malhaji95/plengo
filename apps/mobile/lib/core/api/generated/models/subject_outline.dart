@@ -6,6 +6,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 import 'lesson.dart';
 import 'subject.dart';
+import 'subject_track.dart';
 import 'unit_with_lessons.dart';
 
 part 'subject_outline.g.dart';
@@ -16,6 +17,7 @@ class SubjectOutline {
     required this.subject,
     required this.units,
     required this.lessons,
+    required this.tracks,
   });
   
   factory SubjectOutline.fromJson(Map<String, Object?> json) => _$SubjectOutlineFromJson(json);
@@ -23,6 +25,7 @@ class SubjectOutline {
   final Subject subject;
   final List<UnitWithLessons> units;
   final List<Lesson> lessons;
+  final List<SubjectTrack> tracks;
 
   Map<String, Object?> toJson() => _$SubjectOutlineToJson(this);
 }

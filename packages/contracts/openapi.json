@@ -2177,6 +2177,55 @@
         ],
         "additionalProperties": false
       },
+      "TeacherDetail": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "nameAr": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "photoUrl": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "shortDescription": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "followerCount": {
+            "type": "number"
+          },
+          "isFollowing": {
+            "type": "boolean"
+          },
+          "bio": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "nameAr",
+          "slug",
+          "photoUrl",
+          "shortDescription",
+          "followerCount",
+          "isFollowing",
+          "bio"
+        ],
+        "additionalProperties": false
+      },
       "TeacherList": {
         "type": "array",
         "items": {
@@ -2208,53 +2257,7 @@
         "type": "object",
         "properties": {
           "teacher": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string"
-              },
-              "nameAr": {
-                "type": "string"
-              },
-              "slug": {
-                "type": "string"
-              },
-              "photoUrl": {
-                "type": [
-                  "string",
-                  "null"
-                ]
-              },
-              "shortDescription": {
-                "type": [
-                  "string",
-                  "null"
-                ]
-              },
-              "followerCount": {
-                "type": "number"
-              },
-              "isFollowing": {
-                "type": "boolean"
-              },
-              "bio": {
-                "type": [
-                  "string",
-                  "null"
-                ]
-              }
-            },
-            "required": [
-              "id",
-              "nameAr",
-              "slug",
-              "photoUrl",
-              "shortDescription",
-              "followerCount",
-              "isFollowing",
-              "bio"
-            ],
-            "additionalProperties": false
+            "$ref": "#/components/schemas/TeacherDetail"
           },
           "tracks": {
             "type": "array",

@@ -58,9 +58,9 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
     try {
       await ref.read(authRepositoryProvider).verifyEmail(email: widget.email, otp: _otp.text.trim());
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم تفعيل بريدك الإلكتروني، سجّل الدخول الآن')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('تم تفعيل بريدك الإلكتروني، سجّل الدخول الآن')));
       context.go(Uri(path: Routes.login, queryParameters: {'email': widget.email}).toString());
     } on ApiException catch (e) {
       if (mounted) setState(() => _error = e.message);

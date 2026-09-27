@@ -15,7 +15,9 @@ class AsyncView<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     return value.when(
       data: data,
-      loading: () => const Center(child: Padding(padding: EdgeInsets.all(24), child: CircularProgressIndicator())),
+      loading: () => const Center(
+        child: Padding(padding: EdgeInsets.all(24), child: CircularProgressIndicator()),
+      ),
       error: (e, _) => Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -50,7 +52,11 @@ class EmptyState extends StatelessWidget {
           children: [
             Icon(icon, size: 48, color: color),
             const SizedBox(height: 12),
-            Text(text, textAlign: TextAlign.center, style: TextStyle(color: color)),
+            Text(
+              text,
+              textAlign: TextAlign.center,
+              style: TextStyle(color: color),
+            ),
           ],
         ),
       ),

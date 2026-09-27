@@ -17,6 +17,21 @@ Flutter student app (Android · iOS · Web)      Next.js admin (browser)
    (Neon)          `pgboss`)            public + private buckets
 ```
 
+## Phase 3 status (teachers)
+
+Done:
+
+- Schema: `teachers`, `teacher_tracks` with `UNIQUE(id, subject_id)` (the target of the §7.3 composite
+  keys that content tables add in Phases 5–7; a test proves the key works), `teacher_followers`.
+- Admin: teachers (photo, bio, visibility, order, follower/track counts) and their tracks; tracks
+  overview; image uploads for teacher photos and subject covers.
+- Students: teacher list, profile with tracks, track page, follow/unfollow (idempotent, never grants
+  access), followed teachers, tracks listed on the subject page. The follow UI obeys the remote
+  `features.teacherFollowing` flag.
+- Seed: the two §40 teachers and their tracks.
+
+Deferred: notifying followers / track holders (Phase 10), track content and access (Phases 4–7).
+
 ## Phase 2 status (education structure)
 
 Done:
@@ -170,3 +185,19 @@ from Phase 1; Phase 2 adds the college hierarchy and admin CRUD.
   for unbounded lists from Phase 5 on.
 - **CORS** must list every method the admin uses (`GET, HEAD, POST, PUT, PATCH, DELETE`); the plugin
   default omits `PUT/PATCH/DELETE`, which silently blocks browser edits. Covered by a preflight test.
+
+### ADR-012 — Dev storage and image handling
+
+- With `STORAGE_DRIVER=memory` (local development and tests) the API serves signed
+  `/api/v1/dev-storage/{bucket}/{key}` URLs in place of R2's presigned URLs, so the real browser upload
+  flow (presign → direct PUT → complete → processing) works without R2. Uploads and private reads
+  need an HMAC signature from the memory store; the routes are never registered in production, where
+  the environment check also forbids the memory driver. Objects live in the API process and vanish
+  when it restarts.
+- Images are attached (teacher photo, subject/track cover) only after processing succeeded and only
+  for their intended kind (`teacher`, `cover`).
+- Generated clients name inline objects after their property, so a nested object whose property
+  name equals a component (e.g. `teacher` vs `Teacher`) silently loses fields in the Dart client. The
+  OpenAPI export now fails on such collisions; register those objects with an id instead.
+- Hand-written Dart code is formatted with `dart format` at 120 columns and checked in CI; generated
+  code is excluded.

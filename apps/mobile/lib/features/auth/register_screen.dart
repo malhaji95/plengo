@@ -41,7 +41,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     });
     final email = _email.text.trim().toLowerCase();
     try {
-      await ref.read(authRepositoryProvider).register(
+      await ref
+          .read(authRepositoryProvider)
+          .register(
             fullName: _name.text.trim(),
             email: email,
             password: _password.text,

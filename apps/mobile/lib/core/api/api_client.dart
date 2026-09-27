@@ -65,9 +65,9 @@ class ApiClient {
     final current = await tokens.read();
     if (current == null) return false;
     try {
-      final res = await PlengoApi(_refreshDio).auth.mobileRefresh(
-            body: MobileRefreshRequest(refreshToken: current.refreshToken),
-          );
+      final res = await PlengoApi(
+        _refreshDio,
+      ).auth.mobileRefresh(body: MobileRefreshRequest(refreshToken: current.refreshToken));
       await tokens.write(StoredTokens(accessToken: res.data.accessToken, refreshToken: res.data.refreshToken));
       return true;
     } on DioException catch (e) {
@@ -108,7 +108,8 @@ class _AuthInterceptor extends Interceptor {
       return handler.next(err);
     }
 
-    final canRefresh = !client.useCookies &&
+    final canRefresh =
+        !client.useCookies &&
         response?.statusCode == 401 &&
         !_isAuthEndpoint(err.requestOptions) &&
         err.requestOptions.extra[_retried] != true;

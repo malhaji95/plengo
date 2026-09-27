@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../app/providers.dart';
 import '../../app/router.dart';
+import '../teachers/teacher_providers.dart';
 
 class AccountScreen extends ConsumerWidget {
   const AccountScreen({super.key});
@@ -59,6 +60,13 @@ class AccountScreen extends ConsumerWidget {
             trailing: const Icon(Icons.chevron_left),
             onTap: () => context.go(Routes.placement),
           ),
+          if (ref.watch(teacherFollowingEnabledProvider))
+            ListTile(
+              leading: const Icon(Icons.groups_outlined),
+              title: const Text('المدرسون الذين أتابعهم'),
+              trailing: const Icon(Icons.chevron_left),
+              onTap: () => context.go(Routes.following),
+            ),
           ListTile(
             leading: const Icon(Icons.devices_outlined),
             title: const Text('الأجهزة المتصلة'),

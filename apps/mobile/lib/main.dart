@@ -32,12 +32,9 @@ Future<void> main() async {
     runApp(app);
     return;
   }
-  await SentryFlutter.init(
-    (options) {
-      options.dsn = AppFlags.sentryDsn;
-      options.release = 'plengo@${info.version}+${info.buildNumber}';
-      options.sendDefaultPii = false;
-    },
-    appRunner: () => runApp(app),
-  );
+  await SentryFlutter.init((options) {
+    options.dsn = AppFlags.sentryDsn;
+    options.release = 'plengo@${info.version}+${info.buildNumber}';
+    options.sendDefaultPii = false;
+  }, appRunner: () => runApp(app));
 }

@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../app/router.dart';
 
 import '../../core/api/generated/export.dart';
 import '../../shared/widgets/async_view.dart';
+import '../../shared/widgets/network_avatar.dart';
 import 'catalog_providers.dart';
 
 /// A subject's outline: optional units with their lessons, then lessons directly under the subject.
@@ -34,7 +38,7 @@ class _OutlineView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
-    final empty = outline.units.isEmpty && outline.lessons.isEmpty;
+    final empty = outline.units.isEmpty && outline.lessons.isEmpty && outline.tracks.isEmpty;
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 720),
@@ -57,8 +61,7 @@ class _OutlineView extends StatelessWidget {
                   title: Text(unit.titleAr, style: const TextStyle(fontWeight: FontWeight.w500)),
                   subtitle: Text(lessonCountLabel(unit.lessons.length)),
                   children: [
-                    if (unit.lessons.isEmpty)
-                      const ListTile(title: Text('لا توجد دروس في هذه الوحدة بعد')),
+                    if (unit.lessons.isEmpty) const ListTile(title: Text('لا توجد دروس في هذه الوحدة بعد')),
                     for (final lesson in unit.lessons) _LessonTile(lesson: lesson),
                   ],
                 ),
@@ -74,12 +77,27 @@ class _OutlineView extends StatelessWidget {
                 child: Column(children: [for (final lesson in outline.lessons) _LessonTile(lesson: lesson)]),
               ),
             ],
+            if (outline.tracks.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              Text('مسارات المدرسين', style: text.titleSmall),
+              const SizedBox(height: 8),
+              for (final track in outline.tracks)
+                Card(
+                  margin: const EdgeInsets.only(bottom: 8),
+                  child: ListTile(
+                    leading: NetworkAvatar(url: track.teacherPhotoUrl, name: track.teacherNameAr),
+                    title: Text(track.titleAr),
+                    subtitle: Text(track.teacherNameAr),
+                    trailing: const Icon(Icons.chevron_left),
+                    onTap: () => context.go('${Routes.tracks}/${track.id}'),
+                  ),
+                ),
+            ],
           ],
         ),
       ),
     );
   }
-
 }
 
 class _LessonTile extends StatelessWidget {
@@ -89,18 +107,15 @@ class _LessonTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: const Icon(Icons.article_outlined),
-      title: Text(lesson.titleAr),
-    );
+    return ListTile(leading: const Icon(Icons.article_outlined), title: Text(lesson.titleAr));
   }
 }
 
 /// Arabic count agreement: درس واحد، درسان، 3–10 دروس، 11+ درساً.
 String lessonCountLabel(int n) => switch (n) {
-      0 => 'لا دروس بعد',
-      1 => 'درس واحد',
-      2 => 'درسان',
-      >= 3 && <= 10 => '$n دروس',
-      _ => '$n درساً',
-    };
+  0 => 'لا دروس بعد',
+  1 => 'درس واحد',
+  2 => 'درسان',
+  >= 3 && <= 10 => '$n دروس',
+  _ => '$n درساً',
+};

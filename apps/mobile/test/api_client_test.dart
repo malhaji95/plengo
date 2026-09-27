@@ -18,9 +18,13 @@ class FakeAdapter implements HttpClientAdapter {
   Future<ResponseBody> fetch(RequestOptions options, Stream<Uint8List>? body, Future<void>? cancel) async {
     calls.add(options);
     final (status, json) = await handler(options);
-    return ResponseBody.fromString(jsonEncode(json), status, headers: {
-      Headers.contentTypeHeader: [Headers.jsonContentType],
-    });
+    return ResponseBody.fromString(
+      jsonEncode(json),
+      status,
+      headers: {
+        Headers.contentTypeHeader: [Headers.jsonContentType],
+      },
+    );
   }
 
   @override
@@ -29,10 +33,10 @@ class FakeAdapter implements HttpClientAdapter {
 
 Map<String, Object?> ok(Object data) => {'success': true, 'data': data, 'error': null};
 Map<String, Object?> fail(String code) => {
-      'success': false,
-      'data': null,
-      'error': {'code': code, 'message': 'رسالة'},
-    };
+  'success': false,
+  'data': null,
+  'error': {'code': code, 'message': 'رسالة'},
+};
 
 final me = {
   'id': 'u1',
@@ -44,11 +48,11 @@ final me = {
 };
 
 Map<String, Object?> pair(String n) => {
-      'accessToken': 'access-$n',
-      'accessTokenExpiresAt': '2030-01-01T00:00:00.000Z',
-      'refreshToken': 'refresh-$n',
-      'refreshTokenExpiresAt': '2030-01-01T00:00:00.000Z',
-    };
+  'accessToken': 'access-$n',
+  'accessTokenExpiresAt': '2030-01-01T00:00:00.000Z',
+  'refreshToken': 'refresh-$n',
+  'refreshTokenExpiresAt': '2030-01-01T00:00:00.000Z',
+};
 
 void main() {
   late MemoryTokenStore tokens;
@@ -58,15 +62,15 @@ void main() {
   });
 
   ApiClient build(FakeAdapter adapter, {void Function()? expired, void Function()? update}) => ApiClient(
-        baseUrl: 'http://api.test',
-        tokens: tokens,
-        platform: 'android',
-        appVersion: '1.2.3',
-        useCookies: false,
-        onSessionExpired: expired,
-        onUpdateRequired: update,
-        adapter: adapter,
-      );
+    baseUrl: 'http://api.test',
+    tokens: tokens,
+    platform: 'android',
+    appVersion: '1.2.3',
+    useCookies: false,
+    onSessionExpired: expired,
+    onUpdateRequired: update,
+    adapter: adapter,
+  );
 
   test('sends bearer, platform and version headers', () async {
     final adapter = FakeAdapter((_) async => (200, ok(me)));

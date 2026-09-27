@@ -50,9 +50,8 @@ class PlacementPicker extends ConsumerWidget {
                 selectedId: value.universityId,
                 idOf: (u) => u.id,
                 nameOf: (u) => u.nameAr,
-                onChanged: (id) => onChanged(
-                  (levelId: value.levelId, universityId: id, facultyId: null, academicYearId: null),
-                ),
+                onChanged: (id) =>
+                    onChanged((levelId: value.levelId, universityId: id, facultyId: null, academicYearId: null)),
               ),
               if (value.universityId != null) ...[
                 const SizedBox(height: 12),
@@ -63,9 +62,12 @@ class PlacementPicker extends ConsumerWidget {
                   selectedId: value.facultyId,
                   idOf: (f) => f.id,
                   nameOf: (f) => f.nameAr,
-                  onChanged: (id) => onChanged(
-                    (levelId: value.levelId, universityId: value.universityId, facultyId: id, academicYearId: null),
-                  ),
+                  onChanged: (id) => onChanged((
+                    levelId: value.levelId,
+                    universityId: value.universityId,
+                    facultyId: id,
+                    academicYearId: null,
+                  )),
                 ),
               ],
               if (value.facultyId != null) ...[
@@ -136,6 +138,8 @@ class _Spinner extends StatelessWidget {
   const _Spinner();
 
   @override
-  Widget build(BuildContext context) =>
-      const Padding(padding: EdgeInsets.all(14), child: SizedBox.square(dimension: 16, child: CircularProgressIndicator(strokeWidth: 2)));
+  Widget build(BuildContext context) => const Padding(
+    padding: EdgeInsets.all(14),
+    child: SizedBox.square(dimension: 16, child: CircularProgressIndicator(strokeWidth: 2)),
+  );
 }

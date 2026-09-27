@@ -15,4 +15,4 @@ Local setup: [`docs/deployment.md`](docs/deployment.md).
 
 ## Status
 
-Phases 1 (Foundation) and 2 (Education structure) — see `docs/architecture.md`.
+Phases 1 (Foundation), 2 (Education structure) and 3 (Teachers) — see `docs/architecture.md`.

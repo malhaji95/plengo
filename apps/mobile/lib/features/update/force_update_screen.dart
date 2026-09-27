@@ -21,10 +21,7 @@ class ForceUpdateScreen extends StatelessWidget {
                 Text('يرجى تحديث التطبيق', style: Theme.of(context).textTheme.headlineSmall),
                 const SizedBox(height: 12),
                 const Text('هذا الإصدار لم يعد مدعوماً. حدّث التطبيق للمتابعة.', textAlign: TextAlign.center),
-                if (kIsWeb) ...[
-                  const SizedBox(height: 24),
-                  const Text('أعد تحميل الصفحة للحصول على أحدث إصدار.'),
-                ],
+                if (kIsWeb) ...[const SizedBox(height: 24), const Text('أعد تحميل الصفحة للحصول على أحدث إصدار.')],
               ],
             ),
           ),

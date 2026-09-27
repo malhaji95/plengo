@@ -53,6 +53,15 @@ class UpdateRequiredNotifier extends Notifier<bool> {
 
 final updateRequiredProvider = NotifierProvider<UpdateRequiredNotifier, bool>(UpdateRequiredNotifier.new);
 
+/// Remote config (spec §10.2), or null when it cannot be fetched (offline start must not block).
+final remoteConfigProvider = FutureProvider<RemoteConfig?>((ref) async {
+  try {
+    return (await ref.watch(apiClientProvider).api.config.getConfig()).data;
+  } catch (_) {
+    return null;
+  }
+});
+
 /// Signed-in student, or null when signed out. Loading while the session is restored.
 class AuthController extends AsyncNotifier<Me?> {
   @override
@@ -63,17 +72,14 @@ class AuthController extends AsyncNotifier<Me?> {
 
   Future<void> _checkMinimumVersion() async {
     final env = ref.read(appEnvironmentProvider);
-    try {
-      final config = (await ref.read(apiClientProvider).api.config.getConfig()).data;
-      final min = switch (env.platform) {
-        'ios' => config.minSupportedVersion.ios,
-        'web' => config.minSupportedVersion.web,
-        _ => config.minSupportedVersion.android,
-      };
-      if (compareVersions(env.appVersion, min) < 0) ref.read(updateRequiredProvider.notifier).require();
-    } catch (_) {
-      // Offline start-up must not block; the server enforces the minimum version anyway.
-    }
+    final config = await ref.read(remoteConfigProvider.future);
+    if (config == null) return; // The server enforces the minimum version anyway.
+    final min = switch (env.platform) {
+      'ios' => config.minSupportedVersion.ios,
+      'web' => config.minSupportedVersion.web,
+      _ => config.minSupportedVersion.android,
+    };
+    if (compareVersions(env.appVersion, min) < 0) ref.read(updateRequiredProvider.notifier).require();
   }
 
   Future<void> login(String email, String password) async {

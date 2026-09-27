@@ -4,9 +4,7 @@ import '../../app/providers.dart';
 import '../../core/api/generated/export.dart';
 import '../../core/catalog/catalog_repository.dart';
 
-final catalogRepositoryProvider = Provider<CatalogRepository>(
-  (ref) => CatalogRepository(ref.watch(apiClientProvider)),
-);
+final catalogRepositoryProvider = Provider<CatalogRepository>((ref) => CatalogRepository(ref.watch(apiClientProvider)));
 
 final levelsProvider = FutureProvider<List<EducationLevel>>((ref) => ref.watch(catalogRepositoryProvider).levels());
 

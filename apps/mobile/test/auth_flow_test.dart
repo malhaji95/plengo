@@ -29,7 +29,11 @@ void main() {
     final app = await pumpApp(
       tester,
       arrange: (repo) => when(
-        () => repo.login(email: any(named: 'email'), password: any(named: 'password'), appVersion: any(named: 'appVersion')),
+        () => repo.login(
+          email: any(named: 'email'),
+          password: any(named: 'password'),
+          appVersion: any(named: 'appVersion'),
+        ),
       ).thenThrow(const ApiException('AUTH_INVALID_CREDENTIALS', 'بيانات الدخول غير صحيحة', statusCode: 401)),
     );
     await tester.enterText(fieldByKey('login.email'), 'Student@Example.com ');
@@ -37,15 +41,20 @@ void main() {
     await tester.tap(fieldByKey('login.submit'));
     await tester.pumpAndSettle();
     expect(find.text('بيانات الدخول غير صحيحة'), findsOneWidget);
-    verify(() => app.repo.login(email: 'student@example.com', password: 'wrong-password', appVersion: '1.0.0'))
-        .called(1);
+    verify(
+      () => app.repo.login(email: 'student@example.com', password: 'wrong-password', appVersion: '1.0.0'),
+    ).called(1);
   });
 
   testWidgets('successful login opens the five-tab home shell', (tester) async {
     await pumpApp(
       tester,
       arrange: (repo) => when(
-        () => repo.login(email: any(named: 'email'), password: any(named: 'password'), appVersion: any(named: 'appVersion')),
+        () => repo.login(
+          email: any(named: 'email'),
+          password: any(named: 'password'),
+          appVersion: any(named: 'appVersion'),
+        ),
       ).thenAnswer((_) async => testMe),
     );
     await tester.enterText(fieldByKey('login.email'), 'student@example.com');
@@ -63,7 +72,11 @@ void main() {
       tester,
       arrange: (repo) {
         when(
-          () => repo.login(email: any(named: 'email'), password: any(named: 'password'), appVersion: any(named: 'appVersion')),
+          () => repo.login(
+            email: any(named: 'email'),
+            password: any(named: 'password'),
+            appVersion: any(named: 'appVersion'),
+          ),
         ).thenThrow(const ApiException('AUTH_EMAIL_NOT_VERIFIED', 'البريد الإلكتروني غير مُفعّل', statusCode: 403));
         when(() => repo.resendVerification(any())).thenAnswer((_) async {});
       },

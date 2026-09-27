@@ -11,12 +11,7 @@ abstract final class AppTheme {
 
   static ThemeData _build(Brightness brightness) {
     final scheme = ColorScheme.fromSeed(seedColor: seed, brightness: brightness);
-    final base = ThemeData(
-      colorScheme: scheme,
-      useMaterial3: true,
-      brightness: brightness,
-      fontFamily: fontFamily,
-    );
+    final base = ThemeData(colorScheme: scheme, useMaterial3: true, brightness: brightness, fontFamily: fontFamily);
     return base.copyWith(
       inputDecorationTheme: InputDecorationTheme(
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),

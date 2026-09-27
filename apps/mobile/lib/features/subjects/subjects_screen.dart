@@ -38,9 +38,9 @@ class _SubjectsScreenState extends ConsumerState<SubjectsScreen> {
   }
 
   void _selectLevel(String id) => setState(() {
-        _levelId = id;
-        _universityId = _facultyId = _yearId = null;
-      });
+    _levelId = id;
+    _universityId = _facultyId = _yearId = null;
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +48,17 @@ class _SubjectsScreenState extends ConsumerState<SubjectsScreen> {
     final me = ref.watch(authControllerProvider).value;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('المواد')),
+      appBar: AppBar(
+        title: const Text('المواد'),
+        actions: [
+          IconButton(
+            key: const Key('subjects.teachers'),
+            tooltip: 'المدرسون',
+            icon: const Icon(Icons.groups_outlined),
+            onPressed: () => context.go(Routes.teachers),
+          ),
+        ],
+      ),
       body: AsyncView(
         value: levels,
         onRetry: () => ref.invalidate(levelsProvider),

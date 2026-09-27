@@ -33,7 +33,9 @@ class AuthRepository {
   Future<Me> login({required String email, required String password, String? appVersion}) async {
     await guardApi(() async {
       if (_web) {
-        await client.api.auth.webLogin(body: WebLoginRequest(email: email, password: password));
+        await client.api.auth.webLogin(
+          body: WebLoginRequest(email: email, password: password),
+        );
       } else {
         final res = await client.api.auth.mobileLogin(
           body: MobileLoginRequest(
@@ -43,9 +45,7 @@ class AuthRepository {
             appVersion: appVersion,
           ),
         );
-        await client.tokens.write(
-          StoredTokens(accessToken: res.data.accessToken, refreshToken: res.data.refreshToken),
-        );
+        await client.tokens.write(StoredTokens(accessToken: res.data.accessToken, refreshToken: res.data.refreshToken));
       }
     });
     return currentUser();
@@ -93,8 +93,11 @@ class AuthRepository {
     );
   }
 
-  Future<void> verifyEmail({required String email, required String otp}) =>
-      guardApi(() => client.api.auth.verifyEmail(body: VerifyEmailRequest(email: email, otp: otp)));
+  Future<void> verifyEmail({required String email, required String otp}) => guardApi(
+    () => client.api.auth.verifyEmail(
+      body: VerifyEmailRequest(email: email, otp: otp),
+    ),
+  );
 
   Future<void> resendVerification(String email) =>
       guardApi(() => client.api.auth.resendOtp(body: ResendOtpRequest(email: email)));
@@ -110,8 +113,7 @@ class AuthRepository {
     );
   }
 
-  Future<List<SessionSummary>> sessions() =>
-      guardApi(() async => (await client.api.sessions.listSessions()).data);
+  Future<List<SessionSummary>> sessions() => guardApi(() async => (await client.api.sessions.listSessions()).data);
 
   Future<void> revokeSession(String id) => guardApi(() => client.api.sessions.revokeSession(id: id));
 }

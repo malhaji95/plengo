@@ -77,3 +77,4 @@ swagger_parser:
     - admin-auth
     - admin-uploads
     - admin-structure
+    - admin-teachers

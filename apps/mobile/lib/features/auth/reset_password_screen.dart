@@ -45,9 +45,9 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
           .read(authRepositoryProvider)
           .resetPassword(email: email, otp: _otp.text.trim(), newPassword: _password.text);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم تغيير كلمة المرور، سجّل الدخول بكلمة المرور الجديدة')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('تم تغيير كلمة المرور، سجّل الدخول بكلمة المرور الجديدة')));
       context.go(Uri(path: Routes.login, queryParameters: {'email': email}).toString());
     } on ApiException catch (e) {
       if (mounted) setState(() => _error = e.message);

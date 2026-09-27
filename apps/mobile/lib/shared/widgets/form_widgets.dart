@@ -137,10 +137,7 @@ class AuthScaffold extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(title, style: text.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
-                  if (subtitle != null) ...[
-                    const SizedBox(height: 8),
-                    Text(subtitle!, style: text.bodyMedium),
-                  ],
+                  if (subtitle != null) ...[const SizedBox(height: 8), Text(subtitle!, style: text.bodyMedium)],
                   const SizedBox(height: 24),
                   child,
                 ],

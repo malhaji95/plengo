@@ -20,10 +20,7 @@ Future<AppDatabase> openAppDatabase() async {
         if (version.isEmpty) throw StateError('SQLCipher is not available');
       },
     ),
-    web: DriftWebOptions(
-      sqlite3Wasm: Uri.parse('sqlite3.wasm'),
-      driftWorker: Uri.parse('drift_worker.js'),
-    ),
+    web: DriftWebOptions(sqlite3Wasm: Uri.parse('sqlite3.wasm'), driftWorker: Uri.parse('drift_worker.js')),
   );
   return AppDatabase(executor);
 }

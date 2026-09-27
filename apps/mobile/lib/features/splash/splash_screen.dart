@@ -19,9 +19,7 @@ class SplashScreen extends ConsumerWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      auth.error is ApiException
-                          ? (auth.error! as ApiException).message
-                          : ApiException.genericMessage,
+                      auth.error is ApiException ? (auth.error! as ApiException).message : ApiException.genericMessage,
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 16),

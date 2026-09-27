@@ -16,8 +16,7 @@ class CatalogRepository {
 
   Future<List<EducationLevel>> levels() => guardApi(() async => (await client.api.structure.listLevels()).data);
 
-  Future<List<University>> universities() =>
-      guardApi(() async => (await client.api.structure.listUniversities()).data);
+  Future<List<University>> universities() => guardApi(() async => (await client.api.structure.listUniversities()).data);
 
   Future<List<Faculty>> faculties(String universityId) =>
       guardApi(() async => (await client.api.structure.listFaculties(universityId: universityId)).data);
@@ -26,29 +25,27 @@ class CatalogRepository {
       guardApi(() async => (await client.api.structure.listAcademicYears(facultyId: facultyId)).data);
 
   Future<List<Subject>> subjects(SubjectQuery q) => guardApi(
-        () async => (await client.api.structure.listSubjects(
-          levelId: q.levelId,
-          universityId: q.universityId,
-          facultyId: q.facultyId,
-          academicYearId: q.academicYearId,
-        ))
-            .data,
-      );
+    () async => (await client.api.structure.listSubjects(
+      levelId: q.levelId,
+      universityId: q.universityId,
+      facultyId: q.facultyId,
+      academicYearId: q.academicYearId,
+    )).data,
+  );
 
   Future<SubjectOutline> outline(String subjectId) =>
       guardApi(() async => (await client.api.structure.getSubjectOutline(id: subjectId)).data);
 
   /// Sends the whole placement; layers left null are cleared on the server.
   Future<Me> updatePlacement(Placement p) => guardApi(
-        () async => (await client.api.me.updateMe(
-          body: UpdateProfileRequest(
-            educationLevelId: p.levelId,
-            // Only the deepest chosen layer is needed; the API derives the ones above it.
-            academicYearId: p.academicYearId,
-            facultyId: p.academicYearId == null ? p.facultyId : null,
-            universityId: p.academicYearId == null && p.facultyId == null ? p.universityId : null,
-          ),
-        ))
-            .data,
-      );
+    () async => (await client.api.me.updateMe(
+      body: UpdateProfileRequest(
+        educationLevelId: p.levelId,
+        // Only the deepest chosen layer is needed; the API derives the ones above it.
+        academicYearId: p.academicYearId,
+        facultyId: p.academicYearId == null ? p.facultyId : null,
+        universityId: p.academicYearId == null && p.facultyId == null ? p.universityId : null,
+      ),
+    )).data,
+  );
 }

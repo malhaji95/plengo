@@ -26,9 +26,9 @@ class AppDatabase extends _$AppDatabase {
   }
 
   Future<void> setValue(String key, String value) {
-    return into(keyValues).insertOnConflictUpdate(
-      KeyValuesCompanion.insert(key: key, value: value, updatedAt: Value(DateTime.now())),
-    );
+    return into(
+      keyValues,
+    ).insertOnConflictUpdate(KeyValuesCompanion.insert(key: key, value: value, updatedAt: Value(DateTime.now())));
   }
 
   /// Logout wipes all local learning data (spec §22.5). Device preferences (`settings.*`, e.g.

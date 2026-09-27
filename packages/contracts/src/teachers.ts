@@ -29,8 +29,11 @@ export const teacherTrackSchema = z.object({
   coverUrl: z.string().nullable(),
 });
 
+/** A teacher with the long biography, shown on the profile page. */
+export const teacherDetailSchema = teacherSchema.extend({ bio: z.string().nullable() });
+
 export const teacherProfileSchema = z.object({
-  teacher: teacherSchema.extend({ bio: z.string().nullable() }),
+  teacher: teacherDetailSchema,
   tracks: z.array(teacherTrackSchema),
 });
 
@@ -117,6 +120,7 @@ export type AdminTrack = z.infer<typeof adminTrackSchema>;
 const named: [z.ZodType, string][] = [
   [teacherSchema, 'Teacher'],
   [teacherTrackSchema, 'TeacherTrack'],
+  [teacherDetailSchema, 'TeacherDetail'],
   [teacherProfileSchema, 'TeacherProfile'],
   [trackDetailSchema, 'TrackDetail'],
   [followResultSchema, 'FollowResult'],

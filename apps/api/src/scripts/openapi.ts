@@ -58,9 +58,32 @@ function tidyComponents<T extends Doc>(input: T): T {
       JSON.stringify(doc).replaceAll(`#/components/schemas/${name}"`, `#/components/schemas/${base}"`),
     );
   }
+  assertNoNameCollisions(schemas());
   const sorted = Object.fromEntries(Object.entries(schemas()).sort(([a], [b]) => a.localeCompare(b)));
   if (doc.components) doc.components.schemas = sorted;
   return doc;
+}
+
+/**
+ * Client generators name an inline object after its property (`teacher` → `Teacher`). If that name
+ * is also a component, the generated class silently loses fields, so register such objects instead.
+ */
+function assertNoNameCollisions(schemas: Record<string, unknown>) {
+  const pascal = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+  const walk = (node: unknown, where: string) => {
+    if (!node || typeof node !== 'object') return;
+    const props = (node as { properties?: Record<string, { type?: unknown; properties?: unknown }> })
+      .properties;
+    for (const [name, child] of Object.entries(props ?? {})) {
+      if (child.properties && pascal(name) in schemas) {
+        throw new Error(
+          `Inline object ${where}.${name} collides with component ${pascal(name)}; register it with an id`,
+        );
+      }
+      walk(child, `${where}.${name}`);
+    }
+  };
+  for (const [name, schema] of Object.entries(schemas)) walk(schema, name);
 }
 
 const env = loadEnv({

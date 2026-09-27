@@ -22,7 +22,9 @@ void main() {
       signedInAs: testMe,
       arrangeCatalog: (c) {
         when(() => c.subjects(any())).thenAnswer((inv) async {
-          final q = inv.positionalArguments.first as ({String levelId, String? universityId, String? facultyId, String? academicYearId});
+          final q =
+              inv.positionalArguments.first
+                  as ({String levelId, String? universityId, String? facultyId, String? academicYearId});
           return q.levelId == 'l12'
               ? [subject('p', 'الفيزياء', description: 'فيزياء البكالوريا'), subject('m', 'الرياضيات')]
               : [subject('g9', 'العلوم', levelId: 'l9')];
@@ -40,8 +42,9 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('العلوم'), findsOneWidget);
     expect(find.text('الفيزياء'), findsNothing);
-    verify(() => app.catalog.subjects((levelId: 'l9', universityId: null, facultyId: null, academicYearId: null)))
-        .called(1);
+    verify(
+      () => app.catalog.subjects((levelId: 'l9', universityId: null, facultyId: null, academicYearId: null)),
+    ).called(1);
   });
 
   testWidgets('the college level shows the optional university filter', (tester) async {
@@ -78,10 +81,14 @@ void main() {
                 code: 'mech',
                 titleAr: 'الميكانيك',
                 sortOrder: 0,
-                lessons: [lesson('l1', 'الحركة', unitId: 'u1'), lesson('l2', 'القوى', unitId: 'u1')],
+                lessons: [
+                  lesson('l1', 'الحركة', unitId: 'u1'),
+                  lesson('l2', 'القوى', unitId: 'u1'),
+                ],
               ),
             ],
             lessons: [lesson('l0', 'مراجعة عامة')],
+            tracks: const [],
           ),
         );
       },
@@ -128,8 +135,9 @@ void main() {
     await tester.tap(fieldByKey('placement.save'));
     await tester.pumpAndSettle();
 
-    verify(() => app.catalog.updatePlacement((levelId: 'l9', universityId: null, facultyId: null, academicYearId: null)))
-        .called(1);
+    verify(
+      () => app.catalog.updatePlacement((levelId: 'l9', universityId: null, facultyId: null, academicYearId: null)),
+    ).called(1);
     expect(find.byType(PlacementScreen), findsNothing);
     expect(app.container.read(authControllerProvider).value?.educationLevelId, 'l9');
   });
