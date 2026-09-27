@@ -18,6 +18,7 @@ import { registerVersionGate } from './plugins/version-gate.js';
 import { accessRoutes } from './routes/access.js';
 import { adminAccessRoutes } from './routes/admin/access.js';
 import { adminAuthRoutes } from './routes/admin/auth.js';
+import { adminFlashcardRoutes } from './routes/admin/flashcards.js';
 import { adminQuestionRoutes } from './routes/admin/questions.js';
 import { adminStructureRoutes } from './routes/admin/structure.js';
 import { adminTeacherRoutes } from './routes/admin/teachers.js';
@@ -26,6 +27,7 @@ import { catalogRoutes, collegeReferenceRoutes } from './routes/catalog.js';
 import { configRoutes } from './routes/config.js';
 import { devStorageRoutes } from './routes/dev-storage.js';
 import { MemoryStorage } from './storage/memory-storage.js';
+import { flashcardRoutes } from './routes/flashcards.js';
 import { healthRoutes } from './routes/health.js';
 import { meRoutes } from './routes/me.js';
 import { questionRoutes } from './routes/questions.js';
@@ -115,12 +117,14 @@ export async function buildApp(app: App, c: Container): Promise<App> {
   await app.register(teacherRoutes(c), { prefix: '/api/v1' });
   await app.register(accessRoutes(c), { prefix: '/api/v1' });
   await app.register(questionRoutes(c), { prefix: '/api/v1' });
+  await app.register(flashcardRoutes(c), { prefix: '/api/v1' });
   await app.register(adminAuthRoutes(c), { prefix: '/api/v1/admin' });
   await app.register(uploadRoutes(c, 'admin'), { prefix: '/api/v1/admin' });
   await app.register(adminStructureRoutes(c), { prefix: '/api/v1/admin' });
   await app.register(adminTeacherRoutes(c), { prefix: '/api/v1/admin' });
   await app.register(adminAccessRoutes(c), { prefix: '/api/v1/admin' });
   await app.register(adminQuestionRoutes(c), { prefix: '/api/v1/admin' });
+  await app.register(adminFlashcardRoutes(c), { prefix: '/api/v1/admin' });
 
   return app;
 }

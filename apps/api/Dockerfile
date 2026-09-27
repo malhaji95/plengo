@@ -8,11 +8,13 @@ COPY pnpm-lock.yaml pnpm-workspace.yaml package.json tsconfig.base.json ./
 COPY packages/contracts/package.json packages/contracts/
 COPY packages/db/package.json packages/db/
 COPY packages/arabic-normalizer/package.json packages/arabic-normalizer/
+COPY packages/srs/package.json packages/srs/
 COPY apps/api/package.json apps/api/
 RUN pnpm install --frozen-lockfile --filter @plengo/api...
 COPY packages/contracts packages/contracts
 COPY packages/db packages/db
 COPY packages/arabic-normalizer packages/arabic-normalizer
+COPY packages/srs packages/srs
 COPY apps/api apps/api
 RUN pnpm --filter @plengo/api... run build \
  && pnpm --filter @plengo/api deploy --prod --legacy /out

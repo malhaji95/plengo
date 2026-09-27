@@ -91,6 +91,8 @@ export const subjectOutlineSchema = z.object({
   access: scopeAccessSchema,
   /** Published general questions of the subject. */
   questionCount: contentCountSchema,
+  /** Published general flashcard decks of the subject. */
+  deckCount: contentCountSchema,
 });
 
 export const universityListSchema = z.array(universitySchema);

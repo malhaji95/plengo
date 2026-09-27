@@ -4,6 +4,7 @@ import {
   academicYears,
   educationLevels,
   faculties,
+  flashcardDecks,
   lessons,
   mediaFiles,
   questions,
@@ -361,8 +362,17 @@ export function createStructureRepository(db: Db) {
       const liveWhere = (t: { deletedAt: AnyPgColumn }, col: AnyPgColumn) =>
         and(eq(col, id), isNull(t.deletedAt));
       // Content keeps its subject, track, unit and lesson (§6.1); archive or delete it first.
-      const hasQuestions = (col: AnyPgColumn) =>
-        exists(db.select({ id: questions.id }).from(questions).where(liveWhere(questions, col)).limit(1));
+      const hasContent = async (questionCol: AnyPgColumn, deckCol: AnyPgColumn) =>
+        (await exists(
+          db.select({ id: questions.id }).from(questions).where(liveWhere(questions, questionCol)).limit(1),
+        )) ||
+        (await exists(
+          db
+            .select({ id: flashcardDecks.id })
+            .from(flashcardDecks)
+            .where(liveWhere(flashcardDecks, deckCol))
+            .limit(1),
+        ));
       switch (name) {
         case 'universities':
           return (
@@ -425,7 +435,7 @@ export function createStructureRepository(db: Db) {
                 .where(liveWhere(lessons, lessons.subjectId))
                 .limit(1),
             )) ||
-            (await hasQuestions(questions.subjectId))
+            (await hasContent(questions.subjectId, flashcardDecks.subjectId))
           );
         case 'teachers':
           return exists(
@@ -439,12 +449,12 @@ export function createStructureRepository(db: Db) {
           return (
             (await exists(
               db.select({ id: lessons.id }).from(lessons).where(liveWhere(lessons, lessons.unitId)).limit(1),
-            )) || (await hasQuestions(questions.unitId))
+            )) || (await hasContent(questions.unitId, flashcardDecks.unitId))
           );
         case 'lessons':
-          return hasQuestions(questions.lessonId);
+          return hasContent(questions.lessonId, flashcardDecks.lessonId);
         case 'teacherTracks':
-          return hasQuestions(questions.teacherTrackId);
+          return hasContent(questions.teacherTrackId, flashcardDecks.teacherTrackId);
       }
     },
   };

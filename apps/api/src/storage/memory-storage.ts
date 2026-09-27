@@ -1,3 +1,5 @@
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
 import { hmacHex, safeEqual } from '../lib/crypto.js';
 import type { BucketName, ObjectHead, ObjectStorage, PresignedUpload } from './storage.js';
 
@@ -9,12 +11,33 @@ interface StoredObject {
 /**
  * In-process storage for tests and local development without R2. With `baseUrl` + `secret`, the
  * presigned and public URLs point at the API's dev-only `/api/v1/dev-storage` routes (ADR-012), so
- * browsers can upload and display images end to end. Never used in production (env validation).
+ * browsers can upload and display images end to end. With `dir`, objects are also written to disk so
+ * they survive restarts and are shared with scripts such as the seed. Never used in production.
  */
 export class MemoryStorage implements ObjectStorage {
   readonly objects = new Map<string, StoredObject>();
 
-  constructor(private readonly opts: { baseUrl?: string; secret?: string } = {}) {}
+  constructor(private readonly opts: { baseUrl?: string; secret?: string; dir?: string } = {}) {}
+
+  private file(bucket: BucketName, key: string) {
+    if (!this.opts.dir || key.includes('..')) return null;
+    return join(this.opts.dir, bucket, key);
+  }
+
+  /** Map first, then disk (another process may have written it). */
+  private load(bucket: BucketName, key: string): StoredObject | null {
+    const cached = this.objects.get(this.id(bucket, key));
+    if (cached) return cached;
+    const path = this.file(bucket, key);
+    if (!path) return null;
+    try {
+      const obj = { bytes: readFileSync(path), contentType: readFileSync(`${path}.type`, 'utf8') };
+      this.objects.set(this.id(bucket, key), obj);
+      return obj;
+    } catch {
+      return null;
+    }
+  }
 
   private id(bucket: BucketName, key: string) {
     return `${bucket}/${key}`;
@@ -75,31 +98,42 @@ export class MemoryStorage implements ObjectStorage {
 
   async put(bucket: BucketName, key: string, bytes: Buffer, contentType: string): Promise<void> {
     this.objects.set(this.id(bucket, key), { bytes, contentType });
+    const path = this.file(bucket, key);
+    if (path) {
+      mkdirSync(dirname(path), { recursive: true });
+      writeFileSync(path, bytes);
+      writeFileSync(`${path}.type`, contentType);
+    }
   }
 
   async get(bucket: BucketName, key: string): Promise<Buffer | null> {
-    return this.objects.get(this.id(bucket, key))?.bytes ?? null;
+    return this.load(bucket, key)?.bytes ?? null;
   }
 
   async getWithType(bucket: BucketName, key: string): Promise<StoredObject | null> {
-    return this.objects.get(this.id(bucket, key)) ?? null;
+    return this.load(bucket, key);
   }
 
   async head(bucket: BucketName, key: string): Promise<ObjectHead | null> {
-    const obj = this.objects.get(this.id(bucket, key));
+    const obj = this.load(bucket, key);
     return obj ? { size: obj.bytes.length, contentType: obj.contentType } : null;
   }
 
   async exists(bucket: BucketName, key: string): Promise<boolean> {
-    return this.objects.has(this.id(bucket, key));
+    return this.load(bucket, key) !== null;
   }
 
   async delete(bucket: BucketName, key: string): Promise<void> {
     this.objects.delete(this.id(bucket, key));
+    const path = this.file(bucket, key);
+    if (path) {
+      rmSync(path, { force: true });
+      rmSync(`${path}.type`, { force: true });
+    }
   }
 
   async copy(bucket: BucketName, srcKey: string, dstKey: string): Promise<void> {
-    const obj = this.objects.get(this.id(bucket, srcKey));
-    if (obj) this.objects.set(this.id(bucket, dstKey), obj);
+    const obj = this.load(bucket, srcKey);
+    if (obj) await this.put(bucket, dstKey, obj.bytes, obj.contentType);
   }
 }

@@ -9,6 +9,7 @@ export default defineConfig({
       '@plengo/db': src('db'),
       '@plengo/contracts': src('contracts'),
       '@plengo/arabic-normalizer': src('arabic-normalizer'),
+      '@plengo/srs': src('srs'),
     },
   },
   test: {

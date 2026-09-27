@@ -12,6 +12,7 @@ import type {
 import type { StructureRepository } from '../repositories/structure-repository.js';
 import type { TeacherRepository } from '../repositories/teacher-repository.js';
 import { scopeOf, type AccessService } from './access-service.js';
+import { assertVisibleScope, invalid, resolvePlacement, validateContentScope } from './content-placement.js';
 import type { AuditService } from './audit-service.js';
 import type { FreeContentSource, FreeRuleService } from './free-rule-service.js';
 import { grade, type AnswerInput } from './grading.js';
@@ -32,10 +33,6 @@ interface ContentInput {
   trueFalseAnswer?: boolean | undefined;
   acceptedAnswers?: string[] | undefined;
 }
-
-const invalid = (field: string, reason?: string): never => {
-  throw new AppError('VALIDATION_ERROR', { details: reason ? { field, reason } : { field } });
-};
 
 /** A question's scope: the track when it has one, otherwise the subject's general content (§8.1). */
 export const questionScope = (q: { subjectId: string; teacherTrackId: string | null }): Scope => scopeOf(q);
@@ -106,20 +103,8 @@ export function createQuestionService(deps: {
     return { options: [], answers: accepted };
   }
 
-  /** §6.1: unit and lesson belong to the subject; a lesson inside a unit implies that unit. */
-  async function placement(subjectId: string, unitId: string | null, lessonId: string | null) {
-    if (unitId) {
-      const unit = await structureRepo.getUnit(unitId);
-      if (!unit || unit.subjectId !== subjectId) invalid('unitId');
-    }
-    if (lessonId) {
-      const lesson = await structureRepo.getLesson(lessonId);
-      if (!lesson || lesson.subjectId !== subjectId) invalid('lessonId');
-      if (unitId && lesson!.unitId !== unitId) invalid('lessonId', 'unit_mismatch');
-      if (!unitId) unitId = lesson!.unitId;
-    }
-    return { unitId, lessonId };
-  }
+  const placement = (subjectId: string, unitId: string | null, lessonId: string | null) =>
+    resolvePlacement(structureRepo, subjectId, unitId, lessonId);
 
   async function toAdmin(rows: QuestionWithContent[]): Promise<AdminQuestion[]> {
     const names = await repo.names(
@@ -216,15 +201,8 @@ export function createQuestionService(deps: {
 
   // ---- student helpers ----
 
-  /** The question's subject and track must be visible to students; otherwise it does not exist. */
-  async function visibleScope(subjectId: string, trackId: string | null) {
-    const subject = await structureRepo.getSubject(subjectId, { studentVisible: true });
-    if (!subject) notFound();
-    if (trackId) {
-      const track = await teacherRepo.getTrack(trackId, { visibleOnly: true });
-      if (!track || track.subjectId !== subjectId) notFound();
-    }
-  }
+  const visibleScope = (subjectId: string, trackId: string | null) =>
+    assertVisibleScope({ structureRepo, teacherRepo }, subjectId, trackId);
 
   async function publishedQuestion(id: string) {
     const q = await repo.get(id);
@@ -282,13 +260,8 @@ export function createQuestionService(deps: {
         publish?: boolean | undefined;
       },
     ): Promise<AdminQuestion> {
-      const subject = await structureRepo.getSubject(input.subjectId, { studentVisible: false });
-      if (!subject) invalid('subjectId');
       const trackId = input.teacherTrackId ?? null;
-      if (trackId) {
-        const track = await teacherRepo.getTrack(trackId, { visibleOnly: false });
-        if (!track || track.subjectId !== input.subjectId) invalid('teacherTrackId');
-      }
+      await validateContentScope({ structureRepo, teacherRepo }, input.subjectId, trackId);
       const place = await placement(input.subjectId, input.unitId ?? null, input.lessonId ?? null);
       const body = content(input.type, input, []);
       const scope = questionScope({ subjectId: input.subjectId, teacherTrackId: trackId });

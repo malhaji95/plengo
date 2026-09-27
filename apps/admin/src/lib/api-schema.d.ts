@@ -564,6 +564,102 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/decks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listDecks"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/decks/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getDeck"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/decks/{id}/cards": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getDeckCards"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/srs/states": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listSrsStates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/srs/sync": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["syncSrs"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/srs/due": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listDueCards"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/auth/login": {
         parameters: {
             query?: never;
@@ -1525,6 +1621,134 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/decks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminListDecks"];
+        put?: never;
+        post: operations["adminCreateDeck"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/decks/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminGetDeck"];
+        put?: never;
+        post?: never;
+        delete: operations["adminDeleteDeck"];
+        options?: never;
+        head?: never;
+        patch: operations["adminUpdateDeck"];
+        trace?: never;
+    };
+    "/api/v1/admin/decks/{id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["adminSetDeckStatus"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/decks/{id}/free": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["adminSetDeckFree"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/decks/reorder": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["adminReorderDecks"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/decks/{id}/cards": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminListCards"];
+        put?: never;
+        post: operations["adminCreateCard"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/decks/{id}/cards/reorder": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["adminReorderCards"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/cards/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["adminDeleteCard"];
+        options?: never;
+        head?: never;
+        patch: operations["adminUpdateCard"];
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1575,6 +1799,29 @@ export interface components {
             answerNormalized: string;
             normalizationVersion: number;
         };
+        AdminCard: {
+            id: string;
+            deckId: string;
+            sortOrder: number;
+            /** @enum {string} */
+            status: "draft" | "published" | "archived";
+            contentVersion: number;
+            front: components["schemas"]["CardImage"];
+            back: components["schemas"]["CardImage"];
+        };
+        AdminCardEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AdminCard"];
+            error: null;
+        };
+        AdminCardList: components["schemas"]["AdminCard"][];
+        AdminCardListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AdminCardList"];
+            error: null;
+        };
         AdminCoupon: {
             id: string;
             batchId: string;
@@ -1593,6 +1840,42 @@ export interface components {
             /** @constant */
             success: true;
             data: components["schemas"]["AdminCouponList"];
+            error: null;
+        };
+        AdminDeck: {
+            id: string;
+            subjectId: string;
+            subjectNameAr: string;
+            teacherTrackId: string | null;
+            trackTitleAr: string | null;
+            unitId: string | null;
+            lessonId: string | null;
+            titleAr: string;
+            description: string | null;
+            coverMediaId: string | null;
+            coverUrl: string | null;
+            isFree: boolean;
+            /** @enum {string} */
+            freeSource: "rule" | "manual_override";
+            /** @enum {string} */
+            status: "draft" | "published" | "archived";
+            sortOrder: number;
+            contentVersion: number;
+            cardCount: number;
+            createdAt: string;
+            updatedAt: string;
+        };
+        AdminDeckEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AdminDeck"];
+            error: null;
+        };
+        AdminDeckList: components["schemas"]["AdminDeck"][];
+        AdminDeckListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AdminDeckList"];
             error: null;
         };
         AdminEntitlement: {
@@ -1768,6 +2051,14 @@ export interface components {
         BackupCodeRequest: {
             code: string;
         };
+        CardImage: {
+            mediaId: string;
+            cacheKey: string;
+            fullUrl: string;
+            thumbUrl: string;
+            width: number | null;
+            height: number | null;
+        };
         CheckAnswerRequest: {
             /** Format: uuid */
             selectedOptionId?: string;
@@ -1848,6 +2139,12 @@ export interface components {
             /** Format: uuid */
             facultyId: string;
         };
+        CreateCardRequest: {
+            /** Format: uuid */
+            frontMediaId: string;
+            /** Format: uuid */
+            backMediaId: string;
+        };
         CreateCouponBatchRequest: {
             name: string;
             distributorName?: string | null;
@@ -1862,6 +2159,16 @@ export interface components {
             permanentAccess?: boolean;
             accessDurationDays?: number | null;
             accessExpiresOn?: string | null;
+        };
+        CreateDeckRequest: {
+            /** Format: uuid */
+            subjectId: string;
+            teacherTrackId?: string | null;
+            unitId?: string | null;
+            lessonId?: string | null;
+            titleAr: string;
+            description?: string | null;
+            coverMediaId?: string | null;
         };
         CreateFacultyRequest: {
             code: string;
@@ -1970,6 +2277,17 @@ export interface components {
             data: components["schemas"]["CreateUploadResult"];
             error: null;
         };
+        DeckCards: {
+            deck: components["schemas"]["StudentDeck"];
+            cards: components["schemas"]["StudentCard"][];
+            urlsExpireAt: string;
+        };
+        DeckCardsEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["DeckCards"];
+            error: null;
+        };
         DeletedResult: {
             deleted: boolean;
         };
@@ -1977,6 +2295,22 @@ export interface components {
             /** @constant */
             success: true;
             data: components["schemas"]["DeletedResult"];
+            error: null;
+        };
+        DueCard: {
+            card: components["schemas"]["StudentCard"];
+            deckTitleAr: string;
+            subjectId: string;
+            state: components["schemas"]["SrsCardState"];
+        };
+        DueCards: {
+            cards: components["schemas"]["DueCard"][];
+            urlsExpireAt: string;
+        };
+        DueCardsEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["DueCards"];
             error: null;
         };
         EducationLevel: {
@@ -2343,6 +2677,20 @@ export interface components {
             data: components["schemas"]["ResetResult"];
             error: null;
         };
+        ReviewLog: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            flashcardId: string;
+            /** @enum {string} */
+            rating: "again" | "good" | "easy";
+            stateBefore: components["schemas"]["SrsState"];
+            stateAfter: components["schemas"]["SrsState"];
+            /** Format: date-time */
+            reviewedAt: string;
+            durationMs?: number | null;
+            undone?: boolean;
+        };
         RevokedResult: {
             revoked: boolean;
         };
@@ -2408,6 +2756,107 @@ export interface components {
             /** @constant */
             success: true;
             data: components["schemas"]["SignedOutResult"];
+            error: null;
+        };
+        SrsCardState: {
+            /** @enum {string} */
+            state: "new" | "learning" | "review" | "relearning";
+            step: number;
+            /** Format: date-time */
+            dueAt: string;
+            intervalDays: number;
+            ease: number;
+            reps: number;
+            lapses: number;
+            lastReviewedAt: string | null;
+            flashcardId: string;
+            updatedAt: string;
+        };
+        SrsState: {
+            /** @enum {string} */
+            state: "new" | "learning" | "review" | "relearning";
+            step: number;
+            /** Format: date-time */
+            dueAt: string;
+            intervalDays: number;
+            ease: number;
+            reps: number;
+            lapses: number;
+            lastReviewedAt: string | null;
+        };
+        SrsStatesPage: {
+            items: components["schemas"]["SrsCardState"][];
+            nextCursor: string | null;
+        };
+        SrsStatesPageEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["SrsStatesPage"];
+            error: null;
+        };
+        SrsSyncRequest: {
+            logs: components["schemas"]["ReviewLog"][];
+            states: components["schemas"]["SrsSyncState"][];
+        };
+        SrsSyncResult: {
+            acceptedLogs: number;
+            appliedStates: number;
+            states: components["schemas"]["SrsCardState"][];
+        };
+        SrsSyncResultEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["SrsSyncResult"];
+            error: null;
+        };
+        SrsSyncState: {
+            /** @enum {string} */
+            state: "new" | "learning" | "review" | "relearning";
+            step: number;
+            /** Format: date-time */
+            dueAt: string;
+            intervalDays: number;
+            ease: number;
+            reps: number;
+            lapses: number;
+            lastReviewedAt: string | null;
+            /** Format: uuid */
+            flashcardId: string;
+        };
+        StudentCard: {
+            id: string;
+            deckId: string;
+            sortOrder: number;
+            contentVersion: number;
+            front: components["schemas"]["CardImage"];
+            back: components["schemas"]["CardImage"];
+        };
+        StudentDeck: {
+            id: string;
+            subjectId: string;
+            teacherTrackId: string | null;
+            unitId: string | null;
+            lessonId: string | null;
+            titleAr: string;
+            description: string | null;
+            coverUrl: string | null;
+            cardCount: number;
+            isFree: boolean;
+            locked: boolean;
+            contentVersion: number;
+            sortOrder: number;
+        };
+        StudentDeckEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["StudentDeck"];
+            error: null;
+        };
+        StudentDeckList: components["schemas"]["StudentDeck"][];
+        StudentDeckListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["StudentDeckList"];
             error: null;
         };
         StudentOption: {
@@ -2481,6 +2930,7 @@ export interface components {
             tracks: components["schemas"]["SubjectTrack"][];
             access: components["schemas"]["ScopeAccess"];
             questionCount: components["schemas"]["ContentCount"];
+            deckCount: components["schemas"]["ContentCount"];
         };
         SubjectOutlineEnvelope: {
             /** @constant */
@@ -2579,6 +3029,7 @@ export interface components {
             subject: components["schemas"]["Subject"];
             access: components["schemas"]["ScopeAccess"];
             questionCount: components["schemas"]["ContentCount"];
+            deckCount: components["schemas"]["ContentCount"];
         };
         TrackDetailEnvelope: {
             /** @constant */
@@ -2644,6 +3095,21 @@ export interface components {
             code?: string;
             nameAr?: string;
             isActive?: boolean;
+        };
+        UpdateCardRequest: {
+            /** Format: uuid */
+            frontMediaId?: string;
+            /** Format: uuid */
+            backMediaId?: string;
+            /** @enum {string} */
+            status?: "draft" | "published" | "archived";
+        };
+        UpdateDeckRequest: {
+            unitId?: string | null;
+            lessonId?: string | null;
+            titleAr?: string;
+            description?: string | null;
+            coverMediaId?: string | null;
         };
         UpdateFacultyRequest: {
             code?: string;
@@ -3584,6 +4050,144 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CheckResultEnvelope"];
+                };
+            };
+        };
+    };
+    listDecks: {
+        parameters: {
+            query: {
+                subjectId: string;
+                teacherTrackId?: string;
+                unitId?: string;
+                lessonId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentDeckListEnvelope"];
+                };
+            };
+        };
+    };
+    getDeck: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentDeckEnvelope"];
+                };
+            };
+        };
+    };
+    getDeckCards: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeckCardsEnvelope"];
+                };
+            };
+        };
+    };
+    listSrsStates: {
+        parameters: {
+            query?: {
+                since?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SrsStatesPageEnvelope"];
+                };
+            };
+        };
+    };
+    syncSrs: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SrsSyncRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SrsSyncResultEnvelope"];
+                };
+            };
+        };
+    };
+    listDueCards: {
+        parameters: {
+            query?: {
+                subjectId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DueCardsEnvelope"];
                 };
             };
         };
@@ -5594,6 +6198,325 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["NormalizePreviewEnvelope"];
+                };
+            };
+        };
+    };
+    adminListDecks: {
+        parameters: {
+            query?: {
+                subjectId?: string;
+                teacherTrackId?: string;
+                generalOnly?: "true" | "false";
+                unitId?: string;
+                lessonId?: string;
+                status?: "draft" | "published" | "archived";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminDeckListEnvelope"];
+                };
+            };
+        };
+    };
+    adminCreateDeck: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateDeckRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminDeckEnvelope"];
+                };
+            };
+        };
+    };
+    adminGetDeck: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminDeckEnvelope"];
+                };
+            };
+        };
+    };
+    adminDeleteDeck: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeletedResultEnvelope"];
+                };
+            };
+        };
+    };
+    adminUpdateDeck: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateDeckRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminDeckEnvelope"];
+                };
+            };
+        };
+    };
+    adminSetDeckStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuestionStatusRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminDeckEnvelope"];
+                };
+            };
+        };
+    };
+    adminSetDeckFree: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuestionFreeRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminDeckEnvelope"];
+                };
+            };
+        };
+    };
+    adminReorderDecks: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuestionReorderRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReorderedResultEnvelope"];
+                };
+            };
+        };
+    };
+    adminListCards: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminCardListEnvelope"];
+                };
+            };
+        };
+    };
+    adminCreateCard: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCardRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminCardEnvelope"];
+                };
+            };
+        };
+    };
+    adminReorderCards: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuestionReorderRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReorderedResultEnvelope"];
+                };
+            };
+        };
+    };
+    adminDeleteCard: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeletedResultEnvelope"];
+                };
+            };
+        };
+    };
+    adminUpdateCard: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCardRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminCardEnvelope"];
                 };
             };
         };

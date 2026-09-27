@@ -37,6 +37,8 @@ const envSchema = z
     R2_PUBLIC_BASE_URL: z.string().optional(),
     /** Override for S3-compatible endpoints (MinIO in local dev). Defaults to the R2 account endpoint. */
     R2_ENDPOINT: z.string().optional(),
+    /** STORAGE_DRIVER=memory only: also keep objects on disk (shared with the seed script). */
+    LOCAL_STORAGE_DIR: z.string().optional(),
 
     EMAIL_PROVIDER: z.enum(['console', 'resend']).default('console'),
     EMAIL_PROVIDER_API_KEY: z.string().optional(),

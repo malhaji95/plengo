@@ -49,8 +49,8 @@ jobs:
           pnpm --filter @plengo/api openapi
           pnpm --filter @plengo/admin api-types
           git diff --exit-code -- packages/contracts/openapi.json apps/admin/src/lib/api-schema.d.ts
-      - name: Arabic normalizer fixtures
-        run: pnpm --filter @plengo/arabic-normalizer test
+      - name: Arabic normalizer and SRS fixtures
+        run: pnpm --filter @plengo/arabic-normalizer --filter @plengo/srs test
       - name: API tests (Postgres)
         run: pnpm --filter @plengo/api test
       - name: Build

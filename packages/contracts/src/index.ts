@@ -8,3 +8,4 @@ export * from './structure.js';
 export * from './teachers.js';
 export * from './access.js';
 export * from './questions.js';
+export * from './flashcards.js';

@@ -51,3 +51,7 @@ export const couponStatusEnum = pgEnum('coupon_status', ['active', 'redeemed', '
 export const questionTypeEnum = pgEnum('question_type', ['mcq', 'true_false', 'written']);
 export const contentStatusEnum = pgEnum('content_status', ['draft', 'published', 'archived']);
 export const difficultyEnum = pgEnum('difficulty', ['easy', 'medium', 'hard']);
+
+/* Spaced repetition (spec §13.4, §13.7). */
+export const srsStateEnum = pgEnum('srs_state', ['new', 'learning', 'review', 'relearning']);
+export const srsRatingEnum = pgEnum('srs_rating', ['again', 'good', 'easy']);

@@ -26,6 +26,7 @@
     "@plengo/arabic-normalizer": "workspace:*",
     "@plengo/contracts": "workspace:*",
     "@plengo/db": "workspace:*",
+    "@plengo/srs": "workspace:*",
     "@sentry/node": "^11.0.0",
     "better-auth": "^1.7.6",
     "drizzle-orm": "^0.45.3",

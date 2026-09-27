@@ -9,6 +9,7 @@ import type { JobHandlers, JobQueue } from './jobs/queue.js';
 import { createCouponCrypto } from './lib/coupon-code.js';
 import { createIpHasher } from './lib/crypto.js';
 import { createAccessRepository } from './repositories/access-repository.js';
+import { createFlashcardRepository } from './repositories/flashcard-repository.js';
 import { createQuestionRepository } from './repositories/question-repository.js';
 import { createSessionsRepository, type SessionsRepository } from './repositories/sessions-repository.js';
 import { createStructureRepository, type StructureRepository } from './repositories/structure-repository.js';
@@ -17,7 +18,13 @@ import { createUsersRepository, type UsersRepository } from './repositories/user
 import { createAccessService, type AccessService } from './services/access-service.js';
 import { createAuditService, type AuditService } from './services/audit-service.js';
 import { createCouponService, type CouponService } from './services/coupon-service.js';
+import {
+  createFlashcardService,
+  deckFreeSource,
+  type FlashcardService,
+} from './services/flashcard-service.js';
 import { createFreeRuleService, type FreeRuleService } from './services/free-rule-service.js';
+import { createSrsService, type SrsService } from './services/srs-service.js';
 import { createPromotionService, type PromotionService } from './services/promotion-service.js';
 import {
   createQuestionService,
@@ -61,6 +68,8 @@ export interface Container {
   promotions: PromotionService;
   freeRules: FreeRuleService;
   questions: QuestionService;
+  flashcards: FlashcardService;
+  srs: SrsService;
   media: MediaProcessor;
   guards: Guards;
   jobHandlers: JobHandlers;
@@ -68,7 +77,11 @@ export interface Container {
 
 export function createStorage(env: Env): ObjectStorage {
   if (env.STORAGE_DRIVER === 'memory') {
-    return new MemoryStorage({ baseUrl: env.BETTER_AUTH_URL, secret: env.BETTER_AUTH_SECRET });
+    return new MemoryStorage({
+      baseUrl: env.BETTER_AUTH_URL,
+      secret: env.BETTER_AUTH_SECRET,
+      ...(env.LOCAL_STORAGE_DIR ? { dir: env.LOCAL_STORAGE_DIR } : {}),
+    });
   }
   return new R2Storage({
     endpoint: env.R2_ENDPOINT ?? `https://${env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
@@ -141,6 +154,7 @@ export function createContainer(
   });
   const promotions = createPromotionService({ db, accessRepo, audit, now: overrides.now });
   const questionRepo = createQuestionRepository(db);
+  const flashcardRepo = createFlashcardRepository(db);
   // Each content table registers its free-content source (questions now; decks and quizzes later).
   const freeRules = createFreeRuleService({
     db,
@@ -148,7 +162,7 @@ export function createContainer(
     structureRepo,
     audit,
     jobs: overrides.jobs,
-    sources: [questionFreeSource(questionRepo)],
+    sources: [questionFreeSource(questionRepo), deckFreeSource(flashcardRepo)],
   });
   const teacherRepo = createTeacherRepository(db);
   const questions = createQuestionService({
@@ -161,6 +175,26 @@ export function createContainer(
     audit,
     now: overrides.now,
   });
+  const flashcards = createFlashcardService({
+    db,
+    repo: flashcardRepo,
+    structureRepo,
+    teacherRepo,
+    access,
+    freeRules,
+    audit,
+    storage,
+    now: overrides.now,
+  });
+  const srs = createSrsService({
+    db,
+    flashcardRepo,
+    flashcards,
+    structureRepo,
+    teacherRepo,
+    access,
+    now: overrides.now,
+  });
   const teachers = createTeacherService({
     repo: teacherRepo,
     structureRepo,
@@ -168,6 +202,7 @@ export function createContainer(
     storage,
     access,
     questionCounts: (scope) => questions.counts(scope),
+    deckCounts: (scope) => flashcards.counts(scope),
   });
   const catalog = createCatalogService({
     repo: structureRepo,
@@ -175,6 +210,7 @@ export function createContainer(
     storage,
     access,
     questionCounts: (scope) => questions.counts(scope),
+    deckCounts: (scope) => flashcards.counts(scope),
     subjectTracks: (id) => teachers.subjectTracks(id),
   });
 
@@ -204,6 +240,8 @@ export function createContainer(
     promotions,
     freeRules,
     questions,
+    flashcards,
+    srs,
     guards: createGuards({ auth, sessionsRepo, mobileTokens, now: overrides.now }),
     jobHandlers: {
       'media.process': (data) => media.process(data),

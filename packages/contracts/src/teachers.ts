@@ -48,6 +48,8 @@ export const trackDetailSchema = z.object({
   access: scopeAccessSchema,
   /** Published questions of the track. */
   questionCount: contentCountSchema,
+  /** Published flashcard decks of the track. */
+  deckCount: contentCountSchema,
 });
 
 export const followResultSchema = z.object({ following: z.boolean(), followerCount: z.number() });

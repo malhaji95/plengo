@@ -13,6 +13,7 @@ import {
 } from 'drizzle-orm/pg-core';
 import { contentStatusEnum, difficultyEnum, freeSourceEnum, questionTypeEnum } from './enums.js';
 import { users } from './identity.js';
+import { mediaFiles } from './media.js';
 import { lessons, subjects, units } from './structure.js';
 import { teacherTracks } from './teachers.js';
 
@@ -112,4 +113,77 @@ export const questionAnswers = pgTable(
       .on(t.questionId, t.answerNormalized)
       .where(sql`is_active`),
   ],
+);
+
+/** Official flashcard decks (spec §13.1). Placement and scope rules match questions. */
+export const flashcardDecks = pgTable(
+  'flashcard_decks',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    subjectId: uuid('subject_id')
+      .notNull()
+      .references(() => subjects.id),
+    teacherTrackId: uuid('teacher_track_id'),
+    unitId: uuid('unit_id'),
+    lessonId: uuid('lesson_id'),
+    titleAr: text('title_ar').notNull(),
+    description: text('description'),
+    coverMediaId: uuid('cover_media_id').references(() => mediaFiles.id, { onDelete: 'set null' }),
+    isFree: boolean('is_free').notNull().default(false),
+    freeSource: freeSourceEnum('free_source').notNull().default('rule'),
+    status: contentStatusEnum('status').notNull().default('draft'),
+    sortOrder: integer('sort_order').notNull().default(0),
+    /** Bumped by deck metadata, membership and card order changes (§22.3). */
+    contentVersion: integer('content_version').notNull().default(1),
+    createdByAdminId: uuid('created_by_admin_id').references(() => users.id, { onDelete: 'set null' }),
+    updatedByAdminId: uuid('updated_by_admin_id').references(() => users.id, { onDelete: 'set null' }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+    deletedAt: timestamp('deleted_at', { withTimezone: true }),
+  },
+  (t) => [
+    foreignKey({
+      name: 'flashcard_decks_track_subject_fk',
+      columns: [t.teacherTrackId, t.subjectId],
+      foreignColumns: [teacherTracks.id, teacherTracks.subjectId],
+    }),
+    foreignKey({
+      name: 'flashcard_decks_unit_subject_fk',
+      columns: [t.unitId, t.subjectId],
+      foreignColumns: [units.id, units.subjectId],
+    }),
+    foreignKey({
+      name: 'flashcard_decks_lesson_subject_fk',
+      columns: [t.lessonId, t.subjectId],
+      foreignColumns: [lessons.id, lessons.subjectId],
+    }),
+    index('flashcard_decks_scope_idx').on(t.subjectId, t.teacherTrackId, t.status, t.sortOrder),
+    index('flashcard_decks_unit_idx').on(t.unitId),
+    index('flashcard_decks_lesson_idx').on(t.lessonId),
+  ],
+);
+
+/** Official cards: a front image and a back image (§13.1). */
+export const flashcards = pgTable(
+  'flashcards',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    deckId: uuid('deck_id')
+      .notNull()
+      .references(() => flashcardDecks.id),
+    frontMediaId: uuid('front_media_id')
+      .notNull()
+      .references(() => mediaFiles.id),
+    backMediaId: uuid('back_media_id')
+      .notNull()
+      .references(() => mediaFiles.id),
+    sortOrder: integer('sort_order').notNull().default(0),
+    status: contentStatusEnum('status').notNull().default('published'),
+    /** Bumped when the card's images, order or status change (§22.3). */
+    contentVersion: integer('content_version').notNull().default(1),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+    deletedAt: timestamp('deleted_at', { withTimezone: true }),
+  },
+  (t) => [index('flashcards_deck_sort_idx').on(t.deckId, t.sortOrder)],
 );
