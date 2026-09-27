@@ -30,17 +30,25 @@
             "maxLength": 128
           }
         },
-        "required": ["email", "password"]
+        "required": [
+          "email",
+          "password"
+        ]
       },
       "AdminLoginResult": {
         "type": "object",
         "properties": {
           "next": {
             "type": "string",
-            "enum": ["totp", "enroll"]
+            "enum": [
+              "totp",
+              "enroll"
+            ]
           }
         },
-        "required": ["next"],
+        "required": [
+          "next"
+        ],
         "additionalProperties": false
       },
       "AdminLoginResultEnvelope": {
@@ -57,7 +65,11 @@
             "type": "null"
           }
         },
-        "required": ["success", "data", "error"],
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
         "additionalProperties": false
       },
       "BackupCodeRequest": {
@@ -69,7 +81,9 @@
             "maxLength": 64
           }
         },
-        "required": ["code"],
+        "required": [
+          "code"
+        ],
         "additionalProperties": false
       },
       "CreateUploadRequest": {
@@ -88,7 +102,11 @@
             "maximum": 9007199254740991
           }
         },
-        "required": ["kind", "contentType", "size"],
+        "required": [
+          "kind",
+          "contentType",
+          "size"
+        ],
         "additionalProperties": false
       },
       "CreateUploadResult": {
@@ -121,7 +139,13 @@
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
           }
         },
-        "required": ["id", "uploadUrl", "method", "headers", "expiresAt"],
+        "required": [
+          "id",
+          "uploadUrl",
+          "method",
+          "headers",
+          "expiresAt"
+        ],
         "additionalProperties": false
       },
       "CreateUploadResultEnvelope": {
@@ -138,7 +162,11 @@
             "type": "null"
           }
         },
-        "required": ["success", "data", "error"],
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
         "additionalProperties": false
       },
       "EducationLevel": {
@@ -157,7 +185,12 @@
             "type": "number"
           }
         },
-        "required": ["id", "code", "nameAr", "sortOrder"],
+        "required": [
+          "id",
+          "code",
+          "nameAr",
+          "sortOrder"
+        ],
         "additionalProperties": false
       },
       "EducationLevelList": {
@@ -180,7 +213,11 @@
             "type": "null"
           }
         },
-        "required": ["success", "data", "error"],
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
         "additionalProperties": false
       },
       "EnrolledResult": {
@@ -190,7 +227,9 @@
             "type": "boolean"
           }
         },
-        "required": ["enrolled"],
+        "required": [
+          "enrolled"
+        ],
         "additionalProperties": false
       },
       "EnrolledResultEnvelope": {
@@ -207,7 +246,11 @@
             "type": "null"
           }
         },
-        "required": ["success", "data", "error"],
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
         "additionalProperties": false
       },
       "ForgotPasswordRequest": {
@@ -217,7 +260,9 @@
             "type": "string"
           }
         },
-        "required": ["email"]
+        "required": [
+          "email"
+        ]
       },
       "Me": {
         "type": "object",
@@ -233,16 +278,29 @@
           },
           "role": {
             "type": "string",
-            "enum": ["student", "admin"]
+            "enum": [
+              "student",
+              "admin"
+            ]
           },
           "fullName": {
             "type": "string"
           },
           "educationLevelId": {
-            "type": ["string", "null"]
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
-        "required": ["id", "email", "emailVerified", "role", "fullName", "educationLevelId"],
+        "required": [
+          "id",
+          "email",
+          "emailVerified",
+          "role",
+          "fullName",
+          "educationLevelId"
+        ],
         "additionalProperties": false
       },
       "MediaFile": {
@@ -258,7 +316,11 @@
           },
           "status": {
             "type": "string",
-            "enum": ["pending", "ready", "failed"]
+            "enum": [
+              "pending",
+              "ready",
+              "failed"
+            ]
           },
           "width": {
             "anyOf": [
@@ -290,7 +352,14 @@
             "maximum": 9007199254740991
           }
         },
-        "required": ["id", "kind", "status", "width", "height", "version"],
+        "required": [
+          "id",
+          "kind",
+          "status",
+          "width",
+          "height",
+          "version"
+        ],
         "additionalProperties": false
       },
       "MediaFileEnvelope": {
@@ -307,12 +376,22 @@
             "type": "null"
           }
         },
-        "required": ["success", "data", "error"],
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
         "additionalProperties": false
       },
       "MediaKind": {
         "type": "string",
-        "enum": ["flashcard", "banner", "teacher", "cover", "user-card"]
+        "enum": [
+          "flashcard",
+          "banner",
+          "teacher",
+          "cover",
+          "user-card"
+        ]
       },
       "MeEnvelope": {
         "type": "object",
@@ -328,7 +407,11 @@
             "type": "null"
           }
         },
-        "required": ["success", "data", "error"],
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
         "additionalProperties": false
       },
       "MobileLoginRequest": {
@@ -344,14 +427,21 @@
           },
           "platform": {
             "type": "string",
-            "enum": ["android", "ios"]
+            "enum": [
+              "android",
+              "ios"
+            ]
           },
           "appVersion": {
             "type": "string",
             "maxLength": 32
           }
         },
-        "required": ["email", "password", "platform"]
+        "required": [
+          "email",
+          "password",
+          "platform"
+        ]
       },
       "MobileLogoutRequest": {
         "type": "object",
@@ -362,7 +452,9 @@
             "maxLength": 256
           }
         },
-        "required": ["refreshToken"],
+        "required": [
+          "refreshToken"
+        ],
         "additionalProperties": false
       },
       "MobileRefreshRequest": {
@@ -374,7 +466,9 @@
             "maxLength": 256
           }
         },
-        "required": ["refreshToken"],
+        "required": [
+          "refreshToken"
+        ],
         "additionalProperties": false
       },
       "PasswordConfirmRequest": {
@@ -386,7 +480,9 @@
             "maxLength": 128
           }
         },
-        "required": ["password"],
+        "required": [
+          "password"
+        ],
         "additionalProperties": false
       },
       "RegisterRequest": {
@@ -411,7 +507,11 @@
             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
           }
         },
-        "required": ["fullName", "email", "password"]
+        "required": [
+          "fullName",
+          "email",
+          "password"
+        ]
       },
       "RemoteConfig": {
         "type": "object",
@@ -429,7 +529,11 @@
                 "type": "string"
               }
             },
-            "required": ["android", "ios", "web"],
+            "required": [
+              "android",
+              "ios",
+              "web"
+            ],
             "additionalProperties": false
           },
           "latestVersion": {
@@ -445,7 +549,11 @@
                 "type": "string"
               }
             },
-            "required": ["android", "ios", "web"],
+            "required": [
+              "android",
+              "ios",
+              "web"
+            ],
             "additionalProperties": false
           },
           "features": {
@@ -467,7 +575,13 @@
                 "type": "boolean"
               }
             },
-            "required": ["teacherFollowing", "randomPractice", "studentDecks", "streaks", "contentReports"],
+            "required": [
+              "teacherFollowing",
+              "randomPractice",
+              "studentDecks",
+              "streaks",
+              "contentReports"
+            ],
             "additionalProperties": false
           },
           "srsDefaults": {
@@ -484,7 +598,10 @@
                 "maximum": 9007199254740991
               }
             },
-            "required": ["newCardsPerDay", "maxReviewsPerDay"],
+            "required": [
+              "newCardsPerDay",
+              "maxReviewsPerDay"
+            ],
             "additionalProperties": false
           },
           "support": {
@@ -497,7 +614,10 @@
                 "type": "string"
               }
             },
-            "required": ["email", "whatsapp"],
+            "required": [
+              "email",
+              "whatsapp"
+            ],
             "additionalProperties": false
           },
           "privacyPolicyUrl": {
@@ -532,7 +652,11 @@
             "type": "null"
           }
         },
-        "required": ["success", "data", "error"],
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
         "additionalProperties": false
       },
       "ResendOtpRequest": {
@@ -542,7 +666,9 @@
             "type": "string"
           }
         },
-        "required": ["email"]
+        "required": [
+          "email"
+        ]
       },
       "ResetPasswordRequest": {
         "type": "object",
@@ -560,7 +686,11 @@
             "maxLength": 128
           }
         },
-        "required": ["email", "otp", "newPassword"]
+        "required": [
+          "email",
+          "otp",
+          "newPassword"
+        ]
       },
       "ResetResult": {
         "type": "object",
@@ -569,7 +699,9 @@
             "type": "boolean"
           }
         },
-        "required": ["reset"],
+        "required": [
+          "reset"
+        ],
         "additionalProperties": false
       },
       "ResetResultEnvelope": {
@@ -586,7 +718,11 @@
             "type": "null"
           }
         },
-        "required": ["success", "data", "error"],
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
         "additionalProperties": false
       },
       "RevokedResult": {
@@ -596,7 +732,9 @@
             "type": "boolean"
           }
         },
-        "required": ["revoked"],
+        "required": [
+          "revoked"
+        ],
         "additionalProperties": false
       },
       "RevokedResultEnvelope": {
@@ -613,7 +751,11 @@
             "type": "null"
           }
         },
-        "required": ["success", "data", "error"],
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
         "additionalProperties": false
       },
       "SentResult": {
@@ -623,7 +765,9 @@
             "type": "boolean"
           }
         },
-        "required": ["sent"],
+        "required": [
+          "sent"
+        ],
         "additionalProperties": false
       },
       "SentResultEnvelope": {
@@ -640,7 +784,11 @@
             "type": "null"
           }
         },
-        "required": ["success", "data", "error"],
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
         "additionalProperties": false
       },
       "SessionList": {
@@ -663,12 +811,21 @@
             "type": "null"
           }
         },
-        "required": ["success", "data", "error"],
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
         "additionalProperties": false
       },
       "SessionPlatform": {
         "type": "string",
-        "enum": ["android", "ios", "web", "admin"]
+        "enum": [
+          "android",
+          "ios",
+          "web",
+          "admin"
+        ]
       },
       "SessionSummary": {
         "type": "object",
@@ -680,10 +837,16 @@
             "$ref": "#/components/schemas/SessionPlatform"
           },
           "appVersion": {
-            "type": ["string", "null"]
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "userAgent": {
-            "type": ["string", "null"]
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "createdAt": {
             "type": "string",
@@ -699,7 +862,15 @@
             "type": "boolean"
           }
         },
-        "required": ["id", "platform", "appVersion", "userAgent", "createdAt", "lastSeenAt", "current"],
+        "required": [
+          "id",
+          "platform",
+          "appVersion",
+          "userAgent",
+          "createdAt",
+          "lastSeenAt",
+          "current"
+        ],
         "additionalProperties": false
       },
       "SignedInResult": {
@@ -709,7 +880,9 @@
             "type": "boolean"
           }
         },
-        "required": ["signedIn"],
+        "required": [
+          "signedIn"
+        ],
         "additionalProperties": false
       },
       "SignedInResultEnvelope": {
@@ -726,7 +899,11 @@
             "type": "null"
           }
         },
-        "required": ["success", "data", "error"],
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
         "additionalProperties": false
       },
       "SignedOutResult": {
@@ -736,7 +913,9 @@
             "type": "boolean"
           }
         },
-        "required": ["signedOut"],
+        "required": [
+          "signedOut"
+        ],
         "additionalProperties": false
       },
       "SignedOutResultEnvelope": {
@@ -753,7 +932,11 @@
             "type": "null"
           }
         },
-        "required": ["success", "data", "error"],
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
         "additionalProperties": false
       },
       "TokenPair": {
@@ -776,7 +959,12 @@
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
           }
         },
-        "required": ["accessToken", "accessTokenExpiresAt", "refreshToken", "refreshTokenExpiresAt"],
+        "required": [
+          "accessToken",
+          "accessTokenExpiresAt",
+          "refreshToken",
+          "refreshTokenExpiresAt"
+        ],
         "additionalProperties": false
       },
       "TokenPairEnvelope": {
@@ -793,7 +981,11 @@
             "type": "null"
           }
         },
-        "required": ["success", "data", "error"],
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
         "additionalProperties": false
       },
       "TotpCodeRequest": {
@@ -804,7 +996,9 @@
             "pattern": "^\\d{6}$"
           }
         },
-        "required": ["code"],
+        "required": [
+          "code"
+        ],
         "additionalProperties": false
       },
       "TotpEnrollment": {
@@ -820,7 +1014,10 @@
             }
           }
         },
-        "required": ["totpUri", "backupCodes"],
+        "required": [
+          "totpUri",
+          "backupCodes"
+        ],
         "additionalProperties": false
       },
       "TotpEnrollmentEnvelope": {
@@ -837,7 +1034,11 @@
             "type": "null"
           }
         },
-        "required": ["success", "data", "error"],
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
         "additionalProperties": false
       },
       "VerificationRequiredResult": {
@@ -847,7 +1048,9 @@
             "type": "boolean"
           }
         },
-        "required": ["verificationRequired"],
+        "required": [
+          "verificationRequired"
+        ],
         "additionalProperties": false
       },
       "VerificationRequiredResultEnvelope": {
@@ -864,7 +1067,11 @@
             "type": "null"
           }
         },
-        "required": ["success", "data", "error"],
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
         "additionalProperties": false
       },
       "VerifiedResult": {
@@ -874,7 +1081,9 @@
             "type": "boolean"
           }
         },
-        "required": ["verified"],
+        "required": [
+          "verified"
+        ],
         "additionalProperties": false
       },
       "VerifiedResultEnvelope": {
@@ -891,7 +1100,11 @@
             "type": "null"
           }
         },
-        "required": ["success", "data", "error"],
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
         "additionalProperties": false
       },
       "VerifyEmailRequest": {
@@ -905,7 +1118,10 @@
             "pattern": "^\\d{6}$"
           }
         },
-        "required": ["email", "otp"]
+        "required": [
+          "email",
+          "otp"
+        ]
       },
       "WebLoginRequest": {
         "type": "object",
@@ -919,7 +1135,10 @@
             "maxLength": 128
           }
         },
-        "required": ["email", "password"]
+        "required": [
+          "email",
+          "password"
+        ]
       }
     }
   },
@@ -927,7 +1146,9 @@
     "/api/v1/config": {
       "get": {
         "operationId": "getConfig",
-        "tags": ["config"],
+        "tags": [
+          "config"
+        ],
         "responses": {
           "200": {
             "description": "Default Response",
@@ -945,7 +1166,9 @@
     "/api/v1/levels": {
       "get": {
         "operationId": "listLevels",
-        "tags": ["structure"],
+        "tags": [
+          "structure"
+        ],
         "responses": {
           "200": {
             "description": "Default Response",
@@ -963,7 +1186,9 @@
     "/api/v1/auth/register": {
       "post": {
         "operationId": "register",
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -991,7 +1216,9 @@
     "/api/v1/auth/verify-email": {
       "post": {
         "operationId": "verifyEmail",
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -1019,7 +1246,9 @@
     "/api/v1/auth/resend-otp": {
       "post": {
         "operationId": "resendOtp",
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -1047,7 +1276,9 @@
     "/api/v1/auth/forgot-password": {
       "post": {
         "operationId": "forgotPassword",
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -1075,7 +1306,9 @@
     "/api/v1/auth/reset-password": {
       "post": {
         "operationId": "resetPassword",
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -1103,7 +1336,9 @@
     "/api/v1/auth/mobile/login": {
       "post": {
         "operationId": "mobileLogin",
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -1131,7 +1366,9 @@
     "/api/v1/auth/mobile/refresh": {
       "post": {
         "operationId": "mobileRefresh",
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -1159,7 +1396,9 @@
     "/api/v1/auth/mobile/logout": {
       "post": {
         "operationId": "mobileLogout",
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -1187,7 +1426,9 @@
     "/api/v1/auth/web/login": {
       "post": {
         "operationId": "webLogin",
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -1215,7 +1456,9 @@
     "/api/v1/auth/web/logout": {
       "post": {
         "operationId": "webLogout",
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "responses": {
           "200": {
             "description": "Default Response",
@@ -1233,7 +1476,9 @@
     "/api/v1/me": {
       "get": {
         "operationId": "getMe",
-        "tags": ["me"],
+        "tags": [
+          "me"
+        ],
         "responses": {
           "200": {
             "description": "Default Response",
@@ -1251,7 +1496,9 @@
     "/api/v1/sessions": {
       "get": {
         "operationId": "listSessions",
-        "tags": ["sessions"],
+        "tags": [
+          "sessions"
+        ],
         "responses": {
           "200": {
             "description": "Default Response",
@@ -1269,7 +1516,9 @@
     "/api/v1/sessions/{id}": {
       "delete": {
         "operationId": "revokeSession",
-        "tags": ["sessions"],
+        "tags": [
+          "sessions"
+        ],
         "parameters": [
           {
             "schema": {
@@ -1299,7 +1548,9 @@
     "/api/v1/uploads": {
       "post": {
         "operationId": "studentCreateUpload",
-        "tags": ["uploads"],
+        "tags": [
+          "uploads"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -1327,7 +1578,9 @@
     "/api/v1/uploads/{id}/complete": {
       "post": {
         "operationId": "studentCompleteUpload",
-        "tags": ["uploads"],
+        "tags": [
+          "uploads"
+        ],
         "parameters": [
           {
             "schema": {
@@ -1357,7 +1610,9 @@
     "/api/v1/uploads/{id}": {
       "get": {
         "operationId": "studentGetUpload",
-        "tags": ["uploads"],
+        "tags": [
+          "uploads"
+        ],
         "parameters": [
           {
             "schema": {
@@ -1387,7 +1642,9 @@
     "/api/v1/admin/auth/login": {
       "post": {
         "operationId": "adminLogin",
-        "tags": ["admin-auth"],
+        "tags": [
+          "admin-auth"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -1415,7 +1672,9 @@
     "/api/v1/admin/auth/2fa/verify": {
       "post": {
         "operationId": "adminVerifyTotp",
-        "tags": ["admin-auth"],
+        "tags": [
+          "admin-auth"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -1443,7 +1702,9 @@
     "/api/v1/admin/auth/2fa/backup": {
       "post": {
         "operationId": "adminVerifyBackupCode",
-        "tags": ["admin-auth"],
+        "tags": [
+          "admin-auth"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -1471,7 +1732,9 @@
     "/api/v1/admin/auth/2fa/enroll": {
       "post": {
         "operationId": "adminStartEnrollment",
-        "tags": ["admin-auth"],
+        "tags": [
+          "admin-auth"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -1499,7 +1762,9 @@
     "/api/v1/admin/auth/2fa/confirm": {
       "post": {
         "operationId": "adminConfirmEnrollment",
-        "tags": ["admin-auth"],
+        "tags": [
+          "admin-auth"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -1527,7 +1792,9 @@
     "/api/v1/admin/auth/logout": {
       "post": {
         "operationId": "adminLogout",
-        "tags": ["admin-auth"],
+        "tags": [
+          "admin-auth"
+        ],
         "responses": {
           "200": {
             "description": "Default Response",
@@ -1545,7 +1812,9 @@
     "/api/v1/admin/me": {
       "get": {
         "operationId": "adminGetMe",
-        "tags": ["admin-auth"],
+        "tags": [
+          "admin-auth"
+        ],
         "responses": {
           "200": {
             "description": "Default Response",
@@ -1563,7 +1832,9 @@
     "/api/v1/admin/uploads": {
       "post": {
         "operationId": "adminCreateUpload",
-        "tags": ["admin-uploads"],
+        "tags": [
+          "admin-uploads"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -1591,7 +1862,9 @@
     "/api/v1/admin/uploads/{id}/complete": {
       "post": {
         "operationId": "adminCompleteUpload",
-        "tags": ["admin-uploads"],
+        "tags": [
+          "admin-uploads"
+        ],
         "parameters": [
           {
             "schema": {
@@ -1621,7 +1894,9 @@
     "/api/v1/admin/uploads/{id}": {
       "get": {
         "operationId": "adminGetUpload",
-        "tags": ["admin-uploads"],
+        "tags": [
+          "admin-uploads"
+        ],
         "parameters": [
           {
             "schema": {

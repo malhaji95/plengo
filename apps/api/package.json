@@ -10,7 +10,9 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "openapi": "node --conditions=@plengo/source --import tsx src/scripts/openapi.ts",
-    "admin:create": "node --conditions=@plengo/source --import tsx src/scripts/create-admin.ts"
+    "admin:create": "node --conditions=@plengo/source --import tsx src/scripts/create-admin.ts",
+    "migrate": "node dist/scripts/migrate.js",
+    "migrate:dev": "node --conditions=@plengo/source --import tsx src/scripts/migrate.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1141.0",
@@ -38,5 +40,8 @@
     "otplib": "^13.5.0",
     "pino-pretty": "^13.0.0",
     "tsx": "^4.23.15"
-  }
+  },
+  "files": [
+    "dist"
+  ]
 }

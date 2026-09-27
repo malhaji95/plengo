@@ -4,1381 +4,1381 @@
  */
 
 export interface paths {
-  '/api/v1/config': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/config": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getConfig"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations['getConfig'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/levels': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/levels": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listLevels"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations['listLevels'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/auth/register': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/auth/register": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["register"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post: operations['register'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/auth/verify-email': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/auth/verify-email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["verifyEmail"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post: operations['verifyEmail'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/auth/resend-otp': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/auth/resend-otp": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["resendOtp"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post: operations['resendOtp'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/auth/forgot-password': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/auth/forgot-password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["forgotPassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post: operations['forgotPassword'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/auth/reset-password': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/auth/reset-password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["resetPassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post: operations['resetPassword'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/auth/mobile/login': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/auth/mobile/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["mobileLogin"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post: operations['mobileLogin'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/auth/mobile/refresh': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/auth/mobile/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["mobileRefresh"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post: operations['mobileRefresh'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/auth/mobile/logout': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/auth/mobile/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["mobileLogout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post: operations['mobileLogout'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/auth/web/login': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/auth/web/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["webLogin"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post: operations['webLogin'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/auth/web/logout': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/auth/web/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["webLogout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post: operations['webLogout'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/me': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getMe"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations['getMe'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/sessions': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listSessions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations['listSessions'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/sessions/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/sessions/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["revokeSession"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete: operations['revokeSession'];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/uploads': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/uploads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["studentCreateUpload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post: operations['studentCreateUpload'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/uploads/{id}/complete': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/uploads/{id}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["studentCompleteUpload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post: operations['studentCompleteUpload'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/uploads/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/uploads/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["studentGetUpload"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations['studentGetUpload'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/admin/auth/login': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/admin/auth/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["adminLogin"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post: operations['adminLogin'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/admin/auth/2fa/verify': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/admin/auth/2fa/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["adminVerifyTotp"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post: operations['adminVerifyTotp'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/admin/auth/2fa/backup': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/admin/auth/2fa/backup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["adminVerifyBackupCode"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post: operations['adminVerifyBackupCode'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/admin/auth/2fa/enroll': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/admin/auth/2fa/enroll": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["adminStartEnrollment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post: operations['adminStartEnrollment'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/admin/auth/2fa/confirm': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/admin/auth/2fa/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["adminConfirmEnrollment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post: operations['adminConfirmEnrollment'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/admin/auth/logout': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/admin/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["adminLogout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post: operations['adminLogout'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/admin/me': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/admin/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminGetMe"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations['adminGetMe'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/admin/uploads': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/admin/uploads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["adminCreateUpload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post: operations['adminCreateUpload'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/admin/uploads/{id}/complete': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/admin/uploads/{id}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["adminCompleteUpload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post: operations['adminCompleteUpload'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/admin/uploads/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/admin/uploads/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminGetUpload"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations['adminGetUpload'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-  schemas: {
-    AdminLoginRequest: {
-      email: string;
-      password: string;
+    schemas: {
+        AdminLoginRequest: {
+            email: string;
+            password: string;
+        };
+        AdminLoginResult: {
+            /** @enum {string} */
+            next: "totp" | "enroll";
+        };
+        AdminLoginResultEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AdminLoginResult"];
+            error: null;
+        };
+        BackupCodeRequest: {
+            code: string;
+        };
+        CreateUploadRequest: {
+            kind: components["schemas"]["MediaKind"];
+            contentType: string;
+            size: number;
+        };
+        CreateUploadResult: {
+            /** Format: uuid */
+            id: string;
+            uploadUrl: string;
+            /** @constant */
+            method: "PUT";
+            headers: {
+                [key: string]: string;
+            };
+            /** Format: date-time */
+            expiresAt: string;
+        };
+        CreateUploadResultEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["CreateUploadResult"];
+            error: null;
+        };
+        EducationLevel: {
+            id: string;
+            code: string;
+            nameAr: string;
+            sortOrder: number;
+        };
+        EducationLevelList: components["schemas"]["EducationLevel"][];
+        EducationLevelListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["EducationLevelList"];
+            error: null;
+        };
+        EnrolledResult: {
+            enrolled: boolean;
+        };
+        EnrolledResultEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["EnrolledResult"];
+            error: null;
+        };
+        ForgotPasswordRequest: {
+            email: string;
+        };
+        Me: {
+            id: string;
+            email: string;
+            emailVerified: boolean;
+            /** @enum {string} */
+            role: "student" | "admin";
+            fullName: string;
+            educationLevelId: string | null;
+        };
+        MediaFile: {
+            /** Format: uuid */
+            id: string;
+            kind: components["schemas"]["MediaKind"];
+            /** @enum {string} */
+            status: "pending" | "ready" | "failed";
+            width: number | null;
+            height: number | null;
+            version: number;
+        };
+        MediaFileEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["MediaFile"];
+            error: null;
+        };
+        /** @enum {string} */
+        MediaKind: "flashcard" | "banner" | "teacher" | "cover" | "user-card";
+        MeEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["Me"];
+            error: null;
+        };
+        MobileLoginRequest: {
+            email: string;
+            password: string;
+            /** @enum {string} */
+            platform: "android" | "ios";
+            appVersion?: string;
+        };
+        MobileLogoutRequest: {
+            refreshToken: string;
+        };
+        MobileRefreshRequest: {
+            refreshToken: string;
+        };
+        PasswordConfirmRequest: {
+            password: string;
+        };
+        RegisterRequest: {
+            fullName: string;
+            email: string;
+            password: string;
+            /** Format: uuid */
+            educationLevelId?: string;
+        };
+        RemoteConfig: {
+            minSupportedVersion: {
+                android: string;
+                ios: string;
+                web: string;
+            };
+            latestVersion: {
+                android: string;
+                ios: string;
+                web: string;
+            };
+            features: {
+                teacherFollowing: boolean;
+                randomPractice: boolean;
+                studentDecks: boolean;
+                streaks: boolean;
+                contentReports: boolean;
+            };
+            srsDefaults: {
+                newCardsPerDay: number;
+                maxReviewsPerDay: number;
+            };
+            support: {
+                email: string;
+                whatsapp: string;
+            };
+            privacyPolicyUrl: string;
+            termsUrl: string;
+        };
+        RemoteConfigEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["RemoteConfig"];
+            error: null;
+        };
+        ResendOtpRequest: {
+            email: string;
+        };
+        ResetPasswordRequest: {
+            email: string;
+            otp: string;
+            newPassword: string;
+        };
+        ResetResult: {
+            reset: boolean;
+        };
+        ResetResultEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["ResetResult"];
+            error: null;
+        };
+        RevokedResult: {
+            revoked: boolean;
+        };
+        RevokedResultEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["RevokedResult"];
+            error: null;
+        };
+        SentResult: {
+            sent: boolean;
+        };
+        SentResultEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["SentResult"];
+            error: null;
+        };
+        SessionList: components["schemas"]["SessionSummary"][];
+        SessionListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["SessionList"];
+            error: null;
+        };
+        /** @enum {string} */
+        SessionPlatform: "android" | "ios" | "web" | "admin";
+        SessionSummary: {
+            id: string;
+            platform: components["schemas"]["SessionPlatform"];
+            appVersion: string | null;
+            userAgent: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            lastSeenAt: string;
+            current: boolean;
+        };
+        SignedInResult: {
+            signedIn: boolean;
+        };
+        SignedInResultEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["SignedInResult"];
+            error: null;
+        };
+        SignedOutResult: {
+            signedOut: boolean;
+        };
+        SignedOutResultEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["SignedOutResult"];
+            error: null;
+        };
+        TokenPair: {
+            accessToken: string;
+            /** Format: date-time */
+            accessTokenExpiresAt: string;
+            refreshToken: string;
+            /** Format: date-time */
+            refreshTokenExpiresAt: string;
+        };
+        TokenPairEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["TokenPair"];
+            error: null;
+        };
+        TotpCodeRequest: {
+            code: string;
+        };
+        TotpEnrollment: {
+            totpUri: string;
+            backupCodes: string[];
+        };
+        TotpEnrollmentEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["TotpEnrollment"];
+            error: null;
+        };
+        VerificationRequiredResult: {
+            verificationRequired: boolean;
+        };
+        VerificationRequiredResultEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["VerificationRequiredResult"];
+            error: null;
+        };
+        VerifiedResult: {
+            verified: boolean;
+        };
+        VerifiedResultEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["VerifiedResult"];
+            error: null;
+        };
+        VerifyEmailRequest: {
+            email: string;
+            otp: string;
+        };
+        WebLoginRequest: {
+            email: string;
+            password: string;
+        };
     };
-    AdminLoginResult: {
-      /** @enum {string} */
-      next: 'totp' | 'enroll';
-    };
-    AdminLoginResultEnvelope: {
-      /** @constant */
-      success: true;
-      data: components['schemas']['AdminLoginResult'];
-      error: null;
-    };
-    BackupCodeRequest: {
-      code: string;
-    };
-    CreateUploadRequest: {
-      kind: components['schemas']['MediaKind'];
-      contentType: string;
-      size: number;
-    };
-    CreateUploadResult: {
-      /** Format: uuid */
-      id: string;
-      uploadUrl: string;
-      /** @constant */
-      method: 'PUT';
-      headers: {
-        [key: string]: string;
-      };
-      /** Format: date-time */
-      expiresAt: string;
-    };
-    CreateUploadResultEnvelope: {
-      /** @constant */
-      success: true;
-      data: components['schemas']['CreateUploadResult'];
-      error: null;
-    };
-    EducationLevel: {
-      id: string;
-      code: string;
-      nameAr: string;
-      sortOrder: number;
-    };
-    EducationLevelList: components['schemas']['EducationLevel'][];
-    EducationLevelListEnvelope: {
-      /** @constant */
-      success: true;
-      data: components['schemas']['EducationLevelList'];
-      error: null;
-    };
-    EnrolledResult: {
-      enrolled: boolean;
-    };
-    EnrolledResultEnvelope: {
-      /** @constant */
-      success: true;
-      data: components['schemas']['EnrolledResult'];
-      error: null;
-    };
-    ForgotPasswordRequest: {
-      email: string;
-    };
-    Me: {
-      id: string;
-      email: string;
-      emailVerified: boolean;
-      /** @enum {string} */
-      role: 'student' | 'admin';
-      fullName: string;
-      educationLevelId: string | null;
-    };
-    MediaFile: {
-      /** Format: uuid */
-      id: string;
-      kind: components['schemas']['MediaKind'];
-      /** @enum {string} */
-      status: 'pending' | 'ready' | 'failed';
-      width: number | null;
-      height: number | null;
-      version: number;
-    };
-    MediaFileEnvelope: {
-      /** @constant */
-      success: true;
-      data: components['schemas']['MediaFile'];
-      error: null;
-    };
-    /** @enum {string} */
-    MediaKind: 'flashcard' | 'banner' | 'teacher' | 'cover' | 'user-card';
-    MeEnvelope: {
-      /** @constant */
-      success: true;
-      data: components['schemas']['Me'];
-      error: null;
-    };
-    MobileLoginRequest: {
-      email: string;
-      password: string;
-      /** @enum {string} */
-      platform: 'android' | 'ios';
-      appVersion?: string;
-    };
-    MobileLogoutRequest: {
-      refreshToken: string;
-    };
-    MobileRefreshRequest: {
-      refreshToken: string;
-    };
-    PasswordConfirmRequest: {
-      password: string;
-    };
-    RegisterRequest: {
-      fullName: string;
-      email: string;
-      password: string;
-      /** Format: uuid */
-      educationLevelId?: string;
-    };
-    RemoteConfig: {
-      minSupportedVersion: {
-        android: string;
-        ios: string;
-        web: string;
-      };
-      latestVersion: {
-        android: string;
-        ios: string;
-        web: string;
-      };
-      features: {
-        teacherFollowing: boolean;
-        randomPractice: boolean;
-        studentDecks: boolean;
-        streaks: boolean;
-        contentReports: boolean;
-      };
-      srsDefaults: {
-        newCardsPerDay: number;
-        maxReviewsPerDay: number;
-      };
-      support: {
-        email: string;
-        whatsapp: string;
-      };
-      privacyPolicyUrl: string;
-      termsUrl: string;
-    };
-    RemoteConfigEnvelope: {
-      /** @constant */
-      success: true;
-      data: components['schemas']['RemoteConfig'];
-      error: null;
-    };
-    ResendOtpRequest: {
-      email: string;
-    };
-    ResetPasswordRequest: {
-      email: string;
-      otp: string;
-      newPassword: string;
-    };
-    ResetResult: {
-      reset: boolean;
-    };
-    ResetResultEnvelope: {
-      /** @constant */
-      success: true;
-      data: components['schemas']['ResetResult'];
-      error: null;
-    };
-    RevokedResult: {
-      revoked: boolean;
-    };
-    RevokedResultEnvelope: {
-      /** @constant */
-      success: true;
-      data: components['schemas']['RevokedResult'];
-      error: null;
-    };
-    SentResult: {
-      sent: boolean;
-    };
-    SentResultEnvelope: {
-      /** @constant */
-      success: true;
-      data: components['schemas']['SentResult'];
-      error: null;
-    };
-    SessionList: components['schemas']['SessionSummary'][];
-    SessionListEnvelope: {
-      /** @constant */
-      success: true;
-      data: components['schemas']['SessionList'];
-      error: null;
-    };
-    /** @enum {string} */
-    SessionPlatform: 'android' | 'ios' | 'web' | 'admin';
-    SessionSummary: {
-      id: string;
-      platform: components['schemas']['SessionPlatform'];
-      appVersion: string | null;
-      userAgent: string | null;
-      /** Format: date-time */
-      createdAt: string;
-      /** Format: date-time */
-      lastSeenAt: string;
-      current: boolean;
-    };
-    SignedInResult: {
-      signedIn: boolean;
-    };
-    SignedInResultEnvelope: {
-      /** @constant */
-      success: true;
-      data: components['schemas']['SignedInResult'];
-      error: null;
-    };
-    SignedOutResult: {
-      signedOut: boolean;
-    };
-    SignedOutResultEnvelope: {
-      /** @constant */
-      success: true;
-      data: components['schemas']['SignedOutResult'];
-      error: null;
-    };
-    TokenPair: {
-      accessToken: string;
-      /** Format: date-time */
-      accessTokenExpiresAt: string;
-      refreshToken: string;
-      /** Format: date-time */
-      refreshTokenExpiresAt: string;
-    };
-    TokenPairEnvelope: {
-      /** @constant */
-      success: true;
-      data: components['schemas']['TokenPair'];
-      error: null;
-    };
-    TotpCodeRequest: {
-      code: string;
-    };
-    TotpEnrollment: {
-      totpUri: string;
-      backupCodes: string[];
-    };
-    TotpEnrollmentEnvelope: {
-      /** @constant */
-      success: true;
-      data: components['schemas']['TotpEnrollment'];
-      error: null;
-    };
-    VerificationRequiredResult: {
-      verificationRequired: boolean;
-    };
-    VerificationRequiredResultEnvelope: {
-      /** @constant */
-      success: true;
-      data: components['schemas']['VerificationRequiredResult'];
-      error: null;
-    };
-    VerifiedResult: {
-      verified: boolean;
-    };
-    VerifiedResultEnvelope: {
-      /** @constant */
-      success: true;
-      data: components['schemas']['VerifiedResult'];
-      error: null;
-    };
-    VerifyEmailRequest: {
-      email: string;
-      otp: string;
-    };
-    WebLoginRequest: {
-      email: string;
-      password: string;
-    };
-  };
-  responses: never;
-  parameters: never;
-  requestBodies: never;
-  headers: never;
-  pathItems: never;
+    responses: never;
+    parameters: never;
+    requestBodies: never;
+    headers: never;
+    pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-  getConfig: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Default Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+    getConfig: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content: {
-          'application/json': components['schemas']['RemoteConfigEnvelope'];
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RemoteConfigEnvelope"];
+                };
+            };
         };
-      };
     };
-  };
-  listLevels: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Default Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+    listLevels: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content: {
-          'application/json': components['schemas']['EducationLevelListEnvelope'];
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EducationLevelListEnvelope"];
+                };
+            };
         };
-      };
     };
-  };
-  register: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['RegisterRequest'];
-      };
-    };
-    responses: {
-      /** @description Default Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+    register: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content: {
-          'application/json': components['schemas']['VerificationRequiredResultEnvelope'];
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RegisterRequest"];
+            };
         };
-      };
-    };
-  };
-  verifyEmail: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['VerifyEmailRequest'];
-      };
-    };
-    responses: {
-      /** @description Default Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VerificationRequiredResultEnvelope"];
+                };
+            };
         };
-        content: {
-          'application/json': components['schemas']['VerifiedResultEnvelope'];
+    };
+    verifyEmail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-    };
-  };
-  resendOtp: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['ResendOtpRequest'];
-      };
-    };
-    responses: {
-      /** @description Default Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VerifyEmailRequest"];
+            };
         };
-        content: {
-          'application/json': components['schemas']['SentResultEnvelope'];
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VerifiedResultEnvelope"];
+                };
+            };
         };
-      };
     };
-  };
-  forgotPassword: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['ForgotPasswordRequest'];
-      };
-    };
-    responses: {
-      /** @description Default Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+    resendOtp: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content: {
-          'application/json': components['schemas']['SentResultEnvelope'];
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResendOtpRequest"];
+            };
         };
-      };
-    };
-  };
-  resetPassword: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['ResetPasswordRequest'];
-      };
-    };
-    responses: {
-      /** @description Default Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SentResultEnvelope"];
+                };
+            };
         };
-        content: {
-          'application/json': components['schemas']['ResetResultEnvelope'];
+    };
+    forgotPassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-    };
-  };
-  mobileLogin: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['MobileLoginRequest'];
-      };
-    };
-    responses: {
-      /** @description Default Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ForgotPasswordRequest"];
+            };
         };
-        content: {
-          'application/json': components['schemas']['TokenPairEnvelope'];
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SentResultEnvelope"];
+                };
+            };
         };
-      };
     };
-  };
-  mobileRefresh: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['MobileRefreshRequest'];
-      };
-    };
-    responses: {
-      /** @description Default Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+    resetPassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content: {
-          'application/json': components['schemas']['TokenPairEnvelope'];
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResetPasswordRequest"];
+            };
         };
-      };
-    };
-  };
-  mobileLogout: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['MobileLogoutRequest'];
-      };
-    };
-    responses: {
-      /** @description Default Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResetResultEnvelope"];
+                };
+            };
         };
-        content: {
-          'application/json': components['schemas']['SignedOutResultEnvelope'];
+    };
+    mobileLogin: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-    };
-  };
-  webLogin: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['WebLoginRequest'];
-      };
-    };
-    responses: {
-      /** @description Default Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MobileLoginRequest"];
+            };
         };
-        content: {
-          'application/json': components['schemas']['SignedInResultEnvelope'];
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TokenPairEnvelope"];
+                };
+            };
         };
-      };
     };
-  };
-  webLogout: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Default Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+    mobileRefresh: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content: {
-          'application/json': components['schemas']['SignedOutResultEnvelope'];
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MobileRefreshRequest"];
+            };
         };
-      };
-    };
-  };
-  getMe: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Default Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TokenPairEnvelope"];
+                };
+            };
         };
-        content: {
-          'application/json': components['schemas']['MeEnvelope'];
+    };
+    mobileLogout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-    };
-  };
-  listSessions: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Default Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MobileLogoutRequest"];
+            };
         };
-        content: {
-          'application/json': components['schemas']['SessionListEnvelope'];
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SignedOutResultEnvelope"];
+                };
+            };
         };
-      };
     };
-  };
-  revokeSession: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Default Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+    webLogin: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content: {
-          'application/json': components['schemas']['RevokedResultEnvelope'];
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WebLoginRequest"];
+            };
         };
-      };
-    };
-  };
-  studentCreateUpload: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateUploadRequest'];
-      };
-    };
-    responses: {
-      /** @description Default Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SignedInResultEnvelope"];
+                };
+            };
         };
-        content: {
-          'application/json': components['schemas']['CreateUploadResultEnvelope'];
+    };
+    webLogout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-    };
-  };
-  studentCompleteUpload: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Default Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SignedOutResultEnvelope"];
+                };
+            };
         };
-        content: {
-          'application/json': components['schemas']['MediaFileEnvelope'];
+    };
+    getMe: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-    };
-  };
-  studentGetUpload: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Default Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeEnvelope"];
+                };
+            };
         };
-        content: {
-          'application/json': components['schemas']['MediaFileEnvelope'];
+    };
+    listSessions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-    };
-  };
-  adminLogin: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['AdminLoginRequest'];
-      };
-    };
-    responses: {
-      /** @description Default Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionListEnvelope"];
+                };
+            };
         };
-        content: {
-          'application/json': components['schemas']['AdminLoginResultEnvelope'];
+    };
+    revokeSession: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
         };
-      };
-    };
-  };
-  adminVerifyTotp: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TotpCodeRequest'];
-      };
-    };
-    responses: {
-      /** @description Default Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RevokedResultEnvelope"];
+                };
+            };
         };
-        content: {
-          'application/json': components['schemas']['SignedInResultEnvelope'];
+    };
+    studentCreateUpload: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-    };
-  };
-  adminVerifyBackupCode: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['BackupCodeRequest'];
-      };
-    };
-    responses: {
-      /** @description Default Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateUploadRequest"];
+            };
         };
-        content: {
-          'application/json': components['schemas']['SignedInResultEnvelope'];
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreateUploadResultEnvelope"];
+                };
+            };
         };
-      };
     };
-  };
-  adminStartEnrollment: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['PasswordConfirmRequest'];
-      };
-    };
-    responses: {
-      /** @description Default Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+    studentCompleteUpload: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
         };
-        content: {
-          'application/json': components['schemas']['TotpEnrollmentEnvelope'];
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MediaFileEnvelope"];
+                };
+            };
         };
-      };
     };
-  };
-  adminConfirmEnrollment: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TotpCodeRequest'];
-      };
-    };
-    responses: {
-      /** @description Default Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+    studentGetUpload: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
         };
-        content: {
-          'application/json': components['schemas']['EnrolledResultEnvelope'];
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MediaFileEnvelope"];
+                };
+            };
         };
-      };
     };
-  };
-  adminLogout: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Default Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+    adminLogin: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content: {
-          'application/json': components['schemas']['SignedOutResultEnvelope'];
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminLoginRequest"];
+            };
         };
-      };
-    };
-  };
-  adminGetMe: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Default Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminLoginResultEnvelope"];
+                };
+            };
         };
-        content: {
-          'application/json': components['schemas']['MeEnvelope'];
+    };
+    adminVerifyTotp: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-    };
-  };
-  adminCreateUpload: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateUploadRequest'];
-      };
-    };
-    responses: {
-      /** @description Default Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TotpCodeRequest"];
+            };
         };
-        content: {
-          'application/json': components['schemas']['CreateUploadResultEnvelope'];
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SignedInResultEnvelope"];
+                };
+            };
         };
-      };
     };
-  };
-  adminCompleteUpload: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Default Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+    adminVerifyBackupCode: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content: {
-          'application/json': components['schemas']['MediaFileEnvelope'];
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BackupCodeRequest"];
+            };
         };
-      };
-    };
-  };
-  adminGetUpload: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Default Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SignedInResultEnvelope"];
+                };
+            };
         };
-        content: {
-          'application/json': components['schemas']['MediaFileEnvelope'];
-        };
-      };
     };
-  };
+    adminStartEnrollment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PasswordConfirmRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TotpEnrollmentEnvelope"];
+                };
+            };
+        };
+    };
+    adminConfirmEnrollment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TotpCodeRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EnrolledResultEnvelope"];
+                };
+            };
+        };
+    };
+    adminLogout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SignedOutResultEnvelope"];
+                };
+            };
+        };
+    };
+    adminGetMe: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeEnvelope"];
+                };
+            };
+        };
+    };
+    adminCreateUpload: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateUploadRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreateUploadResultEnvelope"];
+                };
+            };
+        };
+    };
+    adminCompleteUpload: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MediaFileEnvelope"];
+                };
+            };
+        };
+    };
+    adminGetUpload: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MediaFileEnvelope"];
+                };
+            };
+        };
+    };
 }

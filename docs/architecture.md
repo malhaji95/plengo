@@ -1,0 +1,132 @@
+# Architecture
+
+See `spec.md` §0 for the locked decisions. This file records how they were implemented and any
+decision the spec left open (ADR list, spec §41 rule 20).
+
+```text
+Flutter student app (Android · iOS · Web)      Next.js admin (browser)
+        │ bearer JWT (mobile) / cookie (web)            │ cookie + TOTP
+        └───────────────┬───────────────────────────────┘
+                        ▼
+              apps/api (Fastify, Zod, OpenAPI)
+      routes → services → repositories (Drizzle, node-postgres)
+                        │
+        ┌───────────────┼──────────────────┐
+        ▼               ▼                  ▼
+   PostgreSQL      pg-boss (schema      Cloudflare R2
+   (Neon)          `pgboss`)            public + private buckets
+```
+
+## Phase 1 status
+
+Done:
+
+- Monorepo, shared TS/ESLint/Prettier, CI (lint, typecheck, migration check, OpenAPI/client drift
+  checks, API integration tests on Postgres, admin build, Flutter analyze/test/web build, Docker build).
+- API: envelope + Arabic error codes, request IDs, `/health`, `/ready`, `/api/v1/config`, server-side
+  minimum-version gate, CORS allowlist, CSRF checks for cookie requests, §31 rate limits.
+- Auth: registration, 6-digit email OTP verification, OTP password reset, mobile token pair with
+  rotation / retry grace / replay detection, student web cookie sessions, sessions list + revoke,
+  admin password + mandatory TOTP (enrollment, recovery codes, 12 h idle timeout), admin CLI.
+- Storage: provider-neutral interface, R2 (S3) implementation, presigned uploads with signed
+  content-type and length, pg-boss processing into WebP variants, 24 h orphan cleanup, student quota.
+- Admin shell: sign-in, TOTP enrollment/verification, RTL navigation (§26.1).
+- Flutter shell: RTL theme + dark mode + 3 font sizes, auth screens, five-tab shell, sessions,
+  force update, generated API client, token refresh, encrypted drift database, coupon flag gating.
+
+Not verifiable in the cloud build environment (deferred per spec):
+
+- Physical Android/iOS runs (Phase 13 owner smoke tests). Android/iOS builds are not run in CI yet.
+- Live R2 round trip: `apps/api/test/r2-storage.test.ts` has a live suite that runs when
+  `S3_TEST_ENDPOINT`, `S3_TEST_ACCESS_KEY_ID`, `S3_TEST_SECRET_ACCESS_KEY` and `S3_TEST_BUCKET` are set.
+- Sentry is wired but inactive without DSNs.
+
+## Decisions
+
+### ADR-001 — pnpm workspace with a source export condition
+
+Packages export `./src/index.ts` under the custom condition `@plengo/source` and compiled `dist`
+otherwise. Dev (`tsx`), typecheck and tests read sources directly; production images run compiled
+JavaScript produced by `pnpm build` and packaged with `pnpm deploy`.
+
+### ADR-002 — OpenAPI from Zod, named components, generated clients
+
+Routes declare Zod schemas; `fastify-type-provider-zod` emits OpenAPI 3.1. Schemas are registered
+in `z.globalRegistry` with an `id` so they become named components, and the export script
+(`apps/api/src/scripts/openapi.ts`) collapses the provider's identical `…Input` twins and drops
+unreferenced components. Clients: `openapi-typescript` + `openapi-fetch` (admin),
+`swagger_parser` → retrofit/json_serializable (Flutter; pure Dart, no Java in CI).
+Admin endpoints are excluded from the Dart client.
+
+### ADR-003 — Better Auth as a library, not a mounted handler
+
+Better Auth provides password hashing, email OTP (verification + reset), cookie sessions and TOTP.
+Its HTTP handler is not mounted: API routes call `auth.api.*` and translate results into the §30
+envelope and error codes, so every client sees one API surface. Tables are mapped onto the spec's
+names (`users`, `sessions`, `accounts`, `verification_codes`, `admin_two_factor`) with UUID ids.
+OTPs are stored hashed, 6 digits, 10-minute lifetime, 5 attempts.
+
+Registering an email that already exists returns the same success response and sends nothing
+(Better Auth's enumeration protection); forgot-password and resend-OTP also never reveal whether an
+account exists. `AUTH_EMAIL_TAKEN` is therefore not used by registration.
+
+### ADR-004 — Mobile refresh tokens: families, grace window, revocation
+
+- Each mobile login creates a `sessions` row (`platform = android|ios`) and a token family. The
+  family is tied to the session, so the student's session list and "revoke session" cover mobile
+  and web alike.
+- Access token: HS256 JWT, 15 min, claims `sub` (user) and `sid` (session). Every authenticated
+  request also checks that the session is unexpired, so logout/revocation take effect immediately
+  rather than after up to 15 minutes.
+- Refresh token: 256-bit random, stored as HMAC-SHA256 with `MOBILE_REFRESH_TOKEN_PEPPER`,
+  30-day lifetime, rotated on every refresh (row lock serializes concurrent refreshes).
+- Retry grace (30 s): the spec's "replay the same response" is impossible when only hashes are
+  stored, so a rotated token presented inside the window mints a **sibling** successor instead.
+  Both successors stay valid; at most 5 siblings per rotated token. Outside the window the whole
+  family is revoked (tokens `revoked_at`, session expired).
+- Password reset revokes every session and token family of the user.
+
+### ADR-005 — What "2FA-verified admin session" means
+
+When an admin has TOTP enabled, Better Auth only creates a session after the TOTP (or a recovery
+code) is verified. Before enrollment, the password step yields a session that only the enrollment
+routes accept; confirming the first TOTP code enables 2FA. `requireAdmin` therefore requires
+`role = admin`, an active account, `two_factor_enabled = true`, a cookie (never bearer) session and
+activity within 12 hours (`sessions.last_seen_at`, refreshed at most once a minute).
+Admins cannot sign in through the student mobile or web endpoints, and students cannot use admin
+endpoints.
+
+### ADR-006 — Rate limits are in-process
+
+`@fastify/rate-limit` uses its in-memory store. That is correct for the single V1 API instance;
+before running more than one API replica, switch to a shared store. Limits: login 10/15 min per
+IP+email, OTP-sending endpoints 5/hour per email, uploads 60/hour per user (coupon and report
+limits arrive with their phases).
+
+### ADR-007 — Upload pipeline
+
+Originals always go to the private bucket under `{env}/original/{yyyy}/{mm}/{uuid}/original`,
+uploaded directly by the client with a presigned PUT whose `Content-Type` and `Content-Length` are
+signed. `complete` checks the object size and enqueues `media.process`; the worker detects the
+format from magic bytes (sharp), rejects non-images, and writes `full`/`thumb` WebP variants into
+the bucket for the kind (public for banners/teachers/covers, private otherwise).
+Pending uploads older than 24 h are deleted hourly with their originals.
+
+### ADR-008 — Flutter local database
+
+`package:sqlite3` bundles the SQLCipher build (`hooks.user_defines.sqlite3.source: sqlcipher`),
+replacing the discontinued `sqlcipher_flutter_libs`. The key is 32 random bytes generated on first
+launch and kept in Keychain/Keystore. On web the regular WASM SQLite is used (no offline packs on
+web, §22.8). Logout wipes the database except device preferences (`settings.*`: theme, font size).
+
+### ADR-009 — Web build without third-party CDNs
+
+The Arabic font is bundled (IBM Plex Sans Arabic, OFL, a placeholder until branding is decided,
+§44) and web builds use `--no-web-resources-cdn` so CanvasKit is served from the app origin.
+The PWA manifest ships with `display: browser` so browsers do not offer installation under Plan A;
+Plan B changes it to `standalone`.
+
+### ADR-010 — Education levels are reference data
+
+The three levels are inserted by migration `0001_reference_data` because registration needs them
+from Phase 1; Phase 2 adds the college hierarchy and admin CRUD.
