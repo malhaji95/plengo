@@ -6,6 +6,7 @@ import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import { EntityList } from '@/components/entity-list';
 import { FormError } from '@/components/form-error';
+import { ImageUpload } from '@/components/image-upload';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input, Label } from '@/components/ui/input';
@@ -122,7 +123,14 @@ function SubjectDetails({
   subject,
   onSaved,
 }: {
-  subject: { id: string; code: string; nameAr: string; description: string | null; isActive: boolean };
+  subject: {
+    id: string;
+    code: string;
+    nameAr: string;
+    description: string | null;
+    isActive: boolean;
+    coverUrl: string | null;
+  };
   onSaved: () => Promise<unknown>;
 }) {
   const [error, setError] = useState<string | null>(null);
@@ -152,6 +160,26 @@ function SubjectDetails({
 
   return (
     <Card className="space-y-4">
+      <ImageUpload
+        kind="cover"
+        label="صورة الغلاف"
+        imageUrl={subject.coverUrl}
+        onChange={async (coverMediaId) => {
+          setError(null);
+          try {
+            await unwrap(
+              api.PATCH('/api/v1/admin/subjects/{id}', {
+                params: { path: { id: subject.id } },
+                body: { coverMediaId },
+              }),
+            );
+            await onSaved();
+          } catch (err) {
+            setError(errorMessage(err));
+            throw err;
+          }
+        }}
+      />
       <form
         key={`${subject.id}:${subject.code}:${subject.nameAr}`}
         className="grid gap-4 sm:grid-cols-2"
