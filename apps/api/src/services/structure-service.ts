@@ -236,6 +236,10 @@ export function createStructureService(deps: {
       return (await repo.listSubjects(filter, { studentVisible: false })).map((r) => toSubject(r, storage));
     },
 
+    async getSubject(id: string): Promise<Subject> {
+      return toSubject(await subjectOrFail(id), storage);
+    },
+
     async createSubject(
       actor: AdminActor,
       input: CollegePathInput & {

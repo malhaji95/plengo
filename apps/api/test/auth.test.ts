@@ -405,6 +405,35 @@ describe('remote config and force update', () => {
   });
 });
 
+describe('CORS', () => {
+  it('lets the admin and web origins send every method the API uses, with credentials', async () => {
+    for (const method of ['PATCH', 'PUT', 'DELETE']) {
+      const res = await t.app.inject({
+        method: 'OPTIONS',
+        url: '/api/v1/admin/universities/00000000-0000-4000-8000-000000000000',
+        headers: {
+          origin: ADMIN_ORIGIN,
+          'access-control-request-method': method,
+          'access-control-request-headers': 'content-type,x-requested-with',
+        },
+      });
+      expect(res.statusCode).toBe(204);
+      expect(res.headers['access-control-allow-origin']).toBe(ADMIN_ORIGIN);
+      expect(res.headers['access-control-allow-credentials']).toBe('true');
+      expect(String(res.headers['access-control-allow-methods'])).toContain(method);
+    }
+  });
+
+  it('does not allow unknown origins', async () => {
+    const res = await t.app.inject({
+      method: 'OPTIONS',
+      url: '/api/v1/me',
+      headers: { origin: 'https://evil.example', 'access-control-request-method': 'GET' },
+    });
+    expect(res.headers['access-control-allow-origin']).toBeUndefined();
+  });
+});
+
 describe('health', () => {
   it('reports liveness and readiness', async () => {
     expect((await t.app.inject({ method: 'GET', url: '/health' })).json()).toEqual({ status: 'ok' });

@@ -33,12 +33,12 @@ export interface NavItem {
   phase: number;
 }
 
-export const CURRENT_PHASE = 1;
+export const CURRENT_PHASE = 2;
 
 /** Admin navigation, in the order of spec §26.1. */
 export const NAV_ITEMS: NavItem[] = [
   { href: '/', label: 'الرئيسية', icon: LayoutDashboard, phase: 1 },
-  { href: '/admins', label: 'المشرفون', icon: ShieldCheck, phase: 2 },
+  { href: '/admins', label: 'المشرفون', icon: ShieldCheck, phase: 11 },
   { href: '/students', label: 'الطلاب', icon: Users, phase: 4 },
   { href: '/teachers', label: 'المدرسون', icon: UserRound, phase: 3 },
   { href: '/tracks', label: 'المسارات', icon: Route, phase: 3 },

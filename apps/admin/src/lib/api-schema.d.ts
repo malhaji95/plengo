@@ -763,7 +763,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["adminGetSubject"];
         put?: never;
         post?: never;
         delete: operations["adminDeleteSubject"];
@@ -2711,6 +2711,28 @@ export interface operations {
                 "application/json": components["schemas"]["CreateSubjectRequest"];
             };
         };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubjectEnvelope"];
+                };
+            };
+        };
+    };
+    adminGetSubject: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             /** @description Default Response */
             200: {

@@ -75,6 +75,7 @@ export async function buildApp(app: App, c: Container): Promise<App> {
   await app.register(cors, {
     origin: origins,
     credentials: true,
+    methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE'],
     allowedHeaders: [
       'Content-Type',
       'Authorization',

@@ -254,6 +254,18 @@ export function adminStructureRoutes(c: Container): FastifyPluginAsyncZod {
       },
       async (request) => ok(await s.listSubjects(request.query)),
     );
+    app.get(
+      '/subjects/:id',
+      {
+        schema: {
+          operationId: 'adminGetSubject',
+          tags,
+          params: idParams,
+          response: { 200: successEnvelope(subjectSchema) },
+        },
+      },
+      async (request) => ok(await s.getSubject(request.params.id)),
+    );
     app.post(
       '/subjects',
       {
