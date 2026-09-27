@@ -126,6 +126,7 @@ export const dueCardSchema = z.object({
   card: studentCardSchema,
   deckTitleAr: z.string(),
   subjectId: z.string(),
+  subjectNameAr: z.string(),
   state: srsCardStateSchema,
 });
 export const dueCardsSchema = z.object({

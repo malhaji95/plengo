@@ -2586,6 +2586,9 @@
           "subjectId": {
             "type": "string"
           },
+          "subjectNameAr": {
+            "type": "string"
+          },
           "state": {
             "$ref": "#/components/schemas/SrsCardState"
           }
@@ -2594,6 +2597,7 @@
           "card",
           "deckTitleAr",
           "subjectId",
+          "subjectNameAr",
           "state"
         ],
         "additionalProperties": false

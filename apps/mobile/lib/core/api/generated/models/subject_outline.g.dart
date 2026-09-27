@@ -22,6 +22,9 @@ SubjectOutline _$SubjectOutlineFromJson(Map<String, dynamic> json) =>
       questionCount: ContentCount.fromJson(
         json['questionCount'] as Map<String, dynamic>,
       ),
+      deckCount: ContentCount.fromJson(
+        json['deckCount'] as Map<String, dynamic>,
+      ),
     );
 
 Map<String, dynamic> _$SubjectOutlineToJson(SubjectOutline instance) =>
@@ -32,4 +35,5 @@ Map<String, dynamic> _$SubjectOutlineToJson(SubjectOutline instance) =>
       'tracks': instance.tracks,
       'access': instance.access,
       'questionCount': instance.questionCount,
+      'deckCount': instance.deckCount,
     };

@@ -13,12 +13,55 @@ class KeyValues extends Table {
   Set<Column<Object>> get primaryKey => {key};
 }
 
-@DriftDatabase(tables: [KeyValues])
+/// Local spaced-repetition state of official cards (spec §13.6). Scheduling runs on the device;
+/// rows sync to the server and come back from other devices (last review wins).
+class SrsCardStates extends Table {
+  TextColumn get flashcardId => text()();
+  TextColumn get state => text()();
+  IntColumn get step => integer()();
+  IntColumn get dueAt => integer()();
+  IntColumn get intervalDays => integer()();
+  RealColumn get ease => real()();
+  IntColumn get reps => integer()();
+  IntColumn get lapses => integer()();
+  IntColumn get lastReviewedAt => integer().nullable()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {flashcardId};
+}
+
+/// Every rating, kept until the server has it (spec §13.6). `undone` rows restore `before`.
+class SrsReviewLogs extends Table {
+  TextColumn get id => text()();
+  TextColumn get flashcardId => text()();
+  TextColumn get rating => text()();
+  TextColumn get before => text()();
+  TextColumn get after => text()();
+  IntColumn get reviewedAt => integer()();
+  IntColumn get durationMs => integer().nullable()();
+  BoolColumn get undone => boolean().withDefault(const Constant(false))();
+  BoolColumn get synced => boolean().withDefault(const Constant(false))();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DriftDatabase(tables: [KeyValues, SrsCardStates, SrsReviewLogs])
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onUpgrade: (m, from, to) async {
+      if (from < 2) {
+        await m.createTable(srsCardStates);
+        await m.createTable(srsReviewLogs);
+      }
+    },
+  );
 
   Future<String?> getValue(String key) async {
     final row = await (select(keyValues)..where((t) => t.key.equals(key))).getSingleOrNull();

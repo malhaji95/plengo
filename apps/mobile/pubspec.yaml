@@ -27,6 +27,7 @@ dependencies:
   retrofit: ^4.10.0
   sentry_flutter: ^9.30.1
   sqlite3: ^3.6.0
+  crypto: ^3.0.7
 
 dev_dependencies:
   flutter_test:
@@ -81,3 +82,4 @@ swagger_parser:
     - admin-students
     - admin-access
     - admin-questions
+    - admin-flashcards

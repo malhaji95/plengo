@@ -20,6 +20,7 @@ class TrackDetail {
     required this.subject,
     required this.access,
     required this.questionCount,
+    required this.deckCount,
   });
   
   factory TrackDetail.fromJson(Map<String, Object?> json) => _$TrackDetailFromJson(json);
@@ -29,6 +30,7 @@ class TrackDetail {
   final Subject subject;
   final ScopeAccess access;
   final ContentCount questionCount;
+  final ContentCount deckCount;
 
   Map<String, Object?> toJson() => _$TrackDetailToJson(this);
 }

@@ -58,6 +58,16 @@ class TrackScreen extends ConsumerWidget {
                     onTap: () => context.go('${Routes.subjects}/${d.subject.id}'),
                   ),
                 ),
+                if (d.deckCount.total > 0)
+                  Card(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    child: ListTile(
+                      leading: const Icon(Icons.style_outlined),
+                      title: const Text('بطاقات المسار'),
+                      trailing: const Icon(Icons.chevron_left),
+                      onTap: () => context.go('${Routes.tracks}/${d.track.id}/decks'),
+                    ),
+                  ),
                 if (d.questionCount.total > 0)
                   Card(
                     child: ListTile(
@@ -72,7 +82,7 @@ class TrackScreen extends ConsumerWidget {
                       onTap: () => context.go('${Routes.tracks}/${d.track.id}/questions'),
                     ),
                   )
-                else
+                else if (d.deckCount.total == 0)
                   const EmptyState('محتوى هذا المسار قيد الإعداد', icon: Icons.hourglass_empty),
               ],
             ),

@@ -1,5 +1,5 @@
 import { and, asc, eq, gt, inArray, isNotNull, lt, ne, or, sql } from 'drizzle-orm';
-import { cardStates, flashcardDecks, flashcards, reviewLogs, type Db } from '@plengo/db';
+import { cardStates, flashcardDecks, flashcards, reviewLogs, subjects, type Db } from '@plengo/db';
 import type { SrsCardState, SrsStateInput } from '@plengo/contracts';
 import { businessDay, startOfBusinessDay } from '@plengo/srs';
 import { AppError } from '../lib/app-error.js';
@@ -198,10 +198,11 @@ export function createSrsService(deps: {
       const at = now();
       const endOfToday = new Date(startOfBusinessDay(businessDay(at.getTime()) + 1));
       const rows = await db
-        .select({ state: cardStates, deck: flashcardDecks })
+        .select({ state: cardStates, deck: flashcardDecks, subjectNameAr: subjects.nameAr })
         .from(cardStates)
         .innerJoin(flashcards, eq(flashcards.id, cardStates.flashcardId))
         .innerJoin(flashcardDecks, eq(flashcardDecks.id, flashcards.deckId))
+        .innerJoin(subjects, eq(subjects.id, flashcardDecks.subjectId))
         .where(
           and(
             eq(cardStates.userId, userId),
@@ -243,6 +244,7 @@ export function createSrsService(deps: {
           card: await cards.toStudentCard(cardRows.get(r.state.flashcardId!)!),
           deckTitleAr: r.deck.titleAr,
           subjectId: r.deck.subjectId,
+          subjectNameAr: r.subjectNameAr,
           state: toApi(r.state),
         })),
       );

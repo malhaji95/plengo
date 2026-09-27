@@ -20,6 +20,7 @@ void main() {
           tracks: const [],
           access: noAccess,
           questionCount: noQuestions,
+          deckCount: noQuestions,
         ),
       ),
     );

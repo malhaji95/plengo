@@ -53,6 +53,7 @@ SubjectOutline outlineWithQuestions() => SubjectOutline(
   tracks: const [],
   access: noAccess,
   questionCount: const ContentCount(total: 3, free: 1),
+  deckCount: noQuestions,
 );
 
 void main() {

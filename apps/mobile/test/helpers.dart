@@ -11,9 +11,13 @@ import 'package:plengo/core/auth/auth_repository.dart';
 import 'package:plengo/core/auth/token_store.dart';
 import 'package:plengo/core/catalog/catalog_repository.dart';
 import 'package:plengo/core/catalog/teacher_repository.dart';
+import 'package:plengo/core/content/flashcard_repository.dart';
 import 'package:plengo/core/content/question_repository.dart';
 import 'package:plengo/core/db/app_database.dart';
+import 'package:plengo/core/srs/srs_store.dart';
 import 'package:plengo/features/access/access_providers.dart';
+import 'package:plengo/features/flashcards/card_face.dart';
+import 'package:plengo/features/flashcards/flashcard_providers.dart';
 import 'package:plengo/features/questions/question_providers.dart';
 import 'package:plengo/features/subjects/catalog_providers.dart';
 import 'package:plengo/features/teachers/teacher_providers.dart';
@@ -27,6 +31,8 @@ class MockTeacherRepository extends Mock implements TeacherRepository {}
 class MockAccessRepository extends Mock implements AccessRepository {}
 
 class MockQuestionRepository extends Mock implements QuestionRepository {}
+
+class MockFlashcardRepository extends Mock implements FlashcardRepository {}
 
 const noQuestions = ContentCount(total: 0, free: 0);
 
@@ -70,19 +76,20 @@ Subject subject(String id, String name, {String levelId = 'l12', String? descrip
   isActive: true,
 );
 
+typedef PumpedApp = ({
+  MockAuthRepository repo,
+  MockCatalogRepository catalog,
+  MockTeacherRepository teachers,
+  MockAccessRepository access,
+  MockQuestionRepository questions,
+  MockFlashcardRepository flashcards,
+  AppDatabase db,
+  ProviderContainer container,
+});
+
 /// Pumps the real app with mocked repositories and an in-memory database. The config call made
 /// at start-up goes nowhere (no server); it is designed to fail silently.
-Future<
-  ({
-    MockAuthRepository repo,
-    MockCatalogRepository catalog,
-    MockTeacherRepository teachers,
-    MockAccessRepository access,
-    MockQuestionRepository questions,
-    ProviderContainer container,
-  })
->
-pumpApp(
+Future<PumpedApp> pumpApp(
   WidgetTester tester, {
   Me? signedInAs,
   void Function(MockAuthRepository repo)? arrange,
@@ -90,6 +97,8 @@ pumpApp(
   void Function(MockTeacherRepository teachers)? arrangeTeachers,
   void Function(MockAccessRepository access)? arrangeAccess,
   void Function(MockQuestionRepository questions)? arrangeQuestions,
+  void Function(MockFlashcardRepository flashcards)? arrangeFlashcards,
+  int Function()? clock,
   RemoteConfig? config,
   bool couponRedemption = true,
 }) async {
@@ -116,6 +125,11 @@ pumpApp(
   final questions = MockQuestionRepository();
   arrangeQuestions?.call(questions);
 
+  final flashcards = MockFlashcardRepository();
+  when(() => flashcards.push(any())).thenAnswer((_) async => 0);
+  when(() => flashcards.pull(any())).thenAnswer((_) async {});
+  arrangeFlashcards?.call(flashcards);
+
   final db = AppDatabase(NativeDatabase.memory());
   addTearDown(db.close);
   final container = ProviderContainer(
@@ -128,6 +142,10 @@ pumpApp(
       teacherRepositoryProvider.overrideWithValue(teachers),
       accessRepositoryProvider.overrideWithValue(access),
       questionRepositoryProvider.overrideWithValue(questions),
+      flashcardRepositoryProvider.overrideWithValue(flashcards),
+      cardImageBuilderProvider.overrideWithValue((_, image) => Center(child: Text('img:${image.mediaId}'))),
+      cardImagePrefetchProvider.overrideWithValue((_, _) {}),
+      if (clock != null) clockProvider.overrideWithValue(clock),
       couponRedemptionProvider.overrideWithValue(couponRedemption),
       remoteConfigProvider.overrideWith((ref) async => config),
     ],
@@ -136,12 +154,22 @@ pumpApp(
 
   await tester.pumpWidget(UncontrolledProviderScope(container: container, child: const PlengoApp()));
   await tester.pumpAndSettle();
-  return (repo: repo, catalog: catalog, teachers: teachers, access: access, questions: questions, container: container);
+  return (
+    repo: repo,
+    catalog: catalog,
+    teachers: teachers,
+    access: access,
+    questions: questions,
+    flashcards: flashcards,
+    db: db,
+    container: container,
+  );
 }
 
 void registerFallbacks() {
   registerFallbackValue((levelId: '', universityId: null, facultyId: null, academicYearId: null));
   registerFallbackValue((subjectId: '', teacherTrackId: null, unitId: null, lessonId: null));
+  registerFallbackValue(SrsStore(AppDatabase(NativeDatabase.memory())));
 }
 
 Finder fieldByKey(String key) => find.byKey(Key(key));

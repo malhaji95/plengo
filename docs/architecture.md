@@ -17,6 +17,30 @@ Flutter student app (Android · iOS · Web)      Next.js admin (browser)
    (Neon)          `pgboss`)            public + private buckets
 ```
 
+## Phase 6 status (flashcards)
+
+Done:
+
+- `packages/srs`: the §13.4 scheduler (three buttons, learning/relearning steps, ease, late bonus,
+  365-day cap), the exact SHA-256 fuzz, the 04:00 Asia/Damascus business day and Arabic interval
+  labels. `fixtures/scheduler.json` is replayed by the TypeScript tests and by the Dart port
+  (`apps/mobile/lib/core/srs/scheduler.dart`); the Dart port was also run on web (dart2js).
+- Schema (migration 0006): `flashcard_decks` and `flashcards` (both with `content_version`),
+  `card_states`, `review_logs`.
+- Admin: decks by subject/scope/unit/lesson with cover, publish/archive, free override, reorder and
+  delete; cards with front/back image upload, hide/show, reorder, replace images.
+- Students: decks on subject and track pages (locked decks as metadata), Browse (flip,
+  السابق/التالي, RTL arrow keys), Study (predicted intervals under the buttons, up to 10 undos,
+  Space/1/2/3/Z shortcuts, "أنهيت مراجعة اليوم"), and the Review tab with every due card across
+  accessible decks, filterable by subject.
+- Device-side scheduling with SRS state and review logs in the encrypted local database; background
+  sync (`POST /srs/sync`, `GET /srs/states`) with idempotent logs, undo and last-review-wins.
+- Private card images are served with one-hour signed URLs and cached by `{media id}:{version}`.
+- Seed: an official Grade 12 Physics deck (free by rule) and a track deck with rendered images.
+
+Deferred: offline pack download (Phase 9), student decks and "أضف إلى بطاقاتي" (Phase 8), user
+settings for daily limits (Phase 10), flashcard bulk upload (Phase 11).
+
 ## Phase 5 status (questions)
 
 Done:
@@ -313,3 +337,34 @@ from Phase 1; Phase 2 adds the college hierarchy and admin CRUD.
   Returning an override to "rule" re-evaluates the question.
 - **Bidi**: the student app wraps Latin/number runs in question text, options and explanations in
   Unicode isolates (`isolateLtr`), so units and formulas such as `20 m/s` keep their order in RTL.
+
+### ADR-015 — Flashcards and spaced repetition
+
+- **One algorithm, two languages.** The scheduler lives in `packages/srs` (TypeScript) and
+  `lib/core/srs` (Dart) and must produce identical results for `packages/srs/fixtures/scheduler.json`.
+  Fixture expectations were checked against §13.4 by hand and the fuzz vectors by an independent
+  Python run. Ease is rounded to two decimals after each change; review intervals below 3 days are
+  rounded half-up to whole days (fuzz applies only from 3 days); the fuzz reads the first four digest
+  bytes with multiplication, not shifts, so dart2js gives the same numbers.
+- **Business day** uses a fixed UTC+3 offset (Syria's rule since 2022) in both implementations, so the
+  04:00 boundary never depends on a device time zone or a bundled tz database.
+- **Relearning** keeps the interval to return to in `interval_days` (no extra column). Card states
+  store whole days (`interval_days integer`) and `ease` as a double.
+- **Sync**: logs are inserted once (client UUID); an undone log restores its `state_before` only if the
+  stored state's last review is that log's; states then apply only when their last review is newer.
+  The response returns what the server holds so the device adopts other devices' newer reviews. Logs
+  stay local until acknowledged, so offline study loses nothing. Student card states (`user_card_id`)
+  arrive with Phase 8, which adds that foreign key.
+- **Queue** (device): due learning cards first, then today's reviews in a per-day stable pseudo-random
+  order (so the current card does not jump when the queue is rebuilt), then new cards in deck order,
+  then learn-ahead up to 20 minutes. Daily counts come from local logs of the current business day.
+  The global due session (`GET /srs/due`) reviews cards already in progress; new cards come from deck
+  sessions. Limits use remote `srsDefaults` until the student settings of Phase 10.
+- **Content versions** (§22.3): deck metadata, card membership (add, remove, hide/show) and card order
+  bump the deck; a card's images, order or status bump the card.
+- **Images**: card images are private (`flashcard` kind) and returned with one-hour signed URLs only in
+  `GET /decks/{id}/cards` and `GET /srs/due`, i.e. only for accessible decks. The app caches them with
+  `cached_network_image` under `{media id}:{version}:{variant}` and prefetches the next three cards.
+- **Dev storage**: `STORAGE_DRIVER=memory` with `LOCAL_STORAGE_DIR` also writes objects to disk, so
+  uploads and seeded images survive API restarts and the seed script can create processed images the
+  API then serves. Tests keep the pure in-memory store.

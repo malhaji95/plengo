@@ -22,6 +22,7 @@ class SubjectOutline {
     required this.tracks,
     required this.access,
     required this.questionCount,
+    required this.deckCount,
   });
   
   factory SubjectOutline.fromJson(Map<String, Object?> json) => _$SubjectOutlineFromJson(json);
@@ -32,6 +33,7 @@ class SubjectOutline {
   final List<SubjectTrack> tracks;
   final ScopeAccess access;
   final ContentCount questionCount;
+  final ContentCount deckCount;
 
   Map<String, Object?> toJson() => _$SubjectOutlineToJson(this);
 }

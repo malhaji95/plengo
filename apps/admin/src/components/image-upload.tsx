@@ -14,7 +14,7 @@ type Kind = 'teacher' | 'cover' | 'banner' | 'flashcard';
  * Upload flow of spec §12.3: ask the API for a presigned PUT, send the file straight to storage,
  * confirm, then wait until the background job has produced the WebP variants.
  */
-async function uploadImage(kind: Kind, file: File): Promise<string> {
+export async function uploadImage(kind: Kind, file: File): Promise<string> {
   const created = await unwrap(
     api.POST('/api/v1/admin/uploads', { body: { kind, contentType: file.type, size: file.size } }),
   );

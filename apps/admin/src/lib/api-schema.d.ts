@@ -2301,6 +2301,7 @@ export interface components {
             card: components["schemas"]["StudentCard"];
             deckTitleAr: string;
             subjectId: string;
+            subjectNameAr: string;
             state: components["schemas"]["SrsCardState"];
         };
         DueCards: {

@@ -3,9 +3,13 @@
  * extend it with content. Needs the full API environment (apps/api/.env.example works locally).
  *   pnpm --filter @plengo/api seed
  */
+import { randomUUID } from 'node:crypto';
 import { and, eq, isNull } from 'drizzle-orm';
+import sharp from 'sharp';
 import {
   couponBatches,
+  flashcardDecks,
+  mediaFiles,
   coupons,
   promotions,
   questions,
@@ -26,6 +30,7 @@ import { createContainer, type Container } from '../container.js';
 import { loadEnv } from '../env.js';
 import { InlineQueue } from '../jobs/queue.js';
 import { AppError } from '../lib/app-error.js';
+import { objectKey } from '../storage/keys.js';
 import { createCouponCrypto, formatCouponCode } from '../lib/coupon-code.js';
 import { subjectScope, trackScope } from '../services/access-service.js';
 
@@ -587,6 +592,105 @@ export async function seedQuestions(c: Container) {
   return created;
 }
 
+/** A card image rendered from text and processed like an upload (dev seed only). */
+async function seedImage(c: Container, kind: 'flashcard' | 'cover', lines: string[], background: string) {
+  const id = randomUUID();
+  const texts = lines
+    .map(
+      (line, i) =>
+        `<text x="540" y="${300 + i * 140}" font-size="${i === 0 ? 72 : 88}" fill="${i === 0 ? '#ffffff' : '#fde68a'}" text-anchor="middle" font-family="sans-serif">${line}</text>`,
+    )
+    .join('');
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="720"><rect width="100%" height="100%" fill="${background}"/>${texts}</svg>`;
+  const png = await sharp(Buffer.from(svg)).png().toBuffer();
+  const storageKey = objectKey(c.env.APP_ENV, 'original', id, 'original');
+  await c.storage.put('private', storageKey, png, 'image/png');
+  await c.db.insert(mediaFiles).values({
+    id,
+    bucket: kind === 'cover' ? 'public' : 'private',
+    storageKey,
+    kind,
+    mimeType: 'image/png',
+    originalSize: png.length,
+  });
+  await c.media.process({ mediaId: id });
+  return id;
+}
+
+const DECKS: {
+  titleAr: string;
+  lesson?: string;
+  track?: boolean;
+  cards: [front: string[], back: string[]][];
+}[] = [
+  {
+    titleAr: 'قوانين نيوتن',
+    lesson: 'forces',
+    cards: [
+      [['القانون الأول لنيوتن'], ['يبقى الجسم ساكناً', 'أو متحركاً بسرعة ثابتة']],
+      [['القانون الثاني لنيوتن'], ['F = m × a']],
+      [['القانون الثالث لنيوتن'], ['لكل فعل رد فعل', 'مساوٍ له ومعاكس']],
+      [['وحدة القوة'], ['النيوتن N', '1 N = 1 kg·m/s²']],
+    ],
+  },
+  {
+    titleAr: 'بطاقات أ. أحمد: السقوط الحر',
+    track: true,
+    cards: [
+      [['تسارع الجاذبية الأرضية'], ['g ≈ 9.8 m/s²']],
+      [['سرعة جسم يسقط من السكون'], ['v = g × t']],
+      [['المسافة في السقوط الحر'], ['d = ½ g t²']],
+    ],
+  },
+];
+
+/** §40: an official general deck and one track deck (Grade 12 Physics). */
+export async function seedFlashcards(c: Container) {
+  const [admin] = await c.db.select().from(users).where(eq(users.email, 'seed-admin1@example.com'));
+  const actor = { adminId: admin!.id, ip: null };
+  const physics = (
+    await c.db
+      .select()
+      .from(subjects)
+      .where(and(eq(subjects.code, 'g12-physics'), isNull(subjects.deletedAt)))
+  )[0]!;
+  const track = (
+    await c.db
+      .select()
+      .from(teacherTracks)
+      .where(and(eq(teacherTracks.slug, 'ahmad-g12-physics'), isNull(teacherTracks.deletedAt)))
+  )[0]!;
+  const physicsLessons = await c.db
+    .select()
+    .from(lessons)
+    .where(and(eq(lessons.subjectId, physics.id), isNull(lessons.deletedAt)));
+
+  let created = 0;
+  for (const d of DECKS) {
+    const [existing] = await c.db
+      .select({ id: flashcardDecks.id })
+      .from(flashcardDecks)
+      .where(and(eq(flashcardDecks.titleAr, d.titleAr), isNull(flashcardDecks.deletedAt)));
+    if (existing) continue;
+    const deck = await c.flashcards.createDeck(actor, {
+      subjectId: physics.id,
+      teacherTrackId: d.track ? track.id : null,
+      lessonId: d.lesson ? physicsLessons.find((l) => l.code === d.lesson)?.id : undefined,
+      titleAr: d.titleAr,
+      coverMediaId: await seedImage(c, 'cover', [d.titleAr], '#134e4a'),
+    });
+    for (const [front, back] of d.cards) {
+      await c.flashcards.createCard(actor, deck.id, {
+        frontMediaId: await seedImage(c, 'flashcard', front, '#0f766e'),
+        backMediaId: await seedImage(c, 'flashcard', ['', ...back], '#1e3a8a'),
+      });
+    }
+    await c.flashcards.setDeckStatus(actor, deck.id, 'published');
+    created++;
+  }
+  return created;
+}
+
 if (import.meta.url === `file://${process.argv[1]}`) {
   const env = loadEnv();
   const queue = new InlineQueue();
@@ -596,7 +700,10 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     await seedTeachers(c.db);
     const access = await seedAccess(c, queue);
     const createdQuestions = await seedQuestions(c);
-    console.log(`structure, teachers, access and questions seeded (${createdQuestions} new questions)`);
+    const createdDecks = await seedFlashcards(c);
+    console.log(
+      `structure, teachers, access, questions and flashcards seeded (${createdQuestions} new questions, ${createdDecks} new decks)`,
+    );
     console.log(`students: ${access.students.join(', ')} · admins: ${access.admins.join(', ')}`);
     console.log(`password for all seed accounts: ${SEED_PASSWORD} (admins enroll in 2FA at first login)`);
     console.log('coupon batch (permanent, Grade 12 Physics):');

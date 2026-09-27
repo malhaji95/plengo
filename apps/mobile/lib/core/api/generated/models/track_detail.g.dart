@@ -14,6 +14,7 @@ TrackDetail _$TrackDetailFromJson(Map<String, dynamic> json) => TrackDetail(
   questionCount: ContentCount.fromJson(
     json['questionCount'] as Map<String, dynamic>,
   ),
+  deckCount: ContentCount.fromJson(json['deckCount'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$TrackDetailToJson(TrackDetail instance) =>
@@ -23,4 +24,5 @@ Map<String, dynamic> _$TrackDetailToJson(TrackDetail instance) =>
       'subject': instance.subject,
       'access': instance.access,
       'questionCount': instance.questionCount,
+      'deckCount': instance.deckCount,
     };

@@ -133,6 +133,7 @@ void main() {
             subject: subject('p', 'الفيزياء'),
             access: noAccess,
             questionCount: noQuestions,
+            deckCount: noQuestions,
           ),
         );
       },

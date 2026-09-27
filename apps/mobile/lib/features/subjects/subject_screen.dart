@@ -41,7 +41,11 @@ class _OutlineView extends StatelessWidget {
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
     final empty =
-        outline.units.isEmpty && outline.lessons.isEmpty && outline.tracks.isEmpty && outline.questionCount.total == 0;
+        outline.units.isEmpty &&
+        outline.lessons.isEmpty &&
+        outline.tracks.isEmpty &&
+        outline.questionCount.total == 0 &&
+        outline.deckCount.total == 0;
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 720),
@@ -53,6 +57,17 @@ class _OutlineView extends StatelessWidget {
               const SizedBox(height: 16),
             ],
             ScopeAccessBanner(access: outline.access),
+            if (outline.deckCount.total > 0)
+              Card(
+                margin: const EdgeInsets.only(bottom: 8),
+                child: ListTile(
+                  leading: const Icon(Icons.style_outlined),
+                  title: const Text('البطاقات التعليمية'),
+                  subtitle: Text(_deckText(outline.deckCount)),
+                  trailing: const Icon(Icons.chevron_left),
+                  onTap: () => context.go('${Routes.subjects}/${outline.subject.id}/decks'),
+                ),
+              ),
             if (outline.questionCount.total > 0)
               Card(
                 margin: const EdgeInsets.only(bottom: 16),
@@ -157,3 +172,12 @@ String lessonCountLabel(int n) => switch (n) {
   >= 3 && <= 10 => '$n دروس',
   _ => '$n درساً',
 };
+
+String _deckText(ContentCount c) {
+  final decks = c.total == 1
+      ? 'مجموعة واحدة'
+      : c.total == 2
+      ? 'مجموعتان'
+      : '${c.total} مجموعات';
+  return c.free > 0 ? '$decks · ${c.free} مجانية' : decks;
+}

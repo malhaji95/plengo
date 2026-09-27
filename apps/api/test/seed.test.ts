@@ -1,7 +1,13 @@
 import { eq } from 'drizzle-orm';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { entitlements, users } from '@plengo/db';
-import { seedAccess, seedQuestions, seedStructure, seedTeachers } from '../src/scripts/seed.js';
+import {
+  seedAccess,
+  seedFlashcards,
+  seedQuestions,
+  seedStructure,
+  seedTeachers,
+} from '../src/scripts/seed.js';
 import { createTestApp, type TestContext } from './helpers.js';
 
 let t: TestContext;
@@ -18,13 +24,15 @@ describe('development seed (§40)', () => {
       await seedStructure(t.c.db);
       await seedTeachers(t.c.db);
       const access = await seedAccess(t.c, t.queue);
-      return { ...access, questions: await seedQuestions(t.c) };
+      return { ...access, questions: await seedQuestions(t.c), decks: await seedFlashcards(t.c) };
     };
     const first = await run();
     const second = await run();
     expect(first.codes).toHaveLength(10);
     expect(first.questions).toBe(11);
     expect(second.questions).toBe(0);
+    expect(first.decks).toBe(2);
+    expect(second.decks).toBe(0);
     expect(second.codes.map((c) => c.code)).toEqual(first.codes.map((c) => c.code));
     for (const { code } of first.codes) expect(code).toMatch(/^[2-9A-Z]{4}-[2-9A-Z]{4}-[2-9A-Z]{2}$/);
 

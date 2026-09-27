@@ -13,6 +13,11 @@ import '../features/auth/login_screen.dart';
 import '../features/auth/register_screen.dart';
 import '../features/auth/reset_password_screen.dart';
 import '../features/auth/verify_email_screen.dart';
+import '../features/flashcards/browse_screen.dart';
+import '../features/flashcards/deck_screen.dart';
+import '../features/flashcards/decks_screen.dart';
+import '../features/flashcards/review_tab.dart';
+import '../features/flashcards/study_screen.dart';
 import '../features/questions/questions_screen.dart';
 import '../features/shell/home_shell.dart';
 import '../features/shell/placeholder_tab.dart';
@@ -45,6 +50,8 @@ abstract final class Routes {
   static const teachers = '/teachers';
   static const tracks = '/tracks';
   static const redeem = '/redeem';
+  static const decks = '/decks';
+  static const dueStudy = '/review/study';
 
   static const public = {login, register, verifyEmail, forgotPassword, resetPassword};
 }
@@ -131,6 +138,10 @@ GoRouter buildRouter(Ref ref, {required bool couponRedemption}) {
                     builder: (_, state) => SubjectScreen(subjectId: state.pathParameters['id']!),
                     routes: [
                       GoRoute(
+                        path: 'decks',
+                        builder: (_, state) => SubjectDecksRoute(subjectId: state.pathParameters['id']!),
+                      ),
+                      GoRoute(
                         path: 'questions',
                         builder: (_, state) => SubjectQuestionsRoute(
                           subjectId: state.pathParameters['id']!,
@@ -160,17 +171,20 @@ GoRouter buildRouter(Ref ref, {required bool couponRedemption}) {
                     path: 'questions',
                     builder: (_, state) => TrackQuestionsRoute(trackId: state.pathParameters['id']!),
                   ),
+                  GoRoute(
+                    path: 'decks',
+                    builder: (_, state) => TrackDecksRoute(trackId: state.pathParameters['id']!),
+                  ),
                 ],
+              ),
+              GoRoute(
+                path: '${Routes.decks}/:id',
+                builder: (_, state) => DeckScreen(deckId: state.pathParameters['id']!),
               ),
             ],
           ),
           StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: Routes.review,
-                builder: (_, _) => const PlaceholderTab(title: 'المراجعة'),
-              ),
-            ],
+            routes: [GoRoute(path: Routes.review, builder: (_, _) => const ReviewTab())],
           ),
           StatefulShellBranch(
             routes: [
@@ -195,6 +209,23 @@ GoRouter buildRouter(Ref ref, {required bool couponRedemption}) {
             ],
           ),
         ],
+      ),
+      // Full-screen study modes (outside the tab shell).
+      GoRoute(
+        path: '${Routes.decks}/:id/browse',
+        builder: (_, state) => BrowseScreen(deckId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '${Routes.decks}/:id/study',
+        builder: (_, state) =>
+            StudyScreen(source: (deckId: state.pathParameters['id']!, subjectId: null), title: 'مراجعة'),
+      ),
+      GoRoute(
+        path: Routes.dueStudy,
+        builder: (_, state) => StudyScreen(
+          source: (deckId: null, subjectId: state.uri.queryParameters['subjectId']),
+          title: 'كل البطاقات المستحقة',
+        ),
       ),
       if (couponRedemption) GoRoute(path: Routes.redeem, builder: (_, _) => const RedeemScreen()),
     ],
