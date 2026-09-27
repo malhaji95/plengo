@@ -67,3 +67,23 @@ export const sessionSummarySchema = z.object({
   current: z.boolean(),
 });
 export type SessionSummary = z.infer<typeof sessionSummarySchema>;
+
+export const webLoginBodySchema = z.object({ email: emailSchema, password: z.string().min(1).max(128) });
+
+export const sessionListSchema = z.array(sessionSummarySchema);
+
+// Component names for the generated OpenAPI document (and the Dart/TS clients built from it).
+z.globalRegistry.add(platformSchema, { id: 'SessionPlatform' });
+z.globalRegistry.add(registerBodySchema, { id: 'RegisterRequest' });
+z.globalRegistry.add(verifyEmailBodySchema, { id: 'VerifyEmailRequest' });
+z.globalRegistry.add(resendOtpBodySchema, { id: 'ResendOtpRequest' });
+z.globalRegistry.add(forgotPasswordBodySchema, { id: 'ForgotPasswordRequest' });
+z.globalRegistry.add(resetPasswordBodySchema, { id: 'ResetPasswordRequest' });
+z.globalRegistry.add(mobileLoginBodySchema, { id: 'MobileLoginRequest' });
+z.globalRegistry.add(mobileRefreshBodySchema, { id: 'MobileRefreshRequest' });
+z.globalRegistry.add(mobileLogoutBodySchema, { id: 'MobileLogoutRequest' });
+z.globalRegistry.add(webLoginBodySchema, { id: 'WebLoginRequest' });
+z.globalRegistry.add(tokenPairSchema, { id: 'TokenPair' });
+z.globalRegistry.add(meSchema, { id: 'Me' });
+z.globalRegistry.add(sessionSummarySchema, { id: 'SessionSummary' });
+z.globalRegistry.add(sessionListSchema, { id: 'SessionList' });

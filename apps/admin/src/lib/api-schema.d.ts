@@ -455,7 +455,290 @@ export interface paths {
 }
 export type webhooks = Record<string, never>;
 export interface components {
-  schemas: never;
+  schemas: {
+    AdminLoginRequest: {
+      email: string;
+      password: string;
+    };
+    AdminLoginResult: {
+      /** @enum {string} */
+      next: 'totp' | 'enroll';
+    };
+    AdminLoginResultEnvelope: {
+      /** @constant */
+      success: true;
+      data: components['schemas']['AdminLoginResult'];
+      error: null;
+    };
+    BackupCodeRequest: {
+      code: string;
+    };
+    CreateUploadRequest: {
+      kind: components['schemas']['MediaKind'];
+      contentType: string;
+      size: number;
+    };
+    CreateUploadResult: {
+      /** Format: uuid */
+      id: string;
+      uploadUrl: string;
+      /** @constant */
+      method: 'PUT';
+      headers: {
+        [key: string]: string;
+      };
+      /** Format: date-time */
+      expiresAt: string;
+    };
+    CreateUploadResultEnvelope: {
+      /** @constant */
+      success: true;
+      data: components['schemas']['CreateUploadResult'];
+      error: null;
+    };
+    EducationLevel: {
+      id: string;
+      code: string;
+      nameAr: string;
+      sortOrder: number;
+    };
+    EducationLevelList: components['schemas']['EducationLevel'][];
+    EducationLevelListEnvelope: {
+      /** @constant */
+      success: true;
+      data: components['schemas']['EducationLevelList'];
+      error: null;
+    };
+    EnrolledResult: {
+      enrolled: boolean;
+    };
+    EnrolledResultEnvelope: {
+      /** @constant */
+      success: true;
+      data: components['schemas']['EnrolledResult'];
+      error: null;
+    };
+    ForgotPasswordRequest: {
+      email: string;
+    };
+    Me: {
+      id: string;
+      email: string;
+      emailVerified: boolean;
+      /** @enum {string} */
+      role: 'student' | 'admin';
+      fullName: string;
+      educationLevelId: string | null;
+    };
+    MediaFile: {
+      /** Format: uuid */
+      id: string;
+      kind: components['schemas']['MediaKind'];
+      /** @enum {string} */
+      status: 'pending' | 'ready' | 'failed';
+      width: number | null;
+      height: number | null;
+      version: number;
+    };
+    MediaFileEnvelope: {
+      /** @constant */
+      success: true;
+      data: components['schemas']['MediaFile'];
+      error: null;
+    };
+    /** @enum {string} */
+    MediaKind: 'flashcard' | 'banner' | 'teacher' | 'cover' | 'user-card';
+    MeEnvelope: {
+      /** @constant */
+      success: true;
+      data: components['schemas']['Me'];
+      error: null;
+    };
+    MobileLoginRequest: {
+      email: string;
+      password: string;
+      /** @enum {string} */
+      platform: 'android' | 'ios';
+      appVersion?: string;
+    };
+    MobileLogoutRequest: {
+      refreshToken: string;
+    };
+    MobileRefreshRequest: {
+      refreshToken: string;
+    };
+    PasswordConfirmRequest: {
+      password: string;
+    };
+    RegisterRequest: {
+      fullName: string;
+      email: string;
+      password: string;
+      /** Format: uuid */
+      educationLevelId?: string;
+    };
+    RemoteConfig: {
+      minSupportedVersion: {
+        android: string;
+        ios: string;
+        web: string;
+      };
+      latestVersion: {
+        android: string;
+        ios: string;
+        web: string;
+      };
+      features: {
+        teacherFollowing: boolean;
+        randomPractice: boolean;
+        studentDecks: boolean;
+        streaks: boolean;
+        contentReports: boolean;
+      };
+      srsDefaults: {
+        newCardsPerDay: number;
+        maxReviewsPerDay: number;
+      };
+      support: {
+        email: string;
+        whatsapp: string;
+      };
+      privacyPolicyUrl: string;
+      termsUrl: string;
+    };
+    RemoteConfigEnvelope: {
+      /** @constant */
+      success: true;
+      data: components['schemas']['RemoteConfig'];
+      error: null;
+    };
+    ResendOtpRequest: {
+      email: string;
+    };
+    ResetPasswordRequest: {
+      email: string;
+      otp: string;
+      newPassword: string;
+    };
+    ResetResult: {
+      reset: boolean;
+    };
+    ResetResultEnvelope: {
+      /** @constant */
+      success: true;
+      data: components['schemas']['ResetResult'];
+      error: null;
+    };
+    RevokedResult: {
+      revoked: boolean;
+    };
+    RevokedResultEnvelope: {
+      /** @constant */
+      success: true;
+      data: components['schemas']['RevokedResult'];
+      error: null;
+    };
+    SentResult: {
+      sent: boolean;
+    };
+    SentResultEnvelope: {
+      /** @constant */
+      success: true;
+      data: components['schemas']['SentResult'];
+      error: null;
+    };
+    SessionList: components['schemas']['SessionSummary'][];
+    SessionListEnvelope: {
+      /** @constant */
+      success: true;
+      data: components['schemas']['SessionList'];
+      error: null;
+    };
+    /** @enum {string} */
+    SessionPlatform: 'android' | 'ios' | 'web' | 'admin';
+    SessionSummary: {
+      id: string;
+      platform: components['schemas']['SessionPlatform'];
+      appVersion: string | null;
+      userAgent: string | null;
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: date-time */
+      lastSeenAt: string;
+      current: boolean;
+    };
+    SignedInResult: {
+      signedIn: boolean;
+    };
+    SignedInResultEnvelope: {
+      /** @constant */
+      success: true;
+      data: components['schemas']['SignedInResult'];
+      error: null;
+    };
+    SignedOutResult: {
+      signedOut: boolean;
+    };
+    SignedOutResultEnvelope: {
+      /** @constant */
+      success: true;
+      data: components['schemas']['SignedOutResult'];
+      error: null;
+    };
+    TokenPair: {
+      accessToken: string;
+      /** Format: date-time */
+      accessTokenExpiresAt: string;
+      refreshToken: string;
+      /** Format: date-time */
+      refreshTokenExpiresAt: string;
+    };
+    TokenPairEnvelope: {
+      /** @constant */
+      success: true;
+      data: components['schemas']['TokenPair'];
+      error: null;
+    };
+    TotpCodeRequest: {
+      code: string;
+    };
+    TotpEnrollment: {
+      totpUri: string;
+      backupCodes: string[];
+    };
+    TotpEnrollmentEnvelope: {
+      /** @constant */
+      success: true;
+      data: components['schemas']['TotpEnrollment'];
+      error: null;
+    };
+    VerificationRequiredResult: {
+      verificationRequired: boolean;
+    };
+    VerificationRequiredResultEnvelope: {
+      /** @constant */
+      success: true;
+      data: components['schemas']['VerificationRequiredResult'];
+      error: null;
+    };
+    VerifiedResult: {
+      verified: boolean;
+    };
+    VerifiedResultEnvelope: {
+      /** @constant */
+      success: true;
+      data: components['schemas']['VerifiedResult'];
+      error: null;
+    };
+    VerifyEmailRequest: {
+      email: string;
+      otp: string;
+    };
+    WebLoginRequest: {
+      email: string;
+      password: string;
+    };
+  };
   responses: never;
   parameters: never;
   requestBodies: never;
@@ -479,40 +762,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': {
-            /** @enum {boolean} */
-            success: true;
-            data: {
-              minSupportedVersion: {
-                android: string;
-                ios: string;
-                web: string;
-              };
-              latestVersion: {
-                android: string;
-                ios: string;
-                web: string;
-              };
-              features: {
-                teacherFollowing: boolean;
-                randomPractice: boolean;
-                studentDecks: boolean;
-                streaks: boolean;
-                contentReports: boolean;
-              };
-              srsDefaults: {
-                newCardsPerDay: number;
-                maxReviewsPerDay: number;
-              };
-              support: {
-                email: string;
-                whatsapp: string;
-              };
-              privacyPolicyUrl: string;
-              termsUrl: string;
-            };
-            error: null;
-          };
+          'application/json': components['schemas']['RemoteConfigEnvelope'];
         };
       };
     };
@@ -532,17 +782,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': {
-            /** @enum {boolean} */
-            success: true;
-            data: {
-              id: string;
-              code: string;
-              nameAr: string;
-              sortOrder: number;
-            }[];
-            error: null;
-          };
+          'application/json': components['schemas']['EducationLevelListEnvelope'];
         };
       };
     };
@@ -556,13 +796,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        'application/json': {
-          fullName: string;
-          email: string;
-          password: string;
-          /** Format: uuid */
-          educationLevelId?: string;
-        };
+        'application/json': components['schemas']['RegisterRequest'];
       };
     };
     responses: {
@@ -572,14 +806,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': {
-            /** @enum {boolean} */
-            success: true;
-            data: {
-              verificationRequired: boolean;
-            };
-            error: null;
-          };
+          'application/json': components['schemas']['VerificationRequiredResultEnvelope'];
         };
       };
     };
@@ -593,10 +820,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        'application/json': {
-          email: string;
-          otp: string;
-        };
+        'application/json': components['schemas']['VerifyEmailRequest'];
       };
     };
     responses: {
@@ -606,14 +830,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': {
-            /** @enum {boolean} */
-            success: true;
-            data: {
-              verified: boolean;
-            };
-            error: null;
-          };
+          'application/json': components['schemas']['VerifiedResultEnvelope'];
         };
       };
     };
@@ -627,9 +844,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        'application/json': {
-          email: string;
-        };
+        'application/json': components['schemas']['ResendOtpRequest'];
       };
     };
     responses: {
@@ -639,14 +854,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': {
-            /** @enum {boolean} */
-            success: true;
-            data: {
-              sent: boolean;
-            };
-            error: null;
-          };
+          'application/json': components['schemas']['SentResultEnvelope'];
         };
       };
     };
@@ -660,9 +868,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        'application/json': {
-          email: string;
-        };
+        'application/json': components['schemas']['ForgotPasswordRequest'];
       };
     };
     responses: {
@@ -672,14 +878,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': {
-            /** @enum {boolean} */
-            success: true;
-            data: {
-              sent: boolean;
-            };
-            error: null;
-          };
+          'application/json': components['schemas']['SentResultEnvelope'];
         };
       };
     };
@@ -693,11 +892,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        'application/json': {
-          email: string;
-          otp: string;
-          newPassword: string;
-        };
+        'application/json': components['schemas']['ResetPasswordRequest'];
       };
     };
     responses: {
@@ -707,14 +902,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': {
-            /** @enum {boolean} */
-            success: true;
-            data: {
-              reset: boolean;
-            };
-            error: null;
-          };
+          'application/json': components['schemas']['ResetResultEnvelope'];
         };
       };
     };
@@ -728,13 +916,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        'application/json': {
-          email: string;
-          password: string;
-          /** @enum {string} */
-          platform: 'android' | 'ios';
-          appVersion?: string;
-        };
+        'application/json': components['schemas']['MobileLoginRequest'];
       };
     };
     responses: {
@@ -744,19 +926,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': {
-            /** @enum {boolean} */
-            success: true;
-            data: {
-              accessToken: string;
-              /** Format: date-time */
-              accessTokenExpiresAt: string;
-              refreshToken: string;
-              /** Format: date-time */
-              refreshTokenExpiresAt: string;
-            };
-            error: null;
-          };
+          'application/json': components['schemas']['TokenPairEnvelope'];
         };
       };
     };
@@ -770,9 +940,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        'application/json': {
-          refreshToken: string;
-        };
+        'application/json': components['schemas']['MobileRefreshRequest'];
       };
     };
     responses: {
@@ -782,19 +950,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': {
-            /** @enum {boolean} */
-            success: true;
-            data: {
-              accessToken: string;
-              /** Format: date-time */
-              accessTokenExpiresAt: string;
-              refreshToken: string;
-              /** Format: date-time */
-              refreshTokenExpiresAt: string;
-            };
-            error: null;
-          };
+          'application/json': components['schemas']['TokenPairEnvelope'];
         };
       };
     };
@@ -808,9 +964,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        'application/json': {
-          refreshToken: string;
-        };
+        'application/json': components['schemas']['MobileLogoutRequest'];
       };
     };
     responses: {
@@ -820,14 +974,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': {
-            /** @enum {boolean} */
-            success: true;
-            data: {
-              signedOut: boolean;
-            };
-            error: null;
-          };
+          'application/json': components['schemas']['SignedOutResultEnvelope'];
         };
       };
     };
@@ -841,10 +988,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        'application/json': {
-          email: string;
-          password: string;
-        };
+        'application/json': components['schemas']['WebLoginRequest'];
       };
     };
     responses: {
@@ -854,14 +998,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': {
-            /** @enum {boolean} */
-            success: true;
-            data: {
-              signedIn: boolean;
-            };
-            error: null;
-          };
+          'application/json': components['schemas']['SignedInResultEnvelope'];
         };
       };
     };
@@ -881,14 +1018,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': {
-            /** @enum {boolean} */
-            success: true;
-            data: {
-              signedOut: boolean;
-            };
-            error: null;
-          };
+          'application/json': components['schemas']['SignedOutResultEnvelope'];
         };
       };
     };
@@ -908,20 +1038,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': {
-            /** @enum {boolean} */
-            success: true;
-            data: {
-              id: string;
-              email: string;
-              emailVerified: boolean;
-              /** @enum {string} */
-              role: 'student' | 'admin';
-              fullName: string;
-              educationLevelId: string | null;
-            };
-            error: null;
-          };
+          'application/json': components['schemas']['MeEnvelope'];
         };
       };
     };
@@ -941,23 +1058,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': {
-            /** @enum {boolean} */
-            success: true;
-            data: {
-              id: string;
-              /** @enum {string} */
-              platform: 'android' | 'ios' | 'web' | 'admin';
-              appVersion: string | null;
-              userAgent: string | null;
-              /** Format: date-time */
-              createdAt: string;
-              /** Format: date-time */
-              lastSeenAt: string;
-              current: boolean;
-            }[];
-            error: null;
-          };
+          'application/json': components['schemas']['SessionListEnvelope'];
         };
       };
     };
@@ -979,14 +1080,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': {
-            /** @enum {boolean} */
-            success: true;
-            data: {
-              revoked: boolean;
-            };
-            error: null;
-          };
+          'application/json': components['schemas']['RevokedResultEnvelope'];
         };
       };
     };
@@ -1000,12 +1094,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        'application/json': {
-          /** @enum {string} */
-          kind: 'flashcard' | 'banner' | 'teacher' | 'cover' | 'user-card';
-          contentType: string;
-          size: number;
-        };
+        'application/json': components['schemas']['CreateUploadRequest'];
       };
     };
     responses: {
@@ -1015,23 +1104,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': {
-            /** @enum {boolean} */
-            success: true;
-            data: {
-              /** Format: uuid */
-              id: string;
-              uploadUrl: string;
-              /** @enum {string} */
-              method: 'PUT';
-              headers: {
-                [key: string]: string;
-              };
-              /** Format: date-time */
-              expiresAt: string;
-            };
-            error: null;
-          };
+          'application/json': components['schemas']['CreateUploadResultEnvelope'];
         };
       };
     };
@@ -1053,22 +1126,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': {
-            /** @enum {boolean} */
-            success: true;
-            data: {
-              /** Format: uuid */
-              id: string;
-              /** @enum {string} */
-              kind: 'flashcard' | 'banner' | 'teacher' | 'cover' | 'user-card';
-              /** @enum {string} */
-              status: 'pending' | 'ready' | 'failed';
-              width: number | null;
-              height: number | null;
-              version: number;
-            };
-            error: null;
-          };
+          'application/json': components['schemas']['MediaFileEnvelope'];
         };
       };
     };
@@ -1090,22 +1148,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': {
-            /** @enum {boolean} */
-            success: true;
-            data: {
-              /** Format: uuid */
-              id: string;
-              /** @enum {string} */
-              kind: 'flashcard' | 'banner' | 'teacher' | 'cover' | 'user-card';
-              /** @enum {string} */
-              status: 'pending' | 'ready' | 'failed';
-              width: number | null;
-              height: number | null;
-              version: number;
-            };
-            error: null;
-          };
+          'application/json': components['schemas']['MediaFileEnvelope'];
         };
       };
     };
@@ -1119,10 +1162,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        'application/json': {
-          email: string;
-          password: string;
-        };
+        'application/json': components['schemas']['AdminLoginRequest'];
       };
     };
     responses: {
@@ -1132,15 +1172,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': {
-            /** @enum {boolean} */
-            success: true;
-            data: {
-              /** @enum {string} */
-              next: 'totp' | 'enroll';
-            };
-            error: null;
-          };
+          'application/json': components['schemas']['AdminLoginResultEnvelope'];
         };
       };
     };
@@ -1154,9 +1186,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        'application/json': {
-          code: string;
-        };
+        'application/json': components['schemas']['TotpCodeRequest'];
       };
     };
     responses: {
@@ -1166,14 +1196,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': {
-            /** @enum {boolean} */
-            success: true;
-            data: {
-              signedIn: boolean;
-            };
-            error: null;
-          };
+          'application/json': components['schemas']['SignedInResultEnvelope'];
         };
       };
     };
@@ -1187,9 +1210,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        'application/json': {
-          code: string;
-        };
+        'application/json': components['schemas']['BackupCodeRequest'];
       };
     };
     responses: {
@@ -1199,14 +1220,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': {
-            /** @enum {boolean} */
-            success: true;
-            data: {
-              signedIn: boolean;
-            };
-            error: null;
-          };
+          'application/json': components['schemas']['SignedInResultEnvelope'];
         };
       };
     };
@@ -1220,9 +1234,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        'application/json': {
-          password: string;
-        };
+        'application/json': components['schemas']['PasswordConfirmRequest'];
       };
     };
     responses: {
@@ -1232,15 +1244,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': {
-            /** @enum {boolean} */
-            success: true;
-            data: {
-              totpUri: string;
-              backupCodes: string[];
-            };
-            error: null;
-          };
+          'application/json': components['schemas']['TotpEnrollmentEnvelope'];
         };
       };
     };
@@ -1254,9 +1258,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        'application/json': {
-          code: string;
-        };
+        'application/json': components['schemas']['TotpCodeRequest'];
       };
     };
     responses: {
@@ -1266,14 +1268,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': {
-            /** @enum {boolean} */
-            success: true;
-            data: {
-              enrolled: boolean;
-            };
-            error: null;
-          };
+          'application/json': components['schemas']['EnrolledResultEnvelope'];
         };
       };
     };
@@ -1293,14 +1288,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': {
-            /** @enum {boolean} */
-            success: true;
-            data: {
-              signedOut: boolean;
-            };
-            error: null;
-          };
+          'application/json': components['schemas']['SignedOutResultEnvelope'];
         };
       };
     };
@@ -1320,20 +1308,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': {
-            /** @enum {boolean} */
-            success: true;
-            data: {
-              id: string;
-              email: string;
-              emailVerified: boolean;
-              /** @enum {string} */
-              role: 'student' | 'admin';
-              fullName: string;
-              educationLevelId: string | null;
-            };
-            error: null;
-          };
+          'application/json': components['schemas']['MeEnvelope'];
         };
       };
     };
@@ -1347,12 +1322,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        'application/json': {
-          /** @enum {string} */
-          kind: 'flashcard' | 'banner' | 'teacher' | 'cover' | 'user-card';
-          contentType: string;
-          size: number;
-        };
+        'application/json': components['schemas']['CreateUploadRequest'];
       };
     };
     responses: {
@@ -1362,23 +1332,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': {
-            /** @enum {boolean} */
-            success: true;
-            data: {
-              /** Format: uuid */
-              id: string;
-              uploadUrl: string;
-              /** @enum {string} */
-              method: 'PUT';
-              headers: {
-                [key: string]: string;
-              };
-              /** Format: date-time */
-              expiresAt: string;
-            };
-            error: null;
-          };
+          'application/json': components['schemas']['CreateUploadResultEnvelope'];
         };
       };
     };
@@ -1400,22 +1354,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': {
-            /** @enum {boolean} */
-            success: true;
-            data: {
-              /** Format: uuid */
-              id: string;
-              /** @enum {string} */
-              kind: 'flashcard' | 'banner' | 'teacher' | 'cover' | 'user-card';
-              /** @enum {string} */
-              status: 'pending' | 'ready' | 'failed';
-              width: number | null;
-              height: number | null;
-              version: number;
-            };
-            error: null;
-          };
+          'application/json': components['schemas']['MediaFileEnvelope'];
         };
       };
     };
@@ -1437,22 +1376,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': {
-            /** @enum {boolean} */
-            success: true;
-            data: {
-              /** Format: uuid */
-              id: string;
-              /** @enum {string} */
-              kind: 'flashcard' | 'banner' | 'teacher' | 'cover' | 'user-card';
-              /** @enum {string} */
-              status: 'pending' | 'ready' | 'failed';
-              width: number | null;
-              height: number | null;
-              version: number;
-            };
-            error: null;
-          };
+          'application/json': components['schemas']['MediaFileEnvelope'];
         };
       };
     };

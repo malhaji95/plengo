@@ -1,6 +1,6 @@
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
-import { meSchema, sessionSummarySchema, successEnvelope } from '@plengo/contracts';
+import { meSchema, revokedSchema, sessionListSchema, successEnvelope } from '@plengo/contracts';
 import { authOf } from '../authorization/guards.js';
 import { AppError, ok } from '../lib/app-error.js';
 import type { Container } from '../container.js';
@@ -25,7 +25,7 @@ export function meRoutes(c: Container): FastifyPluginAsyncZod {
         schema: {
           operationId: 'listSessions',
           tags: ['sessions'],
-          response: { 200: successEnvelope(z.array(sessionSummarySchema)) },
+          response: { 200: successEnvelope(sessionListSchema) },
         },
       },
       async (request) => {
@@ -52,7 +52,7 @@ export function meRoutes(c: Container): FastifyPluginAsyncZod {
           operationId: 'revokeSession',
           tags: ['sessions'],
           params: z.object({ id: z.uuid() }),
-          response: { 200: successEnvelope(z.object({ revoked: z.boolean() })) },
+          response: { 200: successEnvelope(revokedSchema) },
         },
       },
       async (request) => {

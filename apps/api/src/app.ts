@@ -6,6 +6,7 @@ import swagger from '@fastify/swagger';
 import Fastify, { type FastifyServerOptions } from 'fastify';
 import {
   jsonSchemaTransform,
+  jsonSchemaTransformObject,
   serializerCompiler,
   validatorCompiler,
   type ZodTypeProvider,
@@ -65,6 +66,7 @@ export async function buildApp(app: App, c: Container): Promise<App> {
       },
     },
     transform: jsonSchemaTransform,
+    transformObject: jsonSchemaTransformObject,
   });
 
   const origins = [c.env.APP_WEB_ORIGIN, c.env.ADMIN_ORIGIN];

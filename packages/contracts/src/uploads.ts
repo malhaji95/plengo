@@ -30,3 +30,8 @@ export const mediaFileSchema = z.object({
   version: z.number().int(),
 });
 export type MediaFileDto = z.infer<typeof mediaFileSchema>;
+
+z.globalRegistry.add(mediaKindSchema, { id: 'MediaKind' });
+z.globalRegistry.add(createUploadBodySchema, { id: 'CreateUploadRequest' });
+z.globalRegistry.add(createUploadResponseSchema, { id: 'CreateUploadResult' });
+z.globalRegistry.add(mediaFileSchema, { id: 'MediaFile' });

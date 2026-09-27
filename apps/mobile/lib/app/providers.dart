@@ -1,0 +1,151 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../core/api/api_client.dart';
+import '../core/api/generated/export.dart';
+import '../core/auth/auth_repository.dart';
+import '../core/auth/token_store.dart';
+import '../core/config/version.dart';
+import '../core/db/app_database.dart';
+import 'flags.dart';
+
+/// Values fixed for the lifetime of the process, provided by `main`.
+class AppEnvironment {
+  const AppEnvironment({required this.platform, required this.appVersion});
+
+  /// 'android' | 'ios' | 'web'
+  final String platform;
+  final String appVersion;
+
+  bool get isWeb => platform == 'web';
+}
+
+final appEnvironmentProvider = Provider<AppEnvironment>((ref) => throw UnimplementedError('override in main'));
+final tokenStoreProvider = Provider<TokenStore>((ref) => throw UnimplementedError('override in main'));
+final databaseProvider = Provider<AppDatabase>((ref) => throw UnimplementedError('override in main'));
+
+final apiClientProvider = Provider<ApiClient>((ref) {
+  final env = ref.watch(appEnvironmentProvider);
+  return ApiClient(
+    baseUrl: AppFlags.apiBaseUrl,
+    tokens: ref.watch(tokenStoreProvider),
+    platform: env.platform,
+    appVersion: env.appVersion,
+    useCookies: env.isWeb,
+    onSessionExpired: () => ref.read(authControllerProvider.notifier).sessionExpired(),
+    onUpdateRequired: () => ref.read(updateRequiredProvider.notifier).require(),
+  );
+});
+
+final authRepositoryProvider = Provider<AuthRepository>((ref) {
+  return AuthRepository(client: ref.watch(apiClientProvider), platform: ref.watch(appEnvironmentProvider).platform);
+});
+
+/// Set when the API answers APP_UPDATE_REQUIRED or the config says this build is too old.
+class UpdateRequiredNotifier extends Notifier<bool> {
+  @override
+  bool build() => false;
+
+  void require() => state = true;
+}
+
+final updateRequiredProvider = NotifierProvider<UpdateRequiredNotifier, bool>(UpdateRequiredNotifier.new);
+
+/// Signed-in student, or null when signed out. Loading while the session is restored.
+class AuthController extends AsyncNotifier<Me?> {
+  @override
+  Future<Me?> build() async {
+    await _checkMinimumVersion();
+    return ref.read(authRepositoryProvider).restoreSession();
+  }
+
+  Future<void> _checkMinimumVersion() async {
+    final env = ref.read(appEnvironmentProvider);
+    try {
+      final config = (await ref.read(apiClientProvider).api.config.getConfig()).data;
+      final min = switch (env.platform) {
+        'ios' => config.minSupportedVersion.ios,
+        'web' => config.minSupportedVersion.web,
+        _ => config.minSupportedVersion.android,
+      };
+      if (compareVersions(env.appVersion, min) < 0) ref.read(updateRequiredProvider.notifier).require();
+    } catch (_) {
+      // Offline start-up must not block; the server enforces the minimum version anyway.
+    }
+  }
+
+  Future<void> login(String email, String password) async {
+    final me = await ref
+        .read(authRepositoryProvider)
+        .login(email: email, password: password, appVersion: ref.read(appEnvironmentProvider).appVersion);
+    state = AsyncData(me);
+  }
+
+  Future<void> logout() async {
+    await ref.read(authRepositoryProvider).logout();
+    await ref.read(databaseProvider).wipe();
+    state = const AsyncData(null);
+  }
+
+  void sessionExpired() {
+    if (state.value != null) state = const AsyncData(null);
+  }
+
+  Future<void> retry() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(build);
+  }
+}
+
+final authControllerProvider = AsyncNotifierProvider<AuthController, Me?>(AuthController.new);
+
+/// Appearance settings (spec §25): dark mode and three font-size steps, stored locally.
+class AppearanceSettings {
+  const AppearanceSettings({this.themeMode = ThemeMode.system, this.fontStep = 1});
+
+  final ThemeMode themeMode;
+
+  /// 0 = small, 1 = normal, 2 = large
+  final int fontStep;
+
+  static const fontScales = [0.9, 1.0, 1.15];
+  double get textScale => fontScales[fontStep];
+
+  AppearanceSettings copyWith({ThemeMode? themeMode, int? fontStep}) =>
+      AppearanceSettings(themeMode: themeMode ?? this.themeMode, fontStep: fontStep ?? this.fontStep);
+}
+
+class AppearanceController extends Notifier<AppearanceSettings> {
+  static const _themeKey = 'settings.theme_mode';
+  static const _fontKey = 'settings.font_step';
+
+  @override
+  AppearanceSettings build() {
+    unawaited(_load());
+    return const AppearanceSettings();
+  }
+
+  Future<void> _load() async {
+    final db = ref.read(databaseProvider);
+    final theme = await db.getValue(_themeKey);
+    final font = int.tryParse(await db.getValue(_fontKey) ?? '');
+    state = AppearanceSettings(
+      themeMode: ThemeMode.values.firstWhere((m) => m.name == theme, orElse: () => ThemeMode.system),
+      fontStep: font != null && font >= 0 && font <= 2 ? font : 1,
+    );
+  }
+
+  Future<void> setThemeMode(ThemeMode mode) async {
+    state = state.copyWith(themeMode: mode);
+    await ref.read(databaseProvider).setValue(_themeKey, mode.name);
+  }
+
+  Future<void> setFontStep(int step) async {
+    state = state.copyWith(fontStep: step.clamp(0, 2));
+    await ref.read(databaseProvider).setValue(_fontKey, '${state.fontStep}');
+  }
+}
+
+final appearanceProvider = NotifierProvider<AppearanceController, AppearanceSettings>(AppearanceController.new);

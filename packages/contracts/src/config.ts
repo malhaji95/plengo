@@ -19,3 +19,16 @@ export const remoteConfigSchema = z.object({
   termsUrl: z.string(),
 });
 export type RemoteConfig = z.infer<typeof remoteConfigSchema>;
+
+export const educationLevelSchema = z.object({
+  id: z.string(),
+  code: z.string(),
+  nameAr: z.string(),
+  sortOrder: z.number(),
+});
+export type EducationLevel = z.infer<typeof educationLevelSchema>;
+export const educationLevelListSchema = z.array(educationLevelSchema);
+
+z.globalRegistry.add(remoteConfigSchema, { id: 'RemoteConfig' });
+z.globalRegistry.add(educationLevelSchema, { id: 'EducationLevel' });
+z.globalRegistry.add(educationLevelListSchema, { id: 'EducationLevelList' });

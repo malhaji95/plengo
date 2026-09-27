@@ -1,12 +1,9 @@
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
-import { z } from 'zod';
-import { remoteConfigSchema, successEnvelope } from '@plengo/contracts';
+import { educationLevelListSchema, remoteConfigSchema, successEnvelope } from '@plengo/contracts';
 import { asc } from 'drizzle-orm';
 import { educationLevels } from '@plengo/db';
 import { ok } from '../lib/app-error.js';
 import type { Container } from '../container.js';
-
-const levelSchema = z.object({ id: z.string(), code: z.string(), nameAr: z.string(), sortOrder: z.number() });
 
 export function configRoutes(c: Container): FastifyPluginAsyncZod {
   return async (app) => {
@@ -29,7 +26,7 @@ export function configRoutes(c: Container): FastifyPluginAsyncZod {
         schema: {
           operationId: 'listLevels',
           tags: ['structure'],
-          response: { 200: successEnvelope(z.array(levelSchema)) },
+          response: { 200: successEnvelope(educationLevelListSchema) },
         },
       },
       async () =>

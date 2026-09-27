@@ -1,0 +1,76 @@
+name: plengo
+description: Arabic education app — student client for Android, iOS and web.
+publish_to: none
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  flutter_web_plugins:
+    sdk: flutter
+  cached_network_image: ^4.0.2
+  cupertino_icons: ^1.0.9
+  dio: ^5.11.1
+  drift: ^2.35.0
+  drift_flutter: ^0.3.1
+  flutter_riverpod: ^3.4.3
+  flutter_secure_storage: ^11.2.0
+  go_router: ^18.0.1
+  intl: ^0.20.2
+  json_annotation: ^4.12.0
+  package_info_plus: ^10.2.1
+  retrofit: ^4.10.0
+  sentry_flutter: ^9.30.1
+  sqlite3: ^3.6.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  build_runner: ^2.16.1
+  drift_dev: ^2.35.0
+  json_serializable: ^6.14.1
+  mocktail: ^1.0.5
+  retrofit_generator: ^10.2.11
+  swagger_parser: ^1.45.0
+
+flutter:
+  uses-material-design: true
+  generate: true
+  # Bundled so web never fetches fonts from a CDN (spec §24). Placeholder until branding (§44).
+  fonts:
+    - family: IBMPlexSansArabic
+      fonts:
+        - asset: assets/fonts/IBMPlexSansArabic-Regular.ttf
+        - asset: assets/fonts/IBMPlexSansArabic-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/IBMPlexSansArabic-Bold.ttf
+          weight: 700
+
+# Encrypted local database (spec §22.5): package:sqlite3 bundles the SQLCipher build on native
+# platforms. The web build uses the regular WASM SQLite (no offline packs on web, §22.8).
+hooks:
+  user_defines:
+    sqlite3:
+      source: sqlcipher
+
+swagger_parser:
+  schema_path: ../../packages/contracts/openapi.json
+  output_directory: lib/core/api/generated
+  name: plengo_api
+  language: dart
+  json_serializer: json_serializable
+  root_client: true
+  root_client_name: PlengoApi
+  put_clients_in_folder: true
+  enums_to_json: false
+  unknown_enum_value: false
+  # The student app never calls admin endpoints.
+  exclude_tags:
+    - admin-auth
+    - admin-uploads

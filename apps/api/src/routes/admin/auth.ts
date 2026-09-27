@@ -1,13 +1,23 @@
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
-import { z } from 'zod';
-import { emailSchema, meSchema, successEnvelope } from '@plengo/contracts';
+import {
+  adminCredentialsSchema,
+  adminLoginResultSchema,
+  backupCodeBodySchema,
+  enrolledSchema,
+  meSchema,
+  passwordConfirmBodySchema,
+  signedInSchema,
+  signedOutSchema,
+  successEnvelope,
+  totpCodeBodySchema,
+  totpEnrollmentSchema,
+} from '@plengo/contracts';
 import { authOf } from '../../authorization/guards.js';
 import { AppError, ok } from '../../lib/app-error.js';
 import type { Container } from '../../container.js';
 import { forwardCookies, ipAndEmailKey, requestMeta } from '../helpers.js';
 
 const FIFTEEN_MIN = 15 * 60 * 1000;
-const totpCode = z.string().regex(/^\d{6}$/);
 
 /** Admin sign-in: password step, then TOTP verification or first-time enrollment (spec §11.3). */
 export function adminAuthRoutes(c: Container): FastifyPluginAsyncZod {
@@ -25,8 +35,8 @@ export function adminAuthRoutes(c: Container): FastifyPluginAsyncZod {
         schema: {
           operationId: 'adminLogin',
           tags,
-          body: z.object({ email: emailSchema, password: z.string().min(1).max(128) }),
-          response: { 200: successEnvelope(z.object({ next: z.enum(['totp', 'enroll']) })) },
+          body: adminCredentialsSchema,
+          response: { 200: successEnvelope(adminLoginResultSchema) },
         },
       },
       async (request, reply) => {
@@ -43,8 +53,8 @@ export function adminAuthRoutes(c: Container): FastifyPluginAsyncZod {
         schema: {
           operationId: 'adminVerifyTotp',
           tags,
-          body: z.object({ code: totpCode }),
-          response: { 200: successEnvelope(z.object({ signedIn: z.boolean() })) },
+          body: totpCodeBodySchema,
+          response: { 200: successEnvelope(signedInSchema) },
         },
       },
       async (request, reply) => {
@@ -61,8 +71,8 @@ export function adminAuthRoutes(c: Container): FastifyPluginAsyncZod {
         schema: {
           operationId: 'adminVerifyBackupCode',
           tags,
-          body: z.object({ code: z.string().min(4).max(64) }),
-          response: { 200: successEnvelope(z.object({ signedIn: z.boolean() })) },
+          body: backupCodeBodySchema,
+          response: { 200: successEnvelope(signedInSchema) },
         },
       },
       async (request, reply) => {
@@ -83,10 +93,8 @@ export function adminAuthRoutes(c: Container): FastifyPluginAsyncZod {
         schema: {
           operationId: 'adminStartEnrollment',
           tags,
-          body: z.object({ password: z.string().min(1).max(128) }),
-          response: {
-            200: successEnvelope(z.object({ totpUri: z.string(), backupCodes: z.array(z.string()) })),
-          },
+          body: passwordConfirmBodySchema,
+          response: { 200: successEnvelope(totpEnrollmentSchema) },
         },
       },
       async (request) => {
@@ -105,8 +113,8 @@ export function adminAuthRoutes(c: Container): FastifyPluginAsyncZod {
         schema: {
           operationId: 'adminConfirmEnrollment',
           tags,
-          body: z.object({ code: totpCode }),
-          response: { 200: successEnvelope(z.object({ enrolled: z.boolean() })) },
+          body: totpCodeBodySchema,
+          response: { 200: successEnvelope(enrolledSchema) },
         },
       },
       async (request, reply) => {
@@ -134,7 +142,7 @@ export function adminAuthRoutes(c: Container): FastifyPluginAsyncZod {
         schema: {
           operationId: 'adminLogout',
           tags,
-          response: { 200: successEnvelope(z.object({ signedOut: z.boolean() })) },
+          response: { 200: successEnvelope(signedOutSchema) },
         },
       },
       async (request, reply) => {

@@ -6,6 +6,63 @@ import { createContainer } from '../container.js';
 import { loadEnv } from '../env.js';
 import { InlineQueue } from '../jobs/queue.js';
 
+type Doc = { paths?: unknown; components?: { schemas?: Record<string, unknown> } };
+
+const REF = /#\/components\/schemas\/([A-Za-z0-9]+)"/g;
+
+/**
+ * The Zod provider emits an `<Name>Input` twin for every component. Collapse twins that only
+ * differ by `additionalProperties`, drop components nothing references, and give surviving
+ * input-only twins the plain name, so generated clients get one readable type per concept.
+ */
+function tidyComponents<T extends Doc>(input: T): T {
+  let doc = input;
+  const schemas = () => doc.components?.schemas ?? {};
+  const shape = (value: unknown) =>
+    JSON.stringify(value, (key, v: unknown) => (key === 'additionalProperties' ? undefined : v)).replace(
+      /#\/components\/schemas\/([A-Za-z0-9]+?)(Input)?"/g,
+      '#/components/schemas/$1"',
+    );
+
+  for (let changed = true; changed;) {
+    changed = false;
+    for (const name of Object.keys(schemas())) {
+      const base = name.endsWith('Input') ? name.slice(0, -5) : null;
+      if (!base || !(base in schemas()) || shape(schemas()[name]) !== shape(schemas()[base])) continue;
+      delete schemas()[name];
+      doc = JSON.parse(
+        JSON.stringify(doc).replaceAll(`#/components/schemas/${name}"`, `#/components/schemas/${base}"`),
+      );
+      changed = true;
+    }
+  }
+
+  const used = new Set<string>();
+  const visit = (value: unknown) => {
+    for (const [, name] of JSON.stringify(value).matchAll(REF)) {
+      if (name && !used.has(name)) {
+        used.add(name);
+        visit(schemas()[name]);
+      }
+    }
+  };
+  visit(doc.paths);
+  for (const name of Object.keys(schemas())) if (!used.has(name)) delete schemas()[name];
+
+  for (const name of Object.keys(schemas())) {
+    const base = name.endsWith('Input') ? name.slice(0, -5) : null;
+    if (!base || base in schemas()) continue;
+    schemas()[base] = schemas()[name];
+    delete schemas()[name];
+    doc = JSON.parse(
+      JSON.stringify(doc).replaceAll(`#/components/schemas/${name}"`, `#/components/schemas/${base}"`),
+    );
+  }
+  const sorted = Object.fromEntries(Object.entries(schemas()).sort(([a], [b]) => a.localeCompare(b)));
+  if (doc.components) doc.components.schemas = sorted;
+  return doc;
+}
+
 const env = loadEnv({
   NODE_ENV: 'test',
   APP_ENV: 'test',
@@ -23,7 +80,7 @@ const c = createContainer(env, app.log, { jobs: new InlineQueue() });
 await buildApp(app, c);
 await app.ready();
 const out = fileURLToPath(new URL('../../../../packages/contracts/openapi.json', import.meta.url));
-writeFileSync(out, `${JSON.stringify(app.swagger(), null, 2)}\n`);
+writeFileSync(out, `${JSON.stringify(tidyComponents(app.swagger() as Doc), null, 2)}\n`);
 await app.close();
 await c.pool.end();
 console.log(`wrote ${out}`);

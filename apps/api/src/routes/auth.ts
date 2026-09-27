@@ -1,7 +1,5 @@
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
-import { z } from 'zod';
 import {
-  emailSchema,
   forgotPasswordBodySchema,
   mobileLoginBodySchema,
   mobileLogoutBodySchema,
@@ -9,9 +7,16 @@ import {
   registerBodySchema,
   resendOtpBodySchema,
   resetPasswordBodySchema,
+  resetSchema,
+  sentSchema,
+  signedInSchema,
+  signedOutSchema,
   successEnvelope,
   tokenPairSchema,
+  verificationRequiredSchema,
+  verifiedSchema,
   verifyEmailBodySchema,
+  webLoginBodySchema,
 } from '@plengo/contracts';
 import { ok } from '../lib/app-error.js';
 import type { Container } from '../container.js';
@@ -35,7 +40,7 @@ export function authRoutes(c: Container): FastifyPluginAsyncZod {
           operationId: 'register',
           tags,
           body: registerBodySchema,
-          response: { 200: successEnvelope(z.object({ verificationRequired: z.boolean() })) },
+          response: { 200: successEnvelope(verificationRequiredSchema) },
         },
       },
       async (request) => ok(await c.authService.register(request.body)),
@@ -49,7 +54,7 @@ export function authRoutes(c: Container): FastifyPluginAsyncZod {
           operationId: 'verifyEmail',
           tags,
           body: verifyEmailBodySchema,
-          response: { 200: successEnvelope(z.object({ verified: z.boolean() })) },
+          response: { 200: successEnvelope(verifiedSchema) },
         },
       },
       async (request) => ok(await c.authService.verifyEmail(request.body.email, request.body.otp)),
@@ -63,7 +68,7 @@ export function authRoutes(c: Container): FastifyPluginAsyncZod {
           operationId: 'resendOtp',
           tags,
           body: resendOtpBodySchema,
-          response: { 200: successEnvelope(z.object({ sent: z.boolean() })) },
+          response: { 200: successEnvelope(sentSchema) },
         },
       },
       async (request) => ok(await c.authService.resendVerification(request.body.email)),
@@ -77,7 +82,7 @@ export function authRoutes(c: Container): FastifyPluginAsyncZod {
           operationId: 'forgotPassword',
           tags,
           body: forgotPasswordBodySchema,
-          response: { 200: successEnvelope(z.object({ sent: z.boolean() })) },
+          response: { 200: successEnvelope(sentSchema) },
         },
       },
       async (request) => ok(await c.authService.requestPasswordReset(request.body.email)),
@@ -91,7 +96,7 @@ export function authRoutes(c: Container): FastifyPluginAsyncZod {
           operationId: 'resetPassword',
           tags,
           body: resetPasswordBodySchema,
-          response: { 200: successEnvelope(z.object({ reset: z.boolean() })) },
+          response: { 200: successEnvelope(resetSchema) },
         },
       },
       async (request) =>
@@ -133,7 +138,7 @@ export function authRoutes(c: Container): FastifyPluginAsyncZod {
           operationId: 'mobileLogout',
           tags,
           body: mobileLogoutBodySchema,
-          response: { 200: successEnvelope(z.object({ signedOut: z.boolean() })) },
+          response: { 200: successEnvelope(signedOutSchema) },
         },
       },
       async (request) => {
@@ -149,8 +154,8 @@ export function authRoutes(c: Container): FastifyPluginAsyncZod {
         schema: {
           operationId: 'webLogin',
           tags,
-          body: z.object({ email: emailSchema, password: z.string().min(1).max(128) }),
-          response: { 200: successEnvelope(z.object({ signedIn: z.boolean() })) },
+          body: webLoginBodySchema,
+          response: { 200: successEnvelope(signedInSchema) },
         },
       },
       async (request, reply) => {
@@ -167,7 +172,7 @@ export function authRoutes(c: Container): FastifyPluginAsyncZod {
         schema: {
           operationId: 'webLogout',
           tags,
-          response: { 200: successEnvelope(z.object({ signedOut: z.boolean() })) },
+          response: { 200: successEnvelope(signedOutSchema) },
         },
       },
       async (request, reply) => {

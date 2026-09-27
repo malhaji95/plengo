@@ -17,7 +17,911 @@
         "name": "plengo.session_token"
       }
     },
-    "schemas": {}
+    "schemas": {
+      "AdminLoginRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "required": ["email", "password"]
+      },
+      "AdminLoginResult": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": "string",
+            "enum": ["totp", "enroll"]
+          }
+        },
+        "required": ["next"],
+        "additionalProperties": false
+      },
+      "AdminLoginResultEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/AdminLoginResult"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": ["success", "data", "error"],
+        "additionalProperties": false
+      },
+      "BackupCodeRequest": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "minLength": 4,
+            "maxLength": 64
+          }
+        },
+        "required": ["code"],
+        "additionalProperties": false
+      },
+      "CreateUploadRequest": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/MediaKind"
+          },
+          "contentType": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "size": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": ["kind", "contentType", "size"],
+        "additionalProperties": false
+      },
+      "CreateUploadResult": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "uploadUrl": {
+            "type": "string"
+          },
+          "method": {
+            "type": "string",
+            "const": "PUT"
+          },
+          "headers": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          }
+        },
+        "required": ["id", "uploadUrl", "method", "headers", "expiresAt"],
+        "additionalProperties": false
+      },
+      "CreateUploadResultEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/CreateUploadResult"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": ["success", "data", "error"],
+        "additionalProperties": false
+      },
+      "EducationLevel": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "nameAr": {
+            "type": "string"
+          },
+          "sortOrder": {
+            "type": "number"
+          }
+        },
+        "required": ["id", "code", "nameAr", "sortOrder"],
+        "additionalProperties": false
+      },
+      "EducationLevelList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/EducationLevel"
+        }
+      },
+      "EducationLevelListEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/EducationLevelList"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": ["success", "data", "error"],
+        "additionalProperties": false
+      },
+      "EnrolledResult": {
+        "type": "object",
+        "properties": {
+          "enrolled": {
+            "type": "boolean"
+          }
+        },
+        "required": ["enrolled"],
+        "additionalProperties": false
+      },
+      "EnrolledResultEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/EnrolledResult"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": ["success", "data", "error"],
+        "additionalProperties": false
+      },
+      "ForgotPasswordRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": ["email"]
+      },
+      "Me": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "emailVerified": {
+            "type": "boolean"
+          },
+          "role": {
+            "type": "string",
+            "enum": ["student", "admin"]
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "educationLevelId": {
+            "type": ["string", "null"]
+          }
+        },
+        "required": ["id", "email", "emailVerified", "role", "fullName", "educationLevelId"],
+        "additionalProperties": false
+      },
+      "MediaFile": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/MediaKind"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "ready", "failed"]
+          },
+          "width": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "height": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": ["id", "kind", "status", "width", "height", "version"],
+        "additionalProperties": false
+      },
+      "MediaFileEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/MediaFile"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": ["success", "data", "error"],
+        "additionalProperties": false
+      },
+      "MediaKind": {
+        "type": "string",
+        "enum": ["flashcard", "banner", "teacher", "cover", "user-card"]
+      },
+      "MeEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/Me"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": ["success", "data", "error"],
+        "additionalProperties": false
+      },
+      "MobileLoginRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "platform": {
+            "type": "string",
+            "enum": ["android", "ios"]
+          },
+          "appVersion": {
+            "type": "string",
+            "maxLength": 32
+          }
+        },
+        "required": ["email", "password", "platform"]
+      },
+      "MobileLogoutRequest": {
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string",
+            "minLength": 32,
+            "maxLength": 256
+          }
+        },
+        "required": ["refreshToken"],
+        "additionalProperties": false
+      },
+      "MobileRefreshRequest": {
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string",
+            "minLength": 32,
+            "maxLength": 256
+          }
+        },
+        "required": ["refreshToken"],
+        "additionalProperties": false
+      },
+      "PasswordConfirmRequest": {
+        "type": "object",
+        "properties": {
+          "password": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "required": ["password"],
+        "additionalProperties": false
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 100
+          },
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 128
+          },
+          "educationLevelId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          }
+        },
+        "required": ["fullName", "email", "password"]
+      },
+      "RemoteConfig": {
+        "type": "object",
+        "properties": {
+          "minSupportedVersion": {
+            "type": "object",
+            "properties": {
+              "android": {
+                "type": "string"
+              },
+              "ios": {
+                "type": "string"
+              },
+              "web": {
+                "type": "string"
+              }
+            },
+            "required": ["android", "ios", "web"],
+            "additionalProperties": false
+          },
+          "latestVersion": {
+            "type": "object",
+            "properties": {
+              "android": {
+                "type": "string"
+              },
+              "ios": {
+                "type": "string"
+              },
+              "web": {
+                "type": "string"
+              }
+            },
+            "required": ["android", "ios", "web"],
+            "additionalProperties": false
+          },
+          "features": {
+            "type": "object",
+            "properties": {
+              "teacherFollowing": {
+                "type": "boolean"
+              },
+              "randomPractice": {
+                "type": "boolean"
+              },
+              "studentDecks": {
+                "type": "boolean"
+              },
+              "streaks": {
+                "type": "boolean"
+              },
+              "contentReports": {
+                "type": "boolean"
+              }
+            },
+            "required": ["teacherFollowing", "randomPractice", "studentDecks", "streaks", "contentReports"],
+            "additionalProperties": false
+          },
+          "srsDefaults": {
+            "type": "object",
+            "properties": {
+              "newCardsPerDay": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "maxReviewsPerDay": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              }
+            },
+            "required": ["newCardsPerDay", "maxReviewsPerDay"],
+            "additionalProperties": false
+          },
+          "support": {
+            "type": "object",
+            "properties": {
+              "email": {
+                "type": "string"
+              },
+              "whatsapp": {
+                "type": "string"
+              }
+            },
+            "required": ["email", "whatsapp"],
+            "additionalProperties": false
+          },
+          "privacyPolicyUrl": {
+            "type": "string"
+          },
+          "termsUrl": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "minSupportedVersion",
+          "latestVersion",
+          "features",
+          "srsDefaults",
+          "support",
+          "privacyPolicyUrl",
+          "termsUrl"
+        ],
+        "additionalProperties": false
+      },
+      "RemoteConfigEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/RemoteConfig"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": ["success", "data", "error"],
+        "additionalProperties": false
+      },
+      "ResendOtpRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": ["email"]
+      },
+      "ResetPasswordRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "otp": {
+            "type": "string",
+            "pattern": "^\\d{6}$"
+          },
+          "newPassword": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 128
+          }
+        },
+        "required": ["email", "otp", "newPassword"]
+      },
+      "ResetResult": {
+        "type": "object",
+        "properties": {
+          "reset": {
+            "type": "boolean"
+          }
+        },
+        "required": ["reset"],
+        "additionalProperties": false
+      },
+      "ResetResultEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/ResetResult"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": ["success", "data", "error"],
+        "additionalProperties": false
+      },
+      "RevokedResult": {
+        "type": "object",
+        "properties": {
+          "revoked": {
+            "type": "boolean"
+          }
+        },
+        "required": ["revoked"],
+        "additionalProperties": false
+      },
+      "RevokedResultEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/RevokedResult"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": ["success", "data", "error"],
+        "additionalProperties": false
+      },
+      "SentResult": {
+        "type": "object",
+        "properties": {
+          "sent": {
+            "type": "boolean"
+          }
+        },
+        "required": ["sent"],
+        "additionalProperties": false
+      },
+      "SentResultEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/SentResult"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": ["success", "data", "error"],
+        "additionalProperties": false
+      },
+      "SessionList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/SessionSummary"
+        }
+      },
+      "SessionListEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/SessionList"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": ["success", "data", "error"],
+        "additionalProperties": false
+      },
+      "SessionPlatform": {
+        "type": "string",
+        "enum": ["android", "ios", "web", "admin"]
+      },
+      "SessionSummary": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "platform": {
+            "$ref": "#/components/schemas/SessionPlatform"
+          },
+          "appVersion": {
+            "type": ["string", "null"]
+          },
+          "userAgent": {
+            "type": ["string", "null"]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          },
+          "lastSeenAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          },
+          "current": {
+            "type": "boolean"
+          }
+        },
+        "required": ["id", "platform", "appVersion", "userAgent", "createdAt", "lastSeenAt", "current"],
+        "additionalProperties": false
+      },
+      "SignedInResult": {
+        "type": "object",
+        "properties": {
+          "signedIn": {
+            "type": "boolean"
+          }
+        },
+        "required": ["signedIn"],
+        "additionalProperties": false
+      },
+      "SignedInResultEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/SignedInResult"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": ["success", "data", "error"],
+        "additionalProperties": false
+      },
+      "SignedOutResult": {
+        "type": "object",
+        "properties": {
+          "signedOut": {
+            "type": "boolean"
+          }
+        },
+        "required": ["signedOut"],
+        "additionalProperties": false
+      },
+      "SignedOutResultEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/SignedOutResult"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": ["success", "data", "error"],
+        "additionalProperties": false
+      },
+      "TokenPair": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "accessTokenExpiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          },
+          "refreshToken": {
+            "type": "string"
+          },
+          "refreshTokenExpiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          }
+        },
+        "required": ["accessToken", "accessTokenExpiresAt", "refreshToken", "refreshTokenExpiresAt"],
+        "additionalProperties": false
+      },
+      "TokenPairEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/TokenPair"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": ["success", "data", "error"],
+        "additionalProperties": false
+      },
+      "TotpCodeRequest": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^\\d{6}$"
+          }
+        },
+        "required": ["code"],
+        "additionalProperties": false
+      },
+      "TotpEnrollment": {
+        "type": "object",
+        "properties": {
+          "totpUri": {
+            "type": "string"
+          },
+          "backupCodes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["totpUri", "backupCodes"],
+        "additionalProperties": false
+      },
+      "TotpEnrollmentEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/TotpEnrollment"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": ["success", "data", "error"],
+        "additionalProperties": false
+      },
+      "VerificationRequiredResult": {
+        "type": "object",
+        "properties": {
+          "verificationRequired": {
+            "type": "boolean"
+          }
+        },
+        "required": ["verificationRequired"],
+        "additionalProperties": false
+      },
+      "VerificationRequiredResultEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/VerificationRequiredResult"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": ["success", "data", "error"],
+        "additionalProperties": false
+      },
+      "VerifiedResult": {
+        "type": "object",
+        "properties": {
+          "verified": {
+            "type": "boolean"
+          }
+        },
+        "required": ["verified"],
+        "additionalProperties": false
+      },
+      "VerifiedResultEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/VerifiedResult"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": ["success", "data", "error"],
+        "additionalProperties": false
+      },
+      "VerifyEmailRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "otp": {
+            "type": "string",
+            "pattern": "^\\d{6}$"
+          }
+        },
+        "required": ["email", "otp"]
+      },
+      "WebLoginRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "required": ["email", "password"]
+      }
+    }
   },
   "paths": {
     "/api/v1/config": {
@@ -30,129 +934,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "enum": [true]
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "minSupportedVersion": {
-                          "type": "object",
-                          "properties": {
-                            "android": {
-                              "type": "string"
-                            },
-                            "ios": {
-                              "type": "string"
-                            },
-                            "web": {
-                              "type": "string"
-                            }
-                          },
-                          "required": ["android", "ios", "web"],
-                          "additionalProperties": false
-                        },
-                        "latestVersion": {
-                          "type": "object",
-                          "properties": {
-                            "android": {
-                              "type": "string"
-                            },
-                            "ios": {
-                              "type": "string"
-                            },
-                            "web": {
-                              "type": "string"
-                            }
-                          },
-                          "required": ["android", "ios", "web"],
-                          "additionalProperties": false
-                        },
-                        "features": {
-                          "type": "object",
-                          "properties": {
-                            "teacherFollowing": {
-                              "type": "boolean"
-                            },
-                            "randomPractice": {
-                              "type": "boolean"
-                            },
-                            "studentDecks": {
-                              "type": "boolean"
-                            },
-                            "streaks": {
-                              "type": "boolean"
-                            },
-                            "contentReports": {
-                              "type": "boolean"
-                            }
-                          },
-                          "required": [
-                            "teacherFollowing",
-                            "randomPractice",
-                            "studentDecks",
-                            "streaks",
-                            "contentReports"
-                          ],
-                          "additionalProperties": false
-                        },
-                        "srsDefaults": {
-                          "type": "object",
-                          "properties": {
-                            "newCardsPerDay": {
-                              "type": "integer",
-                              "minimum": -9007199254740991,
-                              "maximum": 9007199254740991
-                            },
-                            "maxReviewsPerDay": {
-                              "type": "integer",
-                              "minimum": -9007199254740991,
-                              "maximum": 9007199254740991
-                            }
-                          },
-                          "required": ["newCardsPerDay", "maxReviewsPerDay"],
-                          "additionalProperties": false
-                        },
-                        "support": {
-                          "type": "object",
-                          "properties": {
-                            "email": {
-                              "type": "string"
-                            },
-                            "whatsapp": {
-                              "type": "string"
-                            }
-                          },
-                          "required": ["email", "whatsapp"],
-                          "additionalProperties": false
-                        },
-                        "privacyPolicyUrl": {
-                          "type": "string"
-                        },
-                        "termsUrl": {
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "minSupportedVersion",
-                        "latestVersion",
-                        "features",
-                        "srsDefaults",
-                        "support",
-                        "privacyPolicyUrl",
-                        "termsUrl"
-                      ],
-                      "additionalProperties": false
-                    },
-                    "error": {
-                      "type": "null"
-                    }
-                  },
-                  "required": ["success", "data", "error"],
-                  "additionalProperties": false
+                  "$ref": "#/components/schemas/RemoteConfigEnvelope"
                 }
               }
             }
@@ -170,40 +952,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "enum": [true]
-                    },
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "type": "string"
-                          },
-                          "code": {
-                            "type": "string"
-                          },
-                          "nameAr": {
-                            "type": "string"
-                          },
-                          "sortOrder": {
-                            "type": "number"
-                          }
-                        },
-                        "required": ["id", "code", "nameAr", "sortOrder"],
-                        "additionalProperties": false
-                      }
-                    },
-                    "error": {
-                      "type": "null"
-                    }
-                  },
-                  "required": ["success", "data", "error"],
-                  "additionalProperties": false
+                  "$ref": "#/components/schemas/EducationLevelListEnvelope"
                 }
               }
             }
@@ -220,28 +969,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "fullName": {
-                    "type": "string",
-                    "minLength": 2,
-                    "maxLength": 100
-                  },
-                  "email": {
-                    "type": "string"
-                  },
-                  "password": {
-                    "type": "string",
-                    "minLength": 8,
-                    "maxLength": 128
-                  },
-                  "educationLevelId": {
-                    "type": "string",
-                    "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                  }
-                },
-                "required": ["fullName", "email", "password"]
+                "$ref": "#/components/schemas/RegisterRequest"
               }
             }
           }
@@ -252,28 +980,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "enum": [true]
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "verificationRequired": {
-                          "type": "boolean"
-                        }
-                      },
-                      "required": ["verificationRequired"],
-                      "additionalProperties": false
-                    },
-                    "error": {
-                      "type": "null"
-                    }
-                  },
-                  "required": ["success", "data", "error"],
-                  "additionalProperties": false
+                  "$ref": "#/components/schemas/VerificationRequiredResultEnvelope"
                 }
               }
             }
@@ -290,17 +997,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "email": {
-                    "type": "string"
-                  },
-                  "otp": {
-                    "type": "string",
-                    "pattern": "^\\d{6}$"
-                  }
-                },
-                "required": ["email", "otp"]
+                "$ref": "#/components/schemas/VerifyEmailRequest"
               }
             }
           }
@@ -311,28 +1008,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "enum": [true]
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "verified": {
-                          "type": "boolean"
-                        }
-                      },
-                      "required": ["verified"],
-                      "additionalProperties": false
-                    },
-                    "error": {
-                      "type": "null"
-                    }
-                  },
-                  "required": ["success", "data", "error"],
-                  "additionalProperties": false
+                  "$ref": "#/components/schemas/VerifiedResultEnvelope"
                 }
               }
             }
@@ -349,13 +1025,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "email": {
-                    "type": "string"
-                  }
-                },
-                "required": ["email"]
+                "$ref": "#/components/schemas/ResendOtpRequest"
               }
             }
           }
@@ -366,28 +1036,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "enum": [true]
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "sent": {
-                          "type": "boolean"
-                        }
-                      },
-                      "required": ["sent"],
-                      "additionalProperties": false
-                    },
-                    "error": {
-                      "type": "null"
-                    }
-                  },
-                  "required": ["success", "data", "error"],
-                  "additionalProperties": false
+                  "$ref": "#/components/schemas/SentResultEnvelope"
                 }
               }
             }
@@ -404,13 +1053,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "email": {
-                    "type": "string"
-                  }
-                },
-                "required": ["email"]
+                "$ref": "#/components/schemas/ForgotPasswordRequest"
               }
             }
           }
@@ -421,28 +1064,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "enum": [true]
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "sent": {
-                          "type": "boolean"
-                        }
-                      },
-                      "required": ["sent"],
-                      "additionalProperties": false
-                    },
-                    "error": {
-                      "type": "null"
-                    }
-                  },
-                  "required": ["success", "data", "error"],
-                  "additionalProperties": false
+                  "$ref": "#/components/schemas/SentResultEnvelope"
                 }
               }
             }
@@ -459,22 +1081,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "email": {
-                    "type": "string"
-                  },
-                  "otp": {
-                    "type": "string",
-                    "pattern": "^\\d{6}$"
-                  },
-                  "newPassword": {
-                    "type": "string",
-                    "minLength": 8,
-                    "maxLength": 128
-                  }
-                },
-                "required": ["email", "otp", "newPassword"]
+                "$ref": "#/components/schemas/ResetPasswordRequest"
               }
             }
           }
@@ -485,28 +1092,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "enum": [true]
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "reset": {
-                          "type": "boolean"
-                        }
-                      },
-                      "required": ["reset"],
-                      "additionalProperties": false
-                    },
-                    "error": {
-                      "type": "null"
-                    }
-                  },
-                  "required": ["success", "data", "error"],
-                  "additionalProperties": false
+                  "$ref": "#/components/schemas/ResetResultEnvelope"
                 }
               }
             }
@@ -523,26 +1109,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "email": {
-                    "type": "string"
-                  },
-                  "password": {
-                    "type": "string",
-                    "minLength": 1,
-                    "maxLength": 128
-                  },
-                  "platform": {
-                    "type": "string",
-                    "enum": ["android", "ios"]
-                  },
-                  "appVersion": {
-                    "type": "string",
-                    "maxLength": 32
-                  }
-                },
-                "required": ["email", "password", "platform"]
+                "$ref": "#/components/schemas/MobileLoginRequest"
               }
             }
           }
@@ -553,46 +1120,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "enum": [true]
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "accessToken": {
-                          "type": "string"
-                        },
-                        "accessTokenExpiresAt": {
-                          "type": "string",
-                          "format": "date-time",
-                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
-                        },
-                        "refreshToken": {
-                          "type": "string"
-                        },
-                        "refreshTokenExpiresAt": {
-                          "type": "string",
-                          "format": "date-time",
-                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
-                        }
-                      },
-                      "required": [
-                        "accessToken",
-                        "accessTokenExpiresAt",
-                        "refreshToken",
-                        "refreshTokenExpiresAt"
-                      ],
-                      "additionalProperties": false
-                    },
-                    "error": {
-                      "type": "null"
-                    }
-                  },
-                  "required": ["success", "data", "error"],
-                  "additionalProperties": false
+                  "$ref": "#/components/schemas/TokenPairEnvelope"
                 }
               }
             }
@@ -609,15 +1137,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "refreshToken": {
-                    "type": "string",
-                    "minLength": 32,
-                    "maxLength": 256
-                  }
-                },
-                "required": ["refreshToken"]
+                "$ref": "#/components/schemas/MobileRefreshRequest"
               }
             }
           }
@@ -628,46 +1148,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "enum": [true]
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "accessToken": {
-                          "type": "string"
-                        },
-                        "accessTokenExpiresAt": {
-                          "type": "string",
-                          "format": "date-time",
-                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
-                        },
-                        "refreshToken": {
-                          "type": "string"
-                        },
-                        "refreshTokenExpiresAt": {
-                          "type": "string",
-                          "format": "date-time",
-                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
-                        }
-                      },
-                      "required": [
-                        "accessToken",
-                        "accessTokenExpiresAt",
-                        "refreshToken",
-                        "refreshTokenExpiresAt"
-                      ],
-                      "additionalProperties": false
-                    },
-                    "error": {
-                      "type": "null"
-                    }
-                  },
-                  "required": ["success", "data", "error"],
-                  "additionalProperties": false
+                  "$ref": "#/components/schemas/TokenPairEnvelope"
                 }
               }
             }
@@ -684,15 +1165,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "refreshToken": {
-                    "type": "string",
-                    "minLength": 32,
-                    "maxLength": 256
-                  }
-                },
-                "required": ["refreshToken"]
+                "$ref": "#/components/schemas/MobileLogoutRequest"
               }
             }
           }
@@ -703,28 +1176,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "enum": [true]
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "signedOut": {
-                          "type": "boolean"
-                        }
-                      },
-                      "required": ["signedOut"],
-                      "additionalProperties": false
-                    },
-                    "error": {
-                      "type": "null"
-                    }
-                  },
-                  "required": ["success", "data", "error"],
-                  "additionalProperties": false
+                  "$ref": "#/components/schemas/SignedOutResultEnvelope"
                 }
               }
             }
@@ -741,18 +1193,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "email": {
-                    "type": "string"
-                  },
-                  "password": {
-                    "type": "string",
-                    "minLength": 1,
-                    "maxLength": 128
-                  }
-                },
-                "required": ["email", "password"]
+                "$ref": "#/components/schemas/WebLoginRequest"
               }
             }
           }
@@ -763,28 +1204,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "enum": [true]
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "signedIn": {
-                          "type": "boolean"
-                        }
-                      },
-                      "required": ["signedIn"],
-                      "additionalProperties": false
-                    },
-                    "error": {
-                      "type": "null"
-                    }
-                  },
-                  "required": ["success", "data", "error"],
-                  "additionalProperties": false
+                  "$ref": "#/components/schemas/SignedInResultEnvelope"
                 }
               }
             }
@@ -802,28 +1222,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "enum": [true]
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "signedOut": {
-                          "type": "boolean"
-                        }
-                      },
-                      "required": ["signedOut"],
-                      "additionalProperties": false
-                    },
-                    "error": {
-                      "type": "null"
-                    }
-                  },
-                  "required": ["success", "data", "error"],
-                  "additionalProperties": false
+                  "$ref": "#/components/schemas/SignedOutResultEnvelope"
                 }
               }
             }
@@ -841,44 +1240,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "enum": [true]
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "string"
-                        },
-                        "email": {
-                          "type": "string"
-                        },
-                        "emailVerified": {
-                          "type": "boolean"
-                        },
-                        "role": {
-                          "type": "string",
-                          "enum": ["student", "admin"]
-                        },
-                        "fullName": {
-                          "type": "string"
-                        },
-                        "educationLevelId": {
-                          "type": ["string", "null"]
-                        }
-                      },
-                      "required": ["id", "email", "emailVerified", "role", "fullName", "educationLevelId"],
-                      "additionalProperties": false
-                    },
-                    "error": {
-                      "type": "null"
-                    }
-                  },
-                  "required": ["success", "data", "error"],
-                  "additionalProperties": false
+                  "$ref": "#/components/schemas/MeEnvelope"
                 }
               }
             }
@@ -896,62 +1258,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "enum": [true]
-                    },
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "type": "string"
-                          },
-                          "platform": {
-                            "type": "string",
-                            "enum": ["android", "ios", "web", "admin"]
-                          },
-                          "appVersion": {
-                            "type": ["string", "null"]
-                          },
-                          "userAgent": {
-                            "type": ["string", "null"]
-                          },
-                          "createdAt": {
-                            "type": "string",
-                            "format": "date-time",
-                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
-                          },
-                          "lastSeenAt": {
-                            "type": "string",
-                            "format": "date-time",
-                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
-                          },
-                          "current": {
-                            "type": "boolean"
-                          }
-                        },
-                        "required": [
-                          "id",
-                          "platform",
-                          "appVersion",
-                          "userAgent",
-                          "createdAt",
-                          "lastSeenAt",
-                          "current"
-                        ],
-                        "additionalProperties": false
-                      }
-                    },
-                    "error": {
-                      "type": "null"
-                    }
-                  },
-                  "required": ["success", "data", "error"],
-                  "additionalProperties": false
+                  "$ref": "#/components/schemas/SessionListEnvelope"
                 }
               }
             }
@@ -981,28 +1288,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "enum": [true]
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "revoked": {
-                          "type": "boolean"
-                        }
-                      },
-                      "required": ["revoked"],
-                      "additionalProperties": false
-                    },
-                    "error": {
-                      "type": "null"
-                    }
-                  },
-                  "required": ["success", "data", "error"],
-                  "additionalProperties": false
+                  "$ref": "#/components/schemas/RevokedResultEnvelope"
                 }
               }
             }
@@ -1019,23 +1305,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "kind": {
-                    "type": "string",
-                    "enum": ["flashcard", "banner", "teacher", "cover", "user-card"]
-                  },
-                  "contentType": {
-                    "type": "string",
-                    "maxLength": 100
-                  },
-                  "size": {
-                    "type": "integer",
-                    "exclusiveMinimum": 0,
-                    "maximum": 9007199254740991
-                  }
-                },
-                "required": ["kind", "contentType", "size"]
+                "$ref": "#/components/schemas/CreateUploadRequest"
               }
             }
           }
@@ -1046,51 +1316,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "enum": [true]
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "string",
-                          "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                        },
-                        "uploadUrl": {
-                          "type": "string"
-                        },
-                        "method": {
-                          "type": "string",
-                          "enum": ["PUT"]
-                        },
-                        "headers": {
-                          "type": "object",
-                          "propertyNames": {
-                            "type": "string"
-                          },
-                          "additionalProperties": {
-                            "type": "string"
-                          }
-                        },
-                        "expiresAt": {
-                          "type": "string",
-                          "format": "date-time",
-                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
-                        }
-                      },
-                      "required": ["id", "uploadUrl", "method", "headers", "expiresAt"],
-                      "additionalProperties": false
-                    },
-                    "error": {
-                      "type": "null"
-                    }
-                  },
-                  "required": ["success", "data", "error"],
-                  "additionalProperties": false
+                  "$ref": "#/components/schemas/CreateUploadResultEnvelope"
                 }
               }
             }
@@ -1120,67 +1346,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "enum": [true]
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "string",
-                          "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                        },
-                        "kind": {
-                          "type": "string",
-                          "enum": ["flashcard", "banner", "teacher", "cover", "user-card"]
-                        },
-                        "status": {
-                          "type": "string",
-                          "enum": ["pending", "ready", "failed"]
-                        },
-                        "width": {
-                          "anyOf": [
-                            {
-                              "type": "integer",
-                              "minimum": -9007199254740991,
-                              "maximum": 9007199254740991
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "height": {
-                          "anyOf": [
-                            {
-                              "type": "integer",
-                              "minimum": -9007199254740991,
-                              "maximum": 9007199254740991
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "version": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        }
-                      },
-                      "required": ["id", "kind", "status", "width", "height", "version"],
-                      "additionalProperties": false
-                    },
-                    "error": {
-                      "type": "null"
-                    }
-                  },
-                  "required": ["success", "data", "error"],
-                  "additionalProperties": false
+                  "$ref": "#/components/schemas/MediaFileEnvelope"
                 }
               }
             }
@@ -1210,67 +1376,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "enum": [true]
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "string",
-                          "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                        },
-                        "kind": {
-                          "type": "string",
-                          "enum": ["flashcard", "banner", "teacher", "cover", "user-card"]
-                        },
-                        "status": {
-                          "type": "string",
-                          "enum": ["pending", "ready", "failed"]
-                        },
-                        "width": {
-                          "anyOf": [
-                            {
-                              "type": "integer",
-                              "minimum": -9007199254740991,
-                              "maximum": 9007199254740991
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "height": {
-                          "anyOf": [
-                            {
-                              "type": "integer",
-                              "minimum": -9007199254740991,
-                              "maximum": 9007199254740991
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "version": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        }
-                      },
-                      "required": ["id", "kind", "status", "width", "height", "version"],
-                      "additionalProperties": false
-                    },
-                    "error": {
-                      "type": "null"
-                    }
-                  },
-                  "required": ["success", "data", "error"],
-                  "additionalProperties": false
+                  "$ref": "#/components/schemas/MediaFileEnvelope"
                 }
               }
             }
@@ -1287,18 +1393,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "email": {
-                    "type": "string"
-                  },
-                  "password": {
-                    "type": "string",
-                    "minLength": 1,
-                    "maxLength": 128
-                  }
-                },
-                "required": ["email", "password"]
+                "$ref": "#/components/schemas/AdminLoginRequest"
               }
             }
           }
@@ -1309,29 +1404,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "enum": [true]
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "next": {
-                          "type": "string",
-                          "enum": ["totp", "enroll"]
-                        }
-                      },
-                      "required": ["next"],
-                      "additionalProperties": false
-                    },
-                    "error": {
-                      "type": "null"
-                    }
-                  },
-                  "required": ["success", "data", "error"],
-                  "additionalProperties": false
+                  "$ref": "#/components/schemas/AdminLoginResultEnvelope"
                 }
               }
             }
@@ -1348,14 +1421,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "code": {
-                    "type": "string",
-                    "pattern": "^\\d{6}$"
-                  }
-                },
-                "required": ["code"]
+                "$ref": "#/components/schemas/TotpCodeRequest"
               }
             }
           }
@@ -1366,28 +1432,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "enum": [true]
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "signedIn": {
-                          "type": "boolean"
-                        }
-                      },
-                      "required": ["signedIn"],
-                      "additionalProperties": false
-                    },
-                    "error": {
-                      "type": "null"
-                    }
-                  },
-                  "required": ["success", "data", "error"],
-                  "additionalProperties": false
+                  "$ref": "#/components/schemas/SignedInResultEnvelope"
                 }
               }
             }
@@ -1404,15 +1449,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "code": {
-                    "type": "string",
-                    "minLength": 4,
-                    "maxLength": 64
-                  }
-                },
-                "required": ["code"]
+                "$ref": "#/components/schemas/BackupCodeRequest"
               }
             }
           }
@@ -1423,28 +1460,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "enum": [true]
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "signedIn": {
-                          "type": "boolean"
-                        }
-                      },
-                      "required": ["signedIn"],
-                      "additionalProperties": false
-                    },
-                    "error": {
-                      "type": "null"
-                    }
-                  },
-                  "required": ["success", "data", "error"],
-                  "additionalProperties": false
+                  "$ref": "#/components/schemas/SignedInResultEnvelope"
                 }
               }
             }
@@ -1461,15 +1477,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "password": {
-                    "type": "string",
-                    "minLength": 1,
-                    "maxLength": 128
-                  }
-                },
-                "required": ["password"]
+                "$ref": "#/components/schemas/PasswordConfirmRequest"
               }
             }
           }
@@ -1480,34 +1488,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "enum": [true]
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "totpUri": {
-                          "type": "string"
-                        },
-                        "backupCodes": {
-                          "type": "array",
-                          "items": {
-                            "type": "string"
-                          }
-                        }
-                      },
-                      "required": ["totpUri", "backupCodes"],
-                      "additionalProperties": false
-                    },
-                    "error": {
-                      "type": "null"
-                    }
-                  },
-                  "required": ["success", "data", "error"],
-                  "additionalProperties": false
+                  "$ref": "#/components/schemas/TotpEnrollmentEnvelope"
                 }
               }
             }
@@ -1524,14 +1505,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "code": {
-                    "type": "string",
-                    "pattern": "^\\d{6}$"
-                  }
-                },
-                "required": ["code"]
+                "$ref": "#/components/schemas/TotpCodeRequest"
               }
             }
           }
@@ -1542,28 +1516,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "enum": [true]
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "enrolled": {
-                          "type": "boolean"
-                        }
-                      },
-                      "required": ["enrolled"],
-                      "additionalProperties": false
-                    },
-                    "error": {
-                      "type": "null"
-                    }
-                  },
-                  "required": ["success", "data", "error"],
-                  "additionalProperties": false
+                  "$ref": "#/components/schemas/EnrolledResultEnvelope"
                 }
               }
             }
@@ -1581,28 +1534,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "enum": [true]
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "signedOut": {
-                          "type": "boolean"
-                        }
-                      },
-                      "required": ["signedOut"],
-                      "additionalProperties": false
-                    },
-                    "error": {
-                      "type": "null"
-                    }
-                  },
-                  "required": ["success", "data", "error"],
-                  "additionalProperties": false
+                  "$ref": "#/components/schemas/SignedOutResultEnvelope"
                 }
               }
             }
@@ -1620,44 +1552,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "enum": [true]
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "string"
-                        },
-                        "email": {
-                          "type": "string"
-                        },
-                        "emailVerified": {
-                          "type": "boolean"
-                        },
-                        "role": {
-                          "type": "string",
-                          "enum": ["student", "admin"]
-                        },
-                        "fullName": {
-                          "type": "string"
-                        },
-                        "educationLevelId": {
-                          "type": ["string", "null"]
-                        }
-                      },
-                      "required": ["id", "email", "emailVerified", "role", "fullName", "educationLevelId"],
-                      "additionalProperties": false
-                    },
-                    "error": {
-                      "type": "null"
-                    }
-                  },
-                  "required": ["success", "data", "error"],
-                  "additionalProperties": false
+                  "$ref": "#/components/schemas/MeEnvelope"
                 }
               }
             }
@@ -1674,23 +1569,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "kind": {
-                    "type": "string",
-                    "enum": ["flashcard", "banner", "teacher", "cover", "user-card"]
-                  },
-                  "contentType": {
-                    "type": "string",
-                    "maxLength": 100
-                  },
-                  "size": {
-                    "type": "integer",
-                    "exclusiveMinimum": 0,
-                    "maximum": 9007199254740991
-                  }
-                },
-                "required": ["kind", "contentType", "size"]
+                "$ref": "#/components/schemas/CreateUploadRequest"
               }
             }
           }
@@ -1701,51 +1580,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "enum": [true]
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "string",
-                          "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                        },
-                        "uploadUrl": {
-                          "type": "string"
-                        },
-                        "method": {
-                          "type": "string",
-                          "enum": ["PUT"]
-                        },
-                        "headers": {
-                          "type": "object",
-                          "propertyNames": {
-                            "type": "string"
-                          },
-                          "additionalProperties": {
-                            "type": "string"
-                          }
-                        },
-                        "expiresAt": {
-                          "type": "string",
-                          "format": "date-time",
-                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
-                        }
-                      },
-                      "required": ["id", "uploadUrl", "method", "headers", "expiresAt"],
-                      "additionalProperties": false
-                    },
-                    "error": {
-                      "type": "null"
-                    }
-                  },
-                  "required": ["success", "data", "error"],
-                  "additionalProperties": false
+                  "$ref": "#/components/schemas/CreateUploadResultEnvelope"
                 }
               }
             }
@@ -1775,67 +1610,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "enum": [true]
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "string",
-                          "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                        },
-                        "kind": {
-                          "type": "string",
-                          "enum": ["flashcard", "banner", "teacher", "cover", "user-card"]
-                        },
-                        "status": {
-                          "type": "string",
-                          "enum": ["pending", "ready", "failed"]
-                        },
-                        "width": {
-                          "anyOf": [
-                            {
-                              "type": "integer",
-                              "minimum": -9007199254740991,
-                              "maximum": 9007199254740991
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "height": {
-                          "anyOf": [
-                            {
-                              "type": "integer",
-                              "minimum": -9007199254740991,
-                              "maximum": 9007199254740991
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "version": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        }
-                      },
-                      "required": ["id", "kind", "status", "width", "height", "version"],
-                      "additionalProperties": false
-                    },
-                    "error": {
-                      "type": "null"
-                    }
-                  },
-                  "required": ["success", "data", "error"],
-                  "additionalProperties": false
+                  "$ref": "#/components/schemas/MediaFileEnvelope"
                 }
               }
             }
@@ -1865,67 +1640,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "enum": [true]
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "string",
-                          "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                        },
-                        "kind": {
-                          "type": "string",
-                          "enum": ["flashcard", "banner", "teacher", "cover", "user-card"]
-                        },
-                        "status": {
-                          "type": "string",
-                          "enum": ["pending", "ready", "failed"]
-                        },
-                        "width": {
-                          "anyOf": [
-                            {
-                              "type": "integer",
-                              "minimum": -9007199254740991,
-                              "maximum": 9007199254740991
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "height": {
-                          "anyOf": [
-                            {
-                              "type": "integer",
-                              "minimum": -9007199254740991,
-                              "maximum": 9007199254740991
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "version": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        }
-                      },
-                      "required": ["id", "kind", "status", "width", "height", "version"],
-                      "additionalProperties": false
-                    },
-                    "error": {
-                      "type": "null"
-                    }
-                  },
-                  "required": ["success", "data", "error"],
-                  "additionalProperties": false
+                  "$ref": "#/components/schemas/MediaFileEnvelope"
                 }
               }
             }
