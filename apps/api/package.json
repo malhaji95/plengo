@@ -1,0 +1,42 @@
+{
+  "name": "@plengo/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --conditions=@plengo/source --import tsx --watch src/main.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/main.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "openapi": "node --conditions=@plengo/source --import tsx src/scripts/openapi.ts",
+    "admin:create": "node --conditions=@plengo/source --import tsx src/scripts/create-admin.ts"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1141.0",
+    "@aws-sdk/s3-request-presigner": "^3.1141.0",
+    "@fastify/cookie": "^11.1.2",
+    "@fastify/cors": "^11.3.0",
+    "@fastify/rate-limit": "^11.2.0",
+    "@fastify/swagger": "^9.9.0",
+    "@fastify/swagger-ui": "^6.1.1",
+    "@plengo/contracts": "workspace:*",
+    "@plengo/db": "workspace:*",
+    "@sentry/node": "^11.0.0",
+    "better-auth": "^1.7.6",
+    "drizzle-orm": "^0.45.3",
+    "fastify": "^5.12.5",
+    "fastify-type-provider-zod": "^7.0.0",
+    "jose": "^6.2.12",
+    "pg": "^8.23.0",
+    "pg-boss": "^12.35.0",
+    "sharp": "^0.35.4",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.23.1",
+    "otplib": "^13.5.0",
+    "pino-pretty": "^13.0.0",
+    "tsx": "^4.23.15"
+  }
+}
