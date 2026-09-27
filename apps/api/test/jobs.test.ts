@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { PgBossQueue, QUEUES } from '../src/jobs/queue.js';
+import { PgBossQueue, QUEUES, type JobHandlers } from '../src/jobs/queue.js';
 import { createTestApp, type TestContext } from './helpers.js';
 
 let t: TestContext;
@@ -16,16 +16,16 @@ describe('pg-boss queue', () => {
     const seen: string[] = [];
     let resolve!: () => void;
     const delivered = new Promise<void>((r) => (resolve = r));
+    const noop = Object.fromEntries(
+      Object.values(QUEUES).map((name) => [name, async () => {}]),
+    ) as unknown as JobHandlers;
     await queue.start(
       {
+        ...noop,
         [QUEUES.mediaProcess]: async ({ mediaId }) => {
           seen.push(mediaId);
           resolve();
         },
-        [QUEUES.mediaCleanup]: async () => {},
-        [QUEUES.couponsGenerate]: async () => {},
-        [QUEUES.recomputeFree]: async () => {},
-        [QUEUES.expireEntitlements]: async () => {},
       },
       { workers: true },
     );

@@ -46,3 +46,8 @@ export const freeRuleTypeEnum = pgEnum('free_rule_type', [
 export const freeSourceEnum = pgEnum('free_source', ['rule', 'manual_override']);
 export const couponBatchStatusEnum = pgEnum('coupon_batch_status', ['active', 'revoked']);
 export const couponStatusEnum = pgEnum('coupon_status', ['active', 'redeemed', 'revoked']);
+
+/* Content (spec §14, §15). */
+export const questionTypeEnum = pgEnum('question_type', ['mcq', 'true_false', 'written']);
+export const contentStatusEnum = pgEnum('content_status', ['draft', 'published', 'archived']);
+export const difficultyEnum = pgEnum('difficulty', ['easy', 'medium', 'hard']);

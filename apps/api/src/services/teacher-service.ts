@@ -19,8 +19,9 @@ export function createTeacherService(deps: {
   structure: StructureService;
   storage: ObjectStorage;
   access: AccessService;
+  questionCounts: (scope: ReturnType<typeof trackScope>) => Promise<{ total: number; free: number }>;
 }) {
-  const { repo, structureRepo, structure, storage, access } = deps;
+  const { repo, structureRepo, structure, storage, access, questionCounts } = deps;
   const notFound = (): never => {
     throw new AppError('NOT_FOUND');
   };
@@ -225,11 +226,12 @@ export function createTeacherService(deps: {
 
     async track(userId: string, trackId: string) {
       const track = (await repo.getTrack(trackId, { visibleOnly: true })) ?? notFound();
-      const [teacher, subject, followed, scopeAccess] = await Promise.all([
+      const [teacher, subject, followed, scopeAccess, questionCount] = await Promise.all([
         repo.getTeacher(track.teacherId, { visibleOnly: true }),
         structureRepo.getSubject(track.subjectId, { studentVisible: true }),
         repo.followedIds(userId),
         access.scopeAccess(userId, trackScope(track.id)),
+        questionCounts(trackScope(track.id)),
       ]);
       if (!teacher || !subject) notFound();
       return {
@@ -237,6 +239,7 @@ export function createTeacherService(deps: {
         teacher: toTeacher(teacher!, followed.has(teacher!.id)),
         subject: toSubject(subject!, storage),
         access: scopeAccess,
+        questionCount,
       };
     },
 

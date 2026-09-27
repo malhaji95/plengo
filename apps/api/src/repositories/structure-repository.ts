@@ -6,9 +6,10 @@ import {
   faculties,
   lessons,
   mediaFiles,
+  questions,
   subjects,
-  teachers,
   teacherTracks,
+  teachers,
   units,
   universities,
   type Db,
@@ -355,13 +356,13 @@ export function createStructureRepository(db: Db) {
     },
 
     /** Whether live rows still hang under a node, which blocks deleting it (ADR-011). */
-    async isInUse(
-      name: 'universities' | 'faculties' | 'academicYears' | 'subjects' | 'units' | 'teachers',
-      id: string,
-    ) {
+    async isInUse(name: OrderedTableName, id: string) {
       const exists = async (query: Promise<unknown[]>) => (await query).length > 0;
       const liveWhere = (t: { deletedAt: AnyPgColumn }, col: AnyPgColumn) =>
         and(eq(col, id), isNull(t.deletedAt));
+      // Content keeps its subject, track, unit and lesson (§6.1); archive or delete it first.
+      const hasQuestions = (col: AnyPgColumn) =>
+        exists(db.select({ id: questions.id }).from(questions).where(liveWhere(questions, col)).limit(1));
       switch (name) {
         case 'universities':
           return (
@@ -423,7 +424,8 @@ export function createStructureRepository(db: Db) {
                 .from(lessons)
                 .where(liveWhere(lessons, lessons.subjectId))
                 .limit(1),
-            ))
+            )) ||
+            (await hasQuestions(questions.subjectId))
           );
         case 'teachers':
           return exists(
@@ -434,9 +436,15 @@ export function createStructureRepository(db: Db) {
               .limit(1),
           );
         case 'units':
-          return exists(
-            db.select({ id: lessons.id }).from(lessons).where(liveWhere(lessons, lessons.unitId)).limit(1),
+          return (
+            (await exists(
+              db.select({ id: lessons.id }).from(lessons).where(liveWhere(lessons, lessons.unitId)).limit(1),
+            )) || (await hasQuestions(questions.unitId))
           );
+        case 'lessons':
+          return hasQuestions(questions.lessonId);
+        case 'teacherTracks':
+          return hasQuestions(questions.teacherTrackId);
       }
     },
   };

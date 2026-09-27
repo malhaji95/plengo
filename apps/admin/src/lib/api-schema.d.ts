@@ -516,6 +516,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/questions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listQuestions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/questions/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getQuestion"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/questions/{id}/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["checkQuestionAnswer"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/auth/login": {
         parameters: {
             query?: never;
@@ -1381,6 +1429,102 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/questions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminListQuestions"];
+        put?: never;
+        post: operations["adminCreateQuestion"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/questions/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminGetQuestion"];
+        put?: never;
+        post?: never;
+        delete: operations["adminDeleteQuestion"];
+        options?: never;
+        head?: never;
+        patch: operations["adminUpdateQuestion"];
+        trace?: never;
+    };
+    "/api/v1/admin/questions/{id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["adminSetQuestionStatus"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/questions/{id}/free": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["adminSetQuestionFree"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/questions/reorder": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["adminReorderQuestions"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/questions/normalize": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["adminNormalizePreview"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1424,6 +1568,12 @@ export interface components {
             success: true;
             data: components["schemas"]["AccessSettings"];
             error: null;
+        };
+        AdminAcceptedAnswer: {
+            id: string;
+            answerOriginal: string;
+            answerNormalized: string;
+            normalizationVersion: number;
         };
         AdminCoupon: {
             id: string;
@@ -1484,6 +1634,54 @@ export interface components {
             /** @constant */
             success: true;
             data: components["schemas"]["AdminLoginResult"];
+            error: null;
+        };
+        AdminQuestion: {
+            id: string;
+            /** @enum {string} */
+            type: "mcq" | "true_false" | "written";
+            subjectId: string;
+            subjectNameAr: string;
+            teacherTrackId: string | null;
+            trackTitleAr: string | null;
+            unitId: string | null;
+            lessonId: string | null;
+            questionText: string;
+            explanation: string | null;
+            difficulty: ("easy" | "medium" | "hard") | null;
+            isFree: boolean;
+            /** @enum {string} */
+            freeSource: "rule" | "manual_override";
+            /** @enum {string} */
+            status: "draft" | "published" | "archived";
+            sortOrder: number;
+            contentVersion: number;
+            options: components["schemas"]["AdminQuestionOption"][];
+            acceptedAnswers: components["schemas"]["AdminAcceptedAnswer"][];
+            createdAt: string;
+            updatedAt: string;
+        };
+        AdminQuestionEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AdminQuestion"];
+            error: null;
+        };
+        AdminQuestionOption: {
+            id: string;
+            text: string;
+            isCorrect: boolean;
+            sortOrder: number;
+        };
+        AdminQuestionPage: {
+            items: components["schemas"]["AdminQuestion"][];
+            nextCursor: string | null;
+            totalCount: number;
+        };
+        AdminQuestionPageEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AdminQuestionPage"];
             error: null;
         };
         AdminStudent: {
@@ -1569,6 +1767,27 @@ export interface components {
         };
         BackupCodeRequest: {
             code: string;
+        };
+        CheckAnswerRequest: {
+            /** Format: uuid */
+            selectedOptionId?: string;
+            writtenAnswer?: string;
+        };
+        CheckResult: {
+            isCorrect: boolean;
+            correctOptionId: string | null;
+            correctAnswer: string | null;
+            explanation: string | null;
+        };
+        CheckResultEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["CheckResult"];
+            error: null;
+        };
+        ContentCount: {
+            total: number;
+            free: number;
         };
         CouponBatch: {
             id: string;
@@ -1669,6 +1888,22 @@ export interface components {
             /** Format: date-time */
             endsAt: string;
             isActive?: boolean;
+        };
+        CreateQuestionRequest: {
+            /** @enum {string} */
+            type: "mcq" | "true_false" | "written";
+            /** Format: uuid */
+            subjectId: string;
+            teacherTrackId?: string | null;
+            unitId?: string | null;
+            lessonId?: string | null;
+            questionText: string;
+            explanation?: string | null;
+            difficulty?: ("easy" | "medium" | "hard") | null;
+            options?: components["schemas"]["QuestionOption"][];
+            trueFalseAnswer?: boolean;
+            acceptedAnswers?: string[];
+            publish?: boolean;
         };
         CreateSubjectRequest: {
             /** Format: uuid */
@@ -1958,6 +2193,22 @@ export interface components {
             data: components["schemas"]["MyEntitlementList"];
             error: null;
         };
+        NormalizePreview: {
+            normalizationVersion: number;
+            items: {
+                original: string;
+                normalized: string;
+            }[];
+        };
+        NormalizePreviewEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["NormalizePreview"];
+            error: null;
+        };
+        NormalizePreviewRequest: {
+            answers: string[];
+        };
         PasswordConfirmRequest: {
             password: string;
         };
@@ -1984,6 +2235,23 @@ export interface components {
             success: true;
             data: components["schemas"]["PromotionList"];
             error: null;
+        };
+        QuestionFreeRequest: {
+            /** @enum {string} */
+            mode: "rule" | "free" | "paid";
+        };
+        QuestionOption: {
+            /** Format: uuid */
+            id?: string;
+            text: string;
+            isCorrect: boolean;
+        };
+        QuestionReorderRequest: {
+            ids: string[];
+        };
+        QuestionStatusRequest: {
+            /** @enum {string} */
+            status: "draft" | "published" | "archived";
         };
         RedeemCouponRequest: {
             code: string;
@@ -2142,6 +2410,43 @@ export interface components {
             data: components["schemas"]["SignedOutResult"];
             error: null;
         };
+        StudentOption: {
+            id: string;
+            text: string;
+        };
+        StudentQuestion: {
+            id: string;
+            /** @enum {string} */
+            type: "mcq" | "true_false" | "written";
+            subjectId: string;
+            teacherTrackId: string | null;
+            unitId: string | null;
+            lessonId: string | null;
+            sortOrder: number;
+            difficulty: ("easy" | "medium" | "hard") | null;
+            isFree: boolean;
+            locked: boolean;
+            questionText: string | null;
+            options: components["schemas"]["StudentOption"][] | null;
+        };
+        StudentQuestionEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["StudentQuestion"];
+            error: null;
+        };
+        StudentQuestionPage: {
+            items: components["schemas"]["StudentQuestion"][];
+            nextCursor: string | null;
+            totalCount: number;
+            accessibleCount: number;
+        };
+        StudentQuestionPageEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["StudentQuestionPage"];
+            error: null;
+        };
         Subject: {
             id: string;
             educationLevelId: string;
@@ -2175,6 +2480,7 @@ export interface components {
             lessons: components["schemas"]["Lesson"][];
             tracks: components["schemas"]["SubjectTrack"][];
             access: components["schemas"]["ScopeAccess"];
+            questionCount: components["schemas"]["ContentCount"];
         };
         SubjectOutlineEnvelope: {
             /** @constant */
@@ -2272,6 +2578,7 @@ export interface components {
             teacher: components["schemas"]["Teacher"];
             subject: components["schemas"]["Subject"];
             access: components["schemas"]["ScopeAccess"];
+            questionCount: components["schemas"]["ContentCount"];
         };
         TrackDetailEnvelope: {
             /** @constant */
@@ -2367,6 +2674,16 @@ export interface components {
             /** Format: date-time */
             endsAt?: string;
             isActive?: boolean;
+        };
+        UpdateQuestionRequest: {
+            unitId?: string | null;
+            lessonId?: string | null;
+            questionText?: string;
+            explanation?: string | null;
+            difficulty?: ("easy" | "medium" | "hard") | null;
+            options?: components["schemas"]["QuestionOption"][];
+            trueFalseAnswer?: boolean;
+            acceptedAnswers?: string[];
         };
         UpdateSubjectRequest: {
             /** Format: uuid */
@@ -3192,6 +3509,81 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RedeemResultEnvelope"];
+                };
+            };
+        };
+    };
+    listQuestions: {
+        parameters: {
+            query: {
+                subjectId: string;
+                teacherTrackId?: string;
+                unitId?: string;
+                lessonId?: string;
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentQuestionPageEnvelope"];
+                };
+            };
+        };
+    };
+    getQuestion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentQuestionEnvelope"];
+                };
+            };
+        };
+    };
+    checkQuestionAnswer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CheckAnswerRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CheckResultEnvelope"];
                 };
             };
         };
@@ -4977,6 +5369,231 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DeletedResultEnvelope"];
+                };
+            };
+        };
+    };
+    adminListQuestions: {
+        parameters: {
+            query?: {
+                subjectId?: string;
+                teacherTrackId?: string;
+                generalOnly?: "true" | "false";
+                unitId?: string;
+                lessonId?: string;
+                status?: "draft" | "published" | "archived";
+                type?: "mcq" | "true_false" | "written";
+                q?: string;
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminQuestionPageEnvelope"];
+                };
+            };
+        };
+    };
+    adminCreateQuestion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateQuestionRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminQuestionEnvelope"];
+                };
+            };
+        };
+    };
+    adminGetQuestion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminQuestionEnvelope"];
+                };
+            };
+        };
+    };
+    adminDeleteQuestion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeletedResultEnvelope"];
+                };
+            };
+        };
+    };
+    adminUpdateQuestion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateQuestionRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminQuestionEnvelope"];
+                };
+            };
+        };
+    };
+    adminSetQuestionStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuestionStatusRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminQuestionEnvelope"];
+                };
+            };
+        };
+    };
+    adminSetQuestionFree: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuestionFreeRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminQuestionEnvelope"];
+                };
+            };
+        };
+    };
+    adminReorderQuestions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuestionReorderRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReorderedResultEnvelope"];
+                };
+            };
+        };
+    };
+    adminNormalizePreview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NormalizePreviewRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NormalizePreviewEnvelope"];
                 };
             };
         };

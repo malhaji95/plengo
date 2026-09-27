@@ -23,6 +23,7 @@
     "@fastify/rate-limit": "^11.2.0",
     "@fastify/swagger": "^9.9.0",
     "@fastify/swagger-ui": "^6.1.1",
+    "@plengo/arabic-normalizer": "workspace:*",
     "@plengo/contracts": "workspace:*",
     "@plengo/db": "workspace:*",
     "@sentry/node": "^11.0.0",

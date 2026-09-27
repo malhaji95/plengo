@@ -1,0 +1,191 @@
+{
+  "version": 1,
+  "normalize": [
+    {
+      "name": "NFKC folds presentation forms",
+      "input": "ﺳﻮﺭﻳﺎ",
+      "expected": "سوريا"
+    },
+    {
+      "name": "tatweel",
+      "input": "سـوريـا",
+      "expected": "سوريا"
+    },
+    {
+      "name": "diacritics",
+      "input": "دِمَشْق",
+      "expected": "دمشق"
+    },
+    {
+      "name": "tanween and shadda",
+      "input": "مُحَمَّدٌ",
+      "expected": "محمد"
+    },
+    {
+      "name": "superscript alef",
+      "input": "هٰذا",
+      "expected": "هذا"
+    },
+    {
+      "name": "alef with hamza above",
+      "input": "أحمد",
+      "expected": "احمد"
+    },
+    {
+      "name": "alef with hamza below",
+      "input": "إسلام",
+      "expected": "اسلام"
+    },
+    {
+      "name": "alef madda",
+      "input": "آمن",
+      "expected": "امن"
+    },
+    {
+      "name": "alef wasla",
+      "input": "ٱلكتاب",
+      "expected": "الكتاب"
+    },
+    {
+      "name": "alef maksura",
+      "input": "مستشفى",
+      "expected": "مستشفي"
+    },
+    {
+      "name": "arabic-indic digits",
+      "input": "٠١٢٣٤٥٦٧٨٩",
+      "expected": "0123456789"
+    },
+    {
+      "name": "persian digits",
+      "input": "۰۱۲۳۴۵۶۷۸۹",
+      "expected": "0123456789"
+    },
+    {
+      "name": "arabic decimal separator",
+      "input": "٣٫٥",
+      "expected": "3.5"
+    },
+    {
+      "name": "decimal point kept between digits",
+      "input": "3.5",
+      "expected": "3.5"
+    },
+    {
+      "name": "decimal comma between digits becomes a point",
+      "input": "3,5",
+      "expected": "3.5"
+    },
+    {
+      "name": "latin lowercase",
+      "input": "DNA Test",
+      "expected": "dna test"
+    },
+    {
+      "name": "punctuation to space",
+      "input": "نعم، صحيح!",
+      "expected": "نعم صحيح"
+    },
+    {
+      "name": "all punctuation marks",
+      "input": "a.b,c،d؛e;f:g!h?i؟j\"k'l«m»n(o)p-q_r/s",
+      "expected": "a b c d e f g h i j k l m n o p q r s"
+    },
+    {
+      "name": "period at end is punctuation",
+      "input": "دمشق.",
+      "expected": "دمشق"
+    },
+    {
+      "name": "point not between digits",
+      "input": "3. 5",
+      "expected": "3 5"
+    },
+    {
+      "name": "collapse whitespace and trim",
+      "input": "  الحركة \t  المستقيمة \n",
+      "expected": "الحركة المستقيمة"
+    },
+    {
+      "name": "taa marbuta is not folded",
+      "input": "مدرسة",
+      "expected": "مدرسة"
+    },
+    {
+      "name": "haa is not folded",
+      "input": "مدرسه",
+      "expected": "مدرسه"
+    },
+    {
+      "name": "hamza on waw is not folded",
+      "input": "مؤمن",
+      "expected": "مؤمن"
+    },
+    {
+      "name": "hamza on yaa is not folded",
+      "input": "سائل",
+      "expected": "سائل"
+    },
+    {
+      "name": "empty",
+      "input": "   ",
+      "expected": ""
+    }
+  ],
+  "match": [
+    {
+      "name": "alef variants",
+      "accepted": ["أحمد"],
+      "input": "احمد",
+      "correct": true
+    },
+    {
+      "name": "diacritics ignored",
+      "accepted": ["دِمَشْق"],
+      "input": "دمشق",
+      "correct": true
+    },
+    {
+      "name": "arabic digits",
+      "accepted": ["3.5"],
+      "input": "٣٫٥",
+      "correct": true
+    },
+    {
+      "name": "tatweel",
+      "accepted": ["سوريا"],
+      "input": "سـوريـا",
+      "correct": true
+    },
+    {
+      "name": "unconfigured synonym",
+      "accepted": ["سيارة"],
+      "input": "عربة",
+      "correct": false
+    },
+    {
+      "name": "taa marbuta variant must be configured",
+      "accepted": ["مدرسة"],
+      "input": "مدرسه",
+      "correct": false
+    },
+    {
+      "name": "any accepted answer",
+      "accepted": ["نيوتن", "إسحاق نيوتن"],
+      "input": "اسحاق نيوتن",
+      "correct": true
+    },
+    {
+      "name": "no partial credit",
+      "accepted": ["إسحاق نيوتن"],
+      "input": "نيوتن",
+      "correct": false
+    },
+    {
+      "name": "empty input never matches",
+      "accepted": [""],
+      "input": "  ",
+      "correct": false
+    }
+  ]
+}

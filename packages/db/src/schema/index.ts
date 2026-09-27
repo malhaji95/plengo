@@ -6,3 +6,4 @@ export * from './media.js';
 export * from './operations.js';
 export * from './teachers.js';
 export * from './access.js';
+export * from './content.js';

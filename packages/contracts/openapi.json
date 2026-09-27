@@ -180,6 +180,30 @@
         ],
         "additionalProperties": false
       },
+      "AdminAcceptedAnswer": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "answerOriginal": {
+            "type": "string"
+          },
+          "answerNormalized": {
+            "type": "string"
+          },
+          "normalizationVersion": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "answerOriginal",
+          "answerNormalized",
+          "normalizationVersion"
+        ],
+        "additionalProperties": false
+      },
       "AdminCoupon": {
         "type": "object",
         "properties": {
@@ -441,6 +465,233 @@
           },
           "data": {
             "$ref": "#/components/schemas/AdminLoginResult"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "AdminQuestion": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "mcq",
+              "true_false",
+              "written"
+            ]
+          },
+          "subjectId": {
+            "type": "string"
+          },
+          "subjectNameAr": {
+            "type": "string"
+          },
+          "teacherTrackId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "trackTitleAr": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "unitId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "lessonId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "questionText": {
+            "type": "string"
+          },
+          "explanation": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "difficulty": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "easy",
+                  "medium",
+                  "hard"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "isFree": {
+            "type": "boolean"
+          },
+          "freeSource": {
+            "type": "string",
+            "enum": [
+              "rule",
+              "manual_override"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published",
+              "archived"
+            ]
+          },
+          "sortOrder": {
+            "type": "number"
+          },
+          "contentVersion": {
+            "type": "number"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminQuestionOption"
+            }
+          },
+          "acceptedAnswers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminAcceptedAnswer"
+            }
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "subjectId",
+          "subjectNameAr",
+          "teacherTrackId",
+          "trackTitleAr",
+          "unitId",
+          "lessonId",
+          "questionText",
+          "explanation",
+          "difficulty",
+          "isFree",
+          "freeSource",
+          "status",
+          "sortOrder",
+          "contentVersion",
+          "options",
+          "acceptedAnswers",
+          "createdAt",
+          "updatedAt"
+        ],
+        "additionalProperties": false
+      },
+      "AdminQuestionEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/AdminQuestion"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "AdminQuestionOption": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "isCorrect": {
+            "type": "boolean"
+          },
+          "sortOrder": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "text",
+          "isCorrect",
+          "sortOrder"
+        ],
+        "additionalProperties": false
+      },
+      "AdminQuestionPage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminQuestion"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "totalCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "nextCursor",
+          "totalCount"
+        ],
+        "additionalProperties": false
+      },
+      "AdminQuestionPageEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/AdminQuestionPage"
           },
           "error": {
             "type": "null"
@@ -803,6 +1054,91 @@
         },
         "required": [
           "code"
+        ],
+        "additionalProperties": false
+      },
+      "CheckAnswerRequest": {
+        "type": "object",
+        "properties": {
+          "selectedOptionId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "writtenAnswer": {
+            "type": "string",
+            "maxLength": 500
+          }
+        },
+        "additionalProperties": false
+      },
+      "CheckResult": {
+        "type": "object",
+        "properties": {
+          "isCorrect": {
+            "type": "boolean"
+          },
+          "correctOptionId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "correctAnswer": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "explanation": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "isCorrect",
+          "correctOptionId",
+          "correctAnswer",
+          "explanation"
+        ],
+        "additionalProperties": false
+      },
+      "CheckResultEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/CheckResult"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "ContentCount": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "number"
+          },
+          "free": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "total",
+          "free"
         ],
         "additionalProperties": false
       },
@@ -1309,6 +1645,119 @@
           "titleAr",
           "startsAt",
           "endsAt"
+        ],
+        "additionalProperties": false
+      },
+      "CreateQuestionRequest": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "mcq",
+              "true_false",
+              "written"
+            ]
+          },
+          "subjectId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "teacherTrackId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "unitId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "lessonId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "questionText": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000
+          },
+          "explanation": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 4000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "difficulty": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "easy",
+                  "medium",
+                  "hard"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "options": {
+            "maxItems": 6,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuestionOption"
+            }
+          },
+          "trueFalseAnswer": {
+            "type": "boolean"
+          },
+          "acceptedAnswers": {
+            "maxItems": 10,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 300
+            }
+          },
+          "publish": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "type",
+          "subjectId",
+          "questionText"
         ],
         "additionalProperties": false
       },
@@ -2614,6 +3063,77 @@
         ],
         "additionalProperties": false
       },
+      "NormalizePreview": {
+        "type": "object",
+        "properties": {
+          "normalizationVersion": {
+            "type": "number"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "original": {
+                  "type": "string"
+                },
+                "normalized": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "original",
+                "normalized"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "normalizationVersion",
+          "items"
+        ],
+        "additionalProperties": false
+      },
+      "NormalizePreviewEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/NormalizePreview"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "NormalizePreviewRequest": {
+        "type": "object",
+        "properties": {
+          "answers": {
+            "minItems": 1,
+            "maxItems": 20,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 300
+            }
+          }
+        },
+        "required": [
+          "answers"
+        ],
+        "additionalProperties": false
+      },
       "PasswordConfirmRequest": {
         "type": "object",
         "properties": {
@@ -2719,6 +3239,82 @@
           "success",
           "data",
           "error"
+        ],
+        "additionalProperties": false
+      },
+      "QuestionFreeRequest": {
+        "type": "object",
+        "properties": {
+          "mode": {
+            "type": "string",
+            "enum": [
+              "rule",
+              "free",
+              "paid"
+            ]
+          }
+        },
+        "required": [
+          "mode"
+        ],
+        "additionalProperties": false
+      },
+      "QuestionOption": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "isCorrect": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "text",
+          "isCorrect"
+        ],
+        "additionalProperties": false
+      },
+      "QuestionReorderRequest": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "minItems": 1,
+            "maxItems": 1000,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          }
+        },
+        "required": [
+          "ids"
+        ],
+        "additionalProperties": false
+      },
+      "QuestionStatusRequest": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published",
+              "archived"
+            ]
+          }
+        },
+        "required": [
+          "status"
         ],
         "additionalProperties": false
       },
@@ -3362,6 +3958,189 @@
         ],
         "additionalProperties": false
       },
+      "StudentOption": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "text"
+        ],
+        "additionalProperties": false
+      },
+      "StudentQuestion": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "mcq",
+              "true_false",
+              "written"
+            ]
+          },
+          "subjectId": {
+            "type": "string"
+          },
+          "teacherTrackId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "unitId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "lessonId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "sortOrder": {
+            "type": "number"
+          },
+          "difficulty": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "easy",
+                  "medium",
+                  "hard"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "isFree": {
+            "type": "boolean"
+          },
+          "locked": {
+            "type": "boolean"
+          },
+          "questionText": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "options": {
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/StudentOption"
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "subjectId",
+          "teacherTrackId",
+          "unitId",
+          "lessonId",
+          "sortOrder",
+          "difficulty",
+          "isFree",
+          "locked",
+          "questionText",
+          "options"
+        ],
+        "additionalProperties": false
+      },
+      "StudentQuestionEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/StudentQuestion"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "StudentQuestionPage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StudentQuestion"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "totalCount": {
+            "type": "number"
+          },
+          "accessibleCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "nextCursor",
+          "totalCount",
+          "accessibleCount"
+        ],
+        "additionalProperties": false
+      },
+      "StudentQuestionPageEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/StudentQuestionPage"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
       "Subject": {
         "type": "object",
         "properties": {
@@ -3510,6 +4289,9 @@
           },
           "access": {
             "$ref": "#/components/schemas/ScopeAccess"
+          },
+          "questionCount": {
+            "$ref": "#/components/schemas/ContentCount"
           }
         },
         "required": [
@@ -3517,7 +4299,8 @@
           "units",
           "lessons",
           "tracks",
-          "access"
+          "access",
+          "questionCount"
         ],
         "additionalProperties": false
       },
@@ -3919,13 +4702,17 @@
           },
           "access": {
             "$ref": "#/components/schemas/ScopeAccess"
+          },
+          "questionCount": {
+            "$ref": "#/components/schemas/ContentCount"
           }
         },
         "required": [
           "track",
           "teacher",
           "subject",
-          "access"
+          "access",
+          "questionCount"
         ],
         "additionalProperties": false
       },
@@ -4303,6 +5090,86 @@
           },
           "isActive": {
             "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateQuestionRequest": {
+        "type": "object",
+        "properties": {
+          "unitId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "lessonId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "questionText": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000
+          },
+          "explanation": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 4000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "difficulty": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "easy",
+                  "medium",
+                  "hard"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "options": {
+            "maxItems": 6,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuestionOption"
+            }
+          },
+          "trueFalseAnswer": {
+            "type": "boolean"
+          },
+          "acceptedAnswers": {
+            "maxItems": 10,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 300
+            }
           }
         },
         "additionalProperties": false
@@ -5582,6 +6449,162 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/RedeemResultEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/questions": {
+      "get": {
+        "operationId": "listQuestions",
+        "tags": [
+          "questions"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "subjectId",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "teacherTrackId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "unitId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "lessonId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false
+          },
+          {
+            "schema": {
+              "default": 30,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudentQuestionPageEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/questions/{id}": {
+      "get": {
+        "operationId": "getQuestion",
+        "tags": [
+          "questions"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudentQuestionEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/questions/{id}/check": {
+      "post": {
+        "operationId": "checkQuestionAnswer",
+        "tags": [
+          "questions"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckAnswerRequest"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckResultEnvelope"
                 }
               }
             }
@@ -8012,6 +9035,409 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/DeletedResultEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/questions": {
+      "get": {
+        "operationId": "adminListQuestions",
+        "tags": [
+          "admin-questions"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "subjectId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "teacherTrackId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            },
+            "in": "query",
+            "name": "generalOnly",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "unitId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "lessonId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "draft",
+                "published",
+                "archived"
+              ]
+            },
+            "in": "query",
+            "name": "status",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "mcq",
+                "true_false",
+                "written"
+              ]
+            },
+            "in": "query",
+            "name": "type",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "in": "query",
+            "name": "q",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false
+          },
+          {
+            "schema": {
+              "default": 50,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminQuestionPageEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "adminCreateQuestion",
+        "tags": [
+          "admin-questions"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateQuestionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminQuestionEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/questions/{id}": {
+      "get": {
+        "operationId": "adminGetQuestion",
+        "tags": [
+          "admin-questions"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminQuestionEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "adminUpdateQuestion",
+        "tags": [
+          "admin-questions"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateQuestionRequest"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminQuestionEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "adminDeleteQuestion",
+        "tags": [
+          "admin-questions"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeletedResultEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/questions/{id}/status": {
+      "post": {
+        "operationId": "adminSetQuestionStatus",
+        "tags": [
+          "admin-questions"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionStatusRequest"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminQuestionEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/questions/{id}/free": {
+      "put": {
+        "operationId": "adminSetQuestionFree",
+        "tags": [
+          "admin-questions"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionFreeRequest"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminQuestionEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/questions/reorder": {
+      "post": {
+        "operationId": "adminReorderQuestions",
+        "tags": [
+          "admin-questions"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionReorderRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReorderedResultEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/questions/normalize": {
+      "post": {
+        "operationId": "adminNormalizePreview",
+        "tags": [
+          "admin-questions"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NormalizePreviewRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NormalizePreviewEnvelope"
                 }
               }
             }

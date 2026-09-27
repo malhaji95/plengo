@@ -9,6 +9,7 @@ import type { JobHandlers, JobQueue } from './jobs/queue.js';
 import { createCouponCrypto } from './lib/coupon-code.js';
 import { createIpHasher } from './lib/crypto.js';
 import { createAccessRepository } from './repositories/access-repository.js';
+import { createQuestionRepository } from './repositories/question-repository.js';
 import { createSessionsRepository, type SessionsRepository } from './repositories/sessions-repository.js';
 import { createStructureRepository, type StructureRepository } from './repositories/structure-repository.js';
 import { createTeacherRepository } from './repositories/teacher-repository.js';
@@ -18,6 +19,11 @@ import { createAuditService, type AuditService } from './services/audit-service.
 import { createCouponService, type CouponService } from './services/coupon-service.js';
 import { createFreeRuleService, type FreeRuleService } from './services/free-rule-service.js';
 import { createPromotionService, type PromotionService } from './services/promotion-service.js';
+import {
+  createQuestionService,
+  questionFreeSource,
+  type QuestionService,
+} from './services/question-service.js';
 import { createAuthService, type AuthService } from './services/auth-service.js';
 import { createCatalogService, type CatalogService } from './services/catalog-service.js';
 import { createConfigService, type ConfigService } from './services/config-service.js';
@@ -54,6 +60,7 @@ export interface Container {
   coupons: CouponService;
   promotions: PromotionService;
   freeRules: FreeRuleService;
+  questions: QuestionService;
   media: MediaProcessor;
   guards: Guards;
   jobHandlers: JobHandlers;
@@ -133,27 +140,41 @@ export function createContainer(
     now: overrides.now,
   });
   const promotions = createPromotionService({ db, accessRepo, audit, now: overrides.now });
-  // Content tables register their free-content sources as they arrive (Phases 5–7).
+  const questionRepo = createQuestionRepository(db);
+  // Each content table registers its free-content source (questions now; decks and quizzes later).
   const freeRules = createFreeRuleService({
     db,
     accessRepo,
     structureRepo,
     audit,
     jobs: overrides.jobs,
-    sources: [],
+    sources: [questionFreeSource(questionRepo)],
+  });
+  const teacherRepo = createTeacherRepository(db);
+  const questions = createQuestionService({
+    db,
+    repo: questionRepo,
+    structureRepo,
+    teacherRepo,
+    access,
+    freeRules,
+    audit,
+    now: overrides.now,
   });
   const teachers = createTeacherService({
-    repo: createTeacherRepository(db),
+    repo: teacherRepo,
     structureRepo,
     structure,
     storage,
     access,
+    questionCounts: (scope) => questions.counts(scope),
   });
   const catalog = createCatalogService({
     repo: structureRepo,
     usersRepo,
     storage,
     access,
+    questionCounts: (scope) => questions.counts(scope),
     subjectTracks: (id) => teachers.subjectTracks(id),
   });
 
@@ -182,6 +203,7 @@ export function createContainer(
     coupons,
     promotions,
     freeRules,
+    questions,
     guards: createGuards({ auth, sessionsRepo, mobileTokens, now: overrides.now }),
     jobHandlers: {
       'media.process': (data) => media.process(data),
@@ -197,6 +219,9 @@ export function createContainer(
         ),
       'access.expire-entitlements': async () => {
         await access.expireAllStale();
+      },
+      'questions.renormalize': async () => {
+        await questions.renormalizeAnswers();
       },
     },
   };

@@ -101,7 +101,7 @@ export function createStructureService(deps: {
 
   async function remove(actor: AdminActor, name: OrderedTableName, id: string) {
     // Lessons and tracks have no children yet; content (Phase 5+) will add checks for them.
-    if (name !== 'lessons' && name !== 'teacherTracks' && (await repo.isInUse(name, id))) {
+    if (await repo.isInUse(name, id)) {
       throw new AppError('RESOURCE_IN_USE');
     }
     if (!(await repo.softDelete(name, id))) notFound();
