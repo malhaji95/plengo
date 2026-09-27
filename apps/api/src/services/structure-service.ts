@@ -18,14 +18,15 @@ export interface AdminActor {
 
 type Patch<T> = { [K in keyof T]?: T[K] | undefined };
 
-/** Postgres unique violation on a `*_code_live_idx` index → CODE_TAKEN. */
+/** Postgres unique violation on a `*_code_live_idx` / `*_slug_live_idx` index → CODE_TAKEN. */
 function rethrowCodeTaken(err: unknown): never {
   const pg = ((err as { cause?: unknown }).cause ?? err) as { code?: string; constraint?: string };
-  if (pg.code === '23505' && pg.constraint?.endsWith('_code_live_idx')) throw new AppError('CODE_TAKEN');
+  if (pg.code === '23505' && /_(code|slug)_live_idx$/.test(pg.constraint ?? ''))
+    throw new AppError('CODE_TAKEN');
   throw err;
 }
 
-async function guardCode<T>(op: () => Promise<T>): Promise<T> {
+export async function guardCode<T>(op: () => Promise<T>): Promise<T> {
   try {
     return await op();
   } catch (err) {
@@ -33,7 +34,9 @@ async function guardCode<T>(op: () => Promise<T>): Promise<T> {
   }
 }
 
-const RESOURCE: Record<OrderedTableName, string> = {
+export const RESOURCE: Record<OrderedTableName, string> = {
+  teachers: 'teacher',
+  teacherTracks: 'teacher_track',
   universities: 'university',
   faculties: 'faculty',
   academicYears: 'academic_year',
@@ -97,7 +100,10 @@ export function createStructureService(deps: {
   }
 
   async function remove(actor: AdminActor, name: OrderedTableName, id: string) {
-    if (name !== 'lessons' && (await repo.isInUse(name, id))) throw new AppError('RESOURCE_IN_USE');
+    // Lessons and tracks have no children yet; content (Phase 5+) will add checks for them.
+    if (name !== 'lessons' && name !== 'teacherTracks' && (await repo.isInUse(name, id))) {
+      throw new AppError('RESOURCE_IN_USE');
+    }
     if (!(await repo.softDelete(name, id))) notFound();
     await record(actor, name, 'deleted', id);
     return { deleted: true };
@@ -125,19 +131,18 @@ export function createStructureService(deps: {
     return { reordered: true };
   }
 
-  async function assertCover(coverMediaId: string | null | undefined) {
-    if (!coverMediaId) return;
-    const media = await repo.getCoverMedia(coverMediaId);
-    if (!media || media.deletedAt || media.kind !== 'cover' || media.status !== 'ready') {
-      throw new AppError('VALIDATION_ERROR', { details: { field: 'coverMediaId' } });
-    }
-  }
+  const assertCover = (coverMediaId: string | null | undefined) =>
+    assertReadyImage(repo, coverMediaId, 'cover', 'coverMediaId');
 
   async function subjectOrFail(id: string) {
     return (await repo.getSubject(id, { studentVisible: false })) ?? notFound();
   }
 
   return {
+    // Shared with the teacher service so all ordered entities behave the same way.
+    create,
+    update,
+
     // ---- levels (fixed set; rename and reorder only) ----
     async updateLevel(
       actor: AdminActor,
@@ -398,3 +403,17 @@ export function createStructureService(deps: {
 }
 
 export type StructureService = ReturnType<typeof createStructureService>;
+
+/** An uploaded image may be attached only once processed, and only for its intended kind. */
+export async function assertReadyImage(
+  repo: StructureRepository,
+  mediaId: string | null | undefined,
+  kind: 'cover' | 'teacher',
+  field: string,
+) {
+  if (!mediaId) return;
+  const media = await repo.getCoverMedia(mediaId);
+  if (!media || media.deletedAt || media.kind !== kind || media.status !== 'ready') {
+    throw new AppError('VALIDATION_ERROR', { details: { field } });
+  }
+}

@@ -30,7 +30,7 @@ export interface TestContext {
   close(): Promise<void>;
 }
 
-export async function createTestApp(): Promise<TestContext> {
+export async function createTestApp(opts: { storage?: MemoryStorage } = {}): Promise<TestContext> {
   const url = process.env.TEST_DB_URL;
   if (!url) throw new Error('TEST_DB_URL not set; global setup did not run');
   const env = loadEnv({
@@ -51,7 +51,7 @@ export async function createTestApp(): Promise<TestContext> {
   });
   const app = createFastify({ logger: { level: 'silent' } });
   const email = new ConsoleEmailSender();
-  const storage = new MemoryStorage();
+  const storage = opts.storage ?? new MemoryStorage();
   const queue = new InlineQueue();
   const clock = new TestClock();
   const c = createContainer(env, app.log, { email, storage, jobs: queue, now: clock.now });

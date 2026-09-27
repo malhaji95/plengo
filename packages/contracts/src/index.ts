@@ -5,3 +5,4 @@ export * from './config.js';
 export * from './uploads.js';
 export * from './results.js';
 export * from './structure.js';
+export * from './teachers.js';

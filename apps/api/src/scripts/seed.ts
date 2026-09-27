@@ -12,6 +12,8 @@ import {
   faculties,
   lessons,
   subjects,
+  teacherTracks,
+  teachers,
   units,
   universities,
   type Db,
@@ -238,13 +240,77 @@ export async function seedStructure(db: Db) {
   );
 }
 
+/** §40: two teachers with one track each. */
+export async function seedTeachers(db: Db) {
+  const seeds = [
+    {
+      slug: 'ahmad',
+      nameAr: 'أ. أحمد',
+      shortDescription: 'مدرّس فيزياء للشهادة الثانوية',
+      track: { slug: 'ahmad-g12-physics', titleAr: 'أ. أحمد — فيزياء بكالوريا', subjectCode: 'g12-physics' },
+    },
+    {
+      slug: 'sara',
+      nameAr: 'أ. سارة',
+      shortDescription: 'مدرّسة رياضيات للصف التاسع',
+      track: { slug: 'sara-g9-math', titleAr: 'أ. سارة — رياضيات تاسع', subjectCode: 'g9-math' },
+    },
+  ];
+  for (const [i, t] of seeds.entries()) {
+    const teacher = await upsert(
+      async () =>
+        (
+          await db
+            .select()
+            .from(teachers)
+            .where(and(eq(teachers.slug, t.slug), isNull(teachers.deletedAt)))
+        )[0],
+      async () =>
+        (
+          await db
+            .insert(teachers)
+            .values({ slug: t.slug, nameAr: t.nameAr, shortDescription: t.shortDescription, sortOrder: i })
+            .returning()
+        )[0]!,
+    );
+    const [subject] = await db
+      .select()
+      .from(subjects)
+      .where(and(eq(subjects.code, t.track.subjectCode), isNull(subjects.deletedAt)));
+    if (!subject) continue;
+    await upsert(
+      async () =>
+        (
+          await db
+            .select()
+            .from(teacherTracks)
+            .where(and(eq(teacherTracks.slug, t.track.slug), isNull(teacherTracks.deletedAt)))
+        )[0],
+      async () =>
+        (
+          await db
+            .insert(teacherTracks)
+            .values({
+              teacherId: teacher.id,
+              subjectId: subject.id,
+              slug: t.track.slug,
+              titleAr: t.track.titleAr,
+            })
+            .returning()
+        )[0]!,
+    );
+  }
+}
+
 if (import.meta.url === `file://${process.argv[1]}`) {
   const url = process.env.DATABASE_URL;
   if (!url) throw new Error('DATABASE_URL is required');
   const pool = createPool(url, 1);
   try {
-    await seedStructure(createDb(pool));
-    console.log('structure seeded');
+    const db = createDb(pool);
+    await seedStructure(db);
+    await seedTeachers(db);
+    console.log('structure and teachers seeded');
   } finally {
     await pool.end();
   }

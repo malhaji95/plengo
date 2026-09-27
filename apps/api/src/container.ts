@@ -9,6 +9,7 @@ import type { JobHandlers, JobQueue } from './jobs/queue.js';
 import { createIpHasher } from './lib/crypto.js';
 import { createSessionsRepository, type SessionsRepository } from './repositories/sessions-repository.js';
 import { createStructureRepository, type StructureRepository } from './repositories/structure-repository.js';
+import { createTeacherRepository } from './repositories/teacher-repository.js';
 import { createUsersRepository, type UsersRepository } from './repositories/users-repository.js';
 import { createAuditService, type AuditService } from './services/audit-service.js';
 import { createAuthService, type AuthService } from './services/auth-service.js';
@@ -17,6 +18,7 @@ import { createConfigService, type ConfigService } from './services/config-servi
 import { createMediaProcessor, type MediaProcessor } from './services/media-processing.js';
 import { createMobileTokenService, type MobileTokenService } from './services/mobile-token-service.js';
 import { createStructureService, type StructureService } from './services/structure-service.js';
+import { createTeacherService, type TeacherService } from './services/teacher-service.js';
 import { createUploadService, type UploadService } from './services/upload-service.js';
 import { MemoryStorage } from './storage/memory-storage.js';
 import { R2Storage } from './storage/r2-storage.js';
@@ -41,13 +43,16 @@ export interface Container {
   structureRepo: StructureRepository;
   structure: StructureService;
   catalog: CatalogService;
+  teachers: TeacherService;
   media: MediaProcessor;
   guards: Guards;
   jobHandlers: JobHandlers;
 }
 
 export function createStorage(env: Env): ObjectStorage {
-  if (env.STORAGE_DRIVER === 'memory') return new MemoryStorage();
+  if (env.STORAGE_DRIVER === 'memory') {
+    return new MemoryStorage({ baseUrl: env.BETTER_AUTH_URL, secret: env.BETTER_AUTH_SECRET });
+  }
   return new R2Storage({
     endpoint: env.R2_ENDPOINT ?? `https://${env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
     accessKeyId: env.R2_ACCESS_KEY_ID!,
@@ -94,7 +99,19 @@ export function createContainer(
   const media = createMediaProcessor({ db, storage, appEnv: env.APP_ENV, log });
   const audit = createAuditService(db, hashIp);
   const structureRepo = createStructureRepository(db);
-  const catalog = createCatalogService({ repo: structureRepo, usersRepo, storage });
+  const structure = createStructureService({ db, repo: structureRepo, audit, storage });
+  const teachers = createTeacherService({
+    repo: createTeacherRepository(db),
+    structureRepo,
+    structure,
+    storage,
+  });
+  const catalog = createCatalogService({
+    repo: structureRepo,
+    usersRepo,
+    storage,
+    subjectTracks: (id) => teachers.subjectTracks(id),
+  });
 
   return {
     env,
@@ -114,8 +131,9 @@ export function createContainer(
     uploadService: createUploadService({ db, storage, jobs: overrides.jobs, appEnv: env.APP_ENV }),
     media,
     structureRepo,
-    structure: createStructureService({ db, repo: structureRepo, audit, storage }),
+    structure,
     catalog,
+    teachers,
     guards: createGuards({ auth, sessionsRepo, mobileTokens, now: overrides.now }),
     jobHandlers: {
       'media.process': (data) => media.process(data),

@@ -22,6 +22,13 @@
       "when": 1790528111008,
       "tag": "0002_education_structure",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1790530828867,
+      "tag": "0003_teachers",
+      "breakpoints": true
     }
   ]
 }

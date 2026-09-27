@@ -63,11 +63,26 @@ export const lessonSchema = z.object({
 
 export const unitWithLessonsSchema = unitSchema.extend({ lessons: z.array(lessonSchema) });
 
-/** A subject with its units (each with its lessons) and the lessons that sit directly under it. */
+/** A track as listed under its subject (spec §23.2 #10: general content + teacher tracks). */
+export const subjectTrackSchema = z.object({
+  id: z.string(),
+  teacherId: z.string(),
+  teacherNameAr: z.string(),
+  teacherPhotoUrl: z.string().nullable(),
+  titleAr: z.string(),
+  description: z.string().nullable(),
+  coverUrl: z.string().nullable(),
+});
+
+/**
+ * A subject with its units (each with its lessons), the lessons that sit directly under it, and the
+ * teacher tracks within it.
+ */
 export const subjectOutlineSchema = z.object({
   subject: subjectSchema,
   units: z.array(unitWithLessonsSchema),
   lessons: z.array(lessonSchema),
+  tracks: z.array(subjectTrackSchema),
 });
 
 export const universityListSchema = z.array(universitySchema);
@@ -156,6 +171,7 @@ const named: [z.ZodType, string][] = [
   [unitSchema, 'Unit'],
   [lessonSchema, 'Lesson'],
   [unitWithLessonsSchema, 'UnitWithLessons'],
+  [subjectTrackSchema, 'SubjectTrack'],
   [subjectOutlineSchema, 'SubjectOutline'],
   [universityListSchema, 'UniversityList'],
   [facultyListSchema, 'FacultyList'],

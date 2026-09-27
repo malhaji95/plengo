@@ -404,6 +404,86 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/teachers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listTeachers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teachers/following": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listFollowedTeachers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teachers/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getTeacherProfile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teachers/{id}/follow": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["followTeacher"];
+        post?: never;
+        delete: operations["unfollowTeacher"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teacher-tracks/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getTrack"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/auth/login": {
         parameters: {
             query?: never;
@@ -884,6 +964,102 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/teachers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminListTeachers"];
+        put?: never;
+        post: operations["adminCreateTeacher"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/teachers/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminGetTeacher"];
+        put?: never;
+        post?: never;
+        delete: operations["adminDeleteTeacher"];
+        options?: never;
+        head?: never;
+        patch: operations["adminUpdateTeacher"];
+        trace?: never;
+    };
+    "/api/v1/admin/teachers/reorder": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["adminReorderTeachers"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/teacher-tracks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminListTracks"];
+        put?: never;
+        post: operations["adminCreateTrack"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/teacher-tracks/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["adminDeleteTrack"];
+        options?: never;
+        head?: never;
+        patch: operations["adminUpdateTrack"];
+        trace?: never;
+    };
+    "/api/v1/admin/teacher-tracks/reorder": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["adminReorderTracks"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -923,6 +1099,59 @@ export interface components {
             data: components["schemas"]["AdminLoginResult"];
             error: null;
         };
+        AdminTeacher: {
+            id: string;
+            nameAr: string;
+            slug: string;
+            photoMediaId: string | null;
+            photoUrl: string | null;
+            shortDescription: string | null;
+            bio: string | null;
+            isActive: boolean;
+            sortOrder: number;
+            followerCount: number;
+            trackCount: number;
+        };
+        AdminTeacherEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AdminTeacher"];
+            error: null;
+        };
+        AdminTeacherList: components["schemas"]["AdminTeacher"][];
+        AdminTeacherListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AdminTeacherList"];
+            error: null;
+        };
+        AdminTrack: {
+            id: string;
+            teacherId: string;
+            subjectId: string;
+            subjectNameAr: string;
+            educationLevelId: string;
+            titleAr: string;
+            slug: string;
+            description: string | null;
+            coverMediaId: string | null;
+            coverUrl: string | null;
+            isActive: boolean;
+            sortOrder: number;
+        };
+        AdminTrackEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AdminTrack"];
+            error: null;
+        };
+        AdminTrackList: components["schemas"]["AdminTrack"][];
+        AdminTrackListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AdminTrackList"];
+            error: null;
+        };
         BackupCodeRequest: {
             code: string;
         };
@@ -955,6 +1184,25 @@ export interface components {
             academicYearId?: string | null;
             code: string;
             nameAr: string;
+            description?: string | null;
+            coverMediaId?: string | null;
+            isActive?: boolean;
+        };
+        CreateTeacherRequest: {
+            nameAr: string;
+            slug: string;
+            shortDescription?: string | null;
+            bio?: string | null;
+            photoMediaId?: string | null;
+            isActive?: boolean;
+        };
+        CreateTrackRequest: {
+            /** Format: uuid */
+            teacherId: string;
+            /** Format: uuid */
+            subjectId: string;
+            titleAr: string;
+            slug: string;
             description?: string | null;
             coverMediaId?: string | null;
             isActive?: boolean;
@@ -1050,6 +1298,16 @@ export interface components {
             /** @constant */
             success: true;
             data: components["schemas"]["FacultyList"];
+            error: null;
+        };
+        FollowResult: {
+            following: boolean;
+            followerCount: number;
+        };
+        FollowResultEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["FollowResult"];
             error: null;
         };
         ForgotPasswordRequest: {
@@ -1292,12 +1550,69 @@ export interface components {
             subject: components["schemas"]["Subject"];
             units: components["schemas"]["UnitWithLessons"][];
             lessons: components["schemas"]["Lesson"][];
+            tracks: components["schemas"]["SubjectTrack"][];
         };
         SubjectOutlineEnvelope: {
             /** @constant */
             success: true;
             data: components["schemas"]["SubjectOutline"];
             error: null;
+        };
+        SubjectTrack: {
+            id: string;
+            teacherId: string;
+            teacherNameAr: string;
+            teacherPhotoUrl: string | null;
+            titleAr: string;
+            description: string | null;
+            coverUrl: string | null;
+        };
+        Teacher: {
+            id: string;
+            nameAr: string;
+            slug: string;
+            photoUrl: string | null;
+            shortDescription: string | null;
+            followerCount: number;
+            isFollowing: boolean;
+        };
+        TeacherList: components["schemas"]["Teacher"][];
+        TeacherListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["TeacherList"];
+            error: null;
+        };
+        TeacherProfile: {
+            teacher: {
+                id: string;
+                nameAr: string;
+                slug: string;
+                photoUrl: string | null;
+                shortDescription: string | null;
+                followerCount: number;
+                isFollowing: boolean;
+                bio: string | null;
+            };
+            tracks: components["schemas"]["TeacherTrack"][];
+        };
+        TeacherProfileEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["TeacherProfile"];
+            error: null;
+        };
+        TeacherTrack: {
+            id: string;
+            teacherId: string;
+            teacherNameAr: string;
+            subjectId: string;
+            subjectNameAr: string;
+            educationLevelId: string;
+            titleAr: string;
+            slug: string;
+            description: string | null;
+            coverUrl: string | null;
         };
         TokenPair: {
             accessToken: string;
@@ -1324,6 +1639,17 @@ export interface components {
             /** @constant */
             success: true;
             data: components["schemas"]["TotpEnrollment"];
+            error: null;
+        };
+        TrackDetail: {
+            track: components["schemas"]["TeacherTrack"];
+            teacher: components["schemas"]["Teacher"];
+            subject: components["schemas"]["Subject"];
+        };
+        TrackDetailEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["TrackDetail"];
             error: null;
         };
         Unit: {
@@ -1415,6 +1741,21 @@ export interface components {
             academicYearId?: string | null;
             code?: string;
             nameAr?: string;
+            description?: string | null;
+            coverMediaId?: string | null;
+            isActive?: boolean;
+        };
+        UpdateTeacherRequest: {
+            nameAr?: string;
+            slug?: string;
+            shortDescription?: string | null;
+            bio?: string | null;
+            photoMediaId?: string | null;
+            isActive?: boolean;
+        };
+        UpdateTrackRequest: {
+            titleAr?: string;
+            slug?: string;
             description?: string | null;
             coverMediaId?: string | null;
             isActive?: boolean;
@@ -2044,6 +2385,134 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["LessonEnvelope"];
+                };
+            };
+        };
+    };
+    listTeachers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TeacherListEnvelope"];
+                };
+            };
+        };
+    };
+    listFollowedTeachers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TeacherListEnvelope"];
+                };
+            };
+        };
+    };
+    getTeacherProfile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TeacherProfileEnvelope"];
+                };
+            };
+        };
+    };
+    followTeacher: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FollowResultEnvelope"];
+                };
+            };
+        };
+    };
+    unfollowTeacher: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FollowResultEnvelope"];
+                };
+            };
+        };
+    };
+    getTrack: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TrackDetailEnvelope"];
                 };
             };
         };
@@ -3031,6 +3500,263 @@ export interface operations {
         };
     };
     adminReorderLessons: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReorderRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReorderedResultEnvelope"];
+                };
+            };
+        };
+    };
+    adminListTeachers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminTeacherListEnvelope"];
+                };
+            };
+        };
+    };
+    adminCreateTeacher: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateTeacherRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminTeacherEnvelope"];
+                };
+            };
+        };
+    };
+    adminGetTeacher: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminTeacherEnvelope"];
+                };
+            };
+        };
+    };
+    adminDeleteTeacher: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeletedResultEnvelope"];
+                };
+            };
+        };
+    };
+    adminUpdateTeacher: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateTeacherRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminTeacherEnvelope"];
+                };
+            };
+        };
+    };
+    adminReorderTeachers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReorderRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReorderedResultEnvelope"];
+                };
+            };
+        };
+    };
+    adminListTracks: {
+        parameters: {
+            query?: {
+                teacherId?: string;
+                subjectId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminTrackListEnvelope"];
+                };
+            };
+        };
+    };
+    adminCreateTrack: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateTrackRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminTrackEnvelope"];
+                };
+            };
+        };
+    };
+    adminDeleteTrack: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeletedResultEnvelope"];
+                };
+            };
+        };
+    };
+    adminUpdateTrack: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateTrackRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminTrackEnvelope"];
+                };
+            };
+        };
+    };
+    adminReorderTracks: {
         parameters: {
             query?: never;
             header?: never;

@@ -17,11 +17,15 @@ import { registerErrorHandling } from './plugins/error-handler.js';
 import { registerVersionGate } from './plugins/version-gate.js';
 import { adminAuthRoutes } from './routes/admin/auth.js';
 import { adminStructureRoutes } from './routes/admin/structure.js';
+import { adminTeacherRoutes } from './routes/admin/teachers.js';
 import { authRoutes } from './routes/auth.js';
 import { catalogRoutes, collegeReferenceRoutes } from './routes/catalog.js';
 import { configRoutes } from './routes/config.js';
+import { devStorageRoutes } from './routes/dev-storage.js';
+import { MemoryStorage } from './storage/memory-storage.js';
 import { healthRoutes } from './routes/health.js';
 import { meRoutes } from './routes/me.js';
+import { teacherRoutes } from './routes/teachers.js';
 import { uploadRoutes } from './routes/uploads.js';
 
 export function loggerOptions(level: string, pretty: boolean): FastifyServerOptions['logger'] {
@@ -94,15 +98,20 @@ export async function buildApp(app: App, c: Container): Promise<App> {
   registerVersionGate(app, c.configService);
 
   await app.register(healthRoutes(c));
+  if (c.storage instanceof MemoryStorage && c.env.APP_ENV !== 'production') {
+    await app.register(devStorageRoutes(c.storage), { prefix: '/api/v1/dev-storage' });
+  }
   await app.register(configRoutes(c), { prefix: '/api/v1' });
   await app.register(authRoutes(c), { prefix: '/api/v1/auth' });
   await app.register(meRoutes(c), { prefix: '/api/v1' });
   await app.register(uploadRoutes(c, 'student'), { prefix: '/api/v1' });
   await app.register(collegeReferenceRoutes(c), { prefix: '/api/v1' });
   await app.register(catalogRoutes(c), { prefix: '/api/v1' });
+  await app.register(teacherRoutes(c), { prefix: '/api/v1' });
   await app.register(adminAuthRoutes(c), { prefix: '/api/v1/admin' });
   await app.register(uploadRoutes(c, 'admin'), { prefix: '/api/v1/admin' });
   await app.register(adminStructureRoutes(c), { prefix: '/api/v1/admin' });
+  await app.register(adminTeacherRoutes(c), { prefix: '/api/v1/admin' });
 
   return app;
 }

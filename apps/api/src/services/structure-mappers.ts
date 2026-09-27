@@ -1,5 +1,5 @@
 import type { AcademicYear, Faculty, Lesson, Subject, Unit, University } from '@plengo/contracts';
-import type { academicYears, faculties, lessons, units, universities } from '@plengo/db';
+import type { academicYears, faculties, lessons, MediaVariants, units, universities } from '@plengo/db';
 import type { SubjectRow } from '../repositories/structure-repository.js';
 import type { ObjectStorage } from '../storage/storage.js';
 
@@ -40,9 +40,18 @@ export const toLesson = (r: Row<typeof lessons>): Lesson => ({
   sortOrder: r.sortOrder,
 });
 
-/** Covers live in the public bucket and are served from the CDN (spec §12.1, §12.5). */
+/** Public images (covers, teacher photos) are served from the CDN (spec §12.1, §12.5). */
+export function publicImageUrl(
+  storage: ObjectStorage,
+  variants: MediaVariants | null | undefined,
+  status: string | null | undefined,
+  variant: 'full' | 'thumb' = 'full',
+): string | null {
+  const v = status === 'ready' ? variants?.[variant] : undefined;
+  return v ? storage.getPublicUrl(v.key) : null;
+}
+
 export function toSubject(r: SubjectRow, storage: ObjectStorage): Subject {
-  const full = r.coverStatus === 'ready' ? r.coverVariants?.full : undefined;
   return {
     id: r.id,
     educationLevelId: r.educationLevelId,
@@ -53,7 +62,7 @@ export function toSubject(r: SubjectRow, storage: ObjectStorage): Subject {
     nameAr: r.nameAr,
     description: r.description,
     coverMediaId: r.coverMediaId,
-    coverUrl: full ? storage.getPublicUrl(full.key) : null,
+    coverUrl: publicImageUrl(storage, r.coverVariants, r.coverStatus),
     sortOrder: r.sortOrder,
     isActive: r.isActive,
   };

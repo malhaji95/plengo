@@ -4,3 +4,4 @@ export * from './structure.js';
 export * from './profiles.js';
 export * from './media.js';
 export * from './operations.js';
+export * from './teachers.js';

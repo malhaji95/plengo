@@ -1,3 +1,4 @@
+import { hmacHex, safeEqual } from '../lib/crypto.js';
 import type { BucketName, ObjectHead, ObjectStorage, PresignedUpload } from './storage.js';
 
 interface StoredObject {
@@ -5,12 +6,43 @@ interface StoredObject {
   contentType: string;
 }
 
-/** In-process storage for tests and offline development. Presigned URLs are not fetchable. */
+/**
+ * In-process storage for tests and local development without R2. With `baseUrl` + `secret`, the
+ * presigned and public URLs point at the API's dev-only `/api/v1/dev-storage` routes (ADR-012), so
+ * browsers can upload and display images end to end. Never used in production (env validation).
+ */
 export class MemoryStorage implements ObjectStorage {
   readonly objects = new Map<string, StoredObject>();
 
+  constructor(private readonly opts: { baseUrl?: string; secret?: string } = {}) {}
+
   private id(bucket: BucketName, key: string) {
     return `${bucket}/${key}`;
+  }
+
+  private sign(bucket: BucketName, key: string, method: 'PUT' | 'GET', len: number, exp: number): string {
+    return hmacHex(this.opts.secret ?? 'memory-storage', `${method} ${bucket}/${key} ${len} ${exp}`);
+  }
+
+  private url(bucket: BucketName, key: string, query: Record<string, string | number>): string {
+    const qs = new URLSearchParams(
+      Object.entries(query).map(([k, v]): [string, string] => [k, String(v)]),
+    ).toString();
+    return this.opts.baseUrl
+      ? `${this.opts.baseUrl.replace(/\/$/, '')}/api/v1/dev-storage/${bucket}/${key}${qs ? `?${qs}` : ''}`
+      : `memory://${bucket}/${key}${qs ? `?${qs}` : ''}`;
+  }
+
+  /** Validates a dev-storage request signature produced by this instance. */
+  verify(
+    bucket: BucketName,
+    key: string,
+    method: 'PUT' | 'GET',
+    len: number,
+    exp: number,
+    sig: string,
+  ): boolean {
+    return exp > Date.now() && safeEqual(sig, this.sign(bucket, key, method, len, exp));
   }
 
   async createPresignedPut(
@@ -20,20 +52,25 @@ export class MemoryStorage implements ObjectStorage {
     contentLength: number,
     ttlSeconds: number,
   ): Promise<PresignedUpload> {
-    const expiresAt = new Date(Date.now() + ttlSeconds * 1000);
+    const exp = Date.now() + ttlSeconds * 1000;
     return {
-      url: `memory://${bucket}/${key}?len=${contentLength}&exp=${expiresAt.getTime()}`,
+      url: this.url(bucket, key, {
+        len: contentLength,
+        exp,
+        sig: this.sign(bucket, key, 'PUT', contentLength, exp),
+      }),
       headers: { 'Content-Type': contentType },
-      expiresAt,
+      expiresAt: new Date(exp),
     };
   }
 
   async getSignedGetUrl(bucket: BucketName, key: string, ttlSeconds: number): Promise<string> {
-    return `memory://${bucket}/${key}?exp=${Date.now() + ttlSeconds * 1000}`;
+    const exp = Date.now() + ttlSeconds * 1000;
+    return this.url(bucket, key, { exp, sig: this.sign(bucket, key, 'GET', 0, exp) });
   }
 
   getPublicUrl(key: string): string {
-    return `memory://public/${key}`;
+    return this.url('public', key, {});
   }
 
   async put(bucket: BucketName, key: string, bytes: Buffer, contentType: string): Promise<void> {
@@ -42,6 +79,10 @@ export class MemoryStorage implements ObjectStorage {
 
   async get(bucket: BucketName, key: string): Promise<Buffer | null> {
     return this.objects.get(this.id(bucket, key))?.bytes ?? null;
+  }
+
+  async getWithType(bucket: BucketName, key: string): Promise<StoredObject | null> {
+    return this.objects.get(this.id(bucket, key)) ?? null;
   }
 
   async head(bucket: BucketName, key: string): Promise<ObjectHead | null> {

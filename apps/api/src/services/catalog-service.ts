@@ -22,8 +22,10 @@ export function createCatalogService(deps: {
   repo: StructureRepository;
   usersRepo: UsersRepository;
   storage: ObjectStorage;
+  /** Tracks of a subject, supplied by the teacher service (kept separate to avoid a cycle). */
+  subjectTracks: (subjectId: string) => Promise<SubjectOutline['tracks']>;
 }) {
-  const { repo, usersRepo, storage } = deps;
+  const { repo, usersRepo, storage, subjectTracks } = deps;
   const notFound = (): never => {
     throw new AppError('NOT_FOUND');
   };
@@ -66,15 +68,17 @@ export function createCatalogService(deps: {
 
     async outline(subjectId: string): Promise<SubjectOutline> {
       const subject = await visibleSubject(subjectId);
-      const [unitRows, lessonRows] = await Promise.all([
+      const [unitRows, lessonRows, tracks] = await Promise.all([
         repo.listUnits(subjectId),
         repo.listLessons(subjectId),
+        subjectTracks(subjectId),
       ]);
       const lessons = lessonRows.map(toLesson);
       return {
         subject: toSubject(subject, storage),
         units: unitRows.map((u) => ({ ...toUnit(u), lessons: lessons.filter((l) => l.unitId === u.id) })),
         lessons: lessons.filter((l) => l.unitId === null),
+        tracks,
       };
     },
 

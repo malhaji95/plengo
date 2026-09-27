@@ -7,6 +7,8 @@ import {
   lessons,
   mediaFiles,
   subjects,
+  teachers,
+  teacherTracks,
   units,
   universities,
   type Db,
@@ -35,6 +37,8 @@ export const ORDERED_TABLES = {
   },
   units: { table: units, scope: { subjectId: units.subjectId } },
   lessons: { table: lessons, scope: { subjectId: lessons.subjectId, unitId: lessons.unitId } },
+  teachers: { table: teachers, scope: {} },
+  teacherTracks: { table: teacherTracks, scope: { teacherId: teacherTracks.teacherId } },
 } as const;
 export type OrderedTableName = keyof typeof ORDERED_TABLES;
 export type SiblingScope = Record<string, string | null>;
@@ -87,7 +91,7 @@ export interface SubjectFilter {
 }
 
 /** A subject is visible to students only when it and every college layer above it are live and active. */
-const studentVisibleSubject = and(
+export const studentVisibleSubject = and(
   isNull(subjects.deletedAt),
   eq(subjects.isActive, true),
   or(isNull(subjects.universityId), and(isNull(universities.deletedAt), eq(universities.isActive, true))),
@@ -351,7 +355,10 @@ export function createStructureRepository(db: Db) {
     },
 
     /** Whether live rows still hang under a node, which blocks deleting it (ADR-011). */
-    async isInUse(name: 'universities' | 'faculties' | 'academicYears' | 'subjects' | 'units', id: string) {
+    async isInUse(
+      name: 'universities' | 'faculties' | 'academicYears' | 'subjects' | 'units' | 'teachers',
+      id: string,
+    ) {
       const exists = async (query: Promise<unknown[]>) => (await query).length > 0;
       const liveWhere = (t: { deletedAt: AnyPgColumn }, col: AnyPgColumn) =>
         and(eq(col, id), isNull(t.deletedAt));
@@ -401,6 +408,13 @@ export function createStructureRepository(db: Db) {
         case 'subjects':
           return (
             (await exists(
+              db
+                .select({ id: teacherTracks.id })
+                .from(teacherTracks)
+                .where(liveWhere(teacherTracks, teacherTracks.subjectId))
+                .limit(1),
+            )) ||
+            (await exists(
               db.select({ id: units.id }).from(units).where(liveWhere(units, units.subjectId)).limit(1),
             )) ||
             (await exists(
@@ -410,6 +424,14 @@ export function createStructureRepository(db: Db) {
                 .where(liveWhere(lessons, lessons.subjectId))
                 .limit(1),
             ))
+          );
+        case 'teachers':
+          return exists(
+            db
+              .select({ id: teacherTracks.id })
+              .from(teacherTracks)
+              .where(liveWhere(teacherTracks, teacherTracks.teacherId))
+              .limit(1),
           );
         case 'units':
           return exists(
