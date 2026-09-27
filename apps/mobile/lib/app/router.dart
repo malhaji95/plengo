@@ -13,6 +13,7 @@ import '../features/auth/login_screen.dart';
 import '../features/auth/register_screen.dart';
 import '../features/auth/reset_password_screen.dart';
 import '../features/auth/verify_email_screen.dart';
+import '../features/questions/questions_screen.dart';
 import '../features/shell/home_shell.dart';
 import '../features/shell/placeholder_tab.dart';
 import '../features/splash/splash_screen.dart';
@@ -128,6 +129,16 @@ GoRouter buildRouter(Ref ref, {required bool couponRedemption}) {
                   GoRoute(
                     path: ':id',
                     builder: (_, state) => SubjectScreen(subjectId: state.pathParameters['id']!),
+                    routes: [
+                      GoRoute(
+                        path: 'questions',
+                        builder: (_, state) => SubjectQuestionsRoute(
+                          subjectId: state.pathParameters['id']!,
+                          unitId: state.uri.queryParameters['unitId'],
+                          lessonId: state.uri.queryParameters['lessonId'],
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -144,6 +155,12 @@ GoRouter buildRouter(Ref ref, {required bool couponRedemption}) {
               GoRoute(
                 path: '${Routes.tracks}/:id',
                 builder: (_, state) => TrackScreen(trackId: state.pathParameters['id']!),
+                routes: [
+                  GoRoute(
+                    path: 'questions',
+                    builder: (_, state) => TrackQuestionsRoute(trackId: state.pathParameters['id']!),
+                  ),
+                ],
               ),
             ],
           ),

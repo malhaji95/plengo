@@ -46,6 +46,7 @@ SubjectOutline outline(ScopeAccess access) => SubjectOutline(
   lessons: const [],
   tracks: const [],
   access: access,
+  questionCount: noQuestions,
 );
 
 Future<void> openSubject(dynamic app, WidgetTester tester) async {

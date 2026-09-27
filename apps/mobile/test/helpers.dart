@@ -11,8 +11,10 @@ import 'package:plengo/core/auth/auth_repository.dart';
 import 'package:plengo/core/auth/token_store.dart';
 import 'package:plengo/core/catalog/catalog_repository.dart';
 import 'package:plengo/core/catalog/teacher_repository.dart';
+import 'package:plengo/core/content/question_repository.dart';
 import 'package:plengo/core/db/app_database.dart';
 import 'package:plengo/features/access/access_providers.dart';
+import 'package:plengo/features/questions/question_providers.dart';
 import 'package:plengo/features/subjects/catalog_providers.dart';
 import 'package:plengo/features/teachers/teacher_providers.dart';
 
@@ -23,6 +25,10 @@ class MockCatalogRepository extends Mock implements CatalogRepository {}
 class MockTeacherRepository extends Mock implements TeacherRepository {}
 
 class MockAccessRepository extends Mock implements AccessRepository {}
+
+class MockQuestionRepository extends Mock implements QuestionRepository {}
+
+const noQuestions = ContentCount(total: 0, free: 0);
 
 const noAccess = ScopeAccess(
   hasAccess: false,
@@ -72,6 +78,7 @@ Future<
     MockCatalogRepository catalog,
     MockTeacherRepository teachers,
     MockAccessRepository access,
+    MockQuestionRepository questions,
     ProviderContainer container,
   })
 >
@@ -82,6 +89,7 @@ pumpApp(
   void Function(MockCatalogRepository catalog)? arrangeCatalog,
   void Function(MockTeacherRepository teachers)? arrangeTeachers,
   void Function(MockAccessRepository access)? arrangeAccess,
+  void Function(MockQuestionRepository questions)? arrangeQuestions,
   RemoteConfig? config,
   bool couponRedemption = true,
 }) async {
@@ -105,6 +113,9 @@ pumpApp(
   when(() => access.myEntitlements()).thenAnswer((_) async => const []);
   arrangeAccess?.call(access);
 
+  final questions = MockQuestionRepository();
+  arrangeQuestions?.call(questions);
+
   final db = AppDatabase(NativeDatabase.memory());
   addTearDown(db.close);
   final container = ProviderContainer(
@@ -116,6 +127,7 @@ pumpApp(
       catalogRepositoryProvider.overrideWithValue(catalog),
       teacherRepositoryProvider.overrideWithValue(teachers),
       accessRepositoryProvider.overrideWithValue(access),
+      questionRepositoryProvider.overrideWithValue(questions),
       couponRedemptionProvider.overrideWithValue(couponRedemption),
       remoteConfigProvider.overrideWith((ref) async => config),
     ],
@@ -124,11 +136,12 @@ pumpApp(
 
   await tester.pumpWidget(UncontrolledProviderScope(container: container, child: const PlengoApp()));
   await tester.pumpAndSettle();
-  return (repo: repo, catalog: catalog, teachers: teachers, access: access, container: container);
+  return (repo: repo, catalog: catalog, teachers: teachers, access: access, questions: questions, container: container);
 }
 
 void registerFallbacks() {
   registerFallbackValue((levelId: '', universityId: null, facultyId: null, academicYearId: null));
+  registerFallbackValue((subjectId: '', teacherTrackId: null, unitId: null, lessonId: null));
 }
 
 Finder fieldByKey(String key) => find.byKey(Key(key));

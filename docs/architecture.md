@@ -17,6 +17,30 @@ Flutter student app (Android · iOS · Web)      Next.js admin (browser)
    (Neon)          `pgboss`)            public + private buckets
 ```
 
+## Phase 5 status (questions)
+
+Done:
+
+- `packages/arabic-normalizer`: the §14.4 rules (version 1) with shared fixtures in
+  `fixtures/v1.json` (the Phase 9 Dart port must pass the same file); run in CI.
+- Schema (migration 0005): `questions` (`content_version`, materialized `is_free`/`free_source`,
+  composite keys that keep track, unit and lesson inside the question's subject), `question_options`
+  (at most one correct option per question, enforced by a partial unique index) and
+  `question_answers` (original, normalized form, normalizer version).
+- Admin: question list by subject/scope/unit/lesson/status/type/text, editor for MCQ, true/false and
+  written questions with a live normalized preview, publish/archive/draft, manual free override,
+  reorder within a lesson, soft delete. All changes are audited.
+- Students: question bank per subject, track and lesson in reading order, locked questions as metadata
+  only, practice with a server check (تحقق) that returns correctness, the correct option or answer and
+  the explanation only after grading.
+- Grading and snapshot helpers used by the check endpoint now and by attempts in Phase 7; a
+  `questions.renormalize` job regenerates accepted answers stored by an older normalizer version.
+- Seed: 11 Grade 12 Physics questions of all types in general and track scopes (5 free by rule, one
+  manual override in the track, one draft), written questions with several accepted answers.
+
+Deferred: attempts, quizzes, mistakes and statistics (Phase 7); question analytics and import/export
+(Phase 11); the Dart normalizer (Phase 9).
+
 ## Phase 4 status (access)
 
 Done:
@@ -265,3 +289,27 @@ from Phase 1; Phase 2 adds the college hierarchy and admin CRUD.
   published items, apply the free set); Phase 4 has none, so previews report zero items.
 - **`COUPON_REDEMPTION`** stays compile-time: the Flutter `couponRedemptionProvider` returns the
   `--dart-define` constant and exists only so widget tests can build both variants.
+
+### ADR-014 — Questions
+
+- **Student endpoints** `GET /questions`, `GET /questions/{id}` and `POST /questions/{id}/check` exist
+  before quizzes so the bank can be browsed and practised question by question. They use the §8.6
+  helpers; the check is stateless (nothing is stored) and reveals the answer only after grading, like
+  practice mode. Attempts in Phase 7 reuse `grade()` and store `questionSnapshot()`.
+- **Reading order** is the order of the free-rule engine: each unit in order (its unit-level
+  questions, then each lesson), then lessons directly under the subject, then questions with neither;
+  `sort_order` orders a slot. Lists page with an opaque offset cursor in that order. Reordering is per
+  slot (same subject, track, unit and lesson) and must list every sibling.
+- **Versioning**: text, explanation, difficulty, options or accepted answers bump `content_version`;
+  moving between units/lessons and status/free changes do not. Option ids survive edits so later
+  attempt answers keep pointing at them; accepted answers are replaced by deactivating the old rows
+  and inserting new ones in the admin's order (the first is shown as the correct answer).
+- **Validation**: MCQ 2–6 distinct options with exactly one correct; true/false uses two fixed
+  options (صح، خطأ); written 1–10 accepted answers, non-empty and distinct after normalization. A
+  lesson implies its unit. Structure (subject, unit, lesson, track) with live questions cannot be
+  deleted.
+- **Free status**: publishing evaluates the scope's effective rule for that question only; a rule
+  change recomputes rule-sourced published questions through the `questions` free-content source.
+  Returning an override to "rule" re-evaluates the question.
+- **Bidi**: the student app wraps Latin/number runs in question text, options and explanations in
+  Unicode isolates (`isolateLtr`), so units and formulas such as `20 m/s` keep their order in RTL.

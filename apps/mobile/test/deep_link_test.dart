@@ -19,6 +19,7 @@ void main() {
           lessons: const [],
           tracks: const [],
           access: noAccess,
+          questionCount: noQuestions,
         ),
       ),
     );

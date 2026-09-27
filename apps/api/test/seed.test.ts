@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { entitlements, users } from '@plengo/db';
-import { seedAccess, seedStructure, seedTeachers } from '../src/scripts/seed.js';
+import { seedAccess, seedQuestions, seedStructure, seedTeachers } from '../src/scripts/seed.js';
 import { createTestApp, type TestContext } from './helpers.js';
 
 let t: TestContext;
@@ -17,11 +17,14 @@ describe('development seed (§40)', () => {
     const run = async () => {
       await seedStructure(t.c.db);
       await seedTeachers(t.c.db);
-      return seedAccess(t.c, t.queue);
+      const access = await seedAccess(t.c, t.queue);
+      return { ...access, questions: await seedQuestions(t.c) };
     };
     const first = await run();
     const second = await run();
     expect(first.codes).toHaveLength(10);
+    expect(first.questions).toBe(11);
+    expect(second.questions).toBe(0);
     expect(second.codes.map((c) => c.code)).toEqual(first.codes.map((c) => c.code));
     for (const { code } of first.codes) expect(code).toMatch(/^[2-9A-Z]{4}-[2-9A-Z]{4}-[2-9A-Z]{2}$/);
 
@@ -38,6 +41,15 @@ describe('development seed (§40)', () => {
     ]);
     expect(rules).toContainEqual(['الفيزياء', 'first_n_items']);
     expect(rules).toContainEqual(['أ. سارة — رياضيات تاسع', 'manual']);
+    // first_n_items 5 on Grade 12 Physics: five of the seven published general questions are free.
+    const physics = await t.c.catalog.subjects({});
+    const g12 = physics.find((s) => s.code === 'g12-physics')!;
+    expect(
+      await t.c.questions.counts({ scopeType: 'subject', subjectId: g12.id, teacherTrackId: null }),
+    ).toEqual({
+      total: 7,
+      free: 5,
+    });
     const promos = await t.c.promotions.list();
     expect(promos.filter((p) => p.titleAr === 'عرض تجريبي منتهٍ')).toMatchObject([{ state: 'disabled' }]);
   });

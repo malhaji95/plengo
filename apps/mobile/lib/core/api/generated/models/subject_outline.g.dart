@@ -19,6 +19,9 @@ SubjectOutline _$SubjectOutlineFromJson(Map<String, dynamic> json) =>
           .map((e) => SubjectTrack.fromJson(e as Map<String, dynamic>))
           .toList(),
       access: ScopeAccess.fromJson(json['access'] as Map<String, dynamic>),
+      questionCount: ContentCount.fromJson(
+        json['questionCount'] as Map<String, dynamic>,
+      ),
     );
 
 Map<String, dynamic> _$SubjectOutlineToJson(SubjectOutline instance) =>
@@ -28,4 +31,5 @@ Map<String, dynamic> _$SubjectOutlineToJson(SubjectOutline instance) =>
       'lessons': instance.lessons,
       'tracks': instance.tracks,
       'access': instance.access,
+      'questionCount': instance.questionCount,
     };

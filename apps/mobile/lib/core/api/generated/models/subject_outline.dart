@@ -4,6 +4,7 @@
 
 import 'package:json_annotation/json_annotation.dart';
 
+import 'content_count.dart';
 import 'lesson.dart';
 import 'scope_access.dart';
 import 'subject.dart';
@@ -20,6 +21,7 @@ class SubjectOutline {
     required this.lessons,
     required this.tracks,
     required this.access,
+    required this.questionCount,
   });
   
   factory SubjectOutline.fromJson(Map<String, Object?> json) => _$SubjectOutlineFromJson(json);
@@ -29,6 +31,7 @@ class SubjectOutline {
   final List<Lesson> lessons;
   final List<SubjectTrack> tracks;
   final ScopeAccess access;
+  final ContentCount questionCount;
 
   Map<String, Object?> toJson() => _$SubjectOutlineToJson(this);
 }

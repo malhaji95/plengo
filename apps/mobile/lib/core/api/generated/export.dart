@@ -11,11 +11,16 @@ export 'clients/sessions_client.dart';
 export 'clients/uploads_client.dart';
 export 'clients/teachers_client.dart';
 export 'clients/access_client.dart';
+export 'clients/questions_client.dart';
 // Data classes
 export 'models/academic_year.dart';
 export 'models/academic_year_list.dart';
 export 'models/academic_year_list_envelope.dart';
 export 'models/access_scope.dart';
+export 'models/check_answer_request.dart';
+export 'models/check_result.dart';
+export 'models/check_result_envelope.dart';
+export 'models/content_count.dart';
 export 'models/create_upload_request.dart';
 export 'models/create_upload_result.dart';
 export 'models/create_upload_result_envelope.dart';
@@ -64,6 +69,11 @@ export 'models/signed_in_result.dart';
 export 'models/signed_in_result_envelope.dart';
 export 'models/signed_out_result.dart';
 export 'models/signed_out_result_envelope.dart';
+export 'models/student_option.dart';
+export 'models/student_question.dart';
+export 'models/student_question_envelope.dart';
+export 'models/student_question_page.dart';
+export 'models/student_question_page_envelope.dart';
 export 'models/subject.dart';
 export 'models/subject_list.dart';
 export 'models/subject_list_envelope.dart';
@@ -105,6 +115,8 @@ export 'models/mobile_login_request_platform.dart';
 export 'models/my_entitlement_source.dart';
 export 'models/my_entitlement_state.dart';
 export 'models/scope_access_reason.dart';
+export 'models/student_question_type.dart';
+export 'models/student_question_difficulty.dart';
 // Root client
 export 'plengo_api.dart';
 

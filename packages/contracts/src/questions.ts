@@ -13,7 +13,7 @@ const questionText = z.string().trim().min(1).max(4000);
 const explanation = z.string().trim().max(4000);
 
 /** Total and free published questions in a scope (subject general content or a track). */
-export const contentCountSchema = z.object({ total: z.number(), free: z.number() });
+export const contentCountSchema = z.object({ total: z.number().int(), free: z.number().int() });
 
 // ---- student ----
 
@@ -39,8 +39,8 @@ export const studentQuestionPageSchema = z.object({
   items: z.array(studentQuestionSchema),
   nextCursor: z.string().nullable(),
   /** Counts for the whole filter, not just this page. */
-  totalCount: z.number(),
-  accessibleCount: z.number(),
+  totalCount: z.number().int(),
+  accessibleCount: z.number().int(),
 });
 
 export const questionListQuerySchema = z.object({
@@ -109,7 +109,7 @@ export const adminQuestionSchema = z.object({
 export const adminQuestionPageSchema = z.object({
   items: z.array(adminQuestionSchema),
   nextCursor: z.string().nullable(),
-  totalCount: z.number(),
+  totalCount: z.number().int(),
 });
 
 const boolParam = z.enum(['true', 'false']).transform((v) => v === 'true');

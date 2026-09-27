@@ -8,6 +8,7 @@ import '../../core/api/generated/export.dart';
 import '../../shared/widgets/async_view.dart';
 import '../../shared/widgets/network_avatar.dart';
 import '../access/access_banner.dart';
+import '../questions/question_providers.dart';
 import 'catalog_providers.dart';
 
 /// A subject's outline: optional units with their lessons, then lessons directly under the subject.
@@ -39,7 +40,8 @@ class _OutlineView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
-    final empty = outline.units.isEmpty && outline.lessons.isEmpty && outline.tracks.isEmpty;
+    final empty =
+        outline.units.isEmpty && outline.lessons.isEmpty && outline.tracks.isEmpty && outline.questionCount.total == 0;
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 720),
@@ -51,6 +53,17 @@ class _OutlineView extends StatelessWidget {
               const SizedBox(height: 16),
             ],
             ScopeAccessBanner(access: outline.access),
+            if (outline.questionCount.total > 0)
+              Card(
+                margin: const EdgeInsets.only(bottom: 16),
+                child: ListTile(
+                  leading: const Icon(Icons.quiz_outlined),
+                  title: const Text('بنك الأسئلة'),
+                  subtitle: Text(_countText(outline.questionCount)),
+                  trailing: const Icon(Icons.chevron_left),
+                  onTap: () => context.go('${Routes.subjects}/${outline.subject.id}/questions'),
+                ),
+              ),
             if (empty) const EmptyState('محتوى هذه المادة قيد الإعداد', icon: Icons.hourglass_empty),
             for (final (i, unit) in outline.units.indexed)
               Card(
@@ -64,7 +77,7 @@ class _OutlineView extends StatelessWidget {
                   subtitle: Text(lessonCountLabel(unit.lessons.length)),
                   children: [
                     if (unit.lessons.isEmpty) const ListTile(title: Text('لا توجد دروس في هذه الوحدة بعد')),
-                    for (final lesson in unit.lessons) _LessonTile(lesson: lesson),
+                    for (final lesson in unit.lessons) _LessonTile(lesson: lesson, subjectId: outline.subject.id),
                   ],
                 ),
               ),
@@ -76,7 +89,11 @@ class _OutlineView extends StatelessWidget {
               ],
               Card(
                 margin: EdgeInsets.zero,
-                child: Column(children: [for (final lesson in outline.lessons) _LessonTile(lesson: lesson)]),
+                child: Column(
+                  children: [
+                    for (final lesson in outline.lessons) _LessonTile(lesson: lesson, subjectId: outline.subject.id),
+                  ],
+                ),
               ),
             ],
             if (outline.tracks.isNotEmpty) ...[
@@ -113,15 +130,24 @@ class _OutlineView extends StatelessWidget {
 }
 
 class _LessonTile extends StatelessWidget {
-  const _LessonTile({required this.lesson});
+  const _LessonTile({required this.lesson, required this.subjectId});
 
   final Lesson lesson;
+  final String subjectId;
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(leading: const Icon(Icons.article_outlined), title: Text(lesson.titleAr));
+    return ListTile(
+      leading: const Icon(Icons.article_outlined),
+      title: Text(lesson.titleAr),
+      trailing: const Icon(Icons.chevron_left),
+      onTap: () => context.go('${Routes.subjects}/$subjectId/questions?lessonId=${lesson.id}'),
+    );
   }
 }
+
+String _countText(ContentCount c) =>
+    c.free > 0 ? '${questionCountLabel(c.total)} · ${c.free} مجاني' : questionCountLabel(c.total);
 
 /// Arabic count agreement: درس واحد، درسان، 3–10 دروس، 11+ درساً.
 String lessonCountLabel(int n) => switch (n) {

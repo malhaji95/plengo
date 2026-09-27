@@ -1,10 +1,12 @@
-import { and, asc, count, eq, ilike, inArray, isNull, ne, sql, type SQL } from 'drizzle-orm';
+import { and, asc, count, eq, getTableColumns, ilike, inArray, isNull, ne, sql, type SQL } from 'drizzle-orm';
 import {
+  lessons,
   questionAnswers,
   questionOptions,
   questions,
   subjects,
   teacherTracks,
+  units,
   type Db,
   type Tx,
 } from '@plengo/db';
@@ -17,15 +19,13 @@ export type QuestionWithContent = QuestionRow & { options: OptionRow[]; answers:
 
 type Conn = Db | Tx;
 
-/** Opaque keyset cursor over (sort_order, id). */
-export const encodeCursor = (row: { sortOrder: number; id: string }) =>
-  Buffer.from(`${row.sortOrder}|${row.id}`).toString('base64url');
+/** Opaque cursor: the offset of the next page in reading order. */
+export const encodeCursor = (offset: number) => Buffer.from(`o:${offset}`).toString('base64url');
 
-export function decodeCursor(cursor: string | undefined): { sortOrder: number; id: string } | null {
-  if (!cursor) return null;
-  const [order, id] = Buffer.from(cursor, 'base64url').toString('utf8').split('|');
-  if (!id || !/^-?\d+$/.test(order ?? '') || !/^[0-9a-f-]{36}$/.test(id)) return null;
-  return { sortOrder: Number(order), id };
+export function decodeCursor(cursor: string | undefined): number {
+  if (!cursor) return 0;
+  const match = /^o:(\d{1,9})$/.exec(Buffer.from(cursor, 'base64url').toString('utf8'));
+  return match ? Number(match[1]) : 0;
 }
 
 const live = isNull(questions.deletedAt);
@@ -106,27 +106,38 @@ export function createQuestionRepository(db: Db) {
     },
 
     /** One page in (sort_order, id) order plus the filter's total. */
+    /**
+     * One page in reading order (the order free rules use, §8.4): each unit in order with its
+     * unit-level questions first, then its lessons; then lessons directly under the subject; then
+     * questions attached to neither. Within a slot, by `sort_order`.
+     */
     async page(filter: QuestionFilter, cursor: string | undefined, limit: number) {
-      const after = decodeCursor(cursor);
+      const offset = decodeCursor(cursor);
       const where = filterWhere(filter);
       const rows = await db
-        .select()
+        .select(getTableColumns(questions))
         .from(questions)
-        .where(
-          and(
-            where,
-            after
-              ? sql`(${questions.sortOrder}, ${questions.id}) > (${after.sortOrder}, ${after.id})`
-              : undefined,
-          ),
+        .leftJoin(units, eq(units.id, questions.unitId))
+        .leftJoin(lessons, eq(lessons.id, questions.lessonId))
+        .where(where)
+        .orderBy(
+          asc(questions.subjectId),
+          sql`case when ${questions.unitId} is not null then 0 when ${questions.lessonId} is not null then 1 else 2 end`,
+          asc(units.sortOrder),
+          asc(units.id),
+          sql`case when ${questions.lessonId} is null then 0 else 1 end`,
+          asc(lessons.sortOrder),
+          asc(lessons.id),
+          asc(questions.sortOrder),
+          asc(questions.id),
         )
-        .orderBy(asc(questions.sortOrder), asc(questions.id))
-        .limit(limit + 1);
+        .limit(limit + 1)
+        .offset(offset);
       const [total] = await db.select({ n: count() }).from(questions).where(where);
       const items = rows.slice(0, limit);
       return {
         items,
-        nextCursor: rows.length > limit ? encodeCursor(items[items.length - 1]!) : null,
+        nextCursor: rows.length > limit ? encodeCursor(offset + limit) : null,
         total: total!.n,
       };
     },

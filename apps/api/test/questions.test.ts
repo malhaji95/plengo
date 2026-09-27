@@ -277,6 +277,42 @@ describe('admin authoring (§14)', () => {
   });
 });
 
+describe('reading order', () => {
+  it('lists questions unit by unit, lesson by lesson, and pages through them', async () => {
+    const w = await world();
+    const loose = await create(mcq(w.subjectId, { questionText: 'بلا موضع', publish: true }));
+    const l2 = await create(mcq(w.subjectId, { lessonId: w.lesson2, questionText: 'درس 2', publish: true }));
+    const l1b = await create(
+      mcq(w.subjectId, { lessonId: w.lesson1, questionText: 'درس 1 ب', publish: true }),
+    );
+    const unitLevel = await create(
+      mcq(w.subjectId, { unitId: w.unitId, questionText: 'الوحدة', publish: true }),
+    );
+    const l1a = await create(
+      mcq(w.subjectId, { lessonId: w.lesson1, questionText: 'درس 1 أ', publish: true }),
+    );
+    await adminCall('POST', '/questions/reorder', { ids: [l1a.id, l1b.id] });
+    const expected = [unitLevel.id, l1a.id, l1b.id, l2.id, loose.id];
+
+    const s = await student();
+    const seen: string[] = [];
+    let cursor: string | null = null;
+    do {
+      const url = `/questions?subjectId=${w.subjectId}&limit=2${cursor ? `&cursor=${cursor}` : ''}`;
+      const res: { data: { items: { id: string }[]; nextCursor: string | null } } = await studentCall(
+        s,
+        'GET',
+        url,
+      );
+      seen.push(...res.data.items.map((q) => q.id));
+      cursor = res.data.nextCursor;
+    } while (cursor);
+    expect(seen).toEqual(expected);
+    const admin = await adminCall<{ items: Q[] }>('GET', `/questions?subjectId=${w.subjectId}`);
+    expect(admin.data.items.map((q) => q.id)).toEqual(expected);
+  });
+});
+
 describe('free status (§8.4)', () => {
   it('evaluates the rule on publish, supports overrides, and recomputes on rule change', async () => {
     const w = await world();

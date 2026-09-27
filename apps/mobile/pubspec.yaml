@@ -80,3 +80,4 @@ swagger_parser:
     - admin-teachers
     - admin-students
     - admin-access
+    - admin-questions

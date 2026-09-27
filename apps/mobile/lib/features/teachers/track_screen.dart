@@ -6,6 +6,7 @@ import '../../app/router.dart';
 import '../../shared/widgets/async_view.dart';
 import '../../shared/widgets/network_avatar.dart';
 import '../access/access_banner.dart';
+import '../questions/question_providers.dart';
 import 'teacher_providers.dart';
 
 /// A teacher track page (spec §7.2, §23.2 #12). Its questions, decks and quizzes arrive with
@@ -57,7 +58,22 @@ class TrackScreen extends ConsumerWidget {
                     onTap: () => context.go('${Routes.subjects}/${d.subject.id}'),
                   ),
                 ),
-                const EmptyState('محتوى هذا المسار قيد الإعداد', icon: Icons.hourglass_empty),
+                if (d.questionCount.total > 0)
+                  Card(
+                    child: ListTile(
+                      leading: const Icon(Icons.quiz_outlined),
+                      title: const Text('أسئلة المسار'),
+                      subtitle: Text(
+                        d.questionCount.free > 0
+                            ? '${questionCountLabel(d.questionCount.total)} · ${d.questionCount.free} مجاني'
+                            : questionCountLabel(d.questionCount.total),
+                      ),
+                      trailing: const Icon(Icons.chevron_left),
+                      onTap: () => context.go('${Routes.tracks}/${d.track.id}/questions'),
+                    ),
+                  )
+                else
+                  const EmptyState('محتوى هذا المسار قيد الإعداد', icon: Icons.hourglass_empty),
               ],
             ),
           ),

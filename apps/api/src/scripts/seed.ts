@@ -8,6 +8,8 @@ import {
   couponBatches,
   coupons,
   promotions,
+  questions,
+  users,
   academicYears,
   educationLevels,
   faculties,
@@ -427,6 +429,164 @@ export async function seedAccess(c: Container, queue: InlineQueue) {
   };
 }
 
+type SeedQuestion = {
+  type: 'mcq' | 'true_false' | 'written';
+  questionText: string;
+  lesson?: string;
+  explanation?: string;
+  options?: [string, boolean][];
+  trueFalseAnswer?: boolean;
+  acceptedAnswers?: string[];
+  draft?: boolean;
+  forceFree?: boolean;
+};
+
+const PHYSICS_QUESTIONS: SeedQuestion[] = [
+  {
+    type: 'mcq',
+    lesson: 'motion',
+    questionText: 'سيارة تتحرك بسرعة ثابتة 20 m/s لمدة 5 s. ما المسافة التي تقطعها؟',
+    options: [
+      ['100 m', true],
+      ['4 m', false],
+      ['25 m', false],
+      ['15 m', false],
+    ],
+    explanation: 'المسافة = السرعة × الزمن = 20 × 5 = 100 m',
+  },
+  {
+    type: 'true_false',
+    lesson: 'motion',
+    questionText: 'السرعة كمية قياسية.',
+    trueFalseAnswer: false,
+    explanation: 'السرعة كمية متجهة لها مقدار واتجاه.',
+  },
+  {
+    type: 'written',
+    lesson: 'forces',
+    questionText: 'من صاحب قوانين الحركة الثلاثة؟',
+    acceptedAnswers: ['نيوتن', 'إسحاق نيوتن', 'اسحق نيوتن'],
+    explanation: 'وضع إسحاق نيوتن قوانين الحركة الثلاثة.',
+  },
+  {
+    type: 'mcq',
+    lesson: 'forces',
+    questionText: 'ما وحدة قياس القوة في النظام الدولي؟',
+    options: [
+      ['النيوتن', true],
+      ['الجول', false],
+      ['الواط', false],
+    ],
+  },
+  {
+    type: 'written',
+    lesson: 'forces',
+    questionText: 'احسب القوة (بالنيوتن) اللازمة لتسريع جسم كتلته 2 kg بتسارع 1.75 m/s².',
+    acceptedAnswers: ['3.5', '3.5 نيوتن'],
+    explanation: 'F = m × a = 2 × 1.75 = 3.5 N',
+  },
+  {
+    type: 'true_false',
+    lesson: 'circuits',
+    questionText: 'تتوزع شدة التيار بالتساوي على المقاومات الموصولة على التسلسل.',
+    trueFalseAnswer: false,
+    explanation: 'في التسلسل تمر شدة التيار نفسها في كل المقاومات.',
+  },
+  {
+    type: 'mcq',
+    lesson: 'circuits',
+    questionText: 'ما وحدة قياس المقاومة الكهربائية؟',
+    options: [
+      ['الأوم', true],
+      ['الفولط', false],
+      ['الأمبير', false],
+      ['الكولوم', false],
+    ],
+  },
+  {
+    type: 'mcq',
+    questionText: 'سؤال قيد الإعداد',
+    options: [
+      ['أ', true],
+      ['ب', false],
+    ],
+    draft: true,
+  },
+];
+
+const TRACK_QUESTIONS: SeedQuestion[] = [
+  {
+    type: 'mcq',
+    questionText: 'جسم يسقط سقوطاً حراً من السكون. ما سرعته بعد 2 s؟ (g = 10 m/s²)',
+    options: [
+      ['20 m/s', true],
+      ['10 m/s', false],
+      ['5 m/s', false],
+    ],
+    forceFree: true,
+  },
+  {
+    type: 'true_false',
+    questionText: 'التسارع في السقوط الحر ثابت بإهمال مقاومة الهواء.',
+    trueFalseAnswer: true,
+  },
+  {
+    type: 'written',
+    questionText: 'ما اسم القوة التي تعاكس حركة جسم على سطح خشن؟',
+    acceptedAnswers: ['الاحتكاك', 'قوة الاحتكاك'],
+  },
+];
+
+/** §40 questions: free and premium of each type, in general and track scopes. */
+export async function seedQuestions(c: Container) {
+  const [admin] = await c.db.select().from(users).where(eq(users.email, 'seed-admin1@example.com'));
+  const actor = { adminId: admin!.id, ip: null };
+  const physics = (
+    await c.db
+      .select()
+      .from(subjects)
+      .where(and(eq(subjects.code, 'g12-physics'), isNull(subjects.deletedAt)))
+  )[0]!;
+  const track = (
+    await c.db
+      .select()
+      .from(teacherTracks)
+      .where(and(eq(teacherTracks.slug, 'ahmad-g12-physics'), isNull(teacherTracks.deletedAt)))
+  )[0]!;
+  const physicsLessons = await c.db
+    .select()
+    .from(lessons)
+    .where(and(eq(lessons.subjectId, physics.id), isNull(lessons.deletedAt)));
+
+  let created = 0;
+  const add = async (list: SeedQuestion[], teacherTrackId: string | null) => {
+    for (const q of list) {
+      const [existing] = await c.db
+        .select({ id: questions.id })
+        .from(questions)
+        .where(and(eq(questions.subjectId, physics.id), eq(questions.questionText, q.questionText)));
+      if (existing) continue;
+      const saved = await c.questions.create(actor, {
+        type: q.type,
+        subjectId: physics.id,
+        teacherTrackId,
+        lessonId: q.lesson ? physicsLessons.find((l) => l.code === q.lesson)?.id : undefined,
+        questionText: q.questionText,
+        explanation: q.explanation ?? null,
+        options: q.options?.map(([text, isCorrect]) => ({ text, isCorrect })),
+        trueFalseAnswer: q.trueFalseAnswer,
+        acceptedAnswers: q.acceptedAnswers,
+        publish: !q.draft,
+      });
+      if (q.forceFree) await c.questions.setFree(actor, saved.id, 'free');
+      created++;
+    }
+  };
+  await add(PHYSICS_QUESTIONS, null);
+  await add(TRACK_QUESTIONS, track.id);
+  return created;
+}
+
 if (import.meta.url === `file://${process.argv[1]}`) {
   const env = loadEnv();
   const queue = new InlineQueue();
@@ -435,7 +595,8 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     await seedStructure(c.db);
     await seedTeachers(c.db);
     const access = await seedAccess(c, queue);
-    console.log('structure, teachers and access seeded');
+    const createdQuestions = await seedQuestions(c);
+    console.log(`structure, teachers, access and questions seeded (${createdQuestions} new questions)`);
     console.log(`students: ${access.students.join(', ')} · admins: ${access.admins.join(', ')}`);
     console.log(`password for all seed accounts: ${SEED_PASSWORD} (admins enroll in 2FA at first login)`);
     console.log('coupon batch (permanent, Grade 12 Physics):');
