@@ -5,3 +5,4 @@ export * from './profiles.js';
 export * from './media.js';
 export * from './operations.js';
 export * from './teachers.js';
+export * from './access.js';

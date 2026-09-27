@@ -96,6 +96,8 @@ const env = loadEnv({
   ADMIN_ORIGIN: 'http://localhost:3000',
   MOBILE_ACCESS_JWT_SECRET: 'openapi-generation-secret-0123456789abcdef',
   MOBILE_REFRESH_TOKEN_PEPPER: 'openapi-generation-secret-0123456789abcdef',
+  COUPON_HMAC_SECRET: 'openapi-generation-secret-0123456789abcdef',
+  COUPON_ENCRYPTION_KEY: Buffer.alloc(32).toString('base64'),
   STORAGE_DRIVER: 'memory',
 });
 const app = createFastify({ logger: false });

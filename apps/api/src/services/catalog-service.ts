@@ -9,6 +9,7 @@ import type {
 } from '@plengo/contracts';
 import { AppError } from '../lib/app-error.js';
 import type { StructureRepository, SubjectFilter } from '../repositories/structure-repository.js';
+import { subjectScope, trackScope, type AccessService } from './access-service.js';
 import type { UsersRepository } from '../repositories/users-repository.js';
 import type { ObjectStorage } from '../storage/storage.js';
 import { resolveCollegePath, type CollegePathInput } from './college-path.js';
@@ -16,16 +17,18 @@ import { toAcademicYear, toFaculty, toLesson, toSubject, toUnit, toUniversity } 
 
 /**
  * What students browse (spec §8.9): every level is browsable regardless of the profile level; only
- * active, non-deleted nodes are shown. Access to content inside subjects arrives with Phase 4.
+ * active, non-deleted nodes are shown. Outlines carry the student's access to the subject and to each
+ * track (§8.6); items inside are flagged individually from Phase 5 on.
  */
 export function createCatalogService(deps: {
   repo: StructureRepository;
   usersRepo: UsersRepository;
   storage: ObjectStorage;
+  access: AccessService;
   /** Tracks of a subject, supplied by the teacher service (kept separate to avoid a cycle). */
-  subjectTracks: (subjectId: string) => Promise<SubjectOutline['tracks']>;
+  subjectTracks: (subjectId: string) => Promise<Omit<SubjectOutline['tracks'][number], 'hasAccess'>[]>;
 }) {
-  const { repo, usersRepo, storage, subjectTracks } = deps;
+  const { repo, usersRepo, storage, access, subjectTracks } = deps;
   const notFound = (): never => {
     throw new AppError('NOT_FOUND');
   };
@@ -66,19 +69,21 @@ export function createCatalogService(deps: {
       return (await repo.listSubjects(filter, { studentVisible: true })).map((r) => toSubject(r, storage));
     },
 
-    async outline(subjectId: string): Promise<SubjectOutline> {
+    async outline(userId: string, subjectId: string): Promise<SubjectOutline> {
       const subject = await visibleSubject(subjectId);
-      const [unitRows, lessonRows, tracks] = await Promise.all([
+      const [unitRows, lessonRows, tracks, ctx] = await Promise.all([
         repo.listUnits(subjectId),
         repo.listLessons(subjectId),
         subjectTracks(subjectId),
+        access.context(userId),
       ]);
       const lessons = lessonRows.map(toLesson);
       return {
         subject: toSubject(subject, storage),
         units: unitRows.map((u) => ({ ...toUnit(u), lessons: lessons.filter((l) => l.unitId === u.id) })),
         lessons: lessons.filter((l) => l.unitId === null),
-        tracks,
+        tracks: tracks.map((t) => ({ ...t, hasAccess: ctx.scopeAccess(trackScope(t.id)).hasAccess })),
+        access: ctx.scopeAccess(subjectScope(subjectId)),
       };
     },
 

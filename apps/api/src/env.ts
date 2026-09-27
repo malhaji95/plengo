@@ -21,6 +21,13 @@ const envSchema = z
     MOBILE_ACCESS_JWT_SECRET: z.string().min(32),
     MOBILE_REFRESH_TOKEN_PEPPER: z.string().min(32),
 
+    /** Keys coupon lookups: code_hash = HMAC-SHA256(secret, normalized code) (spec §9.2). */
+    COUPON_HMAC_SECRET: z.string().min(32),
+    /** 32 bytes, base64: AES-256-GCM key so admins can re-export a batch's codes. */
+    COUPON_ENCRYPTION_KEY: z
+      .string()
+      .refine((v) => Buffer.from(v, 'base64').length === 32, 'must be 32 bytes encoded as base64'),
+
     STORAGE_DRIVER: z.enum(['r2', 'memory']).default('r2'),
     R2_ACCOUNT_ID: z.string().optional(),
     R2_ACCESS_KEY_ID: z.string().optional(),

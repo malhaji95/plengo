@@ -6,3 +6,4 @@ export * from './uploads.js';
 export * from './results.js';
 export * from './structure.js';
 export * from './teachers.js';
+export * from './access.js';

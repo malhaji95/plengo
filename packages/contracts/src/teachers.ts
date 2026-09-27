@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { scopeAccessSchema } from './access.js';
 import { codeSchema, subjectSchema } from './structure.js';
 
 /* Teachers and teacher tracks (spec §7). Slugs share the code format used by imports. */
@@ -42,6 +43,8 @@ export const trackDetailSchema = z.object({
   track: teacherTrackSchema,
   teacher: teacherSchema,
   subject: subjectSchema,
+  /** Access to this track's content (a subject entitlement does not unlock it, §8.1). */
+  access: scopeAccessSchema,
 });
 
 export const followResultSchema = z.object({ following: z.boolean(), followerCount: z.number() });

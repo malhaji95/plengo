@@ -484,6 +484,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/access": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listMyEntitlements"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/coupons/redeem": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["redeemCoupon"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/auth/login": {
         parameters: {
             query?: never;
@@ -1060,6 +1092,295 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/students": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminListStudents"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/students/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminGetStudent"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/students/{id}/entitlements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["adminGrantEntitlement"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/entitlements/{id}/extend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["adminExtendEntitlement"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/entitlements/{id}/revoke": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["adminRevokeEntitlement"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/coupon-batches": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminListCouponBatches"];
+        put?: never;
+        post: operations["adminCreateCouponBatch"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/coupon-batches/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminGetCouponBatch"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/coupon-batches/{id}/coupons": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminListBatchCoupons"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/coupon-batches/{id}/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description CSV or XLSX file with the plaintext codes (spec §9.6). Audited. */
+        get: operations["adminExportCouponBatch"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/coupon-batches/{id}/revoke": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["adminRevokeCouponBatch"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/coupons": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminSearchCoupons"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/coupon-failures": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminCouponFailureReport"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/settings/access": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminGetAccessSettings"];
+        put: operations["adminUpdateAccessSettings"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/promotions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminListPromotions"];
+        put?: never;
+        post: operations["adminCreatePromotion"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/promotions/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["adminDeletePromotion"];
+        options?: never;
+        head?: never;
+        patch: operations["adminUpdatePromotion"];
+        trace?: never;
+    };
+    "/api/v1/admin/free-rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminListFreeRules"];
+        put: operations["adminSaveFreeRule"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/free-rules/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["adminPreviewFreeRule"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/free-rules/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["adminDeleteFreeRule"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1085,6 +1406,72 @@ export interface components {
             data: components["schemas"]["AcademicYearList"];
             error: null;
         };
+        AccessScope: {
+            /** @enum {string} */
+            scopeType: "subject" | "teacher_track";
+            subjectId: string;
+            teacherTrackId: string | null;
+            subjectNameAr: string;
+            trackTitleAr: string | null;
+            teacherNameAr: string | null;
+            educationLevelId: string;
+        };
+        AccessSettings: {
+            allowTemporaryToPermanentUpgrade: boolean;
+        };
+        AccessSettingsEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AccessSettings"];
+            error: null;
+        };
+        AdminCoupon: {
+            id: string;
+            batchId: string;
+            batchName: string;
+            codeLast4: string;
+            /** @enum {string} */
+            status: "active" | "redeemed" | "revoked";
+            currentUses: number;
+            maxUses: number;
+            redeemedAt: string | null;
+            redeemedByUserId: string | null;
+            redeemedByEmail: string | null;
+        };
+        AdminCouponList: components["schemas"]["AdminCoupon"][];
+        AdminCouponListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AdminCouponList"];
+            error: null;
+        };
+        AdminEntitlement: {
+            id: string;
+            scope: components["schemas"]["AccessScope"];
+            /** @enum {string} */
+            source: "coupon" | "admin_grant" | "promotion" | "future_purchase";
+            startsAt: string;
+            expiresAt: string | null;
+            isPermanent: boolean;
+            /** @enum {string} */
+            state: "active" | "expired" | "revoked";
+            userId: string;
+            /** @enum {string} */
+            status: "active" | "revoked" | "expired" | "superseded";
+            couponId: string | null;
+            couponLast4: string | null;
+            grantedByAdminId: string | null;
+            revokedAt: string | null;
+            revokeReason: string | null;
+            createdAt: string;
+        };
+        AdminEntitlementEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AdminEntitlement"];
+            error: null;
+        };
+        AdminEntitlementList: components["schemas"]["AdminEntitlement"][];
         AdminLoginRequest: {
             email: string;
             password: string;
@@ -1097,6 +1484,34 @@ export interface components {
             /** @constant */
             success: true;
             data: components["schemas"]["AdminLoginResult"];
+            error: null;
+        };
+        AdminStudent: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            educationLevelId: string | null;
+            emailVerified: boolean;
+            /** @enum {string} */
+            status: "active" | "disabled";
+            createdAt: string;
+            activeEntitlementCount: number;
+        };
+        AdminStudentDetail: {
+            student: components["schemas"]["AdminStudent"];
+            entitlements: components["schemas"]["AdminEntitlementList"];
+        };
+        AdminStudentDetailEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AdminStudentDetail"];
+            error: null;
+        };
+        AdminStudentList: components["schemas"]["AdminStudent"][];
+        AdminStudentListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AdminStudentList"];
             error: null;
         };
         AdminTeacher: {
@@ -1155,12 +1570,79 @@ export interface components {
         BackupCodeRequest: {
             code: string;
         };
+        CouponBatch: {
+            id: string;
+            name: string;
+            distributorName: string | null;
+            notes: string | null;
+            scope: components["schemas"]["AccessScope"];
+            quantity: number;
+            generatedCount: number;
+            redeemedCount: number;
+            validFrom: string | null;
+            expiresAt: string | null;
+            accessDurationDays: number | null;
+            accessExpiresAt: string | null;
+            permanentAccess: boolean;
+            /** @enum {string} */
+            status: "active" | "revoked";
+            createdAt: string;
+            revokedAt: string | null;
+        };
+        CouponBatchEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["CouponBatch"];
+            error: null;
+        };
+        CouponBatchList: components["schemas"]["CouponBatch"][];
+        CouponBatchListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["CouponBatchList"];
+            error: null;
+        };
+        CouponFailureReport: {
+            since: string;
+            users: {
+                userId: string;
+                email: string | null;
+                failures: number;
+                lastAt: string;
+            }[];
+            ips: {
+                ipHash: string;
+                failures: number;
+                lastAt: string;
+            }[];
+        };
+        CouponFailureReportEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["CouponFailureReport"];
+            error: null;
+        };
         CreateAcademicYearRequest: {
             code: string;
             nameAr: string;
             isActive?: boolean;
             /** Format: uuid */
             facultyId: string;
+        };
+        CreateCouponBatchRequest: {
+            name: string;
+            distributorName?: string | null;
+            notes?: string | null;
+            /** @enum {string} */
+            scopeType: "subject" | "teacher_track";
+            subjectId?: string | null;
+            teacherTrackId?: string | null;
+            quantity: number;
+            validFrom?: string | null;
+            expiresOn?: string | null;
+            permanentAccess?: boolean;
+            accessDurationDays?: number | null;
+            accessExpiresOn?: string | null;
         };
         CreateFacultyRequest: {
             code: string;
@@ -1175,6 +1657,18 @@ export interface components {
             unitId?: string | null;
             code: string;
             titleAr: string;
+        };
+        CreatePromotionRequest: {
+            /** @enum {string} */
+            scopeType: "subject" | "teacher_track";
+            subjectId?: string | null;
+            teacherTrackId?: string | null;
+            titleAr: string;
+            /** Format: date-time */
+            startsAt: string;
+            /** Format: date-time */
+            endsAt: string;
+            isActive?: boolean;
         };
         CreateSubjectRequest: {
             /** Format: uuid */
@@ -1279,6 +1773,10 @@ export interface components {
             data: components["schemas"]["EnrolledResult"];
             error: null;
         };
+        ExtendEntitlementRequest: {
+            makePermanent?: boolean;
+            expiresOn?: string | null;
+        };
         Faculty: {
             id: string;
             code: string;
@@ -1312,6 +1810,65 @@ export interface components {
         };
         ForgotPasswordRequest: {
             email: string;
+        };
+        FreeRule: {
+            id: string;
+            scope: components["schemas"]["AccessScope"];
+            /** @enum {string} */
+            contentKind: "questions" | "flashcard_decks" | "quizzes" | "all";
+            /** @enum {string} */
+            ruleType: "manual" | "first_n_items" | "first_n_lessons" | "first_unit" | "percentage";
+            ruleValue: number | null;
+            updatedAt: string;
+        };
+        FreeRuleEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["FreeRule"];
+            error: null;
+        };
+        FreeRuleList: components["schemas"]["FreeRule"][];
+        FreeRuleListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["FreeRuleList"];
+            error: null;
+        };
+        FreeRulePreview: {
+            freeCount: number;
+            paidCount: number;
+            byKind: {
+                /** @enum {string} */
+                contentKind: "questions" | "flashcard_decks" | "quizzes" | "all";
+                freeCount: number;
+                paidCount: number;
+            }[];
+        };
+        FreeRulePreviewEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["FreeRulePreview"];
+            error: null;
+        };
+        FreeRuleRequest: {
+            /** @enum {string} */
+            scopeType: "subject" | "teacher_track";
+            subjectId?: string | null;
+            teacherTrackId?: string | null;
+            /** @enum {string} */
+            contentKind: "questions" | "flashcard_decks" | "quizzes" | "all";
+            /** @enum {string} */
+            ruleType: "manual" | "first_n_items" | "first_n_lessons" | "first_unit" | "percentage";
+            ruleValue?: number | null;
+        };
+        GrantEntitlementRequest: {
+            /** @enum {string} */
+            scopeType: "subject" | "teacher_track";
+            subjectId?: string | null;
+            teacherTrackId?: string | null;
+            permanentAccess?: boolean;
+            accessDurationDays?: number | null;
+            accessExpiresOn?: string | null;
         };
         Lesson: {
             id: string;
@@ -1383,8 +1940,63 @@ export interface components {
         MobileRefreshRequest: {
             refreshToken: string;
         };
+        MyEntitlement: {
+            id: string;
+            scope: components["schemas"]["AccessScope"];
+            /** @enum {string} */
+            source: "coupon" | "admin_grant" | "promotion" | "future_purchase";
+            startsAt: string;
+            expiresAt: string | null;
+            isPermanent: boolean;
+            /** @enum {string} */
+            state: "active" | "expired" | "revoked";
+        };
+        MyEntitlementList: components["schemas"]["MyEntitlement"][];
+        MyEntitlementListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["MyEntitlementList"];
+            error: null;
+        };
         PasswordConfirmRequest: {
             password: string;
+        };
+        Promotion: {
+            id: string;
+            scope: components["schemas"]["AccessScope"];
+            titleAr: string;
+            startsAt: string;
+            endsAt: string;
+            isActive: boolean;
+            /** @enum {string} */
+            state: "scheduled" | "running" | "ended" | "disabled";
+            createdAt: string;
+        };
+        PromotionEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["Promotion"];
+            error: null;
+        };
+        PromotionList: components["schemas"]["Promotion"][];
+        PromotionListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["PromotionList"];
+            error: null;
+        };
+        RedeemCouponRequest: {
+            code: string;
+        };
+        RedeemResult: {
+            entitlement: components["schemas"]["MyEntitlement"];
+            upgraded: boolean;
+        };
+        RedeemResultEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["RedeemResult"];
+            error: null;
         };
         RegisterRequest: {
             fullName: string;
@@ -1472,6 +2084,17 @@ export interface components {
             data: components["schemas"]["RevokedResult"];
             error: null;
         };
+        RevokeEntitlementRequest: {
+            reason?: string | null;
+        };
+        ScopeAccess: {
+            hasAccess: boolean;
+            reason: ("entitlement" | "promotion") | null;
+            isPermanent: boolean;
+            entitlementExpiresAt: string | null;
+            promotionTitleAr: string | null;
+            promotionEndsAt: string | null;
+        };
         SentResult: {
             sent: boolean;
         };
@@ -1551,6 +2174,7 @@ export interface components {
             units: components["schemas"]["UnitWithLessons"][];
             lessons: components["schemas"]["Lesson"][];
             tracks: components["schemas"]["SubjectTrack"][];
+            access: components["schemas"]["ScopeAccess"];
         };
         SubjectOutlineEnvelope: {
             /** @constant */
@@ -1566,6 +2190,7 @@ export interface components {
             titleAr: string;
             description: string | null;
             coverUrl: string | null;
+            hasAccess: boolean;
         };
         Teacher: {
             id: string;
@@ -1646,6 +2271,7 @@ export interface components {
             track: components["schemas"]["TeacherTrack"];
             teacher: components["schemas"]["Teacher"];
             subject: components["schemas"]["Subject"];
+            access: components["schemas"]["ScopeAccess"];
         };
         TrackDetailEnvelope: {
             /** @constant */
@@ -1733,6 +2359,14 @@ export interface components {
             universityId?: string | null;
             facultyId?: string | null;
             academicYearId?: string | null;
+        };
+        UpdatePromotionRequest: {
+            titleAr?: string;
+            /** Format: date-time */
+            startsAt?: string;
+            /** Format: date-time */
+            endsAt?: string;
+            isActive?: boolean;
         };
         UpdateSubjectRequest: {
             /** Format: uuid */
@@ -2514,6 +3148,50 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TrackDetailEnvelope"];
+                };
+            };
+        };
+    };
+    listMyEntitlements: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MyEntitlementListEnvelope"];
+                };
+            };
+        };
+    };
+    redeemCoupon: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RedeemCouponRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RedeemResultEnvelope"];
                 };
             };
         };
@@ -3777,6 +4455,528 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ReorderedResultEnvelope"];
+                };
+            };
+        };
+    };
+    adminListStudents: {
+        parameters: {
+            query?: {
+                q?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminStudentListEnvelope"];
+                };
+            };
+        };
+    };
+    adminGetStudent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminStudentDetailEnvelope"];
+                };
+            };
+        };
+    };
+    adminGrantEntitlement: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GrantEntitlementRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminEntitlementEnvelope"];
+                };
+            };
+        };
+    };
+    adminExtendEntitlement: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExtendEntitlementRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminEntitlementEnvelope"];
+                };
+            };
+        };
+    };
+    adminRevokeEntitlement: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RevokeEntitlementRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminEntitlementEnvelope"];
+                };
+            };
+        };
+    };
+    adminListCouponBatches: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CouponBatchListEnvelope"];
+                };
+            };
+        };
+    };
+    adminCreateCouponBatch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCouponBatchRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CouponBatchEnvelope"];
+                };
+            };
+        };
+    };
+    adminGetCouponBatch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CouponBatchEnvelope"];
+                };
+            };
+        };
+    };
+    adminListBatchCoupons: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminCouponListEnvelope"];
+                };
+            };
+        };
+    };
+    adminExportCouponBatch: {
+        parameters: {
+            query?: {
+                format?: "csv" | "xlsx";
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    adminRevokeCouponBatch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CouponBatchEnvelope"];
+                };
+            };
+        };
+    };
+    adminSearchCoupons: {
+        parameters: {
+            query: {
+                q: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminCouponListEnvelope"];
+                };
+            };
+        };
+    };
+    adminCouponFailureReport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CouponFailureReportEnvelope"];
+                };
+            };
+        };
+    };
+    adminGetAccessSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccessSettingsEnvelope"];
+                };
+            };
+        };
+    };
+    adminUpdateAccessSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AccessSettings"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccessSettingsEnvelope"];
+                };
+            };
+        };
+    };
+    adminListPromotions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PromotionListEnvelope"];
+                };
+            };
+        };
+    };
+    adminCreatePromotion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreatePromotionRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PromotionEnvelope"];
+                };
+            };
+        };
+    };
+    adminDeletePromotion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeletedResultEnvelope"];
+                };
+            };
+        };
+    };
+    adminUpdatePromotion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdatePromotionRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PromotionEnvelope"];
+                };
+            };
+        };
+    };
+    adminListFreeRules: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FreeRuleListEnvelope"];
+                };
+            };
+        };
+    };
+    adminSaveFreeRule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FreeRuleRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FreeRuleEnvelope"];
+                };
+            };
+        };
+    };
+    adminPreviewFreeRule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FreeRuleRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FreeRulePreviewEnvelope"];
+                };
+            };
+        };
+    };
+    adminDeleteFreeRule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeletedResultEnvelope"];
                 };
             };
         };

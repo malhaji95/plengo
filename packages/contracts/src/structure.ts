@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { scopeAccessSchema } from './access.js';
 
 /*
  * Education structure (spec §6). Codes are the stable identifiers used by bulk import (§27):
@@ -72,6 +73,8 @@ export const subjectTrackSchema = z.object({
   titleAr: z.string(),
   description: z.string().nullable(),
   coverUrl: z.string().nullable(),
+  /** Whether the student can open this track's premium content (entitlement or promotion). */
+  hasAccess: z.boolean(),
 });
 
 /**
@@ -83,6 +86,8 @@ export const subjectOutlineSchema = z.object({
   units: z.array(unitWithLessonsSchema),
   lessons: z.array(lessonSchema),
   tracks: z.array(subjectTrackSchema),
+  /** Access to the subject's general content (not its tracks, §8.1). */
+  access: scopeAccessSchema,
 });
 
 export const universityListSchema = z.array(universitySchema);

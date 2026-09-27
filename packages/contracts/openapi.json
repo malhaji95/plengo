@@ -98,6 +98,307 @@
         ],
         "additionalProperties": false
       },
+      "AccessScope": {
+        "type": "object",
+        "properties": {
+          "scopeType": {
+            "type": "string",
+            "enum": [
+              "subject",
+              "teacher_track"
+            ]
+          },
+          "subjectId": {
+            "type": "string"
+          },
+          "teacherTrackId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "subjectNameAr": {
+            "type": "string"
+          },
+          "trackTitleAr": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "teacherNameAr": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "educationLevelId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "scopeType",
+          "subjectId",
+          "teacherTrackId",
+          "subjectNameAr",
+          "trackTitleAr",
+          "teacherNameAr",
+          "educationLevelId"
+        ],
+        "additionalProperties": false
+      },
+      "AccessSettings": {
+        "type": "object",
+        "properties": {
+          "allowTemporaryToPermanentUpgrade": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "allowTemporaryToPermanentUpgrade"
+        ],
+        "additionalProperties": false
+      },
+      "AccessSettingsEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/AccessSettings"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "AdminCoupon": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "batchId": {
+            "type": "string"
+          },
+          "batchName": {
+            "type": "string"
+          },
+          "codeLast4": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "redeemed",
+              "revoked"
+            ]
+          },
+          "currentUses": {
+            "type": "number"
+          },
+          "maxUses": {
+            "type": "number"
+          },
+          "redeemedAt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "redeemedByUserId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "redeemedByEmail": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "batchId",
+          "batchName",
+          "codeLast4",
+          "status",
+          "currentUses",
+          "maxUses",
+          "redeemedAt",
+          "redeemedByUserId",
+          "redeemedByEmail"
+        ],
+        "additionalProperties": false
+      },
+      "AdminCouponList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/AdminCoupon"
+        }
+      },
+      "AdminCouponListEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/AdminCouponList"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "AdminEntitlement": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "scope": {
+            "$ref": "#/components/schemas/AccessScope"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "coupon",
+              "admin_grant",
+              "promotion",
+              "future_purchase"
+            ]
+          },
+          "startsAt": {
+            "type": "string"
+          },
+          "expiresAt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "isPermanent": {
+            "type": "boolean"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "active",
+              "expired",
+              "revoked"
+            ]
+          },
+          "userId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "revoked",
+              "expired",
+              "superseded"
+            ]
+          },
+          "couponId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "couponLast4": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "grantedByAdminId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "revokedAt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "revokeReason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "createdAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "scope",
+          "source",
+          "startsAt",
+          "expiresAt",
+          "isPermanent",
+          "state",
+          "userId",
+          "status",
+          "couponId",
+          "couponLast4",
+          "grantedByAdminId",
+          "revokedAt",
+          "revokeReason",
+          "createdAt"
+        ],
+        "additionalProperties": false
+      },
+      "AdminEntitlementEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/AdminEntitlement"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "AdminEntitlementList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/AdminEntitlement"
+        }
+      },
       "AdminLoginRequest": {
         "type": "object",
         "properties": {
@@ -140,6 +441,120 @@
           },
           "data": {
             "$ref": "#/components/schemas/AdminLoginResult"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "AdminStudent": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "educationLevelId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "emailVerified": {
+            "type": "boolean"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "disabled"
+            ]
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "activeEntitlementCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "fullName",
+          "educationLevelId",
+          "emailVerified",
+          "status",
+          "createdAt",
+          "activeEntitlementCount"
+        ],
+        "additionalProperties": false
+      },
+      "AdminStudentDetail": {
+        "type": "object",
+        "properties": {
+          "student": {
+            "$ref": "#/components/schemas/AdminStudent"
+          },
+          "entitlements": {
+            "$ref": "#/components/schemas/AdminEntitlementList"
+          }
+        },
+        "required": [
+          "student",
+          "entitlements"
+        ],
+        "additionalProperties": false
+      },
+      "AdminStudentDetailEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/AdminStudentDetail"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "AdminStudentList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/AdminStudent"
+        }
+      },
+      "AdminStudentListEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/AdminStudentList"
           },
           "error": {
             "type": "null"
@@ -391,6 +806,239 @@
         ],
         "additionalProperties": false
       },
+      "CouponBatch": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "distributorName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "scope": {
+            "$ref": "#/components/schemas/AccessScope"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "generatedCount": {
+            "type": "number"
+          },
+          "redeemedCount": {
+            "type": "number"
+          },
+          "validFrom": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "expiresAt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "accessDurationDays": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "accessExpiresAt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "permanentAccess": {
+            "type": "boolean"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "revoked"
+            ]
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "revokedAt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "distributorName",
+          "notes",
+          "scope",
+          "quantity",
+          "generatedCount",
+          "redeemedCount",
+          "validFrom",
+          "expiresAt",
+          "accessDurationDays",
+          "accessExpiresAt",
+          "permanentAccess",
+          "status",
+          "createdAt",
+          "revokedAt"
+        ],
+        "additionalProperties": false
+      },
+      "CouponBatchEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/CouponBatch"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "CouponBatchList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/CouponBatch"
+        }
+      },
+      "CouponBatchListEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/CouponBatchList"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "CouponFailureReport": {
+        "type": "object",
+        "properties": {
+          "since": {
+            "type": "string"
+          },
+          "users": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "userId": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "failures": {
+                  "type": "number"
+                },
+                "lastAt": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "userId",
+                "email",
+                "failures",
+                "lastAt"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "ips": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "ipHash": {
+                  "type": "string"
+                },
+                "failures": {
+                  "type": "number"
+                },
+                "lastAt": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "ipHash",
+                "failures",
+                "lastAt"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "since",
+          "users",
+          "ips"
+        ],
+        "additionalProperties": false
+      },
+      "CouponFailureReportEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/CouponFailureReport"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
       "CreateAcademicYearRequest": {
         "type": "object",
         "properties": {
@@ -416,6 +1064,131 @@
           "nameAr",
           "facultyId"
         ]
+      },
+      "CreateCouponBatchRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "distributorName": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "scopeType": {
+            "type": "string",
+            "enum": [
+              "subject",
+              "teacher_track"
+            ]
+          },
+          "subjectId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "teacherTrackId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5000
+          },
+          "validFrom": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "expiresOn": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "permanentAccess": {
+            "type": "boolean"
+          },
+          "accessDurationDays": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 3650
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "accessExpiresOn": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "scopeType",
+          "quantity"
+        ],
+        "additionalProperties": false
       },
       "CreateFacultyRequest": {
         "type": "object",
@@ -477,6 +1250,67 @@
           "code",
           "titleAr"
         ]
+      },
+      "CreatePromotionRequest": {
+        "type": "object",
+        "properties": {
+          "scopeType": {
+            "type": "string",
+            "enum": [
+              "subject",
+              "teacher_track"
+            ]
+          },
+          "subjectId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "teacherTrackId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "titleAr": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "scopeType",
+          "titleAr",
+          "startsAt",
+          "endsAt"
+        ],
+        "additionalProperties": false
       },
       "CreateSubjectRequest": {
         "type": "object",
@@ -940,6 +1774,27 @@
         ],
         "additionalProperties": false
       },
+      "ExtendEntitlementRequest": {
+        "type": "object",
+        "properties": {
+          "makePermanent": {
+            "type": "boolean"
+          },
+          "expiresOn": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
       "Faculty": {
         "type": "object",
         "properties": {
@@ -1067,6 +1922,309 @@
         "required": [
           "email"
         ]
+      },
+      "FreeRule": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "scope": {
+            "$ref": "#/components/schemas/AccessScope"
+          },
+          "contentKind": {
+            "type": "string",
+            "enum": [
+              "questions",
+              "flashcard_decks",
+              "quizzes",
+              "all"
+            ]
+          },
+          "ruleType": {
+            "type": "string",
+            "enum": [
+              "manual",
+              "first_n_items",
+              "first_n_lessons",
+              "first_unit",
+              "percentage"
+            ]
+          },
+          "ruleValue": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "updatedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "scope",
+          "contentKind",
+          "ruleType",
+          "ruleValue",
+          "updatedAt"
+        ],
+        "additionalProperties": false
+      },
+      "FreeRuleEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/FreeRule"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "FreeRuleList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/FreeRule"
+        }
+      },
+      "FreeRuleListEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/FreeRuleList"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "FreeRulePreview": {
+        "type": "object",
+        "properties": {
+          "freeCount": {
+            "type": "number"
+          },
+          "paidCount": {
+            "type": "number"
+          },
+          "byKind": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "contentKind": {
+                  "type": "string",
+                  "enum": [
+                    "questions",
+                    "flashcard_decks",
+                    "quizzes",
+                    "all"
+                  ]
+                },
+                "freeCount": {
+                  "type": "number"
+                },
+                "paidCount": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "contentKind",
+                "freeCount",
+                "paidCount"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "freeCount",
+          "paidCount",
+          "byKind"
+        ],
+        "additionalProperties": false
+      },
+      "FreeRulePreviewEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/FreeRulePreview"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "FreeRuleRequest": {
+        "type": "object",
+        "properties": {
+          "scopeType": {
+            "type": "string",
+            "enum": [
+              "subject",
+              "teacher_track"
+            ]
+          },
+          "subjectId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "teacherTrackId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "contentKind": {
+            "type": "string",
+            "enum": [
+              "questions",
+              "flashcard_decks",
+              "quizzes",
+              "all"
+            ]
+          },
+          "ruleType": {
+            "type": "string",
+            "enum": [
+              "manual",
+              "first_n_items",
+              "first_n_lessons",
+              "first_unit",
+              "percentage"
+            ]
+          },
+          "ruleValue": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "scopeType",
+          "contentKind",
+          "ruleType"
+        ],
+        "additionalProperties": false
+      },
+      "GrantEntitlementRequest": {
+        "type": "object",
+        "properties": {
+          "scopeType": {
+            "type": "string",
+            "enum": [
+              "subject",
+              "teacher_track"
+            ]
+          },
+          "subjectId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "teacherTrackId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "permanentAccess": {
+            "type": "boolean"
+          },
+          "accessDurationDays": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 3650
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "accessExpiresOn": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "scopeType"
+        ],
+        "additionalProperties": false
       },
       "Lesson": {
         "type": "object",
@@ -1379,6 +2537,83 @@
         ],
         "additionalProperties": false
       },
+      "MyEntitlement": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "scope": {
+            "$ref": "#/components/schemas/AccessScope"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "coupon",
+              "admin_grant",
+              "promotion",
+              "future_purchase"
+            ]
+          },
+          "startsAt": {
+            "type": "string"
+          },
+          "expiresAt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "isPermanent": {
+            "type": "boolean"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "active",
+              "expired",
+              "revoked"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "scope",
+          "source",
+          "startsAt",
+          "expiresAt",
+          "isPermanent",
+          "state"
+        ],
+        "additionalProperties": false
+      },
+      "MyEntitlementList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/MyEntitlement"
+        }
+      },
+      "MyEntitlementListEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/MyEntitlementList"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
       "PasswordConfirmRequest": {
         "type": "object",
         "properties": {
@@ -1390,6 +2625,150 @@
         },
         "required": [
           "password"
+        ],
+        "additionalProperties": false
+      },
+      "Promotion": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "scope": {
+            "$ref": "#/components/schemas/AccessScope"
+          },
+          "titleAr": {
+            "type": "string"
+          },
+          "startsAt": {
+            "type": "string"
+          },
+          "endsAt": {
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "scheduled",
+              "running",
+              "ended",
+              "disabled"
+            ]
+          },
+          "createdAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "scope",
+          "titleAr",
+          "startsAt",
+          "endsAt",
+          "isActive",
+          "state",
+          "createdAt"
+        ],
+        "additionalProperties": false
+      },
+      "PromotionEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/Promotion"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "PromotionList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Promotion"
+        }
+      },
+      "PromotionListEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/PromotionList"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "RedeemCouponRequest": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "maxLength": 64
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "additionalProperties": false
+      },
+      "RedeemResult": {
+        "type": "object",
+        "properties": {
+          "entitlement": {
+            "$ref": "#/components/schemas/MyEntitlement"
+          },
+          "upgraded": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "entitlement",
+          "upgraded"
+        ],
+        "additionalProperties": false
+      },
+      "RedeemResultEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/RedeemResult"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
         ],
         "additionalProperties": false
       },
@@ -1733,6 +3112,75 @@
         ],
         "additionalProperties": false
       },
+      "RevokeEntitlementRequest": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "ScopeAccess": {
+        "type": "object",
+        "properties": {
+          "hasAccess": {
+            "type": "boolean"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "entitlement",
+                  "promotion"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "isPermanent": {
+            "type": "boolean"
+          },
+          "entitlementExpiresAt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "promotionTitleAr": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "promotionEndsAt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "hasAccess",
+          "reason",
+          "isPermanent",
+          "entitlementExpiresAt",
+          "promotionTitleAr",
+          "promotionEndsAt"
+        ],
+        "additionalProperties": false
+      },
       "SentResult": {
         "type": "object",
         "properties": {
@@ -2059,13 +3507,17 @@
             "items": {
               "$ref": "#/components/schemas/SubjectTrack"
             }
+          },
+          "access": {
+            "$ref": "#/components/schemas/ScopeAccess"
           }
         },
         "required": [
           "subject",
           "units",
           "lessons",
-          "tracks"
+          "tracks",
+          "access"
         ],
         "additionalProperties": false
       },
@@ -2122,6 +3574,9 @@
               "string",
               "null"
             ]
+          },
+          "hasAccess": {
+            "type": "boolean"
           }
         },
         "required": [
@@ -2131,7 +3586,8 @@
           "teacherPhotoUrl",
           "titleAr",
           "description",
-          "coverUrl"
+          "coverUrl",
+          "hasAccess"
         ],
         "additionalProperties": false
       },
@@ -2460,12 +3916,16 @@
           },
           "subject": {
             "$ref": "#/components/schemas/Subject"
+          },
+          "access": {
+            "$ref": "#/components/schemas/ScopeAccess"
           }
         },
         "required": [
           "track",
           "teacher",
-          "subject"
+          "subject",
+          "access"
         ],
         "additionalProperties": false
       },
@@ -2819,6 +4279,30 @@
                 "type": "null"
               }
             ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdatePromotionRequest": {
+        "type": "object",
+        "properties": {
+          "titleAr": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+          },
+          "isActive": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -4048,6 +5532,56 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/TrackDetailEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/access": {
+      "get": {
+        "operationId": "listMyEntitlements",
+        "tags": [
+          "access"
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyEntitlementListEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/coupons/redeem": {
+      "post": {
+        "operationId": "redeemCoupon",
+        "tags": [
+          "access"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RedeemCouponRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RedeemResultEnvelope"
                 }
               }
             }
@@ -5776,6 +7310,708 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ReorderedResultEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/students": {
+      "get": {
+        "operationId": "adminListStudents",
+        "tags": [
+          "admin-students"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "in": "query",
+            "name": "q",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminStudentListEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/students/{id}": {
+      "get": {
+        "operationId": "adminGetStudent",
+        "tags": [
+          "admin-students"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminStudentDetailEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/students/{id}/entitlements": {
+      "post": {
+        "operationId": "adminGrantEntitlement",
+        "tags": [
+          "admin-students"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GrantEntitlementRequest"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminEntitlementEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/entitlements/{id}/extend": {
+      "post": {
+        "operationId": "adminExtendEntitlement",
+        "tags": [
+          "admin-students"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExtendEntitlementRequest"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminEntitlementEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/entitlements/{id}/revoke": {
+      "post": {
+        "operationId": "adminRevokeEntitlement",
+        "tags": [
+          "admin-students"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RevokeEntitlementRequest"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminEntitlementEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/coupon-batches": {
+      "get": {
+        "operationId": "adminListCouponBatches",
+        "tags": [
+          "admin-access"
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CouponBatchListEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "adminCreateCouponBatch",
+        "tags": [
+          "admin-access"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCouponBatchRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CouponBatchEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/coupon-batches/{id}": {
+      "get": {
+        "operationId": "adminGetCouponBatch",
+        "tags": [
+          "admin-access"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CouponBatchEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/coupon-batches/{id}/coupons": {
+      "get": {
+        "operationId": "adminListBatchCoupons",
+        "tags": [
+          "admin-access"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCouponListEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/coupon-batches/{id}/export": {
+      "get": {
+        "operationId": "adminExportCouponBatch",
+        "tags": [
+          "admin-access"
+        ],
+        "description": "CSV or XLSX file with the plaintext codes (spec §9.6). Audited.",
+        "parameters": [
+          {
+            "schema": {
+              "default": "csv",
+              "type": "string",
+              "enum": [
+                "csv",
+                "xlsx"
+              ]
+            },
+            "in": "query",
+            "name": "format",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/coupon-batches/{id}/revoke": {
+      "post": {
+        "operationId": "adminRevokeCouponBatch",
+        "tags": [
+          "admin-access"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CouponBatchEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/coupons": {
+      "get": {
+        "operationId": "adminSearchCoupons",
+        "tags": [
+          "admin-access"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 4,
+              "maxLength": 64
+            },
+            "in": "query",
+            "name": "q",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCouponListEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/coupon-failures": {
+      "get": {
+        "operationId": "adminCouponFailureReport",
+        "tags": [
+          "admin-access"
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CouponFailureReportEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/settings/access": {
+      "get": {
+        "operationId": "adminGetAccessSettings",
+        "tags": [
+          "admin-access"
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccessSettingsEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "adminUpdateAccessSettings",
+        "tags": [
+          "admin-access"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccessSettings"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccessSettingsEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/promotions": {
+      "get": {
+        "operationId": "adminListPromotions",
+        "tags": [
+          "admin-access"
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PromotionListEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "adminCreatePromotion",
+        "tags": [
+          "admin-access"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePromotionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PromotionEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/promotions/{id}": {
+      "patch": {
+        "operationId": "adminUpdatePromotion",
+        "tags": [
+          "admin-access"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePromotionRequest"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PromotionEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "adminDeletePromotion",
+        "tags": [
+          "admin-access"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeletedResultEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/free-rules": {
+      "get": {
+        "operationId": "adminListFreeRules",
+        "tags": [
+          "admin-access"
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FreeRuleListEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "adminSaveFreeRule",
+        "tags": [
+          "admin-access"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FreeRuleRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FreeRuleEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/free-rules/preview": {
+      "post": {
+        "operationId": "adminPreviewFreeRule",
+        "tags": [
+          "admin-access"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FreeRuleRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FreeRulePreviewEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/free-rules/{id}": {
+      "delete": {
+        "operationId": "adminDeleteFreeRule",
+        "tags": [
+          "admin-access"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeletedResultEnvelope"
                 }
               }
             }

@@ -5,6 +5,7 @@ import type { TeacherRepository, TeacherRow, TrackRow } from '../repositories/te
 import type { ObjectStorage } from '../storage/storage.js';
 import { toSubject, publicImageUrl } from './structure-mappers.js';
 import { assertReadyImage, type AdminActor, type StructureService } from './structure-service.js';
+import { trackScope, type AccessService } from './access-service.js';
 
 type Patch<T> = { [K in keyof T]?: T[K] | undefined };
 
@@ -17,8 +18,9 @@ export function createTeacherService(deps: {
   structureRepo: StructureRepository;
   structure: StructureService;
   storage: ObjectStorage;
+  access: AccessService;
 }) {
-  const { repo, structureRepo, structure, storage } = deps;
+  const { repo, structureRepo, structure, storage, access } = deps;
   const notFound = (): never => {
     throw new AppError('NOT_FOUND');
   };
@@ -223,16 +225,18 @@ export function createTeacherService(deps: {
 
     async track(userId: string, trackId: string) {
       const track = (await repo.getTrack(trackId, { visibleOnly: true })) ?? notFound();
-      const [teacher, subject, followed] = await Promise.all([
+      const [teacher, subject, followed, scopeAccess] = await Promise.all([
         repo.getTeacher(track.teacherId, { visibleOnly: true }),
         structureRepo.getSubject(track.subjectId, { studentVisible: true }),
         repo.followedIds(userId),
+        access.scopeAccess(userId, trackScope(track.id)),
       ]);
       if (!teacher || !subject) notFound();
       return {
         track: toTrack(track),
         teacher: toTeacher(teacher!, followed.has(teacher!.id)),
         subject: toSubject(subject!, storage),
+        access: scopeAccess,
       };
     },
 

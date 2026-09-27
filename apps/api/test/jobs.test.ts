@@ -23,6 +23,9 @@ describe('pg-boss queue', () => {
           resolve();
         },
         [QUEUES.mediaCleanup]: async () => {},
+        [QUEUES.couponsGenerate]: async () => {},
+        [QUEUES.recomputeFree]: async () => {},
+        [QUEUES.expireEntitlements]: async () => {},
       },
       { workers: true },
     );

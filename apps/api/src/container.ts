@@ -6,12 +6,18 @@ import { ConsoleEmailSender, ResendEmailSender, type EmailSender } from './auth/
 import { createGuards, type Guards } from './authorization/guards.js';
 import type { Env } from './env.js';
 import type { JobHandlers, JobQueue } from './jobs/queue.js';
+import { createCouponCrypto } from './lib/coupon-code.js';
 import { createIpHasher } from './lib/crypto.js';
+import { createAccessRepository } from './repositories/access-repository.js';
 import { createSessionsRepository, type SessionsRepository } from './repositories/sessions-repository.js';
 import { createStructureRepository, type StructureRepository } from './repositories/structure-repository.js';
 import { createTeacherRepository } from './repositories/teacher-repository.js';
 import { createUsersRepository, type UsersRepository } from './repositories/users-repository.js';
+import { createAccessService, type AccessService } from './services/access-service.js';
 import { createAuditService, type AuditService } from './services/audit-service.js';
+import { createCouponService, type CouponService } from './services/coupon-service.js';
+import { createFreeRuleService, type FreeRuleService } from './services/free-rule-service.js';
+import { createPromotionService, type PromotionService } from './services/promotion-service.js';
 import { createAuthService, type AuthService } from './services/auth-service.js';
 import { createCatalogService, type CatalogService } from './services/catalog-service.js';
 import { createConfigService, type ConfigService } from './services/config-service.js';
@@ -44,6 +50,10 @@ export interface Container {
   structure: StructureService;
   catalog: CatalogService;
   teachers: TeacherService;
+  access: AccessService;
+  coupons: CouponService;
+  promotions: PromotionService;
+  freeRules: FreeRuleService;
   media: MediaProcessor;
   guards: Guards;
   jobHandlers: JobHandlers;
@@ -100,16 +110,50 @@ export function createContainer(
   const audit = createAuditService(db, hashIp);
   const structureRepo = createStructureRepository(db);
   const structure = createStructureService({ db, repo: structureRepo, audit, storage });
+  const configService = createConfigService(db);
+  const accessRepo = createAccessRepository(db);
+  const access = createAccessService({
+    db,
+    repo: accessRepo,
+    config: configService,
+    audit,
+    timeZone: env.TZ_BUSINESS,
+    now: overrides.now,
+  });
+  const coupons = createCouponService({
+    db,
+    access,
+    accessRepo,
+    config: configService,
+    audit,
+    jobs: overrides.jobs,
+    crypto: createCouponCrypto(env.COUPON_HMAC_SECRET, env.COUPON_ENCRYPTION_KEY),
+    hashIp,
+    timeZone: env.TZ_BUSINESS,
+    now: overrides.now,
+  });
+  const promotions = createPromotionService({ db, accessRepo, audit, now: overrides.now });
+  // Content tables register their free-content sources as they arrive (Phases 5–7).
+  const freeRules = createFreeRuleService({
+    db,
+    accessRepo,
+    structureRepo,
+    audit,
+    jobs: overrides.jobs,
+    sources: [],
+  });
   const teachers = createTeacherService({
     repo: createTeacherRepository(db),
     structureRepo,
     structure,
     storage,
+    access,
   });
   const catalog = createCatalogService({
     repo: structureRepo,
     usersRepo,
     storage,
+    access,
     subjectTracks: (id) => teachers.subjectTracks(id),
   });
 
@@ -126,7 +170,7 @@ export function createContainer(
     sessionsRepo,
     mobileTokens,
     authService: createAuthService({ auth, usersRepo, sessionsRepo, mobileTokens, catalog }),
-    configService: createConfigService(db),
+    configService,
     audit,
     uploadService: createUploadService({ db, storage, jobs: overrides.jobs, appEnv: env.APP_ENV }),
     media,
@@ -134,11 +178,25 @@ export function createContainer(
     structure,
     catalog,
     teachers,
+    access,
+    coupons,
+    promotions,
+    freeRules,
     guards: createGuards({ auth, sessionsRepo, mobileTokens, now: overrides.now }),
     jobHandlers: {
       'media.process': (data) => media.process(data),
       'media.cleanup-orphans': async () => {
         await media.cleanupOrphans();
+      },
+      'coupons.generate': (data) => coupons.generateBatch(data.batchId),
+      'access.recompute-free': (scope) =>
+        freeRules.recompute(
+          scope.scopeType === 'subject'
+            ? { scopeType: 'subject', subjectId: scope.subjectId!, teacherTrackId: null }
+            : { scopeType: 'teacher_track', subjectId: null, teacherTrackId: scope.teacherTrackId! },
+        ),
+      'access.expire-entitlements': async () => {
+        await access.expireAllStale();
       },
     },
   };

@@ -45,6 +45,8 @@ export async function createTestApp(opts: { storage?: MemoryStorage } = {}): Pro
     ADMIN_ORIGIN: ADMIN_ORIGIN,
     MOBILE_ACCESS_JWT_SECRET: 'test-access-secret-0123456789abcdef0123',
     MOBILE_REFRESH_TOKEN_PEPPER: 'test-refresh-pepper-0123456789abcdef012',
+    COUPON_HMAC_SECRET: 'test-coupon-hmac-secret-0123456789abcdef',
+    COUPON_ENCRYPTION_KEY: Buffer.alloc(32, 7).toString('base64'),
     STORAGE_DRIVER: 'memory',
     EMAIL_PROVIDER: 'console',
     JOBS_ENABLED: 'false',

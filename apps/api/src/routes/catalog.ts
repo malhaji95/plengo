@@ -13,6 +13,7 @@ import {
   universityListSchema,
   unitWithLessonsSchema,
 } from '@plengo/contracts';
+import { authOf } from '../authorization/guards.js';
 import { ok } from '../lib/app-error.js';
 import type { Container } from '../container.js';
 
@@ -97,7 +98,7 @@ export function catalogRoutes(c: Container): FastifyPluginAsyncZod {
           response: { 200: successEnvelope(subjectOutlineSchema) },
         },
       },
-      async (request) => ok(await c.catalog.outline(request.params.id)),
+      async (request) => ok(await c.catalog.outline(authOf(request).userId, request.params.id)),
     );
 
     app.get(

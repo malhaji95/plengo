@@ -15,6 +15,8 @@ import type { Container } from './container.js';
 import { registerCsrf } from './plugins/csrf.js';
 import { registerErrorHandling } from './plugins/error-handler.js';
 import { registerVersionGate } from './plugins/version-gate.js';
+import { accessRoutes } from './routes/access.js';
+import { adminAccessRoutes } from './routes/admin/access.js';
 import { adminAuthRoutes } from './routes/admin/auth.js';
 import { adminStructureRoutes } from './routes/admin/structure.js';
 import { adminTeacherRoutes } from './routes/admin/teachers.js';
@@ -108,10 +110,12 @@ export async function buildApp(app: App, c: Container): Promise<App> {
   await app.register(collegeReferenceRoutes(c), { prefix: '/api/v1' });
   await app.register(catalogRoutes(c), { prefix: '/api/v1' });
   await app.register(teacherRoutes(c), { prefix: '/api/v1' });
+  await app.register(accessRoutes(c), { prefix: '/api/v1' });
   await app.register(adminAuthRoutes(c), { prefix: '/api/v1/admin' });
   await app.register(uploadRoutes(c, 'admin'), { prefix: '/api/v1/admin' });
   await app.register(adminStructureRoutes(c), { prefix: '/api/v1/admin' });
   await app.register(adminTeacherRoutes(c), { prefix: '/api/v1/admin' });
+  await app.register(adminAccessRoutes(c), { prefix: '/api/v1/admin' });
 
   return app;
 }
