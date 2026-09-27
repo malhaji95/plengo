@@ -4,3 +4,4 @@ export * from './auth.js';
 export * from './config.js';
 export * from './uploads.js';
 export * from './results.js';
+export * from './structure.js';

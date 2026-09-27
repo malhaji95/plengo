@@ -16,7 +16,9 @@ import { registerCsrf } from './plugins/csrf.js';
 import { registerErrorHandling } from './plugins/error-handler.js';
 import { registerVersionGate } from './plugins/version-gate.js';
 import { adminAuthRoutes } from './routes/admin/auth.js';
+import { adminStructureRoutes } from './routes/admin/structure.js';
 import { authRoutes } from './routes/auth.js';
+import { catalogRoutes } from './routes/catalog.js';
 import { configRoutes } from './routes/config.js';
 import { healthRoutes } from './routes/health.js';
 import { meRoutes } from './routes/me.js';
@@ -95,8 +97,10 @@ export async function buildApp(app: App, c: Container): Promise<App> {
   await app.register(authRoutes(c), { prefix: '/api/v1/auth' });
   await app.register(meRoutes(c), { prefix: '/api/v1' });
   await app.register(uploadRoutes(c, 'student'), { prefix: '/api/v1' });
+  await app.register(catalogRoutes(c), { prefix: '/api/v1' });
   await app.register(adminAuthRoutes(c), { prefix: '/api/v1/admin' });
   await app.register(uploadRoutes(c, 'admin'), { prefix: '/api/v1/admin' });
+  await app.register(adminStructureRoutes(c), { prefix: '/api/v1/admin' });
 
   return app;
 }

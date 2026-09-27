@@ -8,12 +8,15 @@ import type { Env } from './env.js';
 import type { JobHandlers, JobQueue } from './jobs/queue.js';
 import { createIpHasher } from './lib/crypto.js';
 import { createSessionsRepository, type SessionsRepository } from './repositories/sessions-repository.js';
+import { createStructureRepository, type StructureRepository } from './repositories/structure-repository.js';
 import { createUsersRepository, type UsersRepository } from './repositories/users-repository.js';
 import { createAuditService, type AuditService } from './services/audit-service.js';
 import { createAuthService, type AuthService } from './services/auth-service.js';
+import { createCatalogService, type CatalogService } from './services/catalog-service.js';
 import { createConfigService, type ConfigService } from './services/config-service.js';
 import { createMediaProcessor, type MediaProcessor } from './services/media-processing.js';
 import { createMobileTokenService, type MobileTokenService } from './services/mobile-token-service.js';
+import { createStructureService, type StructureService } from './services/structure-service.js';
 import { createUploadService, type UploadService } from './services/upload-service.js';
 import { MemoryStorage } from './storage/memory-storage.js';
 import { R2Storage } from './storage/r2-storage.js';
@@ -35,6 +38,9 @@ export interface Container {
   configService: ConfigService;
   audit: AuditService;
   uploadService: UploadService;
+  structureRepo: StructureRepository;
+  structure: StructureService;
+  catalog: CatalogService;
   media: MediaProcessor;
   guards: Guards;
   jobHandlers: JobHandlers;
@@ -86,6 +92,9 @@ export function createContainer(
     now: overrides.now,
   });
   const media = createMediaProcessor({ db, storage, appEnv: env.APP_ENV, log });
+  const audit = createAuditService(db, hashIp);
+  const structureRepo = createStructureRepository(db);
+  const catalog = createCatalogService({ repo: structureRepo, usersRepo, storage });
 
   return {
     env,
@@ -99,11 +108,14 @@ export function createContainer(
     usersRepo,
     sessionsRepo,
     mobileTokens,
-    authService: createAuthService({ auth, usersRepo, sessionsRepo, mobileTokens }),
+    authService: createAuthService({ auth, usersRepo, sessionsRepo, mobileTokens, catalog }),
     configService: createConfigService(db),
-    audit: createAuditService(db, hashIp),
+    audit,
     uploadService: createUploadService({ db, storage, jobs: overrides.jobs, appEnv: env.APP_ENV }),
     media,
+    structureRepo,
+    structure: createStructureService({ db, repo: structureRepo, audit, storage }),
+    catalog,
     guards: createGuards({ auth, sessionsRepo, mobileTokens, now: overrides.now }),
     jobHandlers: {
       'media.process': (data) => media.process(data),

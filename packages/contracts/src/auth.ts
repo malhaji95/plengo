@@ -14,6 +14,10 @@ export const registerBodySchema = z.object({
   email: emailSchema,
   password: passwordSchema,
   educationLevelId: z.uuid().optional(),
+  // College students may optionally pick their place in the hierarchy (spec §11.1).
+  universityId: z.uuid().optional(),
+  facultyId: z.uuid().optional(),
+  academicYearId: z.uuid().optional(),
 });
 
 export const verifyEmailBodySchema = z.object({ email: emailSchema, otp: otpSchema });
@@ -54,6 +58,21 @@ export const meSchema = z.object({
   role: z.enum(['student', 'admin']),
   fullName: z.string(),
   educationLevelId: z.string().nullable(),
+  universityId: z.string().nullable(),
+  facultyId: z.string().nullable(),
+  academicYearId: z.string().nullable(),
+});
+
+/**
+ * Profile changes (spec §8.9): the level only sets defaults, and students may change it at any time.
+ * `null` clears an optional college layer.
+ */
+export const updateProfileBodySchema = z.object({
+  fullName: z.string().trim().min(2).max(100).optional(),
+  educationLevelId: z.uuid().optional(),
+  universityId: z.uuid().nullable().optional(),
+  facultyId: z.uuid().nullable().optional(),
+  academicYearId: z.uuid().nullable().optional(),
 });
 export type Me = z.infer<typeof meSchema>;
 
@@ -85,5 +104,6 @@ z.globalRegistry.add(mobileLogoutBodySchema, { id: 'MobileLogoutRequest' });
 z.globalRegistry.add(webLoginBodySchema, { id: 'WebLoginRequest' });
 z.globalRegistry.add(tokenPairSchema, { id: 'TokenPair' });
 z.globalRegistry.add(meSchema, { id: 'Me' });
+z.globalRegistry.add(updateProfileBodySchema, { id: 'UpdateProfileRequest' });
 z.globalRegistry.add(sessionSummarySchema, { id: 'SessionSummary' });
 z.globalRegistry.add(sessionListSchema, { id: 'SessionList' });

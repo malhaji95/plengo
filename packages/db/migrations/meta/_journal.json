@@ -15,6 +15,13 @@
       "when": 1790505311774,
       "tag": "0001_reference_data",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790528111008,
+      "tag": "0002_education_structure",
+      "breakpoints": true
     }
   ]
 }

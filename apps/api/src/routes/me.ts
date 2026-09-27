@@ -1,6 +1,12 @@
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
-import { meSchema, revokedSchema, sessionListSchema, successEnvelope } from '@plengo/contracts';
+import {
+  meSchema,
+  updateProfileBodySchema,
+  revokedSchema,
+  sessionListSchema,
+  successEnvelope,
+} from '@plengo/contracts';
 import { authOf } from '../authorization/guards.js';
 import { AppError, ok } from '../lib/app-error.js';
 import type { Container } from '../container.js';
@@ -17,6 +23,19 @@ export function meRoutes(c: Container): FastifyPluginAsyncZod {
         if (!me) throw new AppError('NOT_FOUND');
         return ok(me);
       },
+    );
+
+    app.patch(
+      '/me',
+      {
+        schema: {
+          operationId: 'updateMe',
+          tags: ['me'],
+          body: updateProfileBodySchema,
+          response: { 200: successEnvelope(meSchema) },
+        },
+      },
+      async (request) => ok(await c.catalog.updateProfile(authOf(request).userId, request.body)),
     );
 
     app.get(

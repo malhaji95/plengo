@@ -25,6 +25,8 @@ export const educationLevelSchema = z.object({
   code: z.string(),
   nameAr: z.string(),
   sortOrder: z.number(),
+  /** Only the college level has the optional University → Faculty → Academic Year layers. */
+  isCollege: z.boolean(),
 });
 export type EducationLevel = z.infer<typeof educationLevelSchema>;
 export const educationLevelListSchema = z.array(educationLevelSchema);

@@ -209,7 +209,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        patch?: never;
+        patch: operations["updateMe"];
         trace?: never;
     };
     "/api/v1/sessions": {
@@ -284,6 +284,118 @@ export interface paths {
             cookie?: never;
         };
         get: operations["studentGetUpload"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/universities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listUniversities"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/faculties": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listFaculties"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/academic-years": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listAcademicYears"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/subjects": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listSubjects"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/subjects/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getSubjectOutline"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/units/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getUnit"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/lessons/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getLesson"];
         put?: never;
         post?: never;
         delete?: never;
@@ -452,10 +564,351 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/levels": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminListLevels"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/levels/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["adminUpdateLevel"];
+        trace?: never;
+    };
+    "/api/v1/admin/universities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminListUniversities"];
+        put?: never;
+        post: operations["adminCreateUniversity"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/universities/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["adminDeleteUniversity"];
+        options?: never;
+        head?: never;
+        patch: operations["adminUpdateUniversity"];
+        trace?: never;
+    };
+    "/api/v1/admin/universities/reorder": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["adminReorderUniversitys"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/faculties": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminListFaculties"];
+        put?: never;
+        post: operations["adminCreateFaculty"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/faculties/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["adminDeleteFaculty"];
+        options?: never;
+        head?: never;
+        patch: operations["adminUpdateFaculty"];
+        trace?: never;
+    };
+    "/api/v1/admin/faculties/reorder": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["adminReorderFacultys"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/academic-years": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminListAcademicYears"];
+        put?: never;
+        post: operations["adminCreateAcademicYear"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/academic-years/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["adminDeleteAcademicYear"];
+        options?: never;
+        head?: never;
+        patch: operations["adminUpdateAcademicYear"];
+        trace?: never;
+    };
+    "/api/v1/admin/academic-years/reorder": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["adminReorderAcademicYears"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/subjects": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminListSubjects"];
+        put?: never;
+        post: operations["adminCreateSubject"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/subjects/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["adminDeleteSubject"];
+        options?: never;
+        head?: never;
+        patch: operations["adminUpdateSubject"];
+        trace?: never;
+    };
+    "/api/v1/admin/subjects/reorder": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["adminReorderSubjects"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/units": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminListUnits"];
+        put?: never;
+        post: operations["adminCreateUnit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/units/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["adminDeleteUnit"];
+        options?: never;
+        head?: never;
+        patch: operations["adminUpdateUnit"];
+        trace?: never;
+    };
+    "/api/v1/admin/units/reorder": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["adminReorderUnits"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/lessons": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminListLessons"];
+        put?: never;
+        post: operations["adminCreateLesson"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/lessons/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["adminDeleteLesson"];
+        options?: never;
+        head?: never;
+        patch: operations["adminUpdateLesson"];
+        trace?: never;
+    };
+    "/api/v1/admin/lessons/reorder": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["adminReorderLessons"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        AcademicYear: {
+            id: string;
+            code: string;
+            nameAr: string;
+            sortOrder: number;
+            isActive: boolean;
+            facultyId: string;
+        };
+        AcademicYearEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AcademicYear"];
+            error: null;
+        };
+        AcademicYearList: components["schemas"]["AcademicYear"][];
+        AcademicYearListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AcademicYearList"];
+            error: null;
+        };
         AdminLoginRequest: {
             email: string;
             password: string;
@@ -472,6 +925,50 @@ export interface components {
         };
         BackupCodeRequest: {
             code: string;
+        };
+        CreateAcademicYearRequest: {
+            code: string;
+            nameAr: string;
+            isActive?: boolean;
+            /** Format: uuid */
+            facultyId: string;
+        };
+        CreateFacultyRequest: {
+            code: string;
+            nameAr: string;
+            isActive?: boolean;
+            /** Format: uuid */
+            universityId: string;
+        };
+        CreateLessonRequest: {
+            /** Format: uuid */
+            subjectId: string;
+            unitId?: string | null;
+            code: string;
+            titleAr: string;
+        };
+        CreateSubjectRequest: {
+            /** Format: uuid */
+            educationLevelId: string;
+            universityId?: string | null;
+            facultyId?: string | null;
+            academicYearId?: string | null;
+            code: string;
+            nameAr: string;
+            description?: string | null;
+            coverMediaId?: string | null;
+            isActive?: boolean;
+        };
+        CreateUnitRequest: {
+            /** Format: uuid */
+            subjectId: string;
+            code: string;
+            titleAr: string;
+        };
+        CreateUniversityRequest: {
+            code: string;
+            nameAr: string;
+            isActive?: boolean;
         };
         CreateUploadRequest: {
             kind: components["schemas"]["MediaKind"];
@@ -496,11 +993,27 @@ export interface components {
             data: components["schemas"]["CreateUploadResult"];
             error: null;
         };
+        DeletedResult: {
+            deleted: boolean;
+        };
+        DeletedResultEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["DeletedResult"];
+            error: null;
+        };
         EducationLevel: {
             id: string;
             code: string;
             nameAr: string;
             sortOrder: number;
+            isCollege: boolean;
+        };
+        EducationLevelEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["EducationLevel"];
+            error: null;
         };
         EducationLevelList: components["schemas"]["EducationLevel"][];
         EducationLevelListEnvelope: {
@@ -518,8 +1031,50 @@ export interface components {
             data: components["schemas"]["EnrolledResult"];
             error: null;
         };
+        Faculty: {
+            id: string;
+            code: string;
+            nameAr: string;
+            sortOrder: number;
+            isActive: boolean;
+            universityId: string;
+        };
+        FacultyEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["Faculty"];
+            error: null;
+        };
+        FacultyList: components["schemas"]["Faculty"][];
+        FacultyListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["FacultyList"];
+            error: null;
+        };
         ForgotPasswordRequest: {
             email: string;
+        };
+        Lesson: {
+            id: string;
+            subjectId: string;
+            unitId: string | null;
+            code: string;
+            titleAr: string;
+            sortOrder: number;
+        };
+        LessonEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["Lesson"];
+            error: null;
+        };
+        LessonList: components["schemas"]["Lesson"][];
+        LessonListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["LessonList"];
+            error: null;
         };
         Me: {
             id: string;
@@ -529,6 +1084,9 @@ export interface components {
             role: "student" | "admin";
             fullName: string;
             educationLevelId: string | null;
+            universityId: string | null;
+            facultyId: string | null;
+            academicYearId: string | null;
         };
         MediaFile: {
             /** Format: uuid */
@@ -576,6 +1134,12 @@ export interface components {
             password: string;
             /** Format: uuid */
             educationLevelId?: string;
+            /** Format: uuid */
+            universityId?: string;
+            /** Format: uuid */
+            facultyId?: string;
+            /** Format: uuid */
+            academicYearId?: string;
         };
         RemoteConfig: {
             minSupportedVersion: {
@@ -611,6 +1175,18 @@ export interface components {
             success: true;
             data: components["schemas"]["RemoteConfig"];
             error: null;
+        };
+        ReorderedResult: {
+            reordered: boolean;
+        };
+        ReorderedResultEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["ReorderedResult"];
+            error: null;
+        };
+        ReorderRequest: {
+            ids: string[];
         };
         ResendOtpRequest: {
             email: string;
@@ -685,6 +1261,44 @@ export interface components {
             data: components["schemas"]["SignedOutResult"];
             error: null;
         };
+        Subject: {
+            id: string;
+            educationLevelId: string;
+            universityId: string | null;
+            facultyId: string | null;
+            academicYearId: string | null;
+            code: string;
+            nameAr: string;
+            description: string | null;
+            coverMediaId: string | null;
+            coverUrl: string | null;
+            sortOrder: number;
+            isActive: boolean;
+        };
+        SubjectEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["Subject"];
+            error: null;
+        };
+        SubjectList: components["schemas"]["Subject"][];
+        SubjectListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["SubjectList"];
+            error: null;
+        };
+        SubjectOutline: {
+            subject: components["schemas"]["Subject"];
+            units: components["schemas"]["UnitWithLessons"][];
+            lessons: components["schemas"]["Lesson"][];
+        };
+        SubjectOutlineEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["SubjectOutline"];
+            error: null;
+        };
         TokenPair: {
             accessToken: string;
             /** Format: date-time */
@@ -711,6 +1325,108 @@ export interface components {
             success: true;
             data: components["schemas"]["TotpEnrollment"];
             error: null;
+        };
+        Unit: {
+            id: string;
+            subjectId: string;
+            code: string;
+            titleAr: string;
+            sortOrder: number;
+        };
+        UnitEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["Unit"];
+            error: null;
+        };
+        UnitList: components["schemas"]["Unit"][];
+        UnitListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["UnitList"];
+            error: null;
+        };
+        UnitWithLessons: {
+            id: string;
+            subjectId: string;
+            code: string;
+            titleAr: string;
+            sortOrder: number;
+            lessons: components["schemas"]["Lesson"][];
+        };
+        UnitWithLessonsEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["UnitWithLessons"];
+            error: null;
+        };
+        University: {
+            id: string;
+            code: string;
+            nameAr: string;
+            sortOrder: number;
+            isActive: boolean;
+        };
+        UniversityEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["University"];
+            error: null;
+        };
+        UniversityList: components["schemas"]["University"][];
+        UniversityListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["UniversityList"];
+            error: null;
+        };
+        UpdateAcademicYearRequest: {
+            code?: string;
+            nameAr?: string;
+            isActive?: boolean;
+        };
+        UpdateFacultyRequest: {
+            code?: string;
+            nameAr?: string;
+            isActive?: boolean;
+        };
+        UpdateLessonRequest: {
+            unitId?: string | null;
+            code?: string;
+            titleAr?: string;
+        };
+        UpdateLevelRequest: {
+            nameAr?: string;
+            sortOrder?: number;
+        };
+        UpdateProfileRequest: {
+            fullName?: string;
+            /** Format: uuid */
+            educationLevelId?: string;
+            universityId?: string | null;
+            facultyId?: string | null;
+            academicYearId?: string | null;
+        };
+        UpdateSubjectRequest: {
+            /** Format: uuid */
+            educationLevelId?: string;
+            universityId?: string | null;
+            facultyId?: string | null;
+            academicYearId?: string | null;
+            code?: string;
+            nameAr?: string;
+            description?: string | null;
+            coverMediaId?: string | null;
+            isActive?: boolean;
+        };
+        UpdateUnitRequest: {
+            code?: string;
+            titleAr?: string;
+        };
+        UpdateUniversityRequest: {
+            code?: string;
+            nameAr?: string;
+            isActive?: boolean;
         };
         VerificationRequiredResult: {
             verificationRequired: boolean;
@@ -1043,6 +1759,30 @@ export interface operations {
             };
         };
     };
+    updateMe: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateProfileRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeEnvelope"];
+                };
+            };
+        };
+    };
     listSessions: {
         parameters: {
             query?: never;
@@ -1149,6 +1889,161 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MediaFileEnvelope"];
+                };
+            };
+        };
+    };
+    listUniversities: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UniversityListEnvelope"];
+                };
+            };
+        };
+    };
+    listFaculties: {
+        parameters: {
+            query: {
+                universityId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FacultyListEnvelope"];
+                };
+            };
+        };
+    };
+    listAcademicYears: {
+        parameters: {
+            query: {
+                facultyId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AcademicYearListEnvelope"];
+                };
+            };
+        };
+    };
+    listSubjects: {
+        parameters: {
+            query?: {
+                levelId?: string;
+                universityId?: string;
+                facultyId?: string;
+                academicYearId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubjectListEnvelope"];
+                };
+            };
+        };
+    };
+    getSubjectOutline: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubjectOutlineEnvelope"];
+                };
+            };
+        };
+    };
+    getUnit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnitWithLessonsEnvelope"];
+                };
+            };
+        };
+    };
+    getLesson: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LessonEnvelope"];
                 };
             };
         };
@@ -1377,6 +2272,762 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MediaFileEnvelope"];
+                };
+            };
+        };
+    };
+    adminListLevels: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EducationLevelListEnvelope"];
+                };
+            };
+        };
+    };
+    adminUpdateLevel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateLevelRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EducationLevelEnvelope"];
+                };
+            };
+        };
+    };
+    adminListUniversities: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UniversityListEnvelope"];
+                };
+            };
+        };
+    };
+    adminCreateUniversity: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateUniversityRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UniversityEnvelope"];
+                };
+            };
+        };
+    };
+    adminDeleteUniversity: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeletedResultEnvelope"];
+                };
+            };
+        };
+    };
+    adminUpdateUniversity: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateUniversityRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UniversityEnvelope"];
+                };
+            };
+        };
+    };
+    adminReorderUniversitys: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReorderRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReorderedResultEnvelope"];
+                };
+            };
+        };
+    };
+    adminListFaculties: {
+        parameters: {
+            query: {
+                universityId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FacultyListEnvelope"];
+                };
+            };
+        };
+    };
+    adminCreateFaculty: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateFacultyRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FacultyEnvelope"];
+                };
+            };
+        };
+    };
+    adminDeleteFaculty: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeletedResultEnvelope"];
+                };
+            };
+        };
+    };
+    adminUpdateFaculty: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateFacultyRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FacultyEnvelope"];
+                };
+            };
+        };
+    };
+    adminReorderFacultys: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReorderRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReorderedResultEnvelope"];
+                };
+            };
+        };
+    };
+    adminListAcademicYears: {
+        parameters: {
+            query: {
+                facultyId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AcademicYearListEnvelope"];
+                };
+            };
+        };
+    };
+    adminCreateAcademicYear: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateAcademicYearRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AcademicYearEnvelope"];
+                };
+            };
+        };
+    };
+    adminDeleteAcademicYear: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeletedResultEnvelope"];
+                };
+            };
+        };
+    };
+    adminUpdateAcademicYear: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateAcademicYearRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AcademicYearEnvelope"];
+                };
+            };
+        };
+    };
+    adminReorderAcademicYears: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReorderRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReorderedResultEnvelope"];
+                };
+            };
+        };
+    };
+    adminListSubjects: {
+        parameters: {
+            query?: {
+                levelId?: string;
+                universityId?: string;
+                facultyId?: string;
+                academicYearId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubjectListEnvelope"];
+                };
+            };
+        };
+    };
+    adminCreateSubject: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateSubjectRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubjectEnvelope"];
+                };
+            };
+        };
+    };
+    adminDeleteSubject: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeletedResultEnvelope"];
+                };
+            };
+        };
+    };
+    adminUpdateSubject: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateSubjectRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubjectEnvelope"];
+                };
+            };
+        };
+    };
+    adminReorderSubjects: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReorderRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReorderedResultEnvelope"];
+                };
+            };
+        };
+    };
+    adminListUnits: {
+        parameters: {
+            query: {
+                subjectId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnitListEnvelope"];
+                };
+            };
+        };
+    };
+    adminCreateUnit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateUnitRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnitEnvelope"];
+                };
+            };
+        };
+    };
+    adminDeleteUnit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeletedResultEnvelope"];
+                };
+            };
+        };
+    };
+    adminUpdateUnit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateUnitRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnitEnvelope"];
+                };
+            };
+        };
+    };
+    adminReorderUnits: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReorderRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReorderedResultEnvelope"];
+                };
+            };
+        };
+    };
+    adminListLessons: {
+        parameters: {
+            query: {
+                subjectId: string;
+                unitId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LessonListEnvelope"];
+                };
+            };
+        };
+    };
+    adminCreateLesson: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateLessonRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LessonEnvelope"];
+                };
+            };
+        };
+    };
+    adminDeleteLesson: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeletedResultEnvelope"];
+                };
+            };
+        };
+    };
+    adminUpdateLesson: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateLessonRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LessonEnvelope"];
+                };
+            };
+        };
+    };
+    adminReorderLessons: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReorderRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReorderedResultEnvelope"];
                 };
             };
         };

@@ -18,6 +18,86 @@
       }
     },
     "schemas": {
+      "AcademicYear": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "nameAr": {
+            "type": "string"
+          },
+          "sortOrder": {
+            "type": "number"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "facultyId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "nameAr",
+          "sortOrder",
+          "isActive",
+          "facultyId"
+        ],
+        "additionalProperties": false
+      },
+      "AcademicYearEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/AcademicYear"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "AcademicYearList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/AcademicYear"
+        }
+      },
+      "AcademicYearListEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/AcademicYearList"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
       "AdminLoginRequest": {
         "type": "object",
         "properties": {
@@ -85,6 +165,221 @@
           "code"
         ],
         "additionalProperties": false
+      },
+      "CreateAcademicYearRequest": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "nameAr": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "facultyId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          }
+        },
+        "required": [
+          "code",
+          "nameAr",
+          "facultyId"
+        ]
+      },
+      "CreateFacultyRequest": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "nameAr": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "universityId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          }
+        },
+        "required": [
+          "code",
+          "nameAr",
+          "universityId"
+        ]
+      },
+      "CreateLessonRequest": {
+        "type": "object",
+        "properties": {
+          "subjectId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "unitId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "code": {
+            "type": "string"
+          },
+          "titleAr": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "subjectId",
+          "code",
+          "titleAr"
+        ]
+      },
+      "CreateSubjectRequest": {
+        "type": "object",
+        "properties": {
+          "educationLevelId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "universityId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "facultyId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "academicYearId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "code": {
+            "type": "string"
+          },
+          "nameAr": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "coverMediaId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "educationLevelId",
+          "code",
+          "nameAr"
+        ]
+      },
+      "CreateUnitRequest": {
+        "type": "object",
+        "properties": {
+          "subjectId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "code": {
+            "type": "string"
+          },
+          "titleAr": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "subjectId",
+          "code",
+          "titleAr"
+        ]
+      },
+      "CreateUniversityRequest": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "nameAr": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "code",
+          "nameAr"
+        ]
       },
       "CreateUploadRequest": {
         "type": "object",
@@ -169,6 +464,39 @@
         ],
         "additionalProperties": false
       },
+      "DeletedResult": {
+        "type": "object",
+        "properties": {
+          "deleted": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "deleted"
+        ],
+        "additionalProperties": false
+      },
+      "DeletedResultEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/DeletedResult"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
       "EducationLevel": {
         "type": "object",
         "properties": {
@@ -183,13 +511,38 @@
           },
           "sortOrder": {
             "type": "number"
+          },
+          "isCollege": {
+            "type": "boolean"
           }
         },
         "required": [
           "id",
           "code",
           "nameAr",
-          "sortOrder"
+          "sortOrder",
+          "isCollege"
+        ],
+        "additionalProperties": false
+      },
+      "EducationLevelEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/EducationLevel"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
         ],
         "additionalProperties": false
       },
@@ -253,6 +606,86 @@
         ],
         "additionalProperties": false
       },
+      "Faculty": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "nameAr": {
+            "type": "string"
+          },
+          "sortOrder": {
+            "type": "number"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "universityId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "nameAr",
+          "sortOrder",
+          "isActive",
+          "universityId"
+        ],
+        "additionalProperties": false
+      },
+      "FacultyEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/Faculty"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "FacultyList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Faculty"
+        }
+      },
+      "FacultyListEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/FacultyList"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
       "ForgotPasswordRequest": {
         "type": "object",
         "properties": {
@@ -263,6 +696,89 @@
         "required": [
           "email"
         ]
+      },
+      "Lesson": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "subjectId": {
+            "type": "string"
+          },
+          "unitId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "code": {
+            "type": "string"
+          },
+          "titleAr": {
+            "type": "string"
+          },
+          "sortOrder": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "subjectId",
+          "unitId",
+          "code",
+          "titleAr",
+          "sortOrder"
+        ],
+        "additionalProperties": false
+      },
+      "LessonEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/Lesson"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "LessonList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Lesson"
+        }
+      },
+      "LessonListEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/LessonList"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
       },
       "Me": {
         "type": "object",
@@ -291,6 +807,24 @@
               "string",
               "null"
             ]
+          },
+          "universityId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "facultyId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "academicYearId": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "required": [
@@ -299,7 +833,10 @@
           "emailVerified",
           "role",
           "fullName",
-          "educationLevelId"
+          "educationLevelId",
+          "universityId",
+          "facultyId",
+          "academicYearId"
         ],
         "additionalProperties": false
       },
@@ -505,6 +1042,21 @@
             "type": "string",
             "format": "uuid",
             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "universityId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "facultyId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "academicYearId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
           }
         },
         "required": [
@@ -656,6 +1208,58 @@
           "success",
           "data",
           "error"
+        ],
+        "additionalProperties": false
+      },
+      "ReorderedResult": {
+        "type": "object",
+        "properties": {
+          "reordered": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "reordered"
+        ],
+        "additionalProperties": false
+      },
+      "ReorderedResultEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/ReorderedResult"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "ReorderRequest": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "minItems": 1,
+            "maxItems": 500,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          }
+        },
+        "required": [
+          "ids"
         ],
         "additionalProperties": false
       },
@@ -939,6 +1543,175 @@
         ],
         "additionalProperties": false
       },
+      "Subject": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "educationLevelId": {
+            "type": "string"
+          },
+          "universityId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "facultyId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "academicYearId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "code": {
+            "type": "string"
+          },
+          "nameAr": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "coverMediaId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "coverUrl": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "sortOrder": {
+            "type": "number"
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "educationLevelId",
+          "universityId",
+          "facultyId",
+          "academicYearId",
+          "code",
+          "nameAr",
+          "description",
+          "coverMediaId",
+          "coverUrl",
+          "sortOrder",
+          "isActive"
+        ],
+        "additionalProperties": false
+      },
+      "SubjectEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/Subject"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "SubjectList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Subject"
+        }
+      },
+      "SubjectListEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/SubjectList"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "SubjectOutline": {
+        "type": "object",
+        "properties": {
+          "subject": {
+            "$ref": "#/components/schemas/Subject"
+          },
+          "units": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UnitWithLessons"
+            }
+          },
+          "lessons": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Lesson"
+            }
+          }
+        },
+        "required": [
+          "subject",
+          "units",
+          "lessons"
+        ],
+        "additionalProperties": false
+      },
+      "SubjectOutlineEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/SubjectOutline"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
       "TokenPair": {
         "type": "object",
         "properties": {
@@ -1040,6 +1813,448 @@
           "error"
         ],
         "additionalProperties": false
+      },
+      "Unit": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "subjectId": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "titleAr": {
+            "type": "string"
+          },
+          "sortOrder": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "subjectId",
+          "code",
+          "titleAr",
+          "sortOrder"
+        ],
+        "additionalProperties": false
+      },
+      "UnitEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/Unit"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "UnitList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Unit"
+        }
+      },
+      "UnitListEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/UnitList"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "UnitWithLessons": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "subjectId": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "titleAr": {
+            "type": "string"
+          },
+          "sortOrder": {
+            "type": "number"
+          },
+          "lessons": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Lesson"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "subjectId",
+          "code",
+          "titleAr",
+          "sortOrder",
+          "lessons"
+        ],
+        "additionalProperties": false
+      },
+      "UnitWithLessonsEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/UnitWithLessons"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "University": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "nameAr": {
+            "type": "string"
+          },
+          "sortOrder": {
+            "type": "number"
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "nameAr",
+          "sortOrder",
+          "isActive"
+        ],
+        "additionalProperties": false
+      },
+      "UniversityEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/University"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "UniversityList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/University"
+        }
+      },
+      "UniversityListEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/UniversityList"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "UpdateAcademicYearRequest": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "nameAr": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "UpdateFacultyRequest": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "nameAr": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "UpdateLessonRequest": {
+        "type": "object",
+        "properties": {
+          "unitId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "code": {
+            "type": "string"
+          },
+          "titleAr": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        }
+      },
+      "UpdateLevelRequest": {
+        "type": "object",
+        "properties": {
+          "nameAr": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "sortOrder": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000000
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateProfileRequest": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 100
+          },
+          "educationLevelId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "universityId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "facultyId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "academicYearId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateSubjectRequest": {
+        "type": "object",
+        "properties": {
+          "educationLevelId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "universityId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "facultyId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "academicYearId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "code": {
+            "type": "string"
+          },
+          "nameAr": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "coverMediaId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "UpdateUnitRequest": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "titleAr": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        }
+      },
+      "UpdateUniversityRequest": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "nameAr": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        }
       },
       "VerificationRequiredResult": {
         "type": "object",
@@ -1491,6 +2706,34 @@
             }
           }
         }
+      },
+      "patch": {
+        "operationId": "updateMe",
+        "tags": [
+          "me"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProfileRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeEnvelope"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/v1/sessions": {
@@ -1632,6 +2875,248 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/MediaFileEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/universities": {
+      "get": {
+        "operationId": "listUniversities",
+        "tags": [
+          "structure"
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UniversityListEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/faculties": {
+      "get": {
+        "operationId": "listFaculties",
+        "tags": [
+          "structure"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "universityId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FacultyListEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/academic-years": {
+      "get": {
+        "operationId": "listAcademicYears",
+        "tags": [
+          "structure"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "facultyId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcademicYearListEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/subjects": {
+      "get": {
+        "operationId": "listSubjects",
+        "tags": [
+          "structure"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "levelId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "universityId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "facultyId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "academicYearId",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubjectListEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/subjects/{id}": {
+      "get": {
+        "operationId": "getSubjectOutline",
+        "tags": [
+          "structure"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubjectOutlineEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/units/{id}": {
+      "get": {
+        "operationId": "getUnit",
+        "tags": [
+          "structure"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitWithLessonsEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/lessons/{id}": {
+      "get": {
+        "operationId": "getLesson",
+        "tags": [
+          "structure"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LessonEnvelope"
                 }
               }
             }
@@ -1916,6 +3401,1068 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/MediaFileEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/levels": {
+      "get": {
+        "operationId": "adminListLevels",
+        "tags": [
+          "admin-structure"
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EducationLevelListEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/levels/{id}": {
+      "patch": {
+        "operationId": "adminUpdateLevel",
+        "tags": [
+          "admin-structure"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateLevelRequest"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EducationLevelEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/universities": {
+      "get": {
+        "operationId": "adminListUniversities",
+        "tags": [
+          "admin-structure"
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UniversityListEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "adminCreateUniversity",
+        "tags": [
+          "admin-structure"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUniversityRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UniversityEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/universities/{id}": {
+      "patch": {
+        "operationId": "adminUpdateUniversity",
+        "tags": [
+          "admin-structure"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUniversityRequest"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UniversityEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "adminDeleteUniversity",
+        "tags": [
+          "admin-structure"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeletedResultEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/universities/reorder": {
+      "put": {
+        "operationId": "adminReorderUniversitys",
+        "tags": [
+          "admin-structure"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReorderRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReorderedResultEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/faculties": {
+      "get": {
+        "operationId": "adminListFaculties",
+        "tags": [
+          "admin-structure"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "universityId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FacultyListEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "adminCreateFaculty",
+        "tags": [
+          "admin-structure"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFacultyRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FacultyEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/faculties/{id}": {
+      "patch": {
+        "operationId": "adminUpdateFaculty",
+        "tags": [
+          "admin-structure"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateFacultyRequest"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FacultyEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "adminDeleteFaculty",
+        "tags": [
+          "admin-structure"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeletedResultEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/faculties/reorder": {
+      "put": {
+        "operationId": "adminReorderFacultys",
+        "tags": [
+          "admin-structure"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReorderRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReorderedResultEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/academic-years": {
+      "get": {
+        "operationId": "adminListAcademicYears",
+        "tags": [
+          "admin-structure"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "facultyId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcademicYearListEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "adminCreateAcademicYear",
+        "tags": [
+          "admin-structure"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAcademicYearRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcademicYearEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/academic-years/{id}": {
+      "patch": {
+        "operationId": "adminUpdateAcademicYear",
+        "tags": [
+          "admin-structure"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAcademicYearRequest"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcademicYearEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "adminDeleteAcademicYear",
+        "tags": [
+          "admin-structure"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeletedResultEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/academic-years/reorder": {
+      "put": {
+        "operationId": "adminReorderAcademicYears",
+        "tags": [
+          "admin-structure"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReorderRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReorderedResultEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/subjects": {
+      "get": {
+        "operationId": "adminListSubjects",
+        "tags": [
+          "admin-structure"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "levelId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "universityId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "facultyId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "academicYearId",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubjectListEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "adminCreateSubject",
+        "tags": [
+          "admin-structure"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSubjectRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubjectEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/subjects/{id}": {
+      "patch": {
+        "operationId": "adminUpdateSubject",
+        "tags": [
+          "admin-structure"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSubjectRequest"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubjectEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "adminDeleteSubject",
+        "tags": [
+          "admin-structure"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeletedResultEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/subjects/reorder": {
+      "put": {
+        "operationId": "adminReorderSubjects",
+        "tags": [
+          "admin-structure"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReorderRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReorderedResultEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/units": {
+      "get": {
+        "operationId": "adminListUnits",
+        "tags": [
+          "admin-structure"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "subjectId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitListEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "adminCreateUnit",
+        "tags": [
+          "admin-structure"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUnitRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/units/{id}": {
+      "patch": {
+        "operationId": "adminUpdateUnit",
+        "tags": [
+          "admin-structure"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUnitRequest"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "adminDeleteUnit",
+        "tags": [
+          "admin-structure"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeletedResultEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/units/reorder": {
+      "put": {
+        "operationId": "adminReorderUnits",
+        "tags": [
+          "admin-structure"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReorderRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReorderedResultEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/lessons": {
+      "get": {
+        "operationId": "adminListLessons",
+        "tags": [
+          "admin-structure"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "subjectId",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "unitId",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LessonListEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "adminCreateLesson",
+        "tags": [
+          "admin-structure"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateLessonRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LessonEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/lessons/{id}": {
+      "patch": {
+        "operationId": "adminUpdateLesson",
+        "tags": [
+          "admin-structure"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateLessonRequest"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LessonEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "adminDeleteLesson",
+        "tags": [
+          "admin-structure"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeletedResultEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/lessons/reorder": {
+      "put": {
+        "operationId": "adminReorderLessons",
+        "tags": [
+          "admin-structure"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReorderRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReorderedResultEnvelope"
                 }
               }
             }

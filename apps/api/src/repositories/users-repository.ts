@@ -1,5 +1,5 @@
 import { and, eq } from 'drizzle-orm';
-import { accounts, educationLevels, profiles, users, type Db, type Tx } from '@plengo/db';
+import { accounts, profiles, users, type Db, type Tx } from '@plengo/db';
 
 type Conn = Db | Tx;
 
@@ -24,24 +24,47 @@ export function createUsersRepository(db: Db) {
       return row?.password ?? null;
     },
 
-    async educationLevelExists(id: string): Promise<boolean> {
-      const [row] = await db
-        .select({ id: educationLevels.id })
-        .from(educationLevels)
-        .where(eq(educationLevels.id, id))
-        .limit(1);
-      return Boolean(row);
-    },
-
-    async upsertProfile(input: { userId: string; fullName: string; educationLevelId?: string | null }) {
+    async upsertProfile(input: {
+      userId: string;
+      fullName: string;
+      educationLevelId?: string | null;
+      universityId?: string | null;
+      facultyId?: string | null;
+      academicYearId?: string | null;
+    }) {
       await db
         .insert(profiles)
         .values({
           userId: input.userId,
           fullName: input.fullName,
           educationLevelId: input.educationLevelId ?? null,
+          universityId: input.universityId ?? null,
+          facultyId: input.facultyId ?? null,
+          academicYearId: input.academicYearId ?? null,
         })
         .onConflictDoNothing();
+    },
+
+    async updateProfile(
+      userId: string,
+      fields: Partial<{
+        fullName: string;
+        educationLevelId: string;
+        universityId: string | null;
+        facultyId: string | null;
+        academicYearId: string | null;
+      }>,
+    ) {
+      await db
+        .update(profiles)
+        .set({ ...fields, updatedAt: new Date() })
+        .where(eq(profiles.userId, userId));
+      if (fields.fullName) {
+        await db
+          .update(users)
+          .set({ name: fields.fullName, updatedAt: new Date() })
+          .where(eq(users.id, userId));
+      }
     },
 
     async getMe(userId: string) {
@@ -54,6 +77,9 @@ export function createUsersRepository(db: Db) {
           name: users.name,
           fullName: profiles.fullName,
           educationLevelId: profiles.educationLevelId,
+          universityId: profiles.universityId,
+          facultyId: profiles.facultyId,
+          academicYearId: profiles.academicYearId,
         })
         .from(users)
         .leftJoin(profiles, eq(profiles.userId, users.id))
@@ -67,6 +93,9 @@ export function createUsersRepository(db: Db) {
         role: row.role,
         fullName: row.fullName ?? row.name,
         educationLevelId: row.educationLevelId ?? null,
+        universityId: row.universityId ?? null,
+        facultyId: row.facultyId ?? null,
+        academicYearId: row.academicYearId ?? null,
       };
     },
 

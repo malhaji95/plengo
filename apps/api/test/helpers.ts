@@ -157,3 +157,32 @@ export function cookieHeader(res: LightMyRequestResponse, previous = ''): string
 }
 
 export const csrfHeaders = (origin: string) => ({ origin, 'x-requested-with': 'XMLHttpRequest' });
+
+/** A fresh admin that has completed TOTP enrollment; returns its session cookie and CSRF headers. */
+export async function enrolledAdminSession(t: TestContext) {
+  const { generateSync } = await import('otplib');
+  const email = await makeAdmin(t);
+  const h = csrfHeaders(ADMIN_ORIGIN);
+  const login = await t.app.inject({
+    method: 'POST',
+    url: '/api/v1/admin/auth/login',
+    headers: h,
+    payload: { email, password: PASSWORD },
+  });
+  let cookie = cookieHeader(login);
+  const enroll = await t.app.inject({
+    method: 'POST',
+    url: '/api/v1/admin/auth/2fa/enroll',
+    headers: { cookie, ...h },
+    payload: { password: PASSWORD },
+  });
+  const secret = new URL(body<{ totpUri: string }>(enroll).data.totpUri).searchParams.get('secret')!;
+  const confirm = await t.app.inject({
+    method: 'POST',
+    url: '/api/v1/admin/auth/2fa/confirm',
+    headers: { cookie, ...h },
+    payload: { code: generateSync({ secret }) },
+  });
+  cookie = cookieHeader(confirm, cookie);
+  return { email, headers: { cookie, ...h } };
+}

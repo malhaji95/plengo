@@ -4,6 +4,7 @@ import type { Auth } from '../auth/better-auth.js';
 import { AppError } from '../lib/app-error.js';
 import type { SessionsRepository } from '../repositories/sessions-repository.js';
 import type { UsersRepository } from '../repositories/users-repository.js';
+import type { CatalogService } from './catalog-service.js';
 import type { MobileTokenService } from './mobile-token-service.js';
 
 const BETTER_AUTH_CODE_MAP: Record<string, ErrorCode> = {
@@ -58,8 +59,9 @@ export function createAuthService(deps: {
   usersRepo: UsersRepository;
   sessionsRepo: SessionsRepository;
   mobileTokens: MobileTokenService;
+  catalog: CatalogService;
 }) {
-  const { auth, usersRepo, sessionsRepo, mobileTokens } = deps;
+  const { auth, usersRepo, sessionsRepo, mobileTokens, catalog } = deps;
 
   /** Constant-ish work for unknown emails so response timing does not reveal account existence. */
   let dummyHash: Promise<string> | null = null;
@@ -94,10 +96,11 @@ export function createAuthService(deps: {
       email: string;
       password: string;
       educationLevelId?: string | undefined;
+      universityId?: string | undefined;
+      facultyId?: string | undefined;
+      academicYearId?: string | undefined;
     }) {
-      if (input.educationLevelId && !(await usersRepo.educationLevelExists(input.educationLevelId))) {
-        throw new AppError('VALIDATION_ERROR', { details: { field: 'educationLevelId' } });
-      }
+      const path = await catalog.validateRegistrationPath(input.educationLevelId, input);
       try {
         const res = await auth.api.signUpEmail({
           body: { name: input.fullName, email: input.email, password: input.password },
@@ -108,6 +111,7 @@ export function createAuthService(deps: {
           userId: res.user.id,
           fullName: input.fullName,
           educationLevelId: input.educationLevelId ?? null,
+          ...path,
         });
       } catch (err) {
         mapAuthError(err);

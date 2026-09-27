@@ -20,6 +20,8 @@ export const ERROR_MESSAGES = {
   RATE_LIMITED: 'محاولات كثيرة، حاول لاحقاً',
   VALIDATION_ERROR: 'البيانات المدخلة غير صحيحة',
   NOT_FOUND: 'العنصر غير موجود',
+  CODE_TAKEN: 'هذا الرمز مستخدم مسبقاً',
+  RESOURCE_IN_USE: 'لا يمكن الحذف لوجود عناصر مرتبطة به',
   NOT_AUTHORIZED: 'لا تملك صلاحية لهذا الإجراء',
   UNAUTHENTICATED: 'يرجى تسجيل الدخول',
   SERVER_ERROR: 'حدث خطأ، حاول لاحقاً',
