@@ -17,6 +17,35 @@ Flutter student app (Android · iOS · Web)      Next.js admin (browser)
    (Neon)          `pgboss`)            public + private buckets
 ```
 
+## Phase 4 status (access)
+
+Done:
+
+- Schema (migration 0004): `entitlements` with the two partial unique active-scope indexes,
+  `coupon_batches`, `coupons` (HMAC hash, AES-256-GCM ciphertext, last 4), `coupon_redemptions`,
+  `coupon_redemption_failures`, `promotions`, `free_access_rules`; the `free_source` enum for the
+  content tables of Phases 5–7. Every scoped table has explicit subject/track FKs and the §8.1 CHECK.
+- Redemption: the §9.4 transaction (`FOR UPDATE` on the coupon, stale-expiry cleanup, active-row lock,
+  temporary→permanent upgrade, entitlement insert before coupon consumption, 23505 on the active-scope
+  indexes → rollback + `ALREADY_ENTITLED`), failure log, §9.5 limits. Tested with 20 concurrent
+  redemptions of one code and with two different codes for the same user and scope.
+- Helpers (§8.6): `scopeOf`, `hasActiveEntitlement`, `isPromoted`, `canAccessItem`,
+  `assertCanAccessItem` and a per-request access context for lists. Subject outlines and track pages
+  carry the scope's access state; a subject entitlement does not open tracks and vice versa.
+- Admin: coupon batches (background generation with progress, CSV/XLSX export, revoke, code search,
+  failure report), students (search, entitlements, grant/extend/revoke), access settings, promotions,
+  free rules with preview. Grants, extensions, revocations, exports, batches, rules, promotions and
+  setting changes are audited.
+- Students: locked notice for both `COUPON_REDEMPTION` builds, code screen (LTR, monospace, uppercase,
+  dashes inserted, Arabic/Persian digits accepted), My access.
+- Jobs: `coupons.generate`, `access.recompute-free`, nightly `access.expire-entitlements`
+  (00:05 Asia/Damascus, reporting only).
+- Seed: 2 admins (2FA pending), 2 students with the §40 entitlements, a 10-code permanent Grade 12
+  Physics batch printed in plaintext, the two free rules and a past-dated promotion.
+
+Deferred: per-item `is_free` and locked item metadata arrive with the content tables (Phases 5–7);
+their free-content sources plug into the free-rule service (ADR-013).
+
 ## Phase 3 status (teachers)
 
 Done:
@@ -133,8 +162,8 @@ endpoints.
 
 `@fastify/rate-limit` uses its in-memory store. That is correct for the single V1 API instance;
 before running more than one API replica, switch to a shared store. Limits: login 10/15 min per
-IP+email, OTP-sending endpoints 5/hour per email, uploads 60/hour per user (coupon and report
-limits arrive with their phases).
+IP+email, OTP-sending endpoints 5/hour per email, uploads 60/hour per user. Coupon limits are
+different: they are counted from the database (ADR-013), so they already hold across replicas.
 
 ### ADR-007 — Upload pipeline
 
@@ -201,3 +230,38 @@ from Phase 1; Phase 2 adds the college hierarchy and admin CRUD.
   OpenAPI export now fails on such collisions; register those objects with an id instead.
 - Hand-written Dart code is formatted with `dart format` at 120 columns and checked in CI; generated
   code is excluded.
+
+### ADR-013 — Access and coupons
+
+- **Clock-based access.** An entitlement is active when `status='active' AND starts_at <= now AND
+(expires_at IS NULL OR expires_at > now)`, evaluated per request with the service clock. The nightly
+  job only updates the stored status. Every grant path (coupon, admin grant, extend) first expires
+  stale rows for the same user and scope inside its transaction, then relies on the partial unique
+  indexes as the final guard. Settings are read before the transaction so a transaction never waits
+  for a second pool connection while holding row locks.
+- **Date-only expiries** become 23:59:59 in `TZ_BUSINESS` (Asia/Damascus), computed with `Intl` so a
+  future DST change is handled. Clients display dates on the Damascus calendar with a fixed UTC+3
+  offset (Syria's rule since 2022) instead of shipping a time-zone database.
+- **Coupon rate limits** are counted from `coupon_redemption_failures` and `coupon_redemptions`
+  (which stores the hashed IP for this purpose): 5/min and 20/hour per user, 60/hour per IP.
+  "10 consecutive failures" means 10 failures since the user's last successful redemption; the
+  30-minute cooldown runs from the latest one, and a further failure after it starts another.
+  Rate-limited attempts are not logged as failures. Malformed codes count as `COUPON_NOT_FOUND`.
+  A code whose fixed access end date has passed answers `COUPON_EXPIRED`, as does a code before its
+  `valid_from`.
+- **Upgrade rule** applies to admin grants too: a permanent grant over an active temporary
+  entitlement supersedes it when `allowTemporaryToPermanentUpgrade` (app setting `access`, default
+  true) allows it. Extending an expired entitlement makes it active again unless another entitlement
+  for the scope is active. Superseded rows are hidden from My access.
+- **Exports** are produced by the API (`GET /admin/coupon-batches/{id}/export?format=csv|xlsx`),
+  audited, with plaintext codes decrypted only there. XLSX is written by a small in-repo writer
+  (inline strings, RTL sheet, `node:zlib`) instead of a spreadsheet dependency; CSV has a UTF-8 BOM
+  and neutralises formula prefixes. `Content-Disposition` is exposed through CORS for the file name.
+- **Free rules**: one rule per scope and content kind; a kind-specific rule overrides the scope's
+  `all` rule; no rule behaves like `manual`. The order used by `first_n_*`, `first_unit` and
+  `percentage` is: each unit in order (its unit-level items, then each of its lessons), then lessons
+  directly under the subject, then items attached to neither. Manual overrides keep their place in
+  that order but never change. Content tables register a `FreeContentSource` (list the scope's
+  published items, apply the free set); Phase 4 has none, so previews report zero items.
+- **`COUPON_REDEMPTION`** stays compile-time: the Flutter `couponRedemptionProvider` returns the
+  `--dart-define` constant and exists only so widget tests can build both variants.

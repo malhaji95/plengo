@@ -4,6 +4,7 @@
 
 import 'package:json_annotation/json_annotation.dart';
 
+import 'scope_access.dart';
 import 'subject.dart';
 import 'teacher.dart';
 import 'teacher_track.dart';
@@ -16,6 +17,7 @@ class TrackDetail {
     required this.track,
     required this.teacher,
     required this.subject,
+    required this.access,
   });
   
   factory TrackDetail.fromJson(Map<String, Object?> json) => _$TrackDetailFromJson(json);
@@ -23,6 +25,7 @@ class TrackDetail {
   final TeacherTrack track;
   final Teacher teacher;
   final Subject subject;
+  final ScopeAccess access;
 
   Map<String, Object?> toJson() => _$TrackDetailToJson(this);
 }

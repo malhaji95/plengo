@@ -90,7 +90,8 @@ export async function buildApp(app: App, c: Container): Promise<App> {
       'X-App-Version',
       'X-Request-Id',
     ],
-    exposedHeaders: ['X-Request-Id'],
+    // Content-Disposition carries export file names (coupon batches, §9.6).
+    exposedHeaders: ['X-Request-Id', 'Content-Disposition'],
   });
   await app.register(cookie);
   // In-memory limits suit the single V1 API instance; see ADR-006 before scaling horizontally.

@@ -7,6 +7,7 @@ import '../../app/router.dart';
 import '../../core/api/generated/export.dart';
 import '../../shared/widgets/async_view.dart';
 import '../../shared/widgets/network_avatar.dart';
+import '../access/access_banner.dart';
 import 'catalog_providers.dart';
 
 /// A subject's outline: optional units with their lessons, then lessons directly under the subject.
@@ -49,6 +50,7 @@ class _OutlineView extends StatelessWidget {
               Text(outline.subject.description!, style: text.bodyMedium),
               const SizedBox(height: 16),
             ],
+            ScopeAccessBanner(access: outline.access),
             if (empty) const EmptyState('محتوى هذه المادة قيد الإعداد', icon: Icons.hourglass_empty),
             for (final (i, unit) in outline.units.indexed)
               Card(
@@ -88,7 +90,17 @@ class _OutlineView extends StatelessWidget {
                     leading: NetworkAvatar(url: track.teacherPhotoUrl, name: track.teacherNameAr),
                     title: Text(track.titleAr),
                     subtitle: Text(track.teacherNameAr),
-                    trailing: const Icon(Icons.chevron_left),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          track.hasAccess ? Icons.lock_open : Icons.lock_outline,
+                          size: 18,
+                          semanticLabel: track.hasAccess ? 'متاح' : 'مقفل',
+                        ),
+                        const Icon(Icons.chevron_left),
+                      ],
+                    ),
                     onTap: () => context.go('${Routes.tracks}/${track.id}'),
                   ),
                 ),

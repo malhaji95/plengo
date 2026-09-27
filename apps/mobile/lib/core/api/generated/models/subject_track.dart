@@ -16,6 +16,7 @@ class SubjectTrack {
     required this.titleAr,
     required this.description,
     required this.coverUrl,
+    required this.hasAccess,
   });
   
   factory SubjectTrack.fromJson(Map<String, Object?> json) => _$SubjectTrackFromJson(json);
@@ -30,6 +31,7 @@ class SubjectTrack {
   final String? description;
   @JsonKey(includeIfNull: true)
   final String? coverUrl;
+  final bool hasAccess;
 
   Map<String, Object?> toJson() => _$SubjectTrackToJson(this);
 }

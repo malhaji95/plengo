@@ -102,6 +102,7 @@ void main() {
     await tester.tap(find.text('حسابي').last);
     await tester.pumpAndSettle();
     expect(find.text('سارة أحمد'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('تسجيل الخروج'), 100);
     await tester.tap(find.text('تسجيل الخروج'));
     await tester.pumpAndSettle();
     expect(find.byType(LoginScreen), findsOneWidget);

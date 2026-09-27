@@ -127,8 +127,12 @@ void main() {
         when(() => t.teachers()).thenAnswer((_) async => [teacher()]);
         when(() => t.profile('t1')).thenAnswer((_) async => profile());
         when(() => t.track('tr1')).thenAnswer(
-          (_) async =>
-              TrackDetail(track: profile().tracks.first, teacher: teacher(), subject: subject('p', 'الفيزياء')),
+          (_) async => TrackDetail(
+            track: profile().tracks.first,
+            teacher: teacher(),
+            subject: subject('p', 'الفيزياء'),
+            access: noAccess,
+          ),
         );
       },
     );

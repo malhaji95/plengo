@@ -6,11 +6,13 @@ import 'package:mocktail/mocktail.dart';
 import 'package:plengo/app/app.dart';
 import 'package:plengo/app/providers.dart';
 import 'package:plengo/core/api/generated/export.dart';
+import 'package:plengo/core/access/access_repository.dart';
 import 'package:plengo/core/auth/auth_repository.dart';
 import 'package:plengo/core/auth/token_store.dart';
 import 'package:plengo/core/catalog/catalog_repository.dart';
 import 'package:plengo/core/catalog/teacher_repository.dart';
 import 'package:plengo/core/db/app_database.dart';
+import 'package:plengo/features/access/access_providers.dart';
 import 'package:plengo/features/subjects/catalog_providers.dart';
 import 'package:plengo/features/teachers/teacher_providers.dart';
 
@@ -19,6 +21,17 @@ class MockAuthRepository extends Mock implements AuthRepository {}
 class MockCatalogRepository extends Mock implements CatalogRepository {}
 
 class MockTeacherRepository extends Mock implements TeacherRepository {}
+
+class MockAccessRepository extends Mock implements AccessRepository {}
+
+const noAccess = ScopeAccess(
+  hasAccess: false,
+  reason: null,
+  isPermanent: false,
+  entitlementExpiresAt: null,
+  promotionTitleAr: null,
+  promotionEndsAt: null,
+);
 
 const grade9 = EducationLevel(id: 'l9', code: 'grade-9', nameAr: 'الصف التاسع', sortOrder: 1, isCollege: false);
 const grade12 = EducationLevel(id: 'l12', code: 'grade-12', nameAr: 'البكالوريا', sortOrder: 2, isCollege: false);
@@ -58,6 +71,7 @@ Future<
     MockAuthRepository repo,
     MockCatalogRepository catalog,
     MockTeacherRepository teachers,
+    MockAccessRepository access,
     ProviderContainer container,
   })
 >
@@ -67,7 +81,9 @@ pumpApp(
   void Function(MockAuthRepository repo)? arrange,
   void Function(MockCatalogRepository catalog)? arrangeCatalog,
   void Function(MockTeacherRepository teachers)? arrangeTeachers,
+  void Function(MockAccessRepository access)? arrangeAccess,
   RemoteConfig? config,
+  bool couponRedemption = true,
 }) async {
   registerFallbacks();
   final repo = MockAuthRepository();
@@ -85,6 +101,10 @@ pumpApp(
   when(() => teachers.followed()).thenAnswer((_) async => const []);
   arrangeTeachers?.call(teachers);
 
+  final access = MockAccessRepository();
+  when(() => access.myEntitlements()).thenAnswer((_) async => const []);
+  arrangeAccess?.call(access);
+
   final db = AppDatabase(NativeDatabase.memory());
   addTearDown(db.close);
   final container = ProviderContainer(
@@ -95,6 +115,8 @@ pumpApp(
       authRepositoryProvider.overrideWithValue(repo),
       catalogRepositoryProvider.overrideWithValue(catalog),
       teacherRepositoryProvider.overrideWithValue(teachers),
+      accessRepositoryProvider.overrideWithValue(access),
+      couponRedemptionProvider.overrideWithValue(couponRedemption),
       remoteConfigProvider.overrideWith((ref) async => config),
     ],
   );
@@ -102,7 +124,7 @@ pumpApp(
 
   await tester.pumpWidget(UncontrolledProviderScope(container: container, child: const PlengoApp()));
   await tester.pumpAndSettle();
-  return (repo: repo, catalog: catalog, teachers: teachers, container: container);
+  return (repo: repo, catalog: catalog, teachers: teachers, access: access, container: container);
 }
 
 void registerFallbacks() {

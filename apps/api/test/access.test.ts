@@ -739,10 +739,12 @@ describe('free rules (§8.4)', () => {
 
     const logs = await t.c.db.select().from(auditLogs).where(eq(auditLogs.resourceId, saved.data.id));
     expect(logs.map((l) => l.action)).toEqual(['free_rule.changed', 'free_rule.changed']);
-    expect(logs[1]!.metadata).toMatchObject({
-      preview: { freeCount: 0, paidCount: 0 },
-      to: { ruleValue: 8 },
-    });
+    expect(logs.map((l) => l.metadata)).toContainEqual(
+      expect.objectContaining({
+        preview: { freeCount: 0, paidCount: 0 },
+        to: { ruleType: 'first_n_items', ruleValue: 8 },
+      }),
+    );
 
     expect(
       (await adminCall('PUT', '/free-rules', { ...payload, ruleType: 'manual', ruleValue: 3 })).status,

@@ -2,6 +2,9 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/access/access_providers.dart';
+import '../features/access/my_access_screen.dart';
+import '../features/access/redeem_screen.dart';
 import '../features/account/account_screen.dart';
 import '../features/account/placement_screen.dart';
 import '../features/account/sessions_screen.dart';
@@ -19,7 +22,6 @@ import '../features/teachers/teacher_screen.dart';
 import '../features/teachers/teachers_screen.dart';
 import '../features/teachers/track_screen.dart';
 import '../features/update/force_update_screen.dart';
-import 'flags.dart';
 import 'providers.dart';
 
 abstract final class Routes {
@@ -38,6 +40,7 @@ abstract final class Routes {
   static const sessions = '/account/sessions';
   static const placement = '/account/placement';
   static const following = '/account/following';
+  static const myAccess = '/account/access';
   static const teachers = '/teachers';
   static const tracks = '/tracks';
   static const redeem = '/redeem';
@@ -57,9 +60,9 @@ class _RouterRefresh extends ChangeNotifier {
   }
 }
 
-/// `couponRedemption` defaults to the compile-time flag. When false the redeem route is not
+/// `couponRedemption` is the compile-time flag (see [couponRedemptionProvider]). When false the redeem route is not
 /// registered at all (spec §8.7, §37.5).
-GoRouter buildRouter(Ref ref, {bool couponRedemption = AppFlags.couponRedemption}) {
+GoRouter buildRouter(Ref ref, {required bool couponRedemption}) {
   // Web: pushed screens (e.g. register) show their own URL too (spec §24 deep links).
   GoRouter.optionURLReflectsImperativeAPIs = true;
   return GoRouter(
@@ -169,23 +172,20 @@ GoRouter buildRouter(Ref ref, {bool couponRedemption = AppFlags.couponRedemption
                   GoRoute(path: 'sessions', builder: (_, _) => const SessionsScreen()),
                   GoRoute(path: 'placement', builder: (_, _) => const PlacementScreen()),
                   GoRoute(path: 'following', builder: (_, _) => const FollowedTeachersScreen()),
+                  GoRoute(path: 'access', builder: (_, _) => const MyAccessScreen()),
                 ],
               ),
             ],
           ),
         ],
       ),
-      if (couponRedemption)
-        GoRoute(
-          path: Routes.redeem,
-          builder: (_, _) => const PlaceholderTab(title: 'إدخال كود التفعيل'),
-        ),
+      if (couponRedemption) GoRoute(path: Routes.redeem, builder: (_, _) => const RedeemScreen()),
     ],
   );
 }
 
 final routerProvider = Provider<GoRouter>((ref) {
-  final router = buildRouter(ref);
+  final router = buildRouter(ref, couponRedemption: ref.read(couponRedemptionProvider));
   ref.onDispose(router.dispose);
   return router;
 });

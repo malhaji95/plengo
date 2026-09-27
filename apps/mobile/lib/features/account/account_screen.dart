@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../app/providers.dart';
 import '../../app/router.dart';
+import '../access/access_providers.dart';
 import '../teachers/teacher_providers.dart';
 
 class AccountScreen extends ConsumerWidget {
@@ -54,6 +55,19 @@ class AccountScreen extends ConsumerWidget {
             ),
           ),
           const Divider(height: 32),
+          ListTile(
+            leading: const Icon(Icons.key_outlined),
+            title: const Text('صلاحيات الوصول'),
+            trailing: const Icon(Icons.chevron_left),
+            onTap: () => context.go(Routes.myAccess),
+          ),
+          if (ref.watch(couponRedemptionProvider))
+            ListTile(
+              leading: const Icon(Icons.vpn_key_outlined),
+              title: const Text('إدخال كود التفعيل'),
+              trailing: const Icon(Icons.chevron_left),
+              onTap: () => context.push(Routes.redeem),
+            ),
           ListTile(
             leading: const Icon(Icons.school_outlined),
             title: const Text('المرحلة التعليمية'),

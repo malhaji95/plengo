@@ -14,6 +14,7 @@ SubjectTrack _$SubjectTrackFromJson(Map<String, dynamic> json) => SubjectTrack(
   titleAr: json['titleAr'] as String,
   description: json['description'] as String?,
   coverUrl: json['coverUrl'] as String?,
+  hasAccess: json['hasAccess'] as bool,
 );
 
 Map<String, dynamic> _$SubjectTrackToJson(SubjectTrack instance) =>
@@ -25,4 +26,5 @@ Map<String, dynamic> _$SubjectTrackToJson(SubjectTrack instance) =>
       'titleAr': instance.titleAr,
       'description': instance.description,
       'coverUrl': instance.coverUrl,
+      'hasAccess': instance.hasAccess,
     };

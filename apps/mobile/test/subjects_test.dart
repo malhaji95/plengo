@@ -88,6 +88,7 @@ void main() {
               ),
             ],
             lessons: [lesson('l0', 'مراجعة عامة')],
+            access: noAccess,
             tracks: const [],
           ),
         );

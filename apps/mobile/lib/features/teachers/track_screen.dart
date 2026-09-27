@@ -5,10 +5,11 @@ import 'package:go_router/go_router.dart';
 import '../../app/router.dart';
 import '../../shared/widgets/async_view.dart';
 import '../../shared/widgets/network_avatar.dart';
+import '../access/access_banner.dart';
 import 'teacher_providers.dart';
 
 /// A teacher track page (spec §7.2, §23.2 #12). Its questions, decks and quizzes arrive with
-/// Phases 5–7; access is decided per track from Phase 4.
+/// Phases 5–7. A track is its own access scope: a subject entitlement does not open it (§8.1).
 class TrackScreen extends ConsumerWidget {
   const TrackScreen({super.key, required this.trackId});
 
@@ -35,6 +36,7 @@ class TrackScreen extends ConsumerWidget {
                   Text(d.track.description!, style: text.bodyMedium),
                 ],
                 const SizedBox(height: 16),
+                ScopeAccessBanner(access: d.access),
                 Card(
                   margin: const EdgeInsets.only(bottom: 8),
                   child: ListTile(

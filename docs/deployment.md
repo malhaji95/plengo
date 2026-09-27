@@ -11,7 +11,7 @@ cp apps/api/.env.example apps/api/.env   # adjust DATABASE_URL if needed
 set -a; . apps/api/.env; set +a
 pnpm --filter @plengo/api migrate:dev
 ADMIN_PASSWORD='choose-one' pnpm --filter @plengo/api admin:create --email admin@example.com --name "المشرف"
-pnpm --filter @plengo/api seed           # optional: §40 levels/subjects/units/lessons for development
+pnpm --filter @plengo/api seed           # development only: §40 structure, teachers, seed accounts, coupons
 pnpm --filter @plengo/api dev            # http://localhost:4000, OTP emails are printed to the log
 NEXT_PUBLIC_API_BASE_URL=http://localhost:4000 pnpm --filter @plengo/admin dev   # http://localhost:3000
 cd apps/mobile && flutter run -d chrome --web-port 3001 --dart-define=API_BASE_URL=http://localhost:4000
@@ -36,6 +36,8 @@ replicas if job handling should stay on one instance.
 
 Production requires `APP_ENV=production`, `STORAGE_DRIVER=r2` and `EMAIL_PROVIDER=resend`; the API
 refuses to start otherwise. Secrets: `BETTER_AUTH_SECRET`, `MOBILE_ACCESS_JWT_SECRET`,
-`MOBILE_REFRESH_TOKEN_PEPPER` (each ≥ 32 random characters), R2 keys, email API key.
+`MOBILE_REFRESH_TOKEN_PEPPER`, `COUPON_HMAC_SECRET` (each ≥ 32 random characters),
+`COUPON_ENCRYPTION_KEY` (32 random bytes, base64: `openssl rand -base64 32`), R2 keys, email API key.
+Never rotate the coupon secrets on a live system: existing codes stop matching and exports fail.
 
 Backups and the restore drill are Phase 13 (spec §35).

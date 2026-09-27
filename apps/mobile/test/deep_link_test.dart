@@ -13,8 +13,13 @@ void main() {
       tester,
       signedInAs: testMe,
       arrangeCatalog: (c) => when(() => c.outline('p')).thenAnswer(
-        (_) async =>
-            SubjectOutline(subject: subject('p', 'الفيزياء'), units: const [], lessons: const [], tracks: const []),
+        (_) async => SubjectOutline(
+          subject: subject('p', 'الفيزياء'),
+          units: const [],
+          lessons: const [],
+          tracks: const [],
+          access: noAccess,
+        ),
       ),
     );
     // Simulate the browser opening /subjects/p while the session is still being restored.
