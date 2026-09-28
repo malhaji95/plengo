@@ -243,3 +243,35 @@ describe('account deletion (§33)', () => {
     expect(forbidden.statusCode).toBe(403);
   });
 });
+
+describe('store review account', () => {
+  it('is a verified student with permanent access to the listed subjects, granted by an admin', async () => {
+    const { createReviewAccount } = await import('../src/services/review-account.js');
+    const [adminRow] = await t.c.db.select().from(users).where(eq(users.role, 'admin')).limit(1);
+    const code = `rev-${randomUUID().slice(0, 8)}`;
+    await t.app.inject({
+      method: 'POST',
+      url: '/api/v1/admin/subjects',
+      headers: admin,
+      payload: { educationLevelId: await levelId(t), code, nameAr: 'مادة المراجعة' },
+    });
+    const email = `review-${randomUUID().slice(0, 6)}@example.com`;
+    const input = {
+      email,
+      name: 'حساب المراجعة',
+      password: 'review-password-1',
+      levelCode: 'grade-12',
+      subjectCodes: [code],
+      grantedByAdminEmail: adminRow!.email,
+    };
+    const created = await createReviewAccount(t.c, input);
+    expect(created.subjects).toEqual([code]);
+    expect((await mobileLogin(t, email, 'review-password-1')).statusCode).toBe(200);
+    const ents = await t.c.db.select().from(entitlements).where(eq(entitlements.userId, created.userId));
+    expect(ents).toMatchObject([{ isPermanent: true, status: 'active', grantedByAdminId: adminRow!.id }]);
+    await expect(createReviewAccount(t.c, input)).rejects.toThrow('already exists');
+    await expect(
+      createReviewAccount(t.c, { ...input, email: `x${email}`, subjectCodes: ['nope'] }),
+    ).rejects.toThrow('unknown subjects');
+  });
+});

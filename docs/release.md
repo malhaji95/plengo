@@ -1,0 +1,139 @@
+# Release (Phase 13)
+
+Everything that can be built and verified in CI is done in the repository. This guide covers what
+needs the owner's machines, accounts and devices: signing, store submissions and the physical-device
+smoke test (spec §39 Phase 13).
+
+## 1. Before the first release
+
+- **Domain** (§44): replace `<domain>` everywhere: API `BETTER_AUTH_URL`, `APP_WEB_ORIGIN`,
+  `ADMIN_ORIGIN`, the web deploy variables, `[privacy@domain]`/`[support@domain]` and the operator
+  name in `apps/mobile/assets/legal/*.md` (then `node tool/legal_html.mjs`). Have the privacy
+  policy and terms reviewed by someone qualified for the operator's jurisdiction.
+- **Branding** (§44): app name, icon, splash, colours and font are placeholders (`lib/app/theme.dart`,
+  `android/app/src/main/res`, `ios/Runner/Assets.xcassets`, `web/icons`, `web/manifest.json`).
+- **Application IDs**: `com.plengo.plengo` (Android `applicationId`, iOS bundle id) is permanent after
+  the first upload — change it first if needed.
+- **Production environment**: see `deployment.md` (secrets, R2 CORS, HSTS, backups workflow).
+- **Admins**: `pnpm --filter @plengo/api admin:create --email … --name …` for each admin; each
+  enrols in TOTP at first login.
+
+## 2. Push notifications (FCM client)
+
+The API sends through FCM HTTP v1 (`FCM_*` variables). The app registers device tokens through the
+`PushMessaging` interface (`lib/core/home/push_messaging.dart`); builds without Firebase use
+`NoPushMessaging` and rely on the in-app inbox. Wiring the device side needs the Firebase project and
+real devices, so it is done here:
+
+1. Create the Firebase project; add the Android app (`com.plengo.plengo`) and the iOS app; upload the
+   APNs key in Firebase (Apple Developer → Keys).
+2. `flutter pub add firebase_core firebase_messaging`; run `flutterfire configure` to generate
+   `firebase_options.dart`.
+3. Implement `FcmPushMessaging implements PushMessaging` (`token()` = `requestPermission()` then
+   `getToken()`; `tokenRefreshes` = `onTokenRefresh`) and override `pushMessagingProvider` in
+   `main.dart` on Android and iOS only (web push stays off: the web CSP allows no Google scripts).
+4. iOS: enable Push Notifications and Background Modes → Remote notifications in Xcode.
+5. Test on devices: send an announcement from the admin to your test account (the preview shows
+   push consent), check the notification, then log out and confirm the token is revoked (no push).
+
+## 3. Other device-bound work (from Phase 9)
+
+- **Free-space warning** before downloads (§22.2: warn if free space < pack size + 500 MB): add a
+  plugin reporting free disk space and check it in `OfflineController` before `download()`.
+- **OS background downloads**: downloads currently continue while the app is open (and resume at the
+  next start). True background transfers need `background_downloader` or WorkManager/URLSession
+  background sessions and device testing.
+- **Android size** (§34.2 ≤ 30 MB): check the AAB's download size in the Play Console.
+
+## 4. Android build
+
+```bash
+keytool -genkey -v -keystore plengo-upload.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+cp apps/mobile/android/key.properties.example apps/mobile/android/key.properties   # fill it in
+cd apps/mobile
+flutter build appbundle --release \
+  --dart-define=API_BASE_URL=https://api.<domain> \
+  --dart-define=COUPON_REDEMPTION=true \
+  --dart-define=SENTRY_DSN_PUBLIC=<public dsn>
+```
+
+Keep the keystore and passwords in a password manager; enrol in Play App Signing. Bump
+`version:` in `pubspec.yaml` (name+build) for every upload.
+
+## 5. iOS build
+
+```bash
+cd apps/mobile
+flutter build ipa --release \
+  --dart-define=API_BASE_URL=https://api.<domain> \
+  --dart-define=COUPON_REDEMPTION=true \
+  --dart-define=SENTRY_DSN_PUBLIC=<public dsn>
+```
+
+Signing through Xcode (automatic signing with the team). **Coupon redemption on iOS** (§44): submit
+with `COUPON_REDEMPTION=true` and the review notes below. If App Review rejects it (guideline 3.1.1),
+rebuild with `COUPON_REDEMPTION=false`: the redeem route and button disappear entirely, and access
+comes from coupons redeemed on Android or the web, or from admin grants. The iOS app must never link
+to or mention web redemption (§0).
+
+## 6. Demo account for store review
+
+```bash
+REVIEW_PASSWORD='<strong password>' pnpm --filter @plengo/api review:create \
+  --email review@<domain> --level grade-12 --subjects g12-physics,g12-math \
+  --granted-by <your admin email>
+```
+
+It creates a verified student with permanent access to those subjects (audited as
+`review_account.created`). Delete it after approval from the admin (student page → حذف الحساب).
+
+### Review notes (App Store Connect / Play Console)
+
+> Plengo is an Arabic study app for school and university students (practice questions, flashcards
+> with spaced repetition, quizzes). Sign in with the demo account: review@<domain> / <password>.
+> The account already has access to Grade 12 Physics and Mathematics.
+> Access to premium subjects is activated with printed codes sold by bookshops and teachers in
+> Syria, outside the app; the app has no purchases and no links to any payment. The "تفعيل كود"
+> screen only enters such a code.
+> Account deletion: حسابي → حذف الحساب (password confirmation). Privacy policy:
+> https://app.<domain>/privacy
+
+## 7. Store listing
+
+- **Name**: بلينغو — مراجعة وتدريب (placeholder until branding)
+- **Category**: Education. **Age rating**: 4+ / Everyone (no user-to-user communication, no ads).
+- **Short description**: أسئلة وبطاقات مراجعة واختبارات تجريبية لطلاب المدارس والجامعات، تعمل دون اتصال.
+- **Description**:
+  تدرّب على أسئلة الاختيار من متعدد والصح والخطأ والأسئلة الكتابية مع تصحيح فوري يفهم الكتابة العربية.
+  راجع بالبطاقات التعليمية بنظام التكرار المتباعد، وأنشئ بطاقاتك الخاصة بالنص والصور.
+  اختبر نفسك باختبارات تجريبية مؤقتة، وراجع أخطاءك حتى تتقنها، وتابع إحصاءاتك وهدفك اليومي.
+  حمّل موادك واستخدمها دون اتصال بالإنترنت.
+- **Privacy URL**: https://app.<domain>/privacy — **Terms**: https://app.<domain>/terms
+- **Screenshots**: Home, a question with feedback, card study, exam results, offline downloads
+  (Arabic UI, phone and tablet sizes).
+- **Data safety (Play) / App Privacy (Apple)** — from `assets/legal/privacy.md`: collected — name,
+  email, user content (answers, cards, images), app activity, device identifiers limited to the push
+  token; linked to the user; not used for tracking; not sold; encrypted in transit; deletion
+  available in the app.
+
+## 8. Physical-device smoke test (owner-run, §39)
+
+Run on one Android phone and one iPhone with the release builds against staging:
+
+1. Install; the Arabic RTL login screen appears; dark mode and font size follow settings.
+2. Register → receive the OTP email → verify → choose the level → Home shows the greeting.
+3. Log out and in again; kill and reopen the app (session restored without login).
+4. Redeem a staging coupon (Android; iOS only if `COUPON_REDEMPTION=true`); My Access shows it.
+5. Answer free and premium questions; a written answer with different alef/hamza spelling is correct.
+6. Study a deck: flip, rate, undo; due counts update on Home.
+7. Download a unit; enable airplane mode; study cards, take a practice quiz and an exam offline;
+   reconnect → the exam submits and statistics update.
+8. Wait past the lease on a test account whose entitlement was revoked → premium pack content is
+   removed on the next online start.
+9. Create a student deck with a camera photo; it syncs to a second device.
+10. Report a problem on a question; resolve it in the admin with "notify" → the inbox shows it.
+11. Notifications: learning and promotions switches; a due reminder at the chosen hour (after FCM).
+12. Delete the account from the app → back at login; the old password no longer works.
+13. Web: the same flows at `app.<staging-domain>` in Chrome and Safari; reload offline after a visit.
+
+Record the device models, OS versions and results in the release notes.

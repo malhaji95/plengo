@@ -74,4 +74,43 @@ most one reminder per student per business day.
 
 `media-public`: `GET` from any origin (`"AllowedOrigins": ["*"], "AllowedMethods": ["GET"]`).
 
-Backups and the restore drill are Phase 13 (spec §35).
+## Backups and restore (spec §35)
+
+Two independent layers:
+
+1. **Neon point-in-time recovery** (enable it on the production project; keep the history window at
+   ≥ 7 days). First choice for mistakes found within the window: restore to a new branch at a
+   timestamp just before the incident, check it, then point `DATABASE_URL` at it.
+2. **Daily logical dumps outside Neon** — `ops/backup/db-backup.sh`, run by
+   `.github/workflows/backups.yml` at 04:15 Damascus: `pg_dump` custom format, verified with
+   `pg_restore --list`, uploaded with rclone to storage in another account/provider, and pruned after
+   35 days (the privacy policy's promise for deleted accounts). Media buckets are copied weekly with
+   `ops/backup/media-sync.sh` (`rclone sync`, so deletions propagate too).
+
+Setup: the workflow's `production` environment needs the secrets `DATABASE_URL` (a read-only role is
+enough) and `RCLONE_CONFIG` (an rclone.conf defining the `r2` source and `backup` destination), and
+the variables `BACKUP_REMOTE` and `MEDIA_BACKUP`.
+
+### Restore procedure
+
+1. Create an empty database (a new Neon project or branch with no tables).
+2. `DUMP=latest BACKUP_REMOTE=backup:plengo-db RESTORE_URL=postgres://…/empty ops/backup/restore-drill.sh`
+   restores the newest dump and checks it: migrations recorded, core tables readable, the three
+   education levels present, no orphaned entitlements or options. It refuses a non-empty target.
+   `DUMP=backup:plengo-db/plengo-<stamp>.dump` picks a specific day.
+3. Run the migrator against it (`node dist/scripts/migrate.js`): it applies only migrations newer
+   than the dump.
+4. Point the API's `DATABASE_URL` at it and restart. pg-boss recreates its schema if missing; queued
+   jobs from after the dump are lost, and the next schedules run normally.
+5. Media: if objects were lost, `rclone sync backup:plengo-media/<bucket> r2:<bucket>` in the other
+   direction. Database rows reference objects by key, so a database restore alone needs no media
+   step.
+
+### Drill
+
+The workflow restores the newest dump into a throwaway Postgres on the first of every month; a
+failure fails the run. Run it by hand before risky migrations (`workflow_dispatch`, task `drill`).
+
+Local drill, 2026-09-28 (seeded development database): dump 1.1 MB, restored and checked in 2 s —
+15/15 migrations, 20 users, 7,210 coupons, 156 audit entries; the migrator then found nothing to
+apply, and a second run against the now non-empty database was refused.

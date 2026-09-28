@@ -15,4 +15,9 @@ Local setup: [`docs/deployment.md`](docs/deployment.md).
 
 ## Status
 
-Phases 1 (Foundation), 2 (Education structure), 3 (Teachers), 4 (Access), 5 (Questions), 6 (Flashcards) and 7 (Learning) — see `docs/architecture.md`.
+All thirteen phases of spec §39 are built and tested in the repository — decisions in
+`docs/architecture.md` (ADR-001 to ADR-023). What remains needs the owner's accounts, machines and
+devices (store signing and submission, the FCM client, the physical-device smoke test):
+see [`docs/release.md`](docs/release.md). Also: [`docs/web.md`](docs/web.md) (student web and its
+measurements), [`docs/performance.md`](docs/performance.md) (load test),
+[`docs/security-review.md`](docs/security-review.md).

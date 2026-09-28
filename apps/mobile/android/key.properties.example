@@ -1,0 +1,5 @@
+# Copy to key.properties (git-ignored) on the release machine; see docs/release.md.
+storeFile=/secure/path/plengo-upload.jks
+storePassword=
+keyAlias=upload
+keyPassword=

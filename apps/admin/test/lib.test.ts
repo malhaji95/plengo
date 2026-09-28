@@ -85,3 +85,24 @@ describe('navigation (§26.1)', () => {
     }
   });
 });
+
+describe('admin security headers (§31)', () => {
+  it('in production: HSTS, no framing and a restrictive CSP', async () => {
+    const env = process.env as Record<string, string | undefined>;
+    const previous = env.NODE_ENV;
+    env.NODE_ENV = 'production';
+    env.NEXT_PUBLIC_API_BASE_URL = 'https://api.example.com';
+    try {
+      const { default: config } = await import('../next.config');
+      const [rule] = await config.headers!();
+      const h = Object.fromEntries(rule!.headers.map((x) => [x.key, x.value]));
+      expect(h['Strict-Transport-Security']).toContain('max-age=31536000');
+      expect(h['X-Frame-Options']).toBe('DENY');
+      expect(h['Content-Security-Policy']).toContain("frame-ancestors 'none'");
+      expect(h['Content-Security-Policy']).toContain("object-src 'none'");
+      expect(h['Content-Security-Policy']).toContain('https://api.example.com');
+    } finally {
+      env.NODE_ENV = previous;
+    }
+  });
+});

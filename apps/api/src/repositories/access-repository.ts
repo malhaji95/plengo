@@ -81,6 +81,9 @@ export type StudentRow = {
   createdAt: Date;
 };
 
+/** `%term%` with the user's own wildcards taken literally. */
+const likeContains = (term: string) => `%${term.replace(/[\\%_]/g, (c) => `\\${c}`)}%`;
+
 export function createAccessRepository(db: Db) {
   return {
     /** Display names for scopes; unknown or deleted scopes are simply missing from the map. */
@@ -252,8 +255,8 @@ export function createAccessRepository(db: Db) {
             ne(users.status, 'deleted'),
             term
               ? or(
-                  ilike(users.email, `%${term}%`),
-                  ilike(profiles.fullName, `%${term}%`),
+                  ilike(users.email, likeContains(term)),
+                  ilike(profiles.fullName, likeContains(term)),
                   sql`${users.id}::text = ${term}`,
                 )
               : undefined,

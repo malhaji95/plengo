@@ -622,3 +622,25 @@ from Phase 1; Phase 2 adds the college hierarchy and admin CRUD.
 - **Measurement.** Budget in CI (brotli first-load set ≤ 4 MB) and a reproducible throttled
   measurement in headless Chromium over the DevTools protocol, with no npm dependencies. The skwasm
   build was evaluated and rejected: same bytes, and the wasm module loads after its JS loader.
+
+### ADR-023 — Hardening and release (Phase 13)
+
+- **Account deletion keeps a tombstone.** §33 says to anonymise learning rows by nulling `user_id`.
+  Every learning table references users with `NOT NULL` and cascade rules that the rest of the code
+  relies on, so the user row itself is anonymised instead: status `deleted`, placeholder name, an
+  undeliverable unique email, no avatar, credentials and sessions deleted. Attempts, reviews,
+  statistics and coupon redemptions keep pointing at a row that identifies nobody, which meets the
+  privacy goal and keeps aggregates and consumed codes intact. Tombstones are hidden from admin lists
+  and search and cannot receive grants; the address can register again.
+- **Backups** are a daily `pg_dump` to storage outside Neon (35-day retention, matching the privacy
+  policy), weekly media `rclone sync`, and a monthly automated restore drill into a throwaway
+  Postgres with integrity checks — on top of Neon point-in-time recovery.
+- **Load testing** runs the real app in-process against a scratch database, with an open-loop mode
+  for the "nominal load" of §34.1 and a closed-loop capacity mode; it found and fixed serial queries
+  in Home.
+- **Security review** is recorded in `security-review.md` with the test behind each claim; this phase
+  added the HSTS and error-reporting tests deferred from the audit, admin CSP/clickjacking headers and
+  escaped `ILIKE` input.
+- **Device-bound work** (FCM client, free-space check, OS background downloads, signing, store
+  submission, the physical-device smoke test) is specified in `release.md` rather than guessed at:
+  none of it can be compiled or run in the cloud container.

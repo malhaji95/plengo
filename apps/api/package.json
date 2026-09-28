@@ -13,7 +13,9 @@
     "admin:create": "node --conditions=@plengo/source --import tsx src/scripts/create-admin.ts",
     "migrate": "node dist/scripts/migrate.js",
     "migrate:dev": "node --conditions=@plengo/source --import tsx src/scripts/migrate.ts",
-    "seed": "node --conditions=@plengo/source --import tsx src/scripts/seed.ts"
+    "seed": "node --conditions=@plengo/source --import tsx src/scripts/seed.ts",
+    "load-test": "node --conditions=@plengo/source --import tsx src/scripts/load-test.ts",
+    "review:create": "node --conditions=@plengo/source --import tsx src/scripts/create-review-account.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1141.0",

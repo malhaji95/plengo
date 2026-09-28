@@ -151,21 +151,37 @@ export function createHomeService(deps: {
     };
   }
 
+  /** Subjects of a level with free content, and how much (questions, decks and quizzes). */
+  async function freeSubjectsOf(levelId: string) {
+    const list = await catalog.subjects({ levelId });
+    const counted = await Promise.all(
+      list.map(async (s) => {
+        const scope = { scopeType: 'subject' as const, subjectId: s.id, teacherTrackId: null };
+        const free = (await Promise.all(deps.counts.map((c) => c(scope)))).reduce((n, c) => n + c.free, 0);
+        return { subjectId: s.id, nameAr: s.nameAr, freeCount: free };
+      }),
+    );
+    return counted.filter((s) => s.freeCount > 0);
+  }
+
   return {
     async home(userId: string) {
-      const me = await catalog.me(userId);
-      const profile = await repo.profile(userId);
+      const [me, profile] = await Promise.all([catalog.me(userId), repo.profile(userId)]);
       const at = now();
       const levelId = me.educationLevelId;
-      const [countdown, bannerRows, unread, resume, owned, followed, mistakes] = await Promise.all([
-        levelId ? repo.nextCountdown(levelId, damascusToday(at)) : Promise.resolve(null),
-        repo.liveBanners(levelId, at),
-        notifications.unreadCount(userId),
-        learning.resume(userId, 5),
-        access.myEntitlements(userId),
-        teachers.followedTeachers(userId),
-        learning.mistakeCounts(userId),
-      ]);
+      // Independent reads run together: Home is the most requested screen (§34.1, p95 ≤ 500 ms).
+      const [countdown, bannerRows, unread, resume, owned, followed, mistakes, todayWork, freeSubjects] =
+        await Promise.all([
+          levelId ? repo.nextCountdown(levelId, damascusToday(at)) : Promise.resolve(null),
+          repo.liveBanners(levelId, at),
+          notifications.unreadCount(userId),
+          learning.resume(userId, 5),
+          access.myEntitlements(userId),
+          teachers.followedTeachers(userId),
+          learning.mistakeCounts(userId),
+          today(userId, profile?.dailyGoal ?? 20),
+          levelId ? freeSubjectsOf(levelId) : Promise.resolve([]),
+        ]);
       const banners: HomeBanner[] = bannerRows.map(({ banner: b, media: m }) => ({
         id: b.id,
         titleAr: b.titleAr,
@@ -175,15 +191,6 @@ export function createHomeService(deps: {
         action: b.action,
         actionTarget: b.actionTarget,
       }));
-      const freeSubjects = [];
-      if (levelId) {
-        for (const s of await catalog.subjects({ levelId })) {
-          const scope = { scopeType: 'subject' as const, subjectId: s.id, teacherTrackId: null };
-          let free = 0;
-          for (const c of deps.counts) free += (await c(scope)).free;
-          if (free > 0) freeSubjects.push({ subjectId: s.id, nameAr: s.nameAr, freeCount: free });
-        }
-      }
       return {
         greetingName: me.fullName,
         unreadNotifications: unread,
@@ -195,7 +202,7 @@ export function createHomeService(deps: {
             }
           : null,
         banners,
-        today: await today(userId, profile?.dailyGoal ?? 20),
+        today: todayWork,
         resume,
         myAccess: owned.filter((e) => e.state === 'active'),
         freeSubjects,
