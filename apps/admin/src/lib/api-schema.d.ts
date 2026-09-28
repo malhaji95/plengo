@@ -948,6 +948,86 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/my-decks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listMyDecks"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/my-decks/changes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["myDeckChanges"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/my-decks/sync": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["syncMyDecks"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/my-decks/{id}/cards": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getMyDeckCards"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listMyReports"];
+        put?: never;
+        post: operations["createReport"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/auth/login": {
         parameters: {
             query?: never;
@@ -2277,6 +2357,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminListReports"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/reports/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminGetReport"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/reports/{id}/resolve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["adminResolveReport"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -2592,6 +2720,42 @@ export interface components {
             lessonId: string | null;
             deleted: boolean;
         };
+        AdminReport: {
+            id: string;
+            itemType: components["schemas"]["ReportItemType"];
+            itemId: string;
+            reason: components["schemas"]["ReportReason"];
+            note: string | null;
+            status: components["schemas"]["ReportStatus"];
+            createdAt: string;
+            resolvedAt: string | null;
+            studentId: string;
+            studentName: string;
+            studentEmail: string;
+            resolutionNote: string | null;
+            resolvedByAdminId: string | null;
+            itemTitleAr: string | null;
+            subjectId: string | null;
+            subjectNameAr: string | null;
+            deckId: string | null;
+            openReportsOnItem: number;
+        };
+        AdminReportEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AdminReport"];
+            error: null;
+        };
+        AdminReportPage: {
+            items: components["schemas"]["AdminReport"][];
+            nextCursor: string | null;
+        };
+        AdminReportPageEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AdminReportPage"];
+            error: null;
+        };
         AdminStudent: {
             id: string;
             email: string;
@@ -2772,6 +2936,7 @@ export interface components {
             question: components["schemas"]["StudentQuestion"] | null;
             deck: components["schemas"]["StudentDeck"] | null;
             card: components["schemas"]["StudentCard"] | null;
+            userCard: components["schemas"]["UserCard"] | null;
         };
         BookmarkEnvelope: {
             /** @constant */
@@ -2998,6 +3163,13 @@ export interface components {
             allowOffline?: boolean;
             questionIds?: string[];
         };
+        CreateReportRequest: {
+            itemType: components["schemas"]["ReportItemType"];
+            /** Format: uuid */
+            itemId: string;
+            reason: components["schemas"]["ReportReason"];
+            note?: string | null;
+        };
         CreateSubjectRequest: {
             /** Format: uuid */
             educationLevelId: string;
@@ -3096,6 +3268,7 @@ export interface components {
         };
         DueCards: {
             cards: components["schemas"]["DueCard"][];
+            userCards: components["schemas"]["DueUserCard"][];
             urlsExpireAt: string;
         };
         DueCardsEnvelope: {
@@ -3103,6 +3276,11 @@ export interface components {
             success: true;
             data: components["schemas"]["DueCards"];
             error: null;
+        };
+        DueUserCard: {
+            card: components["schemas"]["UserCard"];
+            deckName: string;
+            state: components["schemas"]["SrsCardState"];
         };
         EducationLevel: {
             id: string;
@@ -3547,6 +3725,35 @@ export interface components {
         ReorderRequest: {
             ids: string[];
         };
+        Report: {
+            id: string;
+            itemType: components["schemas"]["ReportItemType"];
+            itemId: string;
+            reason: components["schemas"]["ReportReason"];
+            note: string | null;
+            status: components["schemas"]["ReportStatus"];
+            createdAt: string;
+            resolvedAt: string | null;
+        };
+        ReportEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["Report"];
+            error: null;
+        };
+        /** @enum {string} */
+        ReportItemType: "question" | "flashcard";
+        ReportList: components["schemas"]["Report"][];
+        ReportListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["ReportList"];
+            error: null;
+        };
+        /** @enum {string} */
+        ReportReason: "wrong_answer" | "typo" | "unclear" | "image_problem" | "other";
+        /** @enum {string} */
+        ReportStatus: "open" | "resolved" | "dismissed";
         ResendOtpRequest: {
             email: string;
         };
@@ -3563,6 +3770,11 @@ export interface components {
             success: true;
             data: components["schemas"]["ResetResult"];
             error: null;
+        };
+        ResolveReportRequest: {
+            /** @enum {string} */
+            status: "resolved" | "dismissed";
+            resolutionNote?: string | null;
         };
         ResumeItem: {
             subjectId: string;
@@ -3591,7 +3803,9 @@ export interface components {
             /** Format: uuid */
             id: string;
             /** Format: uuid */
-            flashcardId: string;
+            flashcardId?: string;
+            /** Format: uuid */
+            userCardId?: string;
             /** @enum {string} */
             rating: "again" | "good" | "easy";
             stateBefore: components["schemas"]["SrsState"];
@@ -3719,7 +3933,8 @@ export interface components {
             reps: number;
             lapses: number;
             lastReviewedAt: string | null;
-            flashcardId: string;
+            flashcardId: string | null;
+            userCardId: string | null;
             updatedAt: string;
         };
         SrsState: {
@@ -3771,7 +3986,9 @@ export interface components {
             lapses: number;
             lastReviewedAt: string | null;
             /** Format: uuid */
-            flashcardId: string;
+            flashcardId?: string;
+            /** Format: uuid */
+            userCardId?: string;
         };
         StartAttemptRequest: {
             /** Format: uuid */
@@ -4014,6 +4231,14 @@ export interface components {
         SubmitAttemptRequest: {
             answers: components["schemas"]["SubmitAnswer"][];
             timeSpentMs?: number;
+        };
+        SyncRejection: {
+            /** @enum {string} */
+            type: "deck" | "card";
+            id: string;
+            /** @enum {string} */
+            code: "QUOTA_EXCEEDED" | "VALIDATION_ERROR" | "CONTENT_LOCKED" | "NOT_FOUND";
+            reason: string;
         };
         Teacher: {
             id: string;
@@ -4311,6 +4536,114 @@ export interface components {
             code?: string;
             nameAr?: string;
             isActive?: boolean;
+        };
+        UserCard: {
+            id: string;
+            deckId: string;
+            kind: components["schemas"]["UserCardKind"];
+            officialFlashcardId: string | null;
+            locked: boolean;
+            front: components["schemas"]["UserCardFace"];
+            back: components["schemas"]["UserCardFace"];
+            sortOrder: number;
+            createdAt: string;
+            updatedAt: string;
+            deletedAt: string | null;
+        };
+        UserCardFace: {
+            text: string | null;
+            mediaId: string | null;
+            image: components["schemas"]["CardImage"] | null;
+        };
+        /** @enum {string} */
+        UserCardKind: "custom" | "official_ref";
+        UserCardWrite: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            deckId: string;
+            kind: components["schemas"]["UserCardKind"];
+            frontText?: string | null;
+            backText?: string | null;
+            frontMediaId?: string | null;
+            backMediaId?: string | null;
+            officialFlashcardId?: string | null;
+            sortOrder: number;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            deletedAt?: string | null;
+        };
+        UserContentChanges: {
+            decks: components["schemas"]["UserDeck"][];
+            cards: components["schemas"]["UserCard"][];
+            cursor: string;
+            hasMore: boolean;
+            urlsExpireAt: string;
+        };
+        UserContentChangesEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["UserContentChanges"];
+            error: null;
+        };
+        UserContentSyncRequest: {
+            decks: components["schemas"]["UserDeckWrite"][];
+            cards: components["schemas"]["UserCardWrite"][];
+        };
+        UserContentSyncResult: {
+            appliedDecks: number;
+            appliedCards: number;
+            rejected: components["schemas"]["SyncRejection"][];
+        };
+        UserContentSyncResultEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["UserContentSyncResult"];
+            error: null;
+        };
+        UserDeck: {
+            id: string;
+            name: string;
+            subjectId: string | null;
+            color: string | null;
+            sortOrder: number;
+            cardCount: number;
+            createdAt: string;
+            updatedAt: string;
+            deletedAt: string | null;
+        };
+        UserDeckCards: {
+            deck: components["schemas"]["UserDeck"];
+            cards: components["schemas"]["UserCard"][];
+            urlsExpireAt: string;
+        };
+        UserDeckCardsEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["UserDeckCards"];
+            error: null;
+        };
+        UserDeckList: components["schemas"]["UserDeck"][];
+        UserDeckListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["UserDeckList"];
+            error: null;
+        };
+        UserDeckWrite: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            subjectId?: string | null;
+            color?: string | null;
+            sortOrder: number;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            deletedAt?: string | null;
         };
         VerificationRequiredResult: {
             verificationRequired: boolean;
@@ -5780,6 +6113,139 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ResumeListEnvelope"];
+                };
+            };
+        };
+    };
+    listMyDecks: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserDeckListEnvelope"];
+                };
+            };
+        };
+    };
+    myDeckChanges: {
+        parameters: {
+            query?: {
+                since?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserContentChangesEnvelope"];
+                };
+            };
+        };
+    };
+    syncMyDecks: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UserContentSyncRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserContentSyncResultEnvelope"];
+                };
+            };
+        };
+    };
+    getMyDeckCards: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserDeckCardsEnvelope"];
+                };
+            };
+        };
+    };
+    listMyReports: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportListEnvelope"];
+                };
+            };
+        };
+    };
+    createReport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateReportRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportEnvelope"];
                 };
             };
         };
@@ -8607,6 +9073,80 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AttemptSummaryPageEnvelope"];
+                };
+            };
+        };
+    };
+    adminListReports: {
+        parameters: {
+            query?: {
+                status?: components["schemas"]["ReportStatus"];
+                itemType?: components["schemas"]["ReportItemType"];
+                reason?: components["schemas"]["ReportReason"];
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminReportPageEnvelope"];
+                };
+            };
+        };
+    };
+    adminGetReport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminReportEnvelope"];
+                };
+            };
+        };
+    };
+    adminResolveReport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResolveReportRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminReportEnvelope"];
                 };
             };
         };

@@ -72,3 +72,15 @@ export const bookmarkItemTypeEnum = pgEnum('bookmark_item_type', [
   'deck',
 ]);
 export const activityTypeEnum = pgEnum('activity_type', ['question', 'quiz', 'deck']);
+
+/* Student decks and content reports (spec §13.9, §21). */
+export const userCardKindEnum = pgEnum('user_card_kind', ['custom', 'official_ref']);
+export const reportItemTypeEnum = pgEnum('report_item_type', ['question', 'flashcard']);
+export const reportReasonEnum = pgEnum('report_reason', [
+  'wrong_answer',
+  'typo',
+  'unclear',
+  'image_problem',
+  'other',
+]);
+export const reportStatusEnum = pgEnum('report_status', ['open', 'resolved', 'dismissed']);

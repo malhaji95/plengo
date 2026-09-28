@@ -18,6 +18,7 @@ import { registerVersionGate } from './plugins/version-gate.js';
 import { accessRoutes } from './routes/access.js';
 import { adminAccessRoutes } from './routes/admin/access.js';
 import { adminAccountRoutes } from './routes/admin/admins.js';
+import { adminReportRoutes } from './routes/admin/reports.js';
 import { adminAuthRoutes } from './routes/admin/auth.js';
 import { adminFlashcardRoutes } from './routes/admin/flashcards.js';
 import { adminQuestionRoutes } from './routes/admin/questions.js';
@@ -32,6 +33,7 @@ import { MemoryStorage } from './storage/memory-storage.js';
 import { flashcardRoutes } from './routes/flashcards.js';
 import { healthRoutes } from './routes/health.js';
 import { learningRoutes } from './routes/learning.js';
+import { myDeckRoutes } from './routes/my-decks.js';
 import { meRoutes } from './routes/me.js';
 import { questionRoutes } from './routes/questions.js';
 import { teacherRoutes } from './routes/teachers.js';
@@ -131,6 +133,7 @@ export async function buildApp(app: App, c: Container): Promise<App> {
   await app.register(questionRoutes(c), { prefix: '/api/v1' });
   await app.register(flashcardRoutes(c), { prefix: '/api/v1' });
   await app.register(learningRoutes(c), { prefix: '/api/v1' });
+  await app.register(myDeckRoutes(c), { prefix: '/api/v1' });
   await app.register(adminAuthRoutes(c), { prefix: '/api/v1/admin' });
   await app.register(uploadRoutes(c, 'admin'), { prefix: '/api/v1/admin' });
   await app.register(adminStructureRoutes(c), { prefix: '/api/v1/admin' });
@@ -140,6 +143,7 @@ export async function buildApp(app: App, c: Container): Promise<App> {
   await app.register(adminFlashcardRoutes(c), { prefix: '/api/v1/admin' });
   await app.register(adminQuizRoutes(c), { prefix: '/api/v1/admin' });
   await app.register(adminAccountRoutes(c), { prefix: '/api/v1/admin' });
+  await app.register(adminReportRoutes(c), { prefix: '/api/v1/admin' });
 
   return app;
 }

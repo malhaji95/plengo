@@ -4,18 +4,19 @@ import { businessDay, startOfBusinessDay } from '@plengo/srs';
 import { AppError } from '../lib/app-error.js';
 import type { DeckRow, FlashcardRepository } from '../repositories/flashcard-repository.js';
 import type { LearningRepository } from '../repositories/learning-repository.js';
-import type { CardStateRow, SrsRepository } from '../repositories/srs-repository.js';
+import type { CardKey, CardStateRow, SrsRepository } from '../repositories/srs-repository.js';
 import type { StructureRepository } from '../repositories/structure-repository.js';
 import type { TeacherRepository } from '../repositories/teacher-repository.js';
 import type { AccessService } from './access-service.js';
 import { assertVisibleScope } from './content-placement.js';
 import type { FlashcardService } from './flashcard-service.js';
 import { SIGNED_URL_TTL_SECONDS } from './flashcard-service.js';
+import type { UserContentService } from './user-content-service.js';
 
 type StateRow = CardStateRow;
-type LogInput = {
+type CardRef = { flashcardId?: string | undefined; userCardId?: string | undefined };
+type LogInput = CardRef & {
   id: string;
-  flashcardId: string;
   rating: 'again' | 'good' | 'easy';
   stateBefore: SrsStateInput;
   stateAfter: SrsStateInput;
@@ -37,8 +38,13 @@ const toColumns = (s: SrsStateInput) => ({
   lastReviewedAt: s.lastReviewedAt ? new Date(s.lastReviewedAt) : null,
 });
 
+/** The contract guarantees exactly one id. */
+const keyOf = (r: CardRef): CardKey =>
+  r.flashcardId ? { flashcardId: r.flashcardId } : { userCardId: r.userCardId! };
+
 const toApi = (r: StateRow): SrsCardState => ({
-  flashcardId: r.flashcardId!,
+  flashcardId: r.flashcardId,
+  userCardId: r.userCardId,
   state: r.state,
   step: r.step,
   dueAt: r.dueAt.toISOString(),
@@ -68,6 +74,7 @@ function decode(cursor: string | undefined) {
 export function createSrsService(deps: {
   db: Db;
   repo: SrsRepository;
+  userContent: UserContentService;
   flashcardRepo: FlashcardRepository;
   learningRepo: LearningRepository;
   flashcards: FlashcardService;
@@ -79,6 +86,7 @@ export function createSrsService(deps: {
   const {
     db,
     repo,
+    userContent,
     flashcardRepo,
     learningRepo,
     flashcards: cards,
@@ -88,11 +96,12 @@ export function createSrsService(deps: {
   } = deps;
   const now = deps.now ?? (() => new Date());
 
-  async function assertCardsExist(ids: string[]) {
-    if (!ids.length) return;
-    const found = await flashcardRepo.existingCardIds(ids);
-    if (found.length !== ids.length)
+  async function assertCardsExist(userId: string, ids: string[], userCardIds: string[]) {
+    if (ids.length && (await flashcardRepo.existingCardIds(ids)).length !== ids.length)
       throw new AppError('VALIDATION_ERROR', { details: { field: 'flashcardId' } });
+    // Student cards must be the student's own (deleted ones included: reviews can sync after a delete).
+    if (userCardIds.length && (await userContent.ownCards(userId, userCardIds)).length !== userCardIds.length)
+      throw new AppError('VALIDATION_ERROR', { details: { field: 'userCardId' } });
   }
 
   return {
@@ -110,12 +119,12 @@ export function createSrsService(deps: {
     async sync(
       userId: string,
       platform: string | null,
-      body: { logs: LogInput[]; states: (SrsStateInput & { flashcardId: string })[] },
+      body: { logs: LogInput[]; states: (SrsStateInput & CardRef)[] },
     ) {
-      const ids = [
-        ...new Set([...body.logs.map((l) => l.flashcardId), ...body.states.map((s) => s.flashcardId)]),
-      ];
-      await assertCardsExist(ids);
+      const refs = [...body.logs, ...body.states];
+      const ids = [...new Set(refs.flatMap((r) => (r.flashcardId ? [r.flashcardId] : [])))];
+      const userCardIds = [...new Set(refs.flatMap((r) => (r.userCardId ? [r.userCardId] : [])))];
+      await assertCardsExist(userId, ids, userCardIds);
       const at = now();
 
       const result = await db.transaction(async (tx) => {
@@ -124,7 +133,7 @@ export function createSrsService(deps: {
           const inserted = await repo.insertLog(tx, {
             id: log.id,
             userId,
-            flashcardId: log.flashcardId,
+            ...keyOf(log),
             rating: log.rating,
             stateBefore: log.stateBefore,
             stateAfter: log.stateAfter,
@@ -137,7 +146,7 @@ export function createSrsService(deps: {
 
           if (!log.undone) continue;
           if (!(await repo.markLogUndone(tx, log.id, userId))) continue;
-          const current = await repo.stateForUpdate(tx, userId, log.flashcardId);
+          const current = await repo.stateForUpdate(tx, userId, keyOf(log));
           const undoneAt = log.stateAfter.lastReviewedAt ? Date.parse(log.stateAfter.lastReviewedAt) : null;
           if (current && current.lastReviewedAt?.getTime() === undoneAt) {
             await repo.updateState(tx, current.id, { ...toColumns(log.stateBefore), updatedAt: at });
@@ -150,7 +159,7 @@ export function createSrsService(deps: {
           const applied = await repo.upsertIfNewer(
             tx,
             userId,
-            s.flashcardId,
+            keyOf(s),
             toColumns(s),
             new Date(s.lastReviewedAt),
             at,
@@ -159,10 +168,10 @@ export function createSrsService(deps: {
         }
         // The resume pointer follows the latest reviewed deck (§18).
         const latest = body.logs
-          .filter((l) => !l.undone)
+          .filter((l) => !l.undone && l.flashcardId)
           .sort((a, b) => Date.parse(b.reviewedAt) - Date.parse(a.reviewedAt))[0];
         if (latest) {
-          const deck = await flashcardRepo.deckOfCard(tx, latest.flashcardId);
+          const deck = await flashcardRepo.deckOfCard(tx, latest.flashcardId!);
           const reviewedAt = new Date(latest.reviewedAt);
           // Only decks the student can open become the resume pointer.
           if (
@@ -185,7 +194,7 @@ export function createSrsService(deps: {
         return { acceptedLogs, appliedStates };
       });
 
-      const states = await repo.statesFor(userId, ids);
+      const states = await repo.statesFor(userId, ids, userCardIds);
       return { ...result, states: states.map(toApi) };
     },
 
@@ -228,8 +237,18 @@ export function createSrsService(deps: {
           state: toApi(r.state),
         })),
       );
+      // Student cards (§13.9); an official reference whose source is locked leaves the queue.
+      const own = await repo.dueUserCards(userId, endOfToday, subjectId, MAX_DUE);
+      const views = await userContent.toCards(
+        userId,
+        own.map((r) => r.card),
+      );
+      const userCards = own.flatMap((r, i) =>
+        views[i]!.locked ? [] : [{ card: views[i]!, deckName: r.deckName, state: toApi(r.state) }],
+      );
       return {
         cards: items,
+        userCards,
         urlsExpireAt: new Date(at.getTime() + SIGNED_URL_TTL_SECONDS * 1000).toISOString(),
       };
     },

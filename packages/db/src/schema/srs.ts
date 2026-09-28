@@ -15,11 +15,11 @@ import {
 import { flashcards } from './content.js';
 import { srsRatingEnum, srsStateEnum } from './enums.js';
 import { users } from './identity.js';
+import { userCards } from './student-content.js';
 
 /*
  * Spaced repetition state and history (spec §13.7). Scheduling runs on the device; the server stores
- * what clients computed after validation (§13.6). `user_card_id` points at student cards, whose table
- * arrives with Phase 8 (the foreign key is added then).
+ * what clients computed after validation (§13.6). `user_card_id` points at student cards (§13.9).
  */
 
 const exactlyOneCard = (table: string, t: { flashcardId: unknown; userCardId: unknown }) =>
@@ -33,7 +33,7 @@ export const cardStates = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
     flashcardId: uuid('flashcard_id').references(() => flashcards.id),
-    userCardId: uuid('user_card_id'),
+    userCardId: uuid('user_card_id').references(() => userCards.id, { onDelete: 'cascade' }),
     state: srsStateEnum('state').notNull(),
     step: integer('step').notNull().default(0),
     dueAt: timestamp('due_at', { withTimezone: true }).notNull(),
@@ -63,7 +63,7 @@ export const reviewLogs = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
     flashcardId: uuid('flashcard_id').references(() => flashcards.id),
-    userCardId: uuid('user_card_id'),
+    userCardId: uuid('user_card_id').references(() => userCards.id, { onDelete: 'cascade' }),
     rating: srsRatingEnum('rating').notNull(),
     stateBefore: jsonb('state_before').$type<Record<string, unknown>>().notNull(),
     stateAfter: jsonb('state_after').$type<Record<string, unknown>>().notNull(),

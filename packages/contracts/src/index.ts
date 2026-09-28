@@ -12,3 +12,4 @@ export * from './flashcards.js';
 export * from './quizzes.js';
 export * from './learning.js';
 export * from './admins.js';
+export * from './reports.js';

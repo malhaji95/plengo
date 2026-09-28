@@ -23,9 +23,10 @@ import type { StructureRepository } from '../repositories/structure-repository.j
 import type { TeacherRepository } from '../repositories/teacher-repository.js';
 import type { AccessService } from './access-service.js';
 import type { ConfigService } from './config-service.js';
-import { assertVisibleScope, invalid } from './content-placement.js';
+import { assertVisibleScope } from './content-placement.js';
 import { SIGNED_URL_TTL_SECONDS, type FlashcardService } from './flashcard-service.js';
 import { quizAccess } from './quiz-service.js';
+import type { UserContentService } from './user-content-service.js';
 
 type BookmarkType = Bookmark['itemType'];
 
@@ -45,6 +46,7 @@ export function createLearningService(deps: {
   quizRepo: QuizRepository;
   flashcardRepo: FlashcardRepository;
   flashcards: FlashcardService;
+  userContent: UserContentService;
   structureRepo: StructureRepository;
   teacherRepo: TeacherRepository;
   access: AccessService;
@@ -60,6 +62,7 @@ export function createLearningService(deps: {
     quizRepo,
     flashcardRepo,
     flashcards: cards,
+    userContent,
     structureRepo,
     teacherRepo,
     access,
@@ -127,9 +130,12 @@ export function createLearningService(deps: {
     };
   }
 
-  async function assertBookmarkable(type: BookmarkType, id: string) {
+  async function assertBookmarkable(userId: string, type: BookmarkType, id: string) {
     const isVisible = visibility();
-    if (type === 'user_card') invalid('itemType', 'not_available');
+    if (type === 'user_card') {
+      const [own] = await userContent.ownCards(userId, [id]);
+      if (!own || own.deletedAt) throw new AppError('NOT_FOUND');
+    }
     if (type === 'question') {
       const q = await questionRepo.get(id);
       if (!q || q.status !== 'published' || !(await isVisible(q.subjectId, q.teacherTrackId)))
@@ -178,6 +184,9 @@ export function createLearningService(deps: {
       [],
     );
 
+    const ownRows = await userContent.ownCards(userId, byType('user_card'));
+    const ownViews = new Map((await userContent.toCards(userId, ownRows)).map((v) => [v.id, v]));
+
     const out: Bookmark[] = [];
     for (const b of rows) {
       const base = {
@@ -193,6 +202,7 @@ export function createLearningService(deps: {
         question: null as Bookmark['question'],
         deck: null as Bookmark['deck'],
         card: null as Bookmark['card'],
+        userCard: null as Bookmark['userCard'],
       };
       if (b.itemType === 'question') {
         const q = qMap.get(b.itemId);
@@ -228,6 +238,16 @@ export function createLearningService(deps: {
             deck: await cards.studentDeck(userId, d.id),
             // Signed URLs only for cards the student can open (§12.5).
             card: card && !locked ? await cards.toStudentCard(card) : null,
+          });
+        }
+      } else if (b.itemType === 'user_card') {
+        const view = ownViews.get(b.itemId);
+        if (view && !view.deletedAt) {
+          Object.assign(base, {
+            available: true,
+            locked: view.locked,
+            titleAr: view.front.text ?? view.back.text,
+            userCard: view,
           });
         }
       }
@@ -361,7 +381,7 @@ export function createLearningService(deps: {
 
     /** Idempotent. Locked items can be saved; they show as locked (§17). */
     async addBookmark(userId: string, itemType: BookmarkType, itemId: string) {
-      await assertBookmarkable(itemType, itemId);
+      await assertBookmarkable(userId, itemType, itemId);
       const row = await bookmarkRepo.add(userId, itemType, itemId);
       return (await bookmarkViews(userId, [row]))[0]!;
     },

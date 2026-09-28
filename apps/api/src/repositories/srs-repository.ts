@@ -1,5 +1,15 @@
 import { and, asc, eq, gt, inArray, isNotNull, lt, ne, or, sql } from 'drizzle-orm';
-import { cardStates, flashcardDecks, flashcards, reviewLogs, subjects, type Db, type Tx } from '@plengo/db';
+import {
+  cardStates,
+  flashcardDecks,
+  flashcards,
+  reviewLogs,
+  subjects,
+  userCards,
+  userDecks,
+  type Db,
+  type Tx,
+} from '@plengo/db';
 
 export type CardStateRow = typeof cardStates.$inferSelect;
 export type ReviewLogInsert = typeof reviewLogs.$inferInsert;
@@ -10,10 +20,22 @@ export type CardStateColumns = Pick<
   'state' | 'step' | 'dueAt' | 'intervalDays' | 'ease' | 'reps' | 'lapses' | 'lastReviewedAt'
 >;
 
+/** Which card a state or log belongs to: an official card or a student card (§13.7). */
+export type CardKey =
+  { flashcardId: string; userCardId?: undefined } | { userCardId: string; flashcardId?: undefined };
+
+const keyWhere = (userId: string, key: CardKey) =>
+  and(
+    eq(cardStates.userId, userId),
+    key.flashcardId
+      ? eq(cardStates.flashcardId, key.flashcardId)
+      : eq(cardStates.userCardId, key.userCardId!),
+  );
+
 /** Spaced-repetition card states and review logs (§13.6–§13.8). */
 export function createSrsRepository(db: Db) {
   return {
-    /** Keyset page over (updated_at, id) of the student's official-card states. */
+    /** Keyset page over (updated_at, id) of the student's card states. */
     statesSince: (userId: string, after: { at: Date; id: string } | null, limit: number) =>
       db
         .select()
@@ -21,7 +43,6 @@ export function createSrsRepository(db: Db) {
         .where(
           and(
             eq(cardStates.userId, userId),
-            isNotNull(cardStates.flashcardId),
             after
               ? or(
                   gt(cardStates.updatedAt, after.at),
@@ -33,12 +54,20 @@ export function createSrsRepository(db: Db) {
         .orderBy(asc(cardStates.updatedAt), asc(cardStates.id))
         .limit(limit),
 
-    async statesFor(userId: string, flashcardIds: string[]) {
-      if (!flashcardIds.length) return [];
+    async statesFor(userId: string, flashcardIds: string[], userCardIds: string[] = []) {
+      if (!flashcardIds.length && !userCardIds.length) return [];
       return db
         .select()
         .from(cardStates)
-        .where(and(eq(cardStates.userId, userId), inArray(cardStates.flashcardId, flashcardIds)));
+        .where(
+          and(
+            eq(cardStates.userId, userId),
+            or(
+              flashcardIds.length ? inArray(cardStates.flashcardId, flashcardIds) : undefined,
+              userCardIds.length ? inArray(cardStates.userCardId, userCardIds) : undefined,
+            ),
+          ),
+        );
     },
 
     /** Inserts once by the client id; returns whether this call inserted it. */
@@ -61,12 +90,8 @@ export function createSrsRepository(db: Db) {
       return Boolean(mine);
     },
 
-    async stateForUpdate(tx: Tx, userId: string, flashcardId: string) {
-      const [row] = await tx
-        .select()
-        .from(cardStates)
-        .where(and(eq(cardStates.userId, userId), eq(cardStates.flashcardId, flashcardId)))
-        .for('update');
+    async stateForUpdate(tx: Tx, userId: string, key: CardKey) {
+      const [row] = await tx.select().from(cardStates).where(keyWhere(userId, key)).for('update');
       return row ?? null;
     },
 
@@ -78,16 +103,18 @@ export function createSrsRepository(db: Db) {
     async upsertIfNewer(
       tx: Tx,
       userId: string,
-      flashcardId: string,
+      key: CardKey,
       cols: CardStateColumns,
       lastReviewedAt: Date,
       at: Date,
     ) {
       const applied = await tx
         .insert(cardStates)
-        .values({ userId, flashcardId, ...cols, updatedAt: at })
+        .values({ userId, ...key, ...cols, updatedAt: at })
         .onConflictDoUpdate({
-          target: [cardStates.userId, cardStates.flashcardId],
+          target: key.flashcardId
+            ? [cardStates.userId, cardStates.flashcardId]
+            : [cardStates.userId, cardStates.userCardId],
           set: { ...cols, updatedAt: at },
           setWhere: sql`${cardStates.lastReviewedAt} is null or ${cardStates.lastReviewedAt} < ${lastReviewedAt}`,
         })
@@ -113,6 +140,26 @@ export function createSrsRepository(db: Db) {
             sql`${flashcardDecks.deletedAt} is null`,
             eq(flashcardDecks.status, 'published'),
             subjectId ? eq(flashcardDecks.subjectId, subjectId) : undefined,
+          ),
+        )
+        .orderBy(asc(cardStates.dueAt))
+        .limit(limit),
+
+    /** Reviewed states of the student's live cards in live decks, due before `before`. */
+    dueUserCards: (userId: string, before: Date, subjectId: string | undefined, limit: number) =>
+      db
+        .select({ state: cardStates, card: userCards, deckName: userDecks.name })
+        .from(cardStates)
+        .innerJoin(userCards, eq(userCards.id, cardStates.userCardId))
+        .innerJoin(userDecks, eq(userDecks.id, userCards.deckId))
+        .where(
+          and(
+            eq(cardStates.userId, userId),
+            ne(cardStates.state, 'new'),
+            lt(cardStates.dueAt, before),
+            sql`${userCards.deletedAt} is null`,
+            sql`${userDecks.deletedAt} is null`,
+            subjectId ? eq(userDecks.subjectId, subjectId) : undefined,
           ),
         )
         .orderBy(asc(cardStates.dueAt))

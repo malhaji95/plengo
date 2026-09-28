@@ -79,8 +79,10 @@ export const srsStateInputSchema = z.object({
   lastReviewedAt: z.iso.datetime({ offset: true }).nullable(),
 });
 
+/** Exactly one of `flashcardId` (official card) and `userCardId` (student card, §13.9) is set. */
 export const srsCardStateSchema = srsStateInputSchema.extend({
-  flashcardId: z.string(),
+  flashcardId: z.string().nullable(),
+  userCardId: z.string().nullable(),
   updatedAt: z.string(),
 });
 
@@ -94,20 +96,29 @@ export const srsStatesQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(1000).default(500),
 });
 
-export const reviewLogInputSchema = z.object({
-  /** Client UUID: the idempotency key. */
-  id: z.uuid(),
-  flashcardId: z.uuid(),
-  rating: srsRatingSchema,
-  stateBefore: srsStateInputSchema,
-  stateAfter: srsStateInputSchema,
-  reviewedAt: z.iso.datetime({ offset: true }),
-  durationMs: int().min(0).max(3_600_000).nullable().optional(),
-  /** Undo (§13.3): the server restores `stateBefore` if this review is still the card's latest. */
-  undone: z.boolean().optional(),
-});
+const oneCard = (v: { flashcardId?: string | undefined; userCardId?: string | undefined }) =>
+  (v.flashcardId === undefined) !== (v.userCardId === undefined);
+const oneCardError = { message: 'Exactly one of flashcardId and userCardId', path: ['flashcardId'] };
 
-export const srsCardStateInputSchema = srsStateInputSchema.extend({ flashcardId: z.uuid() });
+export const reviewLogInputSchema = z
+  .object({
+    /** Client UUID: the idempotency key. */
+    id: z.uuid(),
+    flashcardId: z.uuid().optional(),
+    userCardId: z.uuid().optional(),
+    rating: srsRatingSchema,
+    stateBefore: srsStateInputSchema,
+    stateAfter: srsStateInputSchema,
+    reviewedAt: z.iso.datetime({ offset: true }),
+    durationMs: int().min(0).max(3_600_000).nullable().optional(),
+    /** Undo (§13.3): the server restores `stateBefore` if this review is still the card's latest. */
+    undone: z.boolean().optional(),
+  })
+  .refine(oneCard, oneCardError);
+
+export const srsCardStateInputSchema = srsStateInputSchema
+  .extend({ flashcardId: z.uuid().optional(), userCardId: z.uuid().optional() })
+  .refine(oneCard, oneCardError);
 
 export const srsSyncBodySchema = z.object({
   logs: z.array(reviewLogInputSchema).max(500),
@@ -129,8 +140,139 @@ export const dueCardSchema = z.object({
   subjectNameAr: z.string(),
   state: srsCardStateSchema,
 });
+// ---- student decks (§13.9) ----
+
+export const USER_DECK_QUOTA = 50;
+export const USER_CARD_QUOTA = 5000;
+export const USER_CARD_TEXT_MAX = 1000;
+
+const isoTime = z.iso.datetime({ offset: true });
+
+export const userDeckSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  subjectId: z.string().nullable(),
+  color: z.string().nullable(),
+  sortOrder: int(),
+  /** Live cards in the deck. */
+  cardCount: int(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  /** Set when deleted; kept in the changes feed so other devices remove it too. */
+  deletedAt: z.string().nullable(),
+});
+export const userDeckListSchema = z.array(userDeckSchema);
+
+export const userCardKindSchema = z.enum(['custom', 'official_ref']);
+
+/** A face of a student card: text, an image, or both. */
+export const userCardFaceSchema = z.object({
+  text: z.string().nullable(),
+  mediaId: z.string().nullable(),
+  /** Null while the image is still processing, or when an official card is locked. */
+  image: cardImageSchema.nullable(),
+});
+
+export const userCardSchema = z.object({
+  id: z.string(),
+  deckId: z.string(),
+  kind: userCardKindSchema,
+  officialFlashcardId: z.string().nullable(),
+  /** An official_ref card whose source the student can no longer open (or that was removed). */
+  locked: z.boolean(),
+  front: userCardFaceSchema,
+  back: userCardFaceSchema,
+  sortOrder: int(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  deletedAt: z.string().nullable(),
+});
+
+export const userDeckCardsSchema = z.object({
+  deck: userDeckSchema,
+  cards: z.array(userCardSchema),
+  urlsExpireAt: z.string(),
+});
+
+export const userDeckInputSchema = z.object({
+  /** Generated on the device. */
+  id: z.uuid(),
+  name: z.string().trim().min(1).max(100),
+  subjectId: z.uuid().nullable().optional(),
+  color: z
+    .string()
+    .regex(/^#[0-9a-fA-F]{6}$/)
+    .nullable()
+    .optional(),
+  sortOrder: int().min(0).max(100_000),
+  createdAt: isoTime,
+  /** Last write wins by this time (§13.9). */
+  updatedAt: isoTime,
+  deletedAt: isoTime.nullable().optional(),
+});
+
+const faceText = z.string().max(USER_CARD_TEXT_MAX).nullable().optional();
+export const userCardInputSchema = z.object({
+  id: z.uuid(),
+  deckId: z.uuid(),
+  kind: userCardKindSchema,
+  frontText: faceText,
+  backText: faceText,
+  frontMediaId: z.uuid().nullable().optional(),
+  backMediaId: z.uuid().nullable().optional(),
+  /** Required for `official_ref` ("أضف إلى بطاقاتي"), absent for `custom`. */
+  officialFlashcardId: z.uuid().nullable().optional(),
+  sortOrder: int().min(0).max(100_000),
+  createdAt: isoTime,
+  updatedAt: isoTime,
+  deletedAt: isoTime.nullable().optional(),
+});
+
+export const userContentSyncBodySchema = z.object({
+  decks: z.array(userDeckInputSchema).max(100),
+  cards: z.array(userCardInputSchema).max(500),
+});
+
+export const syncRejectionSchema = z.object({
+  type: z.enum(['deck', 'card']),
+  id: z.string(),
+  code: z.enum(['QUOTA_EXCEEDED', 'VALIDATION_ERROR', 'CONTENT_LOCKED', 'NOT_FOUND']),
+  /** Machine-readable detail, e.g. `deck_quota`, `card_quota`, `empty_face`, `media`, `deck`. */
+  reason: z.string(),
+});
+
+export const userContentSyncResultSchema = z.object({
+  appliedDecks: int(),
+  appliedCards: int(),
+  /** Items the server refused; the device should undo them locally and tell the student. */
+  rejected: z.array(syncRejectionSchema),
+});
+
+export const userContentChangesQuerySchema = z.object({
+  since: z.string().max(200).optional(),
+  limit: z.coerce.number().int().min(1).max(1000).default(500),
+});
+
+export const userContentChangesSchema = z.object({
+  decks: z.array(userDeckSchema),
+  cards: z.array(userCardSchema),
+  /** Pass back as `since`. Always set; unchanged when there was nothing new. */
+  cursor: z.string(),
+  /** More cards changed than `limit`; call again with `cursor`. */
+  hasMore: z.boolean(),
+  urlsExpireAt: z.string(),
+});
+
+/** A student card due today (§13.2). */
+export const dueUserCardSchema = z.object({
+  card: userCardSchema,
+  deckName: z.string(),
+  state: srsCardStateSchema,
+});
+
 export const dueCardsSchema = z.object({
   cards: z.array(dueCardSchema),
+  userCards: z.array(dueUserCardSchema),
   urlsExpireAt: z.string(),
 });
 export const dueQuerySchema = z.object({ subjectId: z.uuid().optional() });
@@ -211,6 +353,11 @@ export type AdminDeck = z.infer<typeof adminDeckSchema>;
 export type AdminCard = z.infer<typeof adminCardSchema>;
 export type SrsStateInput = z.infer<typeof srsStateInputSchema>;
 export type SrsCardState = z.infer<typeof srsCardStateSchema>;
+export type UserDeck = z.infer<typeof userDeckSchema>;
+export type UserCard = z.infer<typeof userCardSchema>;
+export type UserDeckInput = z.infer<typeof userDeckInputSchema>;
+export type UserCardInput = z.infer<typeof userCardInputSchema>;
+export type SyncRejection = z.infer<typeof syncRejectionSchema>;
 
 const named: [z.ZodType, string][] = [
   [cardImageSchema, 'CardImage'],
@@ -227,6 +374,19 @@ const named: [z.ZodType, string][] = [
   [srsSyncResultSchema, 'SrsSyncResult'],
   [dueCardSchema, 'DueCard'],
   [dueCardsSchema, 'DueCards'],
+  [userDeckSchema, 'UserDeck'],
+  [userDeckListSchema, 'UserDeckList'],
+  [userCardKindSchema, 'UserCardKind'],
+  [userCardFaceSchema, 'UserCardFace'],
+  [userCardSchema, 'UserCard'],
+  [userDeckCardsSchema, 'UserDeckCards'],
+  [userDeckInputSchema, 'UserDeckWrite'],
+  [userCardInputSchema, 'UserCardWrite'],
+  [userContentSyncBodySchema, 'UserContentSyncRequest'],
+  [syncRejectionSchema, 'SyncRejection'],
+  [userContentSyncResultSchema, 'UserContentSyncResult'],
+  [userContentChangesSchema, 'UserContentChanges'],
+  [dueUserCardSchema, 'DueUserCard'],
   [adminDeckSchema, 'AdminDeck'],
   [adminDeckListSchema, 'AdminDeckList'],
   [adminCardSchema, 'AdminCard'],

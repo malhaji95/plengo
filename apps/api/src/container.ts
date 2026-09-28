@@ -21,6 +21,8 @@ import { createSessionsRepository, type SessionsRepository } from './repositorie
 import { createStructureRepository, type StructureRepository } from './repositories/structure-repository.js';
 import { createTeacherRepository } from './repositories/teacher-repository.js';
 import { createUsersRepository, type UsersRepository } from './repositories/users-repository.js';
+import { createReportRepository } from './repositories/report-repository.js';
+import { createUserContentRepository } from './repositories/user-content-repository.js';
 import { createAccessService, type AccessService } from './services/access-service.js';
 import { createAuditService, type AuditService } from './services/audit-service.js';
 import { createCouponService, type CouponService } from './services/coupon-service.js';
@@ -50,6 +52,8 @@ import { createMobileTokenService, type MobileTokenService } from './services/mo
 import { createStructureService, type StructureService } from './services/structure-service.js';
 import { createTeacherService, type TeacherService } from './services/teacher-service.js';
 import { createUploadService, type UploadService } from './services/upload-service.js';
+import { createReportService, type ReportService } from './services/report-service.js';
+import { createUserContentService, type UserContentService } from './services/user-content-service.js';
 import { MemoryStorage } from './storage/memory-storage.js';
 import { R2Storage } from './storage/r2-storage.js';
 import type { ObjectStorage } from './storage/storage.js';
@@ -86,6 +90,8 @@ export interface Container {
   learning: LearningService;
   stats: StatsService;
   admins: AdminService;
+  userContent: UserContentService;
+  reports: ReportService;
   media: MediaProcessor;
   guards: Guards;
   jobHandlers: JobHandlers;
@@ -208,9 +214,20 @@ export function createContainer(
     storage,
     now: overrides.now,
   });
+  const userContent = createUserContentService({
+    db,
+    repo: createUserContentRepository(db),
+    flashcardRepo,
+    flashcards,
+    structureRepo,
+    teacherRepo,
+    access,
+    now: overrides.now,
+  });
   const srs = createSrsService({
     db,
     repo: srsRepo,
+    userContent,
     flashcardRepo,
     learningRepo,
     flashcards,
@@ -253,6 +270,7 @@ export function createContainer(
     quizRepo,
     flashcardRepo,
     flashcards,
+    userContent,
     structureRepo,
     teacherRepo,
     access,
@@ -321,6 +339,16 @@ export function createContainer(
     learning,
     stats,
     admins: createAdminService({ db, auth, usersRepo, sessionsRepo, audit }),
+    userContent,
+    reports: createReportService({
+      repo: createReportRepository(db),
+      questionRepo,
+      flashcardRepo,
+      structureRepo,
+      teacherRepo,
+      audit,
+      now: overrides.now,
+    }),
     guards: createGuards({ auth, sessionsRepo, mobileTokens, now: overrides.now }),
     jobHandlers: {
       'media.process': (data) => media.process(data),

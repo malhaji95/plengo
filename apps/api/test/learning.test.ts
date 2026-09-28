@@ -770,7 +770,7 @@ describe('statistics, bookmarks and progress (§16.2–§18)', () => {
     ).toBe('NOT_FOUND');
     expect(
       (await call(s, 'PUT', '/bookmarks', { itemType: 'user_card', itemId: randomUUID() })).error?.code,
-    ).toBe('VALIDATION_ERROR');
+    ).toBe('NOT_FOUND');
     await call(s, 'DELETE', `/bookmarks/question/${w.premium.id}`);
     expect((await call<{ itemId: string }[]>(s, 'GET', '/bookmarks/keys')).data).toEqual([
       { itemType: 'question', itemId: w.free.id },

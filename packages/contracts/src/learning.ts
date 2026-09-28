@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { studentCardSchema, studentDeckSchema } from './flashcards.js';
+import { studentCardSchema, studentDeckSchema, userCardSchema } from './flashcards.js';
 import { questionTypeSchema, studentQuestionSchema } from './questions.js';
 
 /* Mistake bank, statistics, bookmarks and progress (spec §16–§18). */
@@ -155,6 +155,8 @@ export const bookmarkSchema = z.object({
   question: studentQuestionSchema.nullable(),
   deck: studentDeckSchema.nullable(),
   card: studentCardSchema.nullable(),
+  /** A student's own card (§13.9). */
+  userCard: userCardSchema.nullable(),
 });
 export const bookmarkListSchema = z.object({
   items: z.array(bookmarkSchema),

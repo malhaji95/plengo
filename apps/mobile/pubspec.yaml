@@ -86,3 +86,4 @@ swagger_parser:
     - admin-flashcards
     - admin-quizzes
     - admin-admins
+    - admin-reports
