@@ -22,9 +22,7 @@ abstract class AttemptsClient {
   factory AttemptsClient(Dio dio, {String? baseUrl}) = _AttemptsClient;
 
   @POST('/api/v1/attempts')
-  Future<AttemptEnvelope> startAttempt({
-    @Body() required StartAttemptRequest body,
-  });
+  Future<AttemptEnvelope> startAttempt({@Body() required StartAttemptRequest body});
 
   @GET('/api/v1/attempts')
   Future<AttemptSummaryPageEnvelope> listAttempts({
@@ -35,9 +33,7 @@ abstract class AttemptsClient {
   });
 
   @GET('/api/v1/attempts/{id}')
-  Future<AttemptEnvelope> getAttempt({
-    @Path('id') required String id,
-  });
+  Future<AttemptEnvelope> getAttempt({@Path('id') required String id});
 
   @PUT('/api/v1/attempts/{id}/answers/{questionId}')
   Future<SavedAnswerEnvelope> saveAttemptAnswer({
@@ -54,8 +50,5 @@ abstract class AttemptsClient {
   });
 
   @POST('/api/v1/attempts/{id}/submit')
-  Future<AttemptEnvelope> submitAttempt({
-    @Path('id') required String id,
-    @Body() required SubmitAttemptRequest body,
-  });
+  Future<AttemptEnvelope> submitAttempt({@Path('id') required String id, @Body() required SubmitAttemptRequest body});
 }

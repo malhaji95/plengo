@@ -1,4 +1,5 @@
 import {
+  bigint,
   boolean,
   index,
   integer,
@@ -152,7 +153,8 @@ export const userSubjectStats = pgTable(
     teacherTrackId: uuid('teacher_track_id').references(() => teacherTracks.id),
     answered: integer('answered').notNull().default(0),
     correct: integer('correct').notNull().default(0),
-    timeMs: integer('time_ms').notNull().default(0),
+    /** Sum of answer times; bigint so heavy use never overflows. */
+    timeMs: bigint('time_ms', { mode: 'number' }).notNull().default(0),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [unique('user_subject_stats_uq').on(t.userId, t.subjectId, t.teacherTrackId).nullsNotDistinct()],
@@ -165,7 +167,7 @@ export const questionStats = pgTable('question_stats', {
     .references(() => questions.id, { onDelete: 'cascade' }),
   attemptCount: integer('attempt_count').notNull().default(0),
   correctCount: integer('correct_count').notNull().default(0),
-  totalTimeMs: integer('total_time_ms').notNull().default(0),
+  totalTimeMs: bigint('total_time_ms', { mode: 'number' }).notNull().default(0),
   /** Times each option was chosen, by option id. */
   optionDistribution: jsonb('option_distribution').$type<Record<string, number>>().notNull().default({}),
   flaggedForReview: boolean('flagged_for_review').notNull().default(false),

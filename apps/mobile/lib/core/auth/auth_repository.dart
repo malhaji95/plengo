@@ -73,7 +73,7 @@ class AuthRepository {
     required String fullName,
     required String email,
     required String password,
-    String? educationLevelId,
+    required String educationLevelId,
     String? universityId,
     String? facultyId,
     String? academicYearId,

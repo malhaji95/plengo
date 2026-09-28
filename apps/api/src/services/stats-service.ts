@@ -1,21 +1,6 @@
-import { and, asc, desc, eq, gte, isNotNull, isNull, ne, sql } from 'drizzle-orm';
 import type { Accuracy, FlashcardStats, StatsOverview, SubjectStats } from '@plengo/contracts';
-import {
-  cardStates,
-  flashcardDecks,
-  flashcards,
-  questions,
-  quizAttemptAnswers,
-  quizAttempts,
-  reviewLogs,
-  subjects,
-  teacherTracks,
-  units,
-  userMistakes,
-  userSubjectStats,
-  type Db,
-} from '@plengo/db';
-import { BUSINESS_UTC_OFFSET_MS, DAY, DAY_STARTS_AT_MS, businessDay, startOfBusinessDay } from '@plengo/srs';
+import { DAY, businessDay, startOfBusinessDay } from '@plengo/srs';
+import type { StatsRepository } from '../repositories/stats-repository.js';
 import type { StructureRepository } from '../repositories/structure-repository.js';
 import type { TeacherRepository } from '../repositories/teacher-repository.js';
 import type { AccessService } from './access-service.js';
@@ -29,13 +14,6 @@ export const accuracy = (answered: number, correct: number): Accuracy => ({
   correct,
   accuracyPercent: answered ? Math.round((correct * 100) / answered) : null,
 });
-
-/**
- * The business day (04:00 Damascus boundary) of a timestamp column, as SQL. Grouped by position
- * (`group by 1`): the bound parameters make a repeated expression look different to Postgres.
- */
-const dayOf = (col: unknown) =>
-  sql<number>`floor((extract(epoch from ${col}) * 1000 + ${BUSINESS_UTC_OFFSET_MS - DAY_STARTS_AT_MS}) / ${DAY})::int`;
 
 /** A business day number as its calendar date. */
 export const dateOf = (day: number) => new Date(day * DAY).toISOString().slice(0, 10);
@@ -56,95 +34,30 @@ export function streak(days: Set<number>, today: number) {
  * attempt answers (indexed by user and grading time) joined to the question's current placement.
  */
 export function createStatsService(deps: {
-  db: Db;
+  repo: StatsRepository;
   structureRepo: StructureRepository;
   teacherRepo: TeacherRepository;
   access: AccessService;
+  /** Same counts as the mistake bank shows (hidden questions excluded). */
+  mistakeCounts: (userId: string) => Promise<{ active: number; mastered: number }>;
   now?: () => Date;
 }) {
-  const { db, structureRepo, teacherRepo, access } = deps;
+  const { repo, structureRepo, teacherRepo, access } = deps;
   const now = deps.now ?? (() => new Date());
-
-  const graded = (userId: string) =>
-    and(eq(quizAttemptAnswers.userId, userId), isNotNull(quizAttemptAnswers.gradedAt));
-  const answeredCol = sql<number>`count(*)::int`;
-  const correctCol = sql<number>`count(*) filter (where ${quizAttemptAnswers.isCorrect})::int`;
 
   return {
     async overview(userId: string): Promise<StatsOverview> {
       const today = businessDay(now().getTime());
       const [subjectRows, completed, byType, weak, missed, mistakeCounts, answerDays, reviewDays, ctx] =
         await Promise.all([
-          db
-            .select({
-              s: userSubjectStats,
-              subjectNameAr: subjects.nameAr,
-              trackTitleAr: teacherTracks.titleAr,
-            })
-            .from(userSubjectStats)
-            .innerJoin(subjects, eq(subjects.id, userSubjectStats.subjectId))
-            .leftJoin(teacherTracks, eq(teacherTracks.id, userSubjectStats.teacherTrackId))
-            .where(eq(userSubjectStats.userId, userId))
-            .orderBy(desc(userSubjectStats.answered)),
-          db
-            .select({ n: sql<number>`count(*)::int` })
-            .from(quizAttempts)
-            .where(and(eq(quizAttempts.userId, userId), eq(quizAttempts.status, 'submitted'))),
-          db
-            .select({ type: questions.type, answered: answeredCol, correct: correctCol })
-            .from(quizAttemptAnswers)
-            .innerJoin(questions, eq(questions.id, quizAttemptAnswers.questionId))
-            .where(graded(userId))
-            .groupBy(questions.type),
-          db
-            .select({
-              unitId: units.id,
-              unitNameAr: units.titleAr,
-              subjectId: subjects.id,
-              subjectNameAr: subjects.nameAr,
-              answered: answeredCol,
-              correct: correctCol,
-            })
-            .from(quizAttemptAnswers)
-            .innerJoin(questions, eq(questions.id, quizAttemptAnswers.questionId))
-            .innerJoin(units, eq(units.id, questions.unitId))
-            .innerJoin(subjects, eq(subjects.id, questions.subjectId))
-            .where(and(graded(userId), isNull(units.deletedAt)))
-            .groupBy(units.id, units.titleAr, subjects.id, subjects.nameAr)
-            .having(sql`count(*) >= ${WEAK_UNIT_MIN_ANSWERS}`)
-            .orderBy(
-              sql`count(*) filter (where ${quizAttemptAnswers.isCorrect})::float / count(*)`,
-              asc(units.id),
-            )
-            .limit(5),
-          db
-            .select({ m: userMistakes, q: questions, subjectNameAr: subjects.nameAr })
-            .from(userMistakes)
-            .innerJoin(questions, eq(questions.id, userMistakes.questionId))
-            .innerJoin(subjects, eq(subjects.id, questions.subjectId))
-            .where(
-              and(
-                eq(userMistakes.userId, userId),
-                ne(userMistakes.status, 'removed'),
-                isNull(questions.deletedAt),
-                eq(questions.status, 'published'),
-              ),
-            )
-            .orderBy(desc(userMistakes.wrongCount), desc(userMistakes.lastWrongAt))
-            .limit(20),
-          db
-            .select({ status: userMistakes.status, n: sql<number>`count(*)::int` })
-            .from(userMistakes)
-            .where(eq(userMistakes.userId, userId))
-            .groupBy(userMistakes.status),
-          db
-            .selectDistinct({ day: dayOf(quizAttemptAnswers.gradedAt) })
-            .from(quizAttemptAnswers)
-            .where(graded(userId)),
-          db
-            .selectDistinct({ day: dayOf(reviewLogs.reviewedAt) })
-            .from(reviewLogs)
-            .where(and(eq(reviewLogs.userId, userId), eq(reviewLogs.undone, false))),
+          repo.subjectTotals(userId),
+          repo.submittedAttemptCount(userId),
+          repo.byType(userId),
+          repo.weakestUnits(userId, WEAK_UNIT_MIN_ANSWERS, 5),
+          repo.mostMissed(userId, 20),
+          deps.mistakeCounts(userId),
+          repo.answerDays(userId),
+          repo.reviewDays(userId),
           access.context(userId),
         ]);
 
@@ -157,14 +70,13 @@ export function createStatsService(deps: {
         { answered: 0, correct: 0, timeMs: 0 },
       );
       const days = new Set([...answerDays, ...reviewDays].map((r) => r.day));
-      const count = (s: string) => mistakeCounts.find((m) => m.status === s)?.n ?? 0;
       return {
         totals: accuracy(totals.answered, totals.correct),
-        quizzesCompleted: completed[0]?.n ?? 0,
+        quizzesCompleted: completed,
         studyDays: days.size,
         currentStreak: streak(days, today),
         averageTimeMs: totals.answered ? Math.round(totals.timeMs / totals.answered) : null,
-        mistakes: { active: count('active'), mastered: count('mastered') },
+        mistakes: mistakeCounts,
         subjects: subjectRows.map((r) => ({
           subjectId: r.s.subjectId,
           subjectNameAr: r.subjectNameAr,
@@ -199,23 +111,8 @@ export function createStatsService(deps: {
         structureRepo.getSubject(subjectId, { studentVisible: true }),
         structureRepo.listUnits(subjectId),
         structureRepo.listLessons(subjectId),
-        db
-          .select({
-            unitId: questions.unitId,
-            lessonId: questions.lessonId,
-            type: questions.type,
-            answered: answeredCol,
-            correct: correctCol,
-          })
-          .from(quizAttemptAnswers)
-          .innerJoin(questions, eq(questions.id, quizAttemptAnswers.questionId))
-          .where(and(graded(userId), eq(questions.subjectId, subjectId)))
-          .groupBy(questions.unitId, questions.lessonId, questions.type),
-        db
-          .select({ s: userSubjectStats, trackTitleAr: teacherTracks.titleAr })
-          .from(userSubjectStats)
-          .innerJoin(teacherTracks, eq(teacherTracks.id, userSubjectStats.teacherTrackId))
-          .where(and(eq(userSubjectStats.userId, userId), eq(userSubjectStats.subjectId, subjectId))),
+        repo.subjectGroups(userId, subjectId),
+        repo.trackTotals(userId, subjectId),
       ]);
       const sum = (pick: (g: (typeof groups)[number]) => boolean) => {
         const rows = groups.filter(pick);
@@ -256,11 +153,7 @@ export function createStatsService(deps: {
     async trend(userId: string, weeks: number) {
       const today = businessDay(now().getTime());
       const firstDay = today - weeks * 7 + 1;
-      const rows = await db
-        .select({ day: dayOf(quizAttemptAnswers.gradedAt), answered: answeredCol, correct: correctCol })
-        .from(quizAttemptAnswers)
-        .where(and(graded(userId), gte(quizAttemptAnswers.gradedAt, new Date(startOfBusinessDay(firstDay)))))
-        .groupBy(sql`1`);
+      const rows = await repo.answersPerDay(userId, new Date(startOfBusinessDay(firstDay)));
       return {
         weeks: Array.from({ length: weeks }, (_, i) => {
           const start = firstDay + i * 7;
@@ -281,36 +174,8 @@ export function createStatsService(deps: {
       const at = now().getTime();
       const today = businessDay(at);
       const [states, logs, ctx] = await Promise.all([
-        db
-          .select({ state: cardStates.state, dueAt: cardStates.dueAt, deck: flashcardDecks })
-          .from(cardStates)
-          .innerJoin(flashcards, eq(flashcards.id, cardStates.flashcardId))
-          .innerJoin(flashcardDecks, eq(flashcardDecks.id, flashcards.deckId))
-          .where(
-            and(
-              eq(cardStates.userId, userId),
-              isNull(flashcards.deletedAt),
-              eq(flashcards.status, 'published'),
-              isNull(flashcardDecks.deletedAt),
-              eq(flashcardDecks.status, 'published'),
-            ),
-          ),
-        db
-          .select({
-            day: dayOf(reviewLogs.reviewedAt),
-            n: sql<number>`count(*)::int`,
-            reviewed: sql<number>`count(*) filter (where ${reviewLogs.stateBefore} ->> 'state' = 'review')::int`,
-            kept: sql<number>`count(*) filter (where ${reviewLogs.stateBefore} ->> 'state' = 'review' and ${reviewLogs.rating} <> 'again')::int`,
-          })
-          .from(reviewLogs)
-          .where(
-            and(
-              eq(reviewLogs.userId, userId),
-              eq(reviewLogs.undone, false),
-              gte(reviewLogs.reviewedAt, new Date(startOfBusinessDay(today - 29))),
-            ),
-          )
-          .groupBy(sql`1`),
+        repo.cardStates(userId),
+        repo.reviewsPerDay(userId, new Date(startOfBusinessDay(today - 29))),
         access.context(userId),
       ]);
       const open = states.filter((s) => ctx.canAccessItem(s.deck));

@@ -45,6 +45,8 @@ const envSchema = z
     EMAIL_FROM: z.string().default('Plengo <no-reply@example.com>'),
 
     SENTRY_DSN: z.string().optional(),
+    /** Proxies in front of the API (load balancer = 1). `X-Forwarded-For` beyond them is ignored. */
+    TRUST_PROXY_HOPS: z.coerce.number().int().min(0).max(5).default(1),
     JOBS_ENABLED: bool.default(true),
     TZ_BUSINESS: z.string().default('Asia/Damascus'),
   })

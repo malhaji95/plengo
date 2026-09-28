@@ -10,13 +10,10 @@ part 'attempt_summary_page.g.dart';
 
 @JsonSerializable()
 class AttemptSummaryPage {
-  const AttemptSummaryPage({
-    required this.items,
-    required this.nextCursor,
-  });
-  
+  const AttemptSummaryPage({required this.items, required this.nextCursor});
+
   factory AttemptSummaryPage.fromJson(Map<String, Object?> json) => _$AttemptSummaryPageFromJson(json);
-  
+
   final List<AttemptSummary> items;
   @JsonKey(includeIfNull: true)
   final String? nextCursor;

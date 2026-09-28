@@ -5,16 +5,23 @@ import type { FastifyBaseLogger } from 'fastify';
 import type { ObjectStorage } from '../storage/storage.js';
 import { objectKey, type KeyKind } from '../storage/keys.js';
 
-type ImageKind = 'flashcard' | 'banner' | 'teacher' | 'cover' | 'user-card';
+type ImageKind = 'flashcard' | 'banner' | 'teacher' | 'cover' | 'user-card' | 'avatar';
 
-/** Variant sizes and WebP quality per kind (spec §12.4). */
-export const VARIANT_SPECS: Record<ImageKind, { full: number; thumb: number; quality: number }> = {
-  flashcard: { full: 1080, thumb: 360, quality: 75 },
-  banner: { full: 1600, thumb: 800, quality: 75 },
-  teacher: { full: 800, thumb: 200, quality: 75 },
-  cover: { full: 800, thumb: 200, quality: 75 },
-  'user-card': { full: 1080, thumb: 360, quality: 75 },
+/** Variant sizes, WebP quality and the full-size byte budget per kind (spec §12.4). */
+export const VARIANT_SPECS: Record<
+  ImageKind,
+  { full: number; thumb: number; quality: number; budget: number }
+> = {
+  flashcard: { full: 1080, thumb: 360, quality: 75, budget: 150_000 },
+  banner: { full: 1600, thumb: 800, quality: 75, budget: 200_000 },
+  teacher: { full: 800, thumb: 200, quality: 75, budget: 80_000 },
+  cover: { full: 800, thumb: 200, quality: 75, budget: 80_000 },
+  'user-card': { full: 1080, thumb: 360, quality: 75, budget: 200_000 },
+  avatar: { full: 400, thumb: 120, quality: 75, budget: 60_000 },
 };
+
+/** Lowest quality tried while fitting a budget; below it the image keeps its best effort. */
+export const MIN_QUALITY = 45;
 
 const ACCEPTED_FORMATS = new Set(['png', 'jpeg', 'webp']);
 const MAX_INPUT_PIXELS = 40_000_000;
@@ -57,12 +64,22 @@ export function createMediaProcessor(deps: {
 
       const variants: MediaVariants = {};
       let optimizedSize = 0;
-      for (const variant of ['full', 'thumb'] as const) {
-        const { data, info } = await sharp(original, { limitInputPixels: MAX_INPUT_PIXELS })
+      const encode = (width: number, quality: number) =>
+        sharp(original, { limitInputPixels: MAX_INPUT_PIXELS })
           .rotate()
-          .resize({ width: spec[variant], withoutEnlargement: true })
-          .webp({ quality: spec.quality })
+          .resize({ width, withoutEnlargement: true })
+          .webp({ quality })
           .toBuffer({ resolveWithObject: true });
+      for (const variant of ['full', 'thumb'] as const) {
+        let { data, info } = await encode(spec[variant], spec.quality);
+        // Detailed images step the quality down until the full variant fits its budget.
+        for (
+          let q = spec.quality - 10;
+          variant === 'full' && data.length > spec.budget && q >= MIN_QUALITY;
+          q -= 10
+        ) {
+          ({ data, info } = await encode(spec[variant], q));
+        }
         const key = objectKey(appEnv, row.kind as KeyKind, row.id, variant, row.createdAt);
         await storage.put(row.bucket, key, data, 'image/webp');
         variants[variant] = { key, width: info.width, height: info.height, size: data.length };

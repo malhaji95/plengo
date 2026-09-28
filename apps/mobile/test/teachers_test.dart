@@ -55,6 +55,7 @@ RemoteConfig configWith({required bool teacherFollowing}) => RemoteConfig(
   ),
   srsDefaults: const SrsDefaults(newCardsPerDay: 20, maxReviewsPerDay: 200),
   support: const Support(email: '', whatsapp: ''),
+  storeUrls: const StoreUrls(android: 'https://play.example/plengo', ios: ''),
   privacyPolicyUrl: '',
   termsUrl: '',
 );

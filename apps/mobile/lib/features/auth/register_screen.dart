@@ -47,7 +47,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             fullName: _name.text.trim(),
             email: email,
             password: _password.text,
-            educationLevelId: _placement.levelId,
+            educationLevelId: _placement.levelId!,
             universityId: _placement.universityId,
             facultyId: _placement.facultyId,
             academicYearId: _placement.academicYearId,

@@ -10,14 +10,10 @@ part 'revoked_result_envelope.g.dart';
 
 @JsonSerializable()
 class RevokedResultEnvelope {
-  const RevokedResultEnvelope({
-    required this.success,
-    required this.data,
-    required this.error,
-  });
-  
+  const RevokedResultEnvelope({required this.success, required this.data, required this.error});
+
   factory RevokedResultEnvelope.fromJson(Map<String, Object?> json) => _$RevokedResultEnvelopeFromJson(json);
-  
+
   final bool success;
   final RevokedResult data;
   final dynamic error;

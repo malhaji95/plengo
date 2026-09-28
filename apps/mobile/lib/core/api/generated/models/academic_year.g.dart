@@ -15,12 +15,11 @@ AcademicYear _$AcademicYearFromJson(Map<String, dynamic> json) => AcademicYear(
   facultyId: json['facultyId'] as String,
 );
 
-Map<String, dynamic> _$AcademicYearToJson(AcademicYear instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'code': instance.code,
-      'nameAr': instance.nameAr,
-      'sortOrder': instance.sortOrder,
-      'isActive': instance.isActive,
-      'facultyId': instance.facultyId,
-    };
+Map<String, dynamic> _$AcademicYearToJson(AcademicYear instance) => <String, dynamic>{
+  'id': instance.id,
+  'code': instance.code,
+  'nameAr': instance.nameAr,
+  'sortOrder': instance.sortOrder,
+  'isActive': instance.isActive,
+  'facultyId': instance.facultyId,
+};

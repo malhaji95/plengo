@@ -36,6 +36,7 @@ export const mistakeListSchema = z.object({
   masteredCount: int(),
   /** Correct answers in a row that master a mistake (config `mistakeMasteryStreak`). */
   masteryStreak: int(),
+  nextCursor: z.string().nullable(),
 });
 
 export const mistakeFilterStatusSchema = z.enum(['active', 'mastered']);
@@ -49,6 +50,8 @@ export const mistakeQuerySchema = z.object({
   unitId: z.uuid().optional(),
   lessonId: z.uuid().optional(),
   type: mistakeFilterTypeSchema.optional(),
+  cursor: z.string().max(200).optional(),
+  limit: z.coerce.number().int().min(1).max(500).default(100),
 });
 
 export const learningSettingsSchema = z.object({ mistakeMasteryStreak: int().min(1).max(10) });
@@ -155,9 +158,14 @@ export const bookmarkSchema = z.object({
 });
 export const bookmarkListSchema = z.object({
   items: z.array(bookmarkSchema),
+  nextCursor: z.string().nullable(),
   urlsExpireAt: z.string(),
 });
-export const bookmarkQuerySchema = z.object({ itemType: bookmarkItemTypeSchema.optional() });
+export const bookmarkQuerySchema = z.object({
+  itemType: bookmarkItemTypeSchema.optional(),
+  cursor: z.string().max(200).optional(),
+  limit: z.coerce.number().int().min(1).max(200).default(50),
+});
 export const bookmarkBodySchema = z.object({ itemType: bookmarkItemTypeSchema, itemId: z.uuid() });
 export const bookmarkKeySchema = z.object({ itemType: bookmarkItemTypeSchema, itemId: z.string() });
 export const bookmarkKeyListSchema = z.array(bookmarkKeySchema);

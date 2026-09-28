@@ -170,6 +170,43 @@ export function createQuizRepository(db: Db) {
         .orderBy(asc(quizQuestions.sortOrder), asc(questions.id));
     },
 
+    /** The pass mark of a quiz (deleted ones included); null when it has none. */
+    async passingScore(id: string) {
+      const [row] = await db
+        .select({ p: quizzes.passingScorePercent })
+        .from(quizzes)
+        .where(eq(quizzes.id, id));
+      return row?.p ?? null;
+    },
+
+    /** Titles of live quizzes. */
+    async titles(ids: string[]) {
+      if (!ids.length) return [];
+      return db
+        .select({ id: quizzes.id, t: quizzes.titleAr })
+        .from(quizzes)
+        .where(and(inArray(quizzes.id, ids), isNull(quizzes.deletedAt)));
+    },
+
+    /** A member question appeared or disappeared for students: its quizzes change (§22.3). */
+    async bumpContaining(questionId: string) {
+      await db
+        .update(quizzes)
+        .set({ contentVersion: sql`${quizzes.contentVersion} + 1`, updatedAt: new Date() })
+        .where(
+          and(
+            liveQuiz,
+            inArray(
+              quizzes.id,
+              db
+                .select({ id: quizQuestions.quizId })
+                .from(quizQuestions)
+                .where(eq(quizQuestions.questionId, questionId)),
+            ),
+          ),
+        );
+    },
+
     async setMembers(tx: Tx, quizId: string, questionIds: string[]) {
       await tx.delete(quizQuestions).where(eq(quizQuestions.quizId, quizId));
       if (questionIds.length) {

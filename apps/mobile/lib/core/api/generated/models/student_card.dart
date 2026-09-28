@@ -18,9 +18,9 @@ class StudentCard {
     required this.front,
     required this.back,
   });
-  
+
   factory StudentCard.fromJson(Map<String, Object?> json) => _$StudentCardFromJson(json);
-  
+
   final String id;
   final String deckId;
   final int sortOrder;

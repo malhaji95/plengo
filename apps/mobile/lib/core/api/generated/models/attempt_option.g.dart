@@ -7,15 +7,10 @@ part of 'attempt_option.dart';
 // **************************************************************************
 
 AttemptOption _$AttemptOptionFromJson(Map<String, dynamic> json) =>
-    AttemptOption(
-      id: json['id'] as String,
-      text: json['text'] as String,
-      isCorrect: json['isCorrect'] as bool?,
-    );
+    AttemptOption(id: json['id'] as String, text: json['text'] as String, isCorrect: json['isCorrect'] as bool?);
 
-Map<String, dynamic> _$AttemptOptionToJson(AttemptOption instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'text': instance.text,
-      'isCorrect': instance.isCorrect,
-    };
+Map<String, dynamic> _$AttemptOptionToJson(AttemptOption instance) => <String, dynamic>{
+  'id': instance.id,
+  'text': instance.text,
+  'isCorrect': instance.isCorrect,
+};

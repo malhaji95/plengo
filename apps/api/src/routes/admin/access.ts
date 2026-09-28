@@ -4,10 +4,13 @@ import { z } from 'zod';
 import {
   accessSettingsSchema,
   learningSettingsSchema,
+  remoteConfigSchema,
   adminCouponListSchema,
+  adminCouponPageSchema,
+  couponPageQuerySchema,
   adminEntitlementSchema,
   adminStudentDetailSchema,
-  adminStudentListSchema,
+  adminStudentPageSchema,
   couponBatchListSchema,
   couponBatchSchema,
   couponExportQuerySchema,
@@ -64,10 +67,11 @@ export function adminAccessRoutes(c: Container): FastifyPluginAsyncZod {
             operationId: 'adminListStudents',
             tags,
             querystring: studentSearchQuerySchema,
-            response: { 200: successEnvelope(adminStudentListSchema) },
+            response: { 200: successEnvelope(adminStudentPageSchema) },
           },
         },
-        async (request) => ok(await c.access.searchStudents(request.query.q)),
+        async (request) =>
+          ok(await c.access.searchStudents(request.query.q, request.query.cursor, request.query.limit)),
       );
       app.get(
         '/students/:id',
@@ -174,10 +178,12 @@ export function adminAccessRoutes(c: Container): FastifyPluginAsyncZod {
           operationId: 'adminListBatchCoupons',
           tags,
           params: idParams,
-          response: { 200: successEnvelope(adminCouponListSchema) },
+          querystring: couponPageQuerySchema,
+          response: { 200: successEnvelope(adminCouponPageSchema) },
         },
       },
-      async (request) => ok(await c.coupons.batchCoupons(request.params.id)),
+      async (request) =>
+        ok(await c.coupons.batchCoupons(request.params.id, request.query.cursor, request.query.limit)),
     );
     app.get(
       '/coupon-batches/:id/export',
@@ -270,6 +276,42 @@ export function adminAccessRoutes(c: Container): FastifyPluginAsyncZod {
       },
     );
 
+    app.get(
+      '/settings/remote-config',
+      {
+        schema: {
+          operationId: 'adminGetRemoteConfig',
+          tags,
+          response: { 200: successEnvelope(remoteConfigSchema) },
+        },
+      },
+      async () => ok(await c.configService.getRemoteConfig()),
+    );
+    app.put(
+      '/settings/remote-config',
+      {
+        schema: {
+          operationId: 'adminUpdateRemoteConfig',
+          tags,
+          body: remoteConfigSchema,
+          response: { 200: successEnvelope(remoteConfigSchema) },
+        },
+      },
+      async (request) => {
+        const before = await c.configService.getRemoteConfig();
+        await c.configService.setRemoteConfig(request.body, authOf(request).userId);
+        const saved = await c.configService.getRemoteConfig();
+        await c.audit.record({
+          actorAdminId: authOf(request).userId,
+          action: 'settings.changed',
+          resourceType: 'app_setting',
+          resourceId: 'remote_config',
+          metadata: { from: before, to: saved },
+          ip: request.ip,
+        });
+        return ok(saved);
+      },
+    );
     app.get(
       '/settings/learning',
       {

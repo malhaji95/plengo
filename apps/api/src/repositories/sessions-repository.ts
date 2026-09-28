@@ -59,7 +59,12 @@ export function createSessionsRepository(db: Db) {
 
     async annotate(
       sessionId: string,
-      fields: { platform?: SessionPlatform; ipHash?: string | null; appVersion?: string | null },
+      fields: {
+        platform?: SessionPlatform;
+        ipHash?: string | null;
+        appVersion?: string | null;
+        userAgent?: string | null;
+      },
     ) {
       await db.update(sessions).set(fields).where(eq(sessions.id, sessionId));
     },

@@ -15,12 +15,11 @@ StudentCard _$StudentCardFromJson(Map<String, dynamic> json) => StudentCard(
   back: CardImage.fromJson(json['back'] as Map<String, dynamic>),
 );
 
-Map<String, dynamic> _$StudentCardToJson(StudentCard instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'deckId': instance.deckId,
-      'sortOrder': instance.sortOrder,
-      'contentVersion': instance.contentVersion,
-      'front': instance.front,
-      'back': instance.back,
-    };
+Map<String, dynamic> _$StudentCardToJson(StudentCard instance) => <String, dynamic>{
+  'id': instance.id,
+  'deckId': instance.deckId,
+  'sortOrder': instance.sortOrder,
+  'contentVersion': instance.contentVersion,
+  'front': instance.front,
+  'back': instance.back,
+};

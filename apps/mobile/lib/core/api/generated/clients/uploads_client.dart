@@ -16,17 +16,11 @@ abstract class UploadsClient {
   factory UploadsClient(Dio dio, {String? baseUrl}) = _UploadsClient;
 
   @POST('/api/v1/uploads')
-  Future<CreateUploadResultEnvelope> studentCreateUpload({
-    @Body() required CreateUploadRequest body,
-  });
+  Future<CreateUploadResultEnvelope> studentCreateUpload({@Body() required CreateUploadRequest body});
 
   @POST('/api/v1/uploads/{id}/complete')
-  Future<MediaFileEnvelope> studentCompleteUpload({
-    @Path('id') required String id,
-  });
+  Future<MediaFileEnvelope> studentCompleteUpload({@Path('id') required String id});
 
   @GET('/api/v1/uploads/{id}')
-  Future<MediaFileEnvelope> studentGetUpload({
-    @Path('id') required String id,
-  });
+  Future<MediaFileEnvelope> studentGetUpload({@Path('id') required String id});
 }

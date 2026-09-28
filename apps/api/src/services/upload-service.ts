@@ -13,7 +13,7 @@ export const MAX_STUDENT_UPLOAD_BYTES = 2 * 1024 * 1024;
 export const STUDENT_IMAGE_QUOTA = 300;
 
 const ADMIN_KINDS: readonly MediaKind[] = ['flashcard', 'banner', 'teacher', 'cover'];
-const STUDENT_KINDS: readonly MediaKind[] = ['user-card'];
+const STUDENT_KINDS: readonly MediaKind[] = ['user-card', 'avatar'];
 const PUBLIC_KINDS: readonly MediaKind[] = ['banner', 'teacher', 'cover'];
 
 export type UploadActor = { role: 'student' | 'admin'; userId: string };

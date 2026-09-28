@@ -120,6 +120,7 @@ void main() {
       universityId: null,
       facultyId: null,
       academicYearId: null,
+      avatarUrl: null,
     );
     final app = await pumpApp(
       tester,

@@ -11,14 +11,10 @@ part 'attempt.g.dart';
 
 @JsonSerializable()
 class Attempt {
-  const Attempt({
-    required this.attempt,
-    required this.questions,
-    required this.serverTime,
-  });
-  
+  const Attempt({required this.attempt, required this.questions, required this.serverTime});
+
   factory Attempt.fromJson(Map<String, Object?> json) => _$AttemptFromJson(json);
-  
+
   final AttemptSummary attempt;
   final List<AttemptQuestion> questions;
   final String serverTime;

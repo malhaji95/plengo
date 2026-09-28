@@ -21,6 +21,7 @@ export const DEFAULT_REMOTE_CONFIG: RemoteConfig = {
   },
   srsDefaults: { newCardsPerDay: 20, maxReviewsPerDay: 200 },
   support: { email: '', whatsapp: '' },
+  storeUrls: { android: '', ios: '' },
   privacyPolicyUrl: '',
   termsUrl: '',
 };
@@ -67,6 +68,7 @@ export function createConfigService(db: Db) {
         features: { ...DEFAULT_REMOTE_CONFIG.features, ...stored.features },
         srsDefaults: { ...DEFAULT_REMOTE_CONFIG.srsDefaults, ...stored.srsDefaults },
         support: { ...DEFAULT_REMOTE_CONFIG.support, ...stored.support },
+        storeUrls: { ...DEFAULT_REMOTE_CONFIG.storeUrls, ...stored.storeUrls },
       });
       cache = { value: merged, at: Date.now() };
       return merged;

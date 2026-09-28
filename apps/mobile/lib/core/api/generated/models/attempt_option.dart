@@ -8,14 +8,10 @@ part 'attempt_option.g.dart';
 
 @JsonSerializable()
 class AttemptOption {
-  const AttemptOption({
-    required this.id,
-    required this.text,
-    required this.isCorrect,
-  });
-  
+  const AttemptOption({required this.id, required this.text, required this.isCorrect});
+
   factory AttemptOption.fromJson(Map<String, Object?> json) => _$AttemptOptionFromJson(json);
-  
+
   final String id;
   final String text;
   @JsonKey(includeIfNull: true)

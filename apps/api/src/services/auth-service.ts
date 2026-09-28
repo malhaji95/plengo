@@ -27,6 +27,15 @@ const BETTER_AUTH_CODE_MAP: Record<string, ErrorCode> = {
 };
 
 /** Translate a Better Auth APIError into our §30.4 codes; rethrow anything else. */
+/** What cookie sessions record (§11.2, §31): hashed IP, a user-agent summary, the app version. */
+function sessionFields(meta: RequestMeta) {
+  return {
+    ipHash: meta.ipHash,
+    userAgent: meta.userAgent,
+    appVersion: meta.headers.get('x-app-version')?.slice(0, 20) ?? null,
+  };
+}
+
 export function mapAuthError(err: unknown, fallback: ErrorCode = 'SERVER_ERROR'): never {
   if (err instanceof AppError) throw err;
   if (err instanceof APIError) {
@@ -191,7 +200,7 @@ export function createAuthService(deps: {
           returnHeaders: true,
         });
         const sessionId = await sessionIdFromToken(response.token);
-        if (sessionId) await sessionsRepo.annotate(sessionId, { platform: 'web', ipHash: meta.ipHash });
+        if (sessionId) await sessionsRepo.annotate(sessionId, { platform: 'web', ...sessionFields(meta) });
         return { data: { signedIn: true }, setCookies: cookiesOf(headers) };
       } catch (err) {
         mapAuthError(err, 'AUTH_INVALID_CREDENTIALS');
@@ -228,7 +237,7 @@ export function createAuthService(deps: {
           return { data: { next: 'totp' as const }, setCookies };
         }
         const sessionId = await sessionIdFromToken((response as { token?: string }).token);
-        if (sessionId) await sessionsRepo.annotate(sessionId, { platform: 'admin', ipHash: meta.ipHash });
+        if (sessionId) await sessionsRepo.annotate(sessionId, { platform: 'admin', ...sessionFields(meta) });
         return { data: { next: 'enroll' as const }, setCookies };
       } catch (err) {
         mapAuthError(err, 'AUTH_INVALID_CREDENTIALS');
@@ -243,7 +252,7 @@ export function createAuthService(deps: {
           returnHeaders: true,
         });
         const sessionId = await sessionIdFromToken((response as { token?: string }).token);
-        if (sessionId) await sessionsRepo.annotate(sessionId, { platform: 'admin', ipHash: meta.ipHash });
+        if (sessionId) await sessionsRepo.annotate(sessionId, { platform: 'admin', ...sessionFields(meta) });
         return { data: { signedIn: true }, setCookies: cookiesOf(headers) };
       } catch (err) {
         mapAuthError(err, 'AUTH_OTP_INVALID');
@@ -258,7 +267,7 @@ export function createAuthService(deps: {
           returnHeaders: true,
         });
         const sessionId = await sessionIdFromToken((response as { token?: string }).token);
-        if (sessionId) await sessionsRepo.annotate(sessionId, { platform: 'admin', ipHash: meta.ipHash });
+        if (sessionId) await sessionsRepo.annotate(sessionId, { platform: 'admin', ...sessionFields(meta) });
         return { data: { signedIn: true }, setCookies: cookiesOf(headers) };
       } catch (err) {
         mapAuthError(err, 'AUTH_OTP_INVALID');

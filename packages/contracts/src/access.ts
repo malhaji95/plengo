@@ -126,11 +126,19 @@ export const adminStudentSchema = z.object({
   activeEntitlementCount: z.number(),
 });
 export const adminStudentListSchema = z.array(adminStudentSchema);
+export const adminStudentPageSchema = z.object({
+  items: adminStudentListSchema,
+  nextCursor: z.string().nullable(),
+});
 export const adminStudentDetailSchema = z.object({
   student: adminStudentSchema,
   entitlements: adminEntitlementListSchema,
 });
-export const studentSearchQuerySchema = z.object({ q: text(200).optional() });
+export const studentSearchQuerySchema = z.object({
+  q: text(200).optional(),
+  cursor: z.string().max(200).optional(),
+  limit: z.coerce.number().int().min(1).max(200).default(50),
+});
 
 export const couponBatchSchema = z.object({
   id: z.string(),
@@ -193,6 +201,14 @@ export const adminCouponSchema = z.object({
   redeemedByEmail: z.string().nullable(),
 });
 export const adminCouponListSchema = z.array(adminCouponSchema);
+export const adminCouponPageSchema = z.object({
+  items: adminCouponListSchema,
+  nextCursor: z.string().nullable(),
+});
+export const couponPageQuerySchema = z.object({
+  cursor: z.string().max(200).optional(),
+  limit: z.coerce.number().int().min(1).max(1000).default(200),
+});
 /** `q` is a full code (any format students might type) or its last four characters. */
 export const couponSearchQuerySchema = z.object({ q: text(64).min(4) });
 export const couponExportQuerySchema = z.object({ format: z.enum(['csv', 'xlsx']).default('csv') });
@@ -339,6 +355,8 @@ const named: [z.ZodType, string][] = [
   [createCouponBatchBodySchema, 'CreateCouponBatchRequest'],
   [adminCouponSchema, 'AdminCoupon'],
   [adminCouponListSchema, 'AdminCouponList'],
+  [adminCouponPageSchema, 'AdminCouponPage'],
+  [adminStudentPageSchema, 'AdminStudentPage'],
   [couponFailureReportSchema, 'CouponFailureReport'],
   [promotionSchema, 'Promotion'],
   [promotionListSchema, 'PromotionList'],

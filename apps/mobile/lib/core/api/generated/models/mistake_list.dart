@@ -15,14 +15,17 @@ class MistakeList {
     required this.activeCount,
     required this.masteredCount,
     required this.masteryStreak,
+    required this.nextCursor,
   });
-  
+
   factory MistakeList.fromJson(Map<String, Object?> json) => _$MistakeListFromJson(json);
-  
+
   final List<Mistake> items;
   final int activeCount;
   final int masteredCount;
   final int masteryStreak;
+  @JsonKey(includeIfNull: true)
+  final String? nextCursor;
 
   Map<String, Object?> toJson() => _$MistakeListToJson(this);
 }

@@ -9,6 +9,7 @@ export const mediaKindEnum = pgEnum('media_kind', [
   'teacher',
   'cover',
   'user-card',
+  'avatar',
   'import',
   'original',
 ]);

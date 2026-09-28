@@ -1,13 +1,23 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-/// Blocking screen below `minSupportedVersion` (spec §10.2). Store links are added with the
-/// store listings in Phase 13; on web a reload fetches the new build.
-class ForceUpdateScreen extends StatelessWidget {
+import '../../app/providers.dart';
+
+/// Blocking screen below `minSupportedVersion` (spec §10.2): a store link on Android/iOS (from
+/// remote config `storeUrls`), a reload on web that fetches the new build.
+class ForceUpdateScreen extends ConsumerWidget {
   const ForceUpdateScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final env = ref.watch(appEnvironmentProvider);
+    final urls = ref.watch(remoteConfigProvider).value?.storeUrls;
+    final store = switch (env.platform) {
+      'android' => urls?.android,
+      'ios' => urls?.ios,
+      _ => null,
+    };
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -21,7 +31,20 @@ class ForceUpdateScreen extends StatelessWidget {
                 Text('يرجى تحديث التطبيق', style: Theme.of(context).textTheme.headlineSmall),
                 const SizedBox(height: 12),
                 const Text('هذا الإصدار لم يعد مدعوماً. حدّث التطبيق للمتابعة.', textAlign: TextAlign.center),
-                if (kIsWeb) ...[const SizedBox(height: 24), const Text('أعد تحميل الصفحة للحصول على أحدث إصدار.')],
+                const SizedBox(height: 24),
+                if (env.isWeb)
+                  FilledButton.icon(
+                    // Reloading the page loads the new build.
+                    onPressed: () => launchUrl(Uri.base, webOnlyWindowName: '_self'),
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('إعادة تحميل الصفحة'),
+                  )
+                else if (store != null && store.isNotEmpty)
+                  FilledButton.icon(
+                    onPressed: () => launchUrl(Uri.parse(store), mode: LaunchMode.externalApplication),
+                    icon: const Icon(Icons.open_in_new),
+                    label: const Text('تحديث من المتجر'),
+                  ),
               ],
             ),
           ),

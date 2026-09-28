@@ -237,6 +237,97 @@
         ],
         "additionalProperties": false
       },
+      "AdminAccount": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "disabled"
+            ]
+          },
+          "twoFactorEnabled": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "lastSeenAt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "fullName",
+          "status",
+          "twoFactorEnabled",
+          "createdAt",
+          "lastSeenAt"
+        ],
+        "additionalProperties": false
+      },
+      "AdminAccountEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/AdminAccount"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "AdminAccountList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/AdminAccount"
+        }
+      },
+      "AdminAccountListEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/AdminAccountList"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
       "AdminCard": {
         "type": "object",
         "properties": {
@@ -407,6 +498,46 @@
           },
           "data": {
             "$ref": "#/components/schemas/AdminCouponList"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "AdminCouponPage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "$ref": "#/components/schemas/AdminCouponList"
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "additionalProperties": false
+      },
+      "AdminCouponPageEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/AdminCouponPage"
           },
           "error": {
             "type": "null"
@@ -1386,7 +1517,26 @@
           "$ref": "#/components/schemas/AdminStudent"
         }
       },
-      "AdminStudentListEnvelope": {
+      "AdminStudentPage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "$ref": "#/components/schemas/AdminStudentList"
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "additionalProperties": false
+      },
+      "AdminStudentPageEnvelope": {
         "type": "object",
         "properties": {
           "success": {
@@ -1394,7 +1544,7 @@
             "const": true
           },
           "data": {
-            "$ref": "#/components/schemas/AdminStudentList"
+            "$ref": "#/components/schemas/AdminStudentPage"
           },
           "error": {
             "type": "null"
@@ -2299,12 +2449,19 @@
               "$ref": "#/components/schemas/Bookmark"
             }
           },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "urlsExpireAt": {
             "type": "string"
           }
         },
         "required": [
           "items",
+          "nextCursor",
           "urlsExpireAt"
         ],
         "additionalProperties": false
@@ -2785,6 +2942,29 @@
           "code",
           "nameAr",
           "facultyId"
+        ]
+      },
+      "CreateAdminRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 120
+          },
+          "password": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "email",
+          "fullName",
+          "password"
         ]
       },
       "CreateCardRequest": {
@@ -4781,6 +4961,12 @@
               "string",
               "null"
             ]
+          },
+          "avatarUrl": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "required": [
@@ -4792,7 +4978,8 @@
           "educationLevelId",
           "universityId",
           "facultyId",
-          "academicYearId"
+          "academicYearId",
+          "avatarUrl"
         ],
         "additionalProperties": false
       },
@@ -4883,7 +5070,8 @@
           "banner",
           "teacher",
           "cover",
-          "user-card"
+          "user-card",
+          "avatar"
         ]
       },
       "MeEnvelope": {
@@ -5075,13 +5263,20 @@
             "type": "integer",
             "minimum": -9007199254740991,
             "maximum": 9007199254740991
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "required": [
           "items",
           "activeCount",
           "masteredCount",
-          "masteryStreak"
+          "masteryStreak",
+          "nextCursor"
         ],
         "additionalProperties": false
       },
@@ -5603,7 +5798,8 @@
         "required": [
           "fullName",
           "email",
-          "password"
+          "password",
+          "educationLevelId"
         ]
       },
       "RemoteConfig": {
@@ -5613,13 +5809,16 @@
             "type": "object",
             "properties": {
               "android": {
-                "type": "string"
+                "type": "string",
+                "pattern": "^\\d+\\.\\d+\\.\\d+$"
               },
               "ios": {
-                "type": "string"
+                "type": "string",
+                "pattern": "^\\d+\\.\\d+\\.\\d+$"
               },
               "web": {
-                "type": "string"
+                "type": "string",
+                "pattern": "^\\d+\\.\\d+\\.\\d+$"
               }
             },
             "required": [
@@ -5633,13 +5832,16 @@
             "type": "object",
             "properties": {
               "android": {
-                "type": "string"
+                "type": "string",
+                "pattern": "^\\d+\\.\\d+\\.\\d+$"
               },
               "ios": {
-                "type": "string"
+                "type": "string",
+                "pattern": "^\\d+\\.\\d+\\.\\d+$"
               },
               "web": {
-                "type": "string"
+                "type": "string",
+                "pattern": "^\\d+\\.\\d+\\.\\d+$"
               }
             },
             "required": [
@@ -5713,6 +5915,22 @@
             ],
             "additionalProperties": false
           },
+          "storeUrls": {
+            "type": "object",
+            "properties": {
+              "android": {
+                "type": "string"
+              },
+              "ios": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "android",
+              "ios"
+            ],
+            "additionalProperties": false
+          },
           "privacyPolicyUrl": {
             "type": "string"
           },
@@ -5726,6 +5944,7 @@
           "features",
           "srsDefaults",
           "support",
+          "storeUrls",
           "privacyPolicyUrl",
           "termsUrl"
         ],
@@ -9083,6 +9302,18 @@
                 "type": "null"
               }
             ]
+          },
+          "avatarMediaId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "additionalProperties": false
@@ -11383,6 +11614,26 @@
             "in": "query",
             "name": "type",
             "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false
+          },
+          {
+            "schema": {
+              "default": 100,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false
           }
         ],
         "responses": {
@@ -11549,6 +11800,26 @@
             },
             "in": "query",
             "name": "itemType",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false
+          },
+          {
+            "schema": {
+              "default": 50,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200
+            },
+            "in": "query",
+            "name": "limit",
             "required": false
           }
         ],
@@ -13459,6 +13730,26 @@
             "in": "query",
             "name": "q",
             "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false
+          },
+          {
+            "schema": {
+              "default": 50,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false
           }
         ],
         "responses": {
@@ -13467,7 +13758,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminStudentListEnvelope"
+                  "$ref": "#/components/schemas/AdminStudentPageEnvelope"
                 }
               }
             }
@@ -13723,6 +14014,26 @@
           {
             "schema": {
               "type": "string",
+              "maxLength": 200
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false
+          },
+          {
+            "schema": {
+              "default": 200,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1000
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
               "format": "uuid",
               "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
             },
@@ -13737,7 +14048,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminCouponListEnvelope"
+                  "$ref": "#/components/schemas/AdminCouponPageEnvelope"
                 }
               }
             }
@@ -13909,6 +14220,54 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AccessSettingsEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/settings/remote-config": {
+      "get": {
+        "operationId": "adminGetRemoteConfig",
+        "tags": [
+          "admin-access"
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RemoteConfigEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "adminUpdateRemoteConfig",
+        "tags": [
+          "admin-access"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoteConfig"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RemoteConfigEnvelope"
                 }
               }
             }
@@ -15480,6 +15839,294 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ReorderedResultEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/admins": {
+      "get": {
+        "operationId": "adminListAdmins",
+        "tags": [
+          "admin-admins"
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminAccountListEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "adminCreateAdmin",
+        "tags": [
+          "admin-admins"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAdminRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminAccountEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/admins/{id}/deactivate": {
+      "post": {
+        "operationId": "adminDeactivateAdmin",
+        "tags": [
+          "admin-admins"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminAccountEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/admins/{id}/reactivate": {
+      "post": {
+        "operationId": "adminReactivateAdmin",
+        "tags": [
+          "admin-admins"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminAccountEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/admins/{id}/reset-2fa": {
+      "post": {
+        "operationId": "adminResetAdminTwoFactor",
+        "tags": [
+          "admin-admins"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminAccountEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/students/{id}/sessions": {
+      "get": {
+        "operationId": "adminListStudentSessions",
+        "tags": [
+          "admin-students"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionListEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/students/{id}/sessions/{sessionId}": {
+      "delete": {
+        "operationId": "adminRevokeStudentSession",
+        "tags": [
+          "admin-students"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "sessionId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RevokedResultEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/students/{id}/attempts": {
+      "get": {
+        "operationId": "adminListStudentAttempts",
+        "tags": [
+          "admin-students"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "$ref": "#/components/schemas/AttemptStatus"
+            },
+            "in": "query",
+            "name": "status",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "quizId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false
+          },
+          {
+            "schema": {
+              "default": 20,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttemptSummaryPageEnvelope"
                 }
               }
             }

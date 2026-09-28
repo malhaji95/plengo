@@ -41,8 +41,22 @@ class LearningRepository {
   Future<Attempt> submit(String attemptId, SubmitAttemptRequest body) =>
       guardApi(() async => (await client.api.attempts.submitAttempt(id: attemptId, body: body)).data);
 
-  Future<MistakeList> mistakes({MistakeFilterStatus status = MistakeFilterStatus.active}) =>
-      guardApi(() async => (await client.api.mistakes.listMistakes(status: status)).data);
+  /// Every page of the mistake bank (read whole to group and filter it on screen).
+  Future<MistakeList> mistakes({MistakeFilterStatus status = MistakeFilterStatus.active}) => guardApi(() async {
+    var page = (await client.api.mistakes.listMistakes(status: status, limit: 500)).data;
+    final items = [...page.items];
+    while (page.nextCursor != null) {
+      page = (await client.api.mistakes.listMistakes(status: status, limit: 500, cursor: page.nextCursor)).data;
+      items.addAll(page.items);
+    }
+    return MistakeList(
+      items: items,
+      activeCount: page.activeCount,
+      masteredCount: page.masteredCount,
+      masteryStreak: page.masteryStreak,
+      nextCursor: null,
+    );
+  });
 
   Future<void> removeMistake(String questionId) =>
       guardApi(() async => client.api.mistakes.removeMistake(questionId: questionId));
@@ -57,7 +71,16 @@ class LearningRepository {
 
   Future<FlashcardStats> flashcardStats() => guardApi(() async => (await client.api.stats.getFlashcardStats()).data);
 
-  Future<BookmarkList> bookmarks() => guardApi(() async => (await client.api.bookmarks.listBookmarks()).data);
+  /// All saved items, page by page.
+  Future<BookmarkList> bookmarks() => guardApi(() async {
+    var page = (await client.api.bookmarks.listBookmarks(limit: 200)).data;
+    final items = [...page.items];
+    while (page.nextCursor != null) {
+      page = (await client.api.bookmarks.listBookmarks(limit: 200, cursor: page.nextCursor)).data;
+      items.addAll(page.items);
+    }
+    return BookmarkList(items: items, nextCursor: null, urlsExpireAt: page.urlsExpireAt);
+  });
 
   Future<List<BookmarkKey>> bookmarkKeys() =>
       guardApi(() async => (await client.api.bookmarks.listBookmarkKeys()).data);

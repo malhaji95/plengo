@@ -8,6 +8,7 @@ import type {
   MyEntitlement,
   ScopeAccess,
 } from '@plengo/contracts';
+import { decodeCursor, encodeCursor } from '../repositories/question-repository.js';
 import { AppError } from '../lib/app-error.js';
 import { endOfBusinessDay } from '../lib/business-time.js';
 import {
@@ -327,7 +328,8 @@ export function createAccessService(deps: {
 
     // ---- admin ----
 
-    async searchStudents(q: string | undefined): Promise<AdminStudent[]> {
+    async searchStudents(q: string | undefined, cursor?: string, limit = 50) {
+      const offset = decodeCursor(cursor);
       const term = q?.trim();
       const filter = term
         ? or(
@@ -341,9 +343,13 @@ export function createAccessService(deps: {
         .from(users)
         .leftJoin(profiles, eq(profiles.userId, users.id))
         .where(and(eq(users.role, 'student'), filter))
-        .orderBy(desc(users.createdAt))
-        .limit(50);
-      return toStudents(rows);
+        .orderBy(desc(users.createdAt), desc(users.id))
+        .limit(limit + 1)
+        .offset(offset);
+      return {
+        items: await toStudents(rows.slice(0, limit)),
+        nextCursor: rows.length > limit ? encodeCursor(offset + limit) : null,
+      };
     },
 
     async studentDetail(userId: string) {

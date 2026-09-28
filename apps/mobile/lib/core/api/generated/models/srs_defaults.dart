@@ -8,13 +8,10 @@ part 'srs_defaults.g.dart';
 
 @JsonSerializable()
 class SrsDefaults {
-  const SrsDefaults({
-    required this.newCardsPerDay,
-    required this.maxReviewsPerDay,
-  });
-  
+  const SrsDefaults({required this.newCardsPerDay, required this.maxReviewsPerDay});
+
   factory SrsDefaults.fromJson(Map<String, Object?> json) => _$SrsDefaultsFromJson(json);
-  
+
   final int newCardsPerDay;
   final int maxReviewsPerDay;
 

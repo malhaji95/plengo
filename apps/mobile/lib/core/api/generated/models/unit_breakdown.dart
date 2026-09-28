@@ -18,9 +18,9 @@ class UnitBreakdown {
     required this.unitNameAr,
     required this.lessons,
   });
-  
+
   factory UnitBreakdown.fromJson(Map<String, Object?> json) => _$UnitBreakdownFromJson(json);
-  
+
   final int answered;
   final int correct;
   @JsonKey(includeIfNull: true)

@@ -1,4 +1,4 @@
-import { and, desc, eq, inArray, lt, sql } from 'drizzle-orm';
+import { and, desc, eq, inArray, isNotNull, lt, sql } from 'drizzle-orm';
 import { quizAttemptAnswers, quizAttempts, type Db, type Tx } from '@plengo/db';
 import { decodeCursor, encodeCursor } from './question-repository.js';
 
@@ -17,6 +17,25 @@ export function createAttemptRepository(db: Db) {
         .onConflictDoNothing({ target: [quizAttempts.userId, quizAttempts.clientAttemptId] })
         .returning();
       return row ?? null;
+    },
+
+    /**
+     * Serializes starts of one student's attempts at one quiz for the rest of the transaction, then
+     * counts the attempts that use up `max_attempts`.
+     */
+    async lockAndCountUsed(tx: Tx, userId: string, quizId: string) {
+      await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${`${userId}:${quizId}`}))`);
+      const [row] = await tx
+        .select({ n: sql<number>`count(*)::int` })
+        .from(quizAttempts)
+        .where(
+          and(
+            eq(quizAttempts.userId, userId),
+            eq(quizAttempts.quizId, quizId),
+            sql`${quizAttempts.status} <> 'abandoned'`,
+          ),
+        );
+      return row!.n;
     },
 
     async byClientId(userId: string, clientAttemptId: string, conn: Conn = db) {
@@ -126,6 +145,73 @@ export function createAttemptRepository(db: Db) {
         .groupBy(quizAttempts.quizId);
       for (const r of rows) out.set(r.quizId!, { used: r.used, best: r.best, inProgressId: r.inProgressId });
       return out;
+    },
+
+    /** Whether the question is part of one of the student's unfinished exams (§15.2). */
+    async inOpenExam(userId: string, questionId: string) {
+      const [row] = await db
+        .select({ id: quizAttempts.id })
+        .from(quizAttempts)
+        .where(
+          and(
+            eq(quizAttempts.userId, userId),
+            eq(quizAttempts.status, 'in_progress'),
+            eq(quizAttempts.mode, 'exam'),
+            sql`${quizAttempts.questionOrder} @> ${JSON.stringify([questionId])}::jsonb`,
+          ),
+        )
+        .limit(1);
+      return Boolean(row);
+    },
+
+    /** Per question the student has a graded answer for: whether any of them was correct. */
+    async correctnessByQuestion(userId: string, questionIds: string[]) {
+      if (!questionIds.length) return [];
+      return db
+        .select({
+          id: quizAttemptAnswers.questionId,
+          ok: sql<boolean>`bool_or(${quizAttemptAnswers.isCorrect})`,
+        })
+        .from(quizAttemptAnswers)
+        .where(
+          and(
+            eq(quizAttemptAnswers.userId, userId),
+            isNotNull(quizAttemptAnswers.gradedAt),
+            inArray(quizAttemptAnswers.questionId, questionIds),
+          ),
+        )
+        .groupBy(quizAttemptAnswers.questionId);
+    },
+
+    /** Of the given quizzes, those the student has submitted an attempt at. */
+    async submittedQuizIds(userId: string, quizIds: string[]) {
+      if (!quizIds.length) return [];
+      return db
+        .selectDistinct({ id: quizAttempts.quizId })
+        .from(quizAttempts)
+        .where(
+          and(
+            eq(quizAttempts.userId, userId),
+            eq(quizAttempts.status, 'submitted'),
+            inArray(quizAttempts.quizId, quizIds),
+          ),
+        );
+    },
+
+    /** The student's unfinished attempts at the given quizzes, latest activity first. */
+    async inProgressFor(userId: string, quizIds: string[]) {
+      if (!quizIds.length) return [];
+      return db
+        .select({ id: quizAttempts.id, quizId: quizAttempts.quizId })
+        .from(quizAttempts)
+        .where(
+          and(
+            eq(quizAttempts.userId, userId),
+            eq(quizAttempts.status, 'in_progress'),
+            inArray(quizAttempts.quizId, quizIds),
+          ),
+        )
+        .orderBy(desc(quizAttempts.lastActivityAt));
     },
 
     /** Job (§15.5): unfinished attempts without activity since `before` become abandoned. */

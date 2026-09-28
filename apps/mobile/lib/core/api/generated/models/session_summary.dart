@@ -19,9 +19,9 @@ class SessionSummary {
     required this.lastSeenAt,
     required this.current,
   });
-  
+
   factory SessionSummary.fromJson(Map<String, Object?> json) => _$SessionSummaryFromJson(json);
-  
+
   final String id;
   final SessionPlatform platform;
   @JsonKey(includeIfNull: true)

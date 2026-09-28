@@ -1,7 +1,6 @@
 import { randomInt } from 'node:crypto';
-import { and, eq, inArray, isNull, sql } from 'drizzle-orm';
 import type { AttemptQuestion, AttemptSummary, AttemptView, CheckResult } from '@plengo/contracts';
-import { questions, quizzes, userMistakes, type AttemptFilters, type Db, type Tx } from '@plengo/db';
+import type { AttemptFilters, Db, Tx } from '@plengo/db';
 import { AppError } from '../lib/app-error.js';
 import type { AnswerRow, AttemptRepository, AttemptRow } from '../repositories/attempt-repository.js';
 import type { GradedAnswer, LearningRepository } from '../repositories/learning-repository.js';
@@ -21,6 +20,8 @@ export const LATE_GRACE_MS = 2 * 60_000;
 export const ABANDON_AFTER_MS = 7 * 24 * 3600_000;
 export const DEFAULT_PRACTICE_COUNT = 20;
 const MAX_TIME_MS = 86_400_000;
+/** Per-answer time counted in statistics: longer pauses are not time spent on the question. */
+export const MAX_STATS_TIME_MS = 30 * 60_000;
 
 type Answer = {
   selectedOptionId?: string | null | undefined;
@@ -149,11 +150,7 @@ export function createAttemptService(deps: {
 
   async function passingOf(a: AttemptRow) {
     if (!a.quizId) return null;
-    const [row] = await db
-      .select({ p: quizzes.passingScorePercent })
-      .from(quizzes)
-      .where(eq(quizzes.id, a.quizId));
-    return row?.p ?? null;
+    return quizRepo.passingScore(a.quizId);
   }
 
   async function view(a: AttemptRow): Promise<AttemptView> {
@@ -241,7 +238,7 @@ export function createAttemptService(deps: {
     at: Date,
     masteryStreak: number,
   ) {
-    const timeMs = Math.min(Math.max(a.timeSpentMs ?? 0, 0), MAX_TIME_MS);
+    const timeMs = Math.min(Math.max(a.timeSpentMs ?? 0, 0), MAX_STATS_TIME_MS);
     const values = {
       selectedOptionId: a.selectedOptionId ?? null,
       writtenAnswer: a.writtenAnswer ?? null,
@@ -308,6 +305,7 @@ export function createAttemptService(deps: {
     return {
       quizId: quiz.id,
       quizContentVersion: quiz.contentVersion,
+      maxAttempts: quiz.maxAttempts,
       titleAr: quiz.titleAr,
       subjectId: quiz.subjectId,
       teacherTrackId: quiz.teacherTrackId,
@@ -328,28 +326,23 @@ export function createAttemptService(deps: {
     const scopeOpen = ctx.scopeAccess(
       scopeOf({ subjectId: f.subjectId!, teacherTrackId: trackId }),
     ).hasAccess;
-    const rows = await db
-      .select({ id: questions.id })
-      .from(questions)
-      .where(
-        and(
-          isNull(questions.deletedAt),
-          eq(questions.status, 'published'),
-          eq(questions.subjectId, f.subjectId!),
-          trackId ? eq(questions.teacherTrackId, trackId) : isNull(questions.teacherTrackId),
-          f.unitId ? eq(questions.unitId, f.unitId) : undefined,
-          f.lessonId ? eq(questions.lessonId, f.lessonId) : undefined,
-          f.types?.length ? inArray(questions.type, f.types) : undefined,
-          scopeOpen ? undefined : eq(questions.isFree, true),
-        ),
-      )
-      .orderBy(sql`random()`)
-      .limit(f.count ?? DEFAULT_PRACTICE_COUNT);
+    const rows = await questionRepo.randomPublishedIds(
+      {
+        subjectId: f.subjectId!,
+        teacherTrackId: trackId,
+        unitId: f.unitId,
+        lessonId: f.lessonId,
+        types: f.types,
+        freeOnly: !scopeOpen,
+      },
+      f.count ?? DEFAULT_PRACTICE_COUNT,
+    );
     if (!rows.length) invalid('filters', 'no_questions');
     const content = await withContent(rows.map((r) => r.id));
     return {
       quizId: null,
       quizContentVersion: null,
+      maxAttempts: null,
       titleAr: 'تدريب عشوائي',
       subjectId: f.subjectId!,
       teacherTrackId: trackId,
@@ -363,28 +356,7 @@ export function createAttemptService(deps: {
 
   /** "اختبر أخطائي" (§16.1): active mistakes the student can still open. */
   async function mistakes(userId: string, f: AttemptFilters) {
-    const rows = await db
-      .select({ q: questions })
-      .from(userMistakes)
-      .innerJoin(questions, eq(questions.id, userMistakes.questionId))
-      .where(
-        and(
-          eq(userMistakes.userId, userId),
-          eq(userMistakes.status, 'active'),
-          isNull(questions.deletedAt),
-          eq(questions.status, 'published'),
-          f.subjectId ? eq(questions.subjectId, f.subjectId) : undefined,
-          f.subjectId && f.teacherTrackId !== undefined
-            ? f.teacherTrackId
-              ? eq(questions.teacherTrackId, f.teacherTrackId)
-              : isNull(questions.teacherTrackId)
-            : undefined,
-          f.unitId ? eq(questions.unitId, f.unitId) : undefined,
-          f.lessonId ? eq(questions.lessonId, f.lessonId) : undefined,
-          f.types?.length ? inArray(questions.type, f.types) : undefined,
-          f.questionIds?.length ? inArray(questions.id, f.questionIds) : undefined,
-        ),
-      );
+    const rows = await learningRepo.activeMistakeQuestions(userId, f);
     const ctx = await access.context(userId);
     const scopes = new Map<string, boolean>();
     const open = [];
@@ -401,6 +373,7 @@ export function createAttemptService(deps: {
     return {
       quizId: null,
       quizContentVersion: null,
+      maxAttempts: null,
       titleAr: 'مراجعة الأخطاء',
       subjectId: only?.subjectId ?? null,
       teacherTrackId:
@@ -436,6 +409,13 @@ export function createAttemptService(deps: {
             : await mistakes(userId, f);
       const at = now();
       const row = await db.transaction(async (tx) => {
+        if (built.quizId && built.maxAttempts !== null) {
+          // Re-checked under a lock: concurrent starts cannot both take the last attempt.
+          const used = await repo.lockAndCountUsed(tx, userId, built.quizId);
+          if (used >= built.maxAttempts && !(await repo.byClientId(userId, body.clientAttemptId, tx))) {
+            invalid('quizId', 'max_attempts');
+          }
+        }
         const inserted = await repo.insert(tx, {
           clientAttemptId: body.clientAttemptId,
           userId,

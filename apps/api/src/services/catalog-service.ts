@@ -40,6 +40,17 @@ export function createCatalogService(deps: {
     return (await repo.getSubject(id, { studentVisible: true })) ?? notFound();
   }
 
+  /** The signed-in user with a signed avatar URL (private bucket, 1 hour). */
+  async function me(userId: string) {
+    const row = (await usersRepo.getMe(userId)) ?? notFound();
+    const { avatar, ...rest } = row;
+    const key = avatar?.variants.full?.key;
+    return {
+      ...rest,
+      avatarUrl: avatar && key ? await storage.getSignedGetUrl(avatar.bucket, key, 3600) : null,
+    };
+  }
+
   return {
     async levels(): Promise<EducationLevel[]> {
       return (await repo.listLevels()).map((l) => ({
@@ -112,19 +123,35 @@ export function createCatalogService(deps: {
      * Profile level and college path only set defaults; they never restrict browsing (§8.9). Sending
      * the level or any college layer replaces the whole placement: layers not sent become empty.
      */
+    me,
+
     async updateProfile(
       userId: string,
-      input: CollegePathInput & { fullName?: string | undefined; educationLevelId?: string | undefined },
+      input: CollegePathInput & {
+        fullName?: string | undefined;
+        educationLevelId?: string | undefined;
+        avatarMediaId?: string | null | undefined;
+      },
     ) {
-      const me = (await usersRepo.getMe(userId)) ?? notFound();
+      const current = (await usersRepo.getMe(userId)) ?? notFound();
       const fields: Parameters<UsersRepository['updateProfile']>[1] = {};
       if (input.fullName) fields.fullName = input.fullName;
+      if (input.avatarMediaId !== undefined) {
+        if (input.avatarMediaId) {
+          // Only the student's own processed avatar upload.
+          const m = await usersRepo.getMedia(input.avatarMediaId);
+          if (!m || m.deletedAt || m.kind !== 'avatar' || m.status !== 'ready' || m.ownerUserId !== userId) {
+            throw new AppError('VALIDATION_ERROR', { details: { field: 'avatarMediaId' } });
+          }
+        }
+        fields.avatarMediaId = input.avatarMediaId;
+      }
 
       const collegeGiven =
         input.universityId !== undefined ||
         input.facultyId !== undefined ||
         input.academicYearId !== undefined;
-      const levelId = input.educationLevelId ?? me.educationLevelId;
+      const levelId = input.educationLevelId ?? current.educationLevelId;
       if (collegeGiven || input.educationLevelId !== undefined) {
         if (!levelId) throw new AppError('VALIDATION_ERROR', { details: { field: 'educationLevelId' } });
         const path = await resolveCollegePath(
@@ -140,7 +167,7 @@ export function createCatalogService(deps: {
         Object.assign(fields, { educationLevelId: levelId, ...path });
       }
       if (Object.keys(fields).length) await usersRepo.updateProfile(userId, fields);
-      return (await usersRepo.getMe(userId))!;
+      return me(userId);
     },
 
     /** Validates a registration's optional level + college path before the account is created. */

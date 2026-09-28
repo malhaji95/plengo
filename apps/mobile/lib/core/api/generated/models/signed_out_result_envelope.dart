@@ -10,14 +10,10 @@ part 'signed_out_result_envelope.g.dart';
 
 @JsonSerializable()
 class SignedOutResultEnvelope {
-  const SignedOutResultEnvelope({
-    required this.success,
-    required this.data,
-    required this.error,
-  });
-  
+  const SignedOutResultEnvelope({required this.success, required this.data, required this.error});
+
   factory SignedOutResultEnvelope.fromJson(Map<String, Object?> json) => _$SignedOutResultEnvelopeFromJson(json);
-  
+
   final bool success;
   final SignedOutResult data;
   final dynamic error;

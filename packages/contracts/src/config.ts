@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
-const perPlatform = z.object({ android: z.string(), ios: z.string(), web: z.string() });
+const version = z.string().regex(/^\d+\.\d+\.\d+$/);
+const perPlatform = z.object({ android: version, ios: version, web: version });
 
 /** GET /api/v1/config (spec §10.2). Nothing payment-related may ever appear here. */
 export const remoteConfigSchema = z.object({
@@ -15,6 +16,8 @@ export const remoteConfigSchema = z.object({
   }),
   srsDefaults: z.object({ newCardsPerDay: z.number().int(), maxReviewsPerDay: z.number().int() }),
   support: z.object({ email: z.string(), whatsapp: z.string() }),
+  /** Store pages for the "يرجى تحديث التطبيق" screen (§10.2); web reloads instead. */
+  storeUrls: z.object({ android: z.string(), ios: z.string() }),
   privacyPolicyUrl: z.string(),
   termsUrl: z.string(),
 });

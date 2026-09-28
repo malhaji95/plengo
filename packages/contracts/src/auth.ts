@@ -13,7 +13,7 @@ export const registerBodySchema = z.object({
   fullName: z.string().trim().min(2).max(100),
   email: emailSchema,
   password: passwordSchema,
-  educationLevelId: z.uuid().optional(),
+  educationLevelId: z.uuid(),
   // College students may optionally pick their place in the hierarchy (spec §11.1).
   universityId: z.uuid().optional(),
   facultyId: z.uuid().optional(),
@@ -61,6 +61,8 @@ export const meSchema = z.object({
   universityId: z.string().nullable(),
   facultyId: z.string().nullable(),
   academicYearId: z.string().nullable(),
+  /** Signed URL (1 hour) of the optional profile picture (§11.1). */
+  avatarUrl: z.string().nullable(),
 });
 
 /**
@@ -73,6 +75,8 @@ export const updateProfileBodySchema = z.object({
   universityId: z.uuid().nullable().optional(),
   facultyId: z.uuid().nullable().optional(),
   academicYearId: z.uuid().nullable().optional(),
+  /** A ready `avatar` upload of this student, or null to remove the picture. */
+  avatarMediaId: z.uuid().nullable().optional(),
 });
 export type Me = z.infer<typeof meSchema>;
 

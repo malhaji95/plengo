@@ -12,9 +12,8 @@ MeEnvelope _$MeEnvelopeFromJson(Map<String, dynamic> json) => MeEnvelope(
   error: json['error'],
 );
 
-Map<String, dynamic> _$MeEnvelopeToJson(MeEnvelope instance) =>
-    <String, dynamic>{
-      'success': instance.success,
-      'data': instance.data,
-      'error': instance.error,
-    };
+Map<String, dynamic> _$MeEnvelopeToJson(MeEnvelope instance) => <String, dynamic>{
+  'success': instance.success,
+  'data': instance.data,
+  'error': instance.error,
+};

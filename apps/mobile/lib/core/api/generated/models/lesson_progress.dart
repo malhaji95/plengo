@@ -19,9 +19,9 @@ class LessonProgress {
     required this.completionPercent,
     required this.lessonId,
   });
-  
+
   factory LessonProgress.fromJson(Map<String, Object?> json) => _$LessonProgressFromJson(json);
-  
+
   final int questionsAttempted;
   final int questionsCorrect;
   final int questionsTotal;

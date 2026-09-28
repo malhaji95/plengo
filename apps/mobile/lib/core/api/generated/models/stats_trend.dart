@@ -10,12 +10,10 @@ part 'stats_trend.g.dart';
 
 @JsonSerializable()
 class StatsTrend {
-  const StatsTrend({
-    required this.weeks,
-  });
-  
+  const StatsTrend({required this.weeks});
+
   factory StatsTrend.fromJson(Map<String, Object?> json) => _$StatsTrendFromJson(json);
-  
+
   final List<TrendWeek> weeks;
 
   Map<String, Object?> toJson() => _$StatsTrendToJson(this);

@@ -10,14 +10,10 @@ part 'create_upload_request.g.dart';
 
 @JsonSerializable()
 class CreateUploadRequest {
-  const CreateUploadRequest({
-    required this.kind,
-    required this.contentType,
-    required this.size,
-  });
-  
+  const CreateUploadRequest({required this.kind, required this.contentType, required this.size});
+
   factory CreateUploadRequest.fromJson(Map<String, Object?> json) => _$CreateUploadRequestFromJson(json);
-  
+
   final MediaKind kind;
   final String contentType;
   final int size;

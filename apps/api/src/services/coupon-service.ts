@@ -8,6 +8,7 @@ import {
   type Db,
 } from '@plengo/db';
 import type { AdminCoupon, CouponBatch, ErrorCode, RedeemResult } from '@plengo/contracts';
+import { decodeCursor, encodeCursor } from '../repositories/question-repository.js';
 import { AppError } from '../lib/app-error.js';
 import { businessDate, endOfBusinessDay, startOfBusinessDay } from '../lib/business-time.js';
 import {
@@ -174,6 +175,7 @@ export function createCouponService(deps: {
   async function listCoupons(
     where: ReturnType<typeof eq> | undefined,
     limit?: number,
+    offset = 0,
   ): Promise<AdminCoupon[]> {
     const query = db
       .select({
@@ -189,7 +191,7 @@ export function createCouponService(deps: {
       .leftJoin(users, eq(users.id, couponRedemptions.userId))
       .where(where)
       .orderBy(coupons.createdAt, coupons.id);
-    const rows = limit ? await query.limit(limit) : await query;
+    const rows = limit ? await query.limit(limit).offset(offset) : await query;
     return rows.map((r) => ({
       id: r.coupon.id,
       batchId: r.coupon.batchId,
@@ -204,9 +206,27 @@ export function createCouponService(deps: {
     }));
   }
 
-  return {
+  /**
+   * One redemption at a time per student (in-process, like the other limits, ADR-006), so a burst
+   * of parallel requests cannot all pass the rate-limit count before any attempt is recorded.
+   */
+  const perStudent = new Map<string, Promise<unknown>>();
+  function serialized<T>(userId: string, run: () => Promise<T>): Promise<T> {
+    const next = (perStudent.get(userId) ?? Promise.resolve()).catch(() => undefined).then(run);
+    perStudent.set(userId, next);
+    const clear = () => {
+      if (perStudent.get(userId) === next) perStudent.delete(userId);
+    };
+    next.then(clear, clear);
+    return next;
+  }
+
+  const service = {
+    redeem: (ctx: RedeemContext, rawCode: string): Promise<RedeemResult> =>
+      serialized(ctx.userId, () => service.redeemNow(ctx, rawCode)),
+
     /** spec §9.4, steps 1–15. */
-    async redeem(ctx: RedeemContext, rawCode: string): Promise<RedeemResult> {
+    async redeemNow(ctx: RedeemContext, rawCode: string): Promise<RedeemResult> {
       const at = now();
       const ipHash = ctx.ip ? hashIp(ctx.ip) : null;
       await checkRateLimit(ctx.userId, ipHash, at);
@@ -292,7 +312,15 @@ export function createCouponService(deps: {
 
     getBatch,
 
-    batchCoupons: (batchId: string) => listCoupons(eq(coupons.batchId, batchId)),
+    /** One page of a batch's codes (a batch holds up to 5,000). */
+    async batchCoupons(batchId: string, cursor?: string, limit = 200) {
+      const offset = decodeCursor(cursor);
+      const rows = await listCoupons(eq(coupons.batchId, batchId), limit + 1, offset);
+      return {
+        items: rows.slice(0, limit),
+        nextCursor: rows.length > limit ? encodeCursor(offset + limit) : null,
+      };
+    },
 
     /** Full code (any spelling a student might type) or the last four characters (§26.2 search). */
     async searchCoupons(q: string): Promise<AdminCoupon[]> {
@@ -547,6 +575,7 @@ export function createCouponService(deps: {
       };
     },
   };
+  return service;
 }
 
 export type CouponService = ReturnType<typeof createCouponService>;

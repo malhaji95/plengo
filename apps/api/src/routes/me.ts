@@ -19,9 +19,7 @@ export function meRoutes(c: Container): FastifyPluginAsyncZod {
       '/me',
       { schema: { operationId: 'getMe', tags: ['me'], response: { 200: successEnvelope(meSchema) } } },
       async (request) => {
-        const me = await c.usersRepo.getMe(authOf(request).userId);
-        if (!me) throw new AppError('NOT_FOUND');
-        return ok(me);
+        return ok(await c.catalog.me(authOf(request).userId));
       },
     );
 

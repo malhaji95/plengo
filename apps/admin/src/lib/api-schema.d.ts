@@ -1733,6 +1733,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/settings/remote-config": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminGetRemoteConfig"];
+        put: operations["adminUpdateRemoteConfig"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/settings/learning": {
         parameters: {
             query?: never;
@@ -2149,6 +2165,118 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/admins": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminListAdmins"];
+        put?: never;
+        post: operations["adminCreateAdmin"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/admins/{id}/deactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["adminDeactivateAdmin"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/admins/{id}/reactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["adminReactivateAdmin"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/admins/{id}/reset-2fa": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["adminResetAdminTwoFactor"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/students/{id}/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminListStudentSessions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/students/{id}/sessions/{sessionId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["adminRevokeStudentSession"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/students/{id}/attempts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminListStudentAttempts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -2204,6 +2332,29 @@ export interface components {
             answerNormalized: string;
             normalizationVersion: number;
         };
+        AdminAccount: {
+            id: string;
+            email: string;
+            fullName: string;
+            /** @enum {string} */
+            status: "active" | "disabled";
+            twoFactorEnabled: boolean;
+            createdAt: string;
+            lastSeenAt: string | null;
+        };
+        AdminAccountEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AdminAccount"];
+            error: null;
+        };
+        AdminAccountList: components["schemas"]["AdminAccount"][];
+        AdminAccountListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AdminAccountList"];
+            error: null;
+        };
         AdminCard: {
             id: string;
             deckId: string;
@@ -2245,6 +2396,16 @@ export interface components {
             /** @constant */
             success: true;
             data: components["schemas"]["AdminCouponList"];
+            error: null;
+        };
+        AdminCouponPage: {
+            items: components["schemas"]["AdminCouponList"];
+            nextCursor: string | null;
+        };
+        AdminCouponPageEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AdminCouponPage"];
             error: null;
         };
         AdminDeck: {
@@ -2453,10 +2614,14 @@ export interface components {
             error: null;
         };
         AdminStudentList: components["schemas"]["AdminStudent"][];
-        AdminStudentListEnvelope: {
+        AdminStudentPage: {
+            items: components["schemas"]["AdminStudentList"];
+            nextCursor: string | null;
+        };
+        AdminStudentPageEnvelope: {
             /** @constant */
             success: true;
-            data: components["schemas"]["AdminStudentList"];
+            data: components["schemas"]["AdminStudentPage"];
             error: null;
         };
         AdminTeacher: {
@@ -2629,6 +2794,7 @@ export interface components {
         };
         BookmarkList: {
             items: components["schemas"]["Bookmark"][];
+            nextCursor: string | null;
             urlsExpireAt: string;
         };
         BookmarkListEnvelope: {
@@ -2734,6 +2900,11 @@ export interface components {
             isActive?: boolean;
             /** Format: uuid */
             facultyId: string;
+        };
+        CreateAdminRequest: {
+            email: string;
+            fullName: string;
+            password: string;
         };
         CreateCardRequest: {
             /** Format: uuid */
@@ -3136,6 +3307,7 @@ export interface components {
             universityId: string | null;
             facultyId: string | null;
             academicYearId: string | null;
+            avatarUrl: string | null;
         };
         MediaFile: {
             /** Format: uuid */
@@ -3154,7 +3326,7 @@ export interface components {
             error: null;
         };
         /** @enum {string} */
-        MediaKind: "flashcard" | "banner" | "teacher" | "cover" | "user-card";
+        MediaKind: "flashcard" | "banner" | "teacher" | "cover" | "user-card" | "avatar";
         MeEnvelope: {
             /** @constant */
             success: true;
@@ -3196,6 +3368,7 @@ export interface components {
             activeCount: number;
             masteredCount: number;
             masteryStreak: number;
+            nextCursor: string | null;
         };
         MistakeListEnvelope: {
             /** @constant */
@@ -3315,7 +3488,7 @@ export interface components {
             email: string;
             password: string;
             /** Format: uuid */
-            educationLevelId?: string;
+            educationLevelId: string;
             /** Format: uuid */
             universityId?: string;
             /** Format: uuid */
@@ -3348,6 +3521,10 @@ export interface components {
             support: {
                 email: string;
                 whatsapp: string;
+            };
+            storeUrls: {
+                android: string;
+                ios: string;
             };
             privacyPolicyUrl: string;
             termsUrl: string;
@@ -4064,6 +4241,7 @@ export interface components {
             universityId?: string | null;
             facultyId?: string | null;
             academicYearId?: string | null;
+            avatarMediaId?: string | null;
         };
         UpdatePromotionRequest: {
             titleAr?: string;
@@ -5346,6 +5524,8 @@ export interface operations {
                 unitId?: string;
                 lessonId?: string;
                 type?: components["schemas"]["MistakeFilterType"];
+                cursor?: string;
+                limit?: number;
             };
             header?: never;
             path?: never;
@@ -5474,6 +5654,8 @@ export interface operations {
         parameters: {
             query?: {
                 itemType?: components["schemas"]["BookmarkItemType"];
+                cursor?: string;
+                limit?: number;
             };
             header?: never;
             path?: never;
@@ -6869,6 +7051,8 @@ export interface operations {
         parameters: {
             query?: {
                 q?: string;
+                cursor?: string;
+                limit?: number;
             };
             header?: never;
             path?: never;
@@ -6882,7 +7066,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminStudentListEnvelope"];
+                    "application/json": components["schemas"]["AdminStudentPageEnvelope"];
                 };
             };
         };
@@ -7055,7 +7239,10 @@ export interface operations {
     };
     adminListBatchCoupons: {
         parameters: {
-            query?: never;
+            query?: {
+                cursor?: string;
+                limit?: number;
+            };
             header?: never;
             path: {
                 id: string;
@@ -7070,7 +7257,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminCouponListEnvelope"];
+                    "application/json": components["schemas"]["AdminCouponPageEnvelope"];
                 };
             };
         };
@@ -7201,6 +7388,50 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AccessSettingsEnvelope"];
+                };
+            };
+        };
+    };
+    adminGetRemoteConfig: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RemoteConfigEnvelope"];
+                };
+            };
+        };
+    };
+    adminUpdateRemoteConfig: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RemoteConfig"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RemoteConfigEnvelope"];
                 };
             };
         };
@@ -8194,6 +8425,188 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ReorderedResultEnvelope"];
+                };
+            };
+        };
+    };
+    adminListAdmins: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminAccountListEnvelope"];
+                };
+            };
+        };
+    };
+    adminCreateAdmin: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateAdminRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminAccountEnvelope"];
+                };
+            };
+        };
+    };
+    adminDeactivateAdmin: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminAccountEnvelope"];
+                };
+            };
+        };
+    };
+    adminReactivateAdmin: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminAccountEnvelope"];
+                };
+            };
+        };
+    };
+    adminResetAdminTwoFactor: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminAccountEnvelope"];
+                };
+            };
+        };
+    };
+    adminListStudentSessions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionListEnvelope"];
+                };
+            };
+        };
+    };
+    adminRevokeStudentSession: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                sessionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RevokedResultEnvelope"];
+                };
+            };
+        };
+    };
+    adminListStudentAttempts: {
+        parameters: {
+            query?: {
+                status?: components["schemas"]["AttemptStatus"];
+                quizId?: string;
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AttemptSummaryPageEnvelope"];
                 };
             };
         };

@@ -8,12 +8,10 @@ part 'reset_result.g.dart';
 
 @JsonSerializable()
 class ResetResult {
-  const ResetResult({
-    required this.reset,
-  });
-  
+  const ResetResult({required this.reset});
+
   factory ResetResult.fromJson(Map<String, Object?> json) => _$ResetResultFromJson(json);
-  
+
   final bool reset;
 
   Map<String, Object?> toJson() => _$ResetResultToJson(this);

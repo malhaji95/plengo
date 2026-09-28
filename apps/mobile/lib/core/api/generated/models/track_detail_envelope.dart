@@ -10,14 +10,10 @@ part 'track_detail_envelope.g.dart';
 
 @JsonSerializable()
 class TrackDetailEnvelope {
-  const TrackDetailEnvelope({
-    required this.success,
-    required this.data,
-    required this.error,
-  });
-  
+  const TrackDetailEnvelope({required this.success, required this.data, required this.error});
+
   factory TrackDetailEnvelope.fromJson(Map<String, Object?> json) => _$TrackDetailEnvelopeFromJson(json);
-  
+
   final bool success;
   final TrackDetail data;
   final dynamic error;

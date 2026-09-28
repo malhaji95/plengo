@@ -17,14 +17,13 @@ SubjectTrack _$SubjectTrackFromJson(Map<String, dynamic> json) => SubjectTrack(
   hasAccess: json['hasAccess'] as bool,
 );
 
-Map<String, dynamic> _$SubjectTrackToJson(SubjectTrack instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'teacherId': instance.teacherId,
-      'teacherNameAr': instance.teacherNameAr,
-      'teacherPhotoUrl': instance.teacherPhotoUrl,
-      'titleAr': instance.titleAr,
-      'description': instance.description,
-      'coverUrl': instance.coverUrl,
-      'hasAccess': instance.hasAccess,
-    };
+Map<String, dynamic> _$SubjectTrackToJson(SubjectTrack instance) => <String, dynamic>{
+  'id': instance.id,
+  'teacherId': instance.teacherId,
+  'teacherNameAr': instance.teacherNameAr,
+  'teacherPhotoUrl': instance.teacherPhotoUrl,
+  'titleAr': instance.titleAr,
+  'description': instance.description,
+  'coverUrl': instance.coverUrl,
+  'hasAccess': instance.hasAccess,
+};

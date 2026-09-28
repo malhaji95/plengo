@@ -61,6 +61,8 @@ export function createAuth(deps: { env: Env; db: Db; email: EmailSender }) {
     ],
     advanced: {
       database: { generateId: 'uuid' },
+      // Sessions keep only a salted IP hash (written by the API, spec §31), never the raw address.
+      ipAddress: { disableIpTracking: true },
       cookiePrefix: 'plengo',
       useSecureCookies: secureCookies,
       defaultCookieAttributes: { sameSite: 'lax', httpOnly: true, secure: secureCookies },

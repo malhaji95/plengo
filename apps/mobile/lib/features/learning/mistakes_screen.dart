@@ -25,6 +25,14 @@ class MistakesScreen extends ConsumerStatefulWidget {
 class _MistakesScreenState extends ConsumerState<MistakesScreen> {
   var _status = MistakeFilterStatus.active;
   String? _subjectId;
+  String? _unitId;
+  MistakeType? _type;
+
+  static const _typeLabels = {
+    MistakeType.mcq: 'اختيار من متعدد',
+    MistakeType.trueFalse: 'صح أو خطأ',
+    MistakeType.written: 'إجابة مكتوبة',
+  };
 
   Future<void> _test(MistakeList list) async {
     var count = list.activeCount.clamp(1, 20).toDouble();
@@ -72,7 +80,12 @@ class _MistakesScreenState extends ConsumerState<MistakesScreen> {
         ref.read(learningRepositoryProvider),
         source: StartAttemptRequestSource.mistakes,
         mode: mode,
-        filters: AttemptFilters(subjectId: _subjectId, count: count.round()),
+        filters: AttemptFilters(
+          subjectId: _subjectId,
+          unitId: _unitId,
+          types: _type == null ? null : [AttemptFiltersTypes.values.byName(_type!.name)],
+          count: count.round(),
+        ),
       );
       if (!mounted) return;
       await context.push('/attempts/${a.attempt.id}');
@@ -92,7 +105,15 @@ class _MistakesScreenState extends ConsumerState<MistakesScreen> {
         onRetry: () => ref.invalidate(mistakesProvider(_status)),
         data: (list) {
           final subjects = <String, String>{for (final m in list.items) m.subjectId: m.subjectNameAr};
-          final shown = list.items.where((m) => _subjectId == null || m.subjectId == _subjectId).toList();
+          final inSubject = list.items.where((m) => _subjectId == null || m.subjectId == _subjectId).toList();
+          final units = <String, String>{
+            for (final m in inSubject)
+              if (m.unitId != null) m.unitId!: m.unitNameAr ?? '',
+          };
+          final types = {for (final m in inSubject) m.type};
+          final shown = inSubject
+              .where((m) => (_unitId == null || m.unitId == _unitId) && (_type == null || m.type == _type))
+              .toList();
           // Group by subject, then unit (or the lesson directly under the subject).
           final groups = <String, List<Mistake>>{};
           for (final m in shown) {
@@ -122,16 +143,56 @@ class _MistakesScreenState extends ConsumerState<MistakesScreen> {
                     ChoiceChip(
                       label: const Text('كل المواد'),
                       selected: _subjectId == null,
-                      onSelected: (_) => setState(() => _subjectId = null),
+                      onSelected: (_) => setState(() {
+                        _subjectId = null;
+                        _unitId = null;
+                      }),
                     ),
                     for (final MapEntry(key: id, value: name) in subjects.entries)
                       ChoiceChip(
                         label: Text(name),
                         selected: _subjectId == id,
-                        onSelected: (_) => setState(() => _subjectId = id),
+                        onSelected: (_) => setState(() {
+                          _subjectId = id;
+                          _unitId = null;
+                        }),
                       ),
                   ],
                 ),
+              // Units once a subject is chosen (or when there is only one subject).
+              if ((_subjectId != null || subjects.length == 1) && units.length > 1) ...[
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  children: [
+                    ChoiceChip(
+                      label: const Text('كل الوحدات'),
+                      selected: _unitId == null,
+                      onSelected: (_) => setState(() => _unitId = null),
+                    ),
+                    for (final MapEntry(key: id, value: name) in units.entries)
+                      ChoiceChip(
+                        label: Text(name),
+                        selected: _unitId == id,
+                        onSelected: (_) => setState(() => _unitId = id),
+                      ),
+                  ],
+                ),
+              ],
+              if (types.length > 1) ...[
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  children: [
+                    for (final t in MistakeType.values.where(types.contains))
+                      FilterChip(
+                        label: Text(_typeLabels[t]!),
+                        selected: _type == t,
+                        onSelected: (on) => setState(() => _type = on ? t : null),
+                      ),
+                  ],
+                ),
+              ],
               if (_status == MistakeFilterStatus.active && shown.isNotEmpty) ...[
                 const SizedBox(height: 12),
                 FilledButton.icon(
@@ -185,9 +246,16 @@ class _MistakeTile extends ConsumerWidget {
             if (m.correctStreak > 0) 'صحيحة متتالية: ${m.correctStreak}',
           ].join(' · '),
         ),
-        onTap: m.lessonId != null
-            ? () => context.go('${Routes.subjects}/${m.subjectId}/questions?lessonId=${m.lessonId}')
-            : null,
+        // The related lesson or unit (§16.1).
+        onTap: () => context.go(
+          m.lessonId != null
+              ? '${Routes.subjects}/${m.subjectId}/questions?lessonId=${m.lessonId}'
+              : m.unitId != null
+              ? '${Routes.subjects}/${m.subjectId}/questions?unitId=${m.unitId}'
+              : m.teacherTrackId != null
+              ? '${Routes.tracks}/${m.teacherTrackId}/questions'
+              : '${Routes.subjects}/${m.subjectId}/questions',
+        ),
         trailing: m.status == MistakeStatus.active
             ? IconButton(
                 tooltip: 'إزالة من الأخطاء',

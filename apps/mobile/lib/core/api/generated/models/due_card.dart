@@ -18,9 +18,9 @@ class DueCard {
     required this.subjectNameAr,
     required this.state,
   });
-  
+
   factory DueCard.fromJson(Map<String, Object?> json) => _$DueCardFromJson(json);
-  
+
   final StudentCard card;
   final String deckTitleAr;
   final String subjectId;

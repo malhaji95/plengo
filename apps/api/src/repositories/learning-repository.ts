@@ -1,5 +1,18 @@
-import { sql } from 'drizzle-orm';
-import { questionStats, userMistakes, userProgress, userSubjectStats, type Tx } from '@plengo/db';
+import { and, desc, eq, inArray, isNull, ne, sql } from 'drizzle-orm';
+import {
+  lessons,
+  questionStats,
+  questions,
+  subjects,
+  teacherTracks,
+  units,
+  userMistakes,
+  userProgress,
+  userSubjectStats,
+  type AttemptFilters,
+  type Db,
+  type Tx,
+} from '@plengo/db';
 
 /** Auto-flag thresholds for admin review (§26.2). */
 export const QUESTION_FLAG_MIN_ATTEMPTS = 30;
@@ -33,11 +46,119 @@ export interface ProgressTouch {
 }
 
 /**
- * Writes that follow a graded answer (§16.1, §16.2, §18, §28.1). Each runs inside the grading
- * transaction as a single upsert, so concurrent grading of other questions never loses counts.
+ * Mistake bank and progress pointers (§16.1, §18). The writes that follow a graded answer (§16.1,
+ * §16.2, §18, §28.1) each run inside the grading transaction as a single upsert, so concurrent
+ * grading of other questions never loses counts.
  */
-export function createLearningRepository() {
+export function createLearningRepository(db: Db) {
   return {
+    /** The student's non-removed mistakes on live published questions, latest wrong first. */
+    mistakes: (userId: string) =>
+      db
+        .select({ m: userMistakes, q: questions })
+        .from(userMistakes)
+        .innerJoin(questions, eq(questions.id, userMistakes.questionId))
+        .where(
+          and(
+            eq(userMistakes.userId, userId),
+            ne(userMistakes.status, 'removed'),
+            isNull(questions.deletedAt),
+            eq(questions.status, 'published'),
+          ),
+        )
+        .orderBy(desc(userMistakes.lastWrongAt)),
+
+    /**
+     * Questions of the student's active mistakes, live and published, matching the filters. The
+     * track filter applies only with a subject (null means general content).
+     */
+    activeMistakeQuestions: (userId: string, f: AttemptFilters) =>
+      db
+        .select({ q: questions })
+        .from(userMistakes)
+        .innerJoin(questions, eq(questions.id, userMistakes.questionId))
+        .where(
+          and(
+            eq(userMistakes.userId, userId),
+            eq(userMistakes.status, 'active'),
+            isNull(questions.deletedAt),
+            eq(questions.status, 'published'),
+            f.subjectId ? eq(questions.subjectId, f.subjectId) : undefined,
+            f.subjectId && f.teacherTrackId !== undefined
+              ? f.teacherTrackId
+                ? eq(questions.teacherTrackId, f.teacherTrackId)
+                : isNull(questions.teacherTrackId)
+              : undefined,
+            f.unitId ? eq(questions.unitId, f.unitId) : undefined,
+            f.lessonId ? eq(questions.lessonId, f.lessonId) : undefined,
+            f.types?.length ? inArray(questions.type, f.types) : undefined,
+            f.questionIds?.length ? inArray(questions.id, f.questionIds) : undefined,
+          ),
+        ),
+
+    /** Marks a mistake removed; false when the student has none for the question. */
+    async removeMistake(userId: string, questionId: string, at: Date) {
+      const rows = await db
+        .update(userMistakes)
+        .set({ status: 'removed', updatedAt: at })
+        .where(and(eq(userMistakes.userId, userId), eq(userMistakes.questionId, questionId)))
+        .returning({ id: userMistakes.questionId });
+      return rows.length > 0;
+    },
+
+    /** The resume pointer of one subject scope (a null track is general content). */
+    progressPointer: (userId: string, subjectId: string, teacherTrackId: string | null) =>
+      db
+        .select()
+        .from(userProgress)
+        .where(
+          and(
+            eq(userProgress.userId, userId),
+            eq(userProgress.subjectId, subjectId),
+            teacherTrackId
+              ? eq(userProgress.teacherTrackId, teacherTrackId)
+              : isNull(userProgress.teacherTrackId),
+          ),
+        ),
+
+    /** The student's resume pointers, newest first. */
+    recentProgress: (userId: string, limit: number) =>
+      db
+        .select()
+        .from(userProgress)
+        .where(eq(userProgress.userId, userId))
+        .orderBy(desc(userProgress.lastActivityAt))
+        .limit(limit),
+
+    /** Arabic names of subjects, tracks, units and lessons by id. */
+    async names(subjectIds: string[], trackIds: string[], unitIds: string[], lessonIds: string[]) {
+      const [s, t, u, l] = await Promise.all([
+        subjectIds.length
+          ? db
+              .select({ id: subjects.id, n: subjects.nameAr })
+              .from(subjects)
+              .where(inArray(subjects.id, subjectIds))
+          : [],
+        trackIds.length
+          ? db
+              .select({ id: teacherTracks.id, n: teacherTracks.titleAr })
+              .from(teacherTracks)
+              .where(inArray(teacherTracks.id, trackIds))
+          : [],
+        unitIds.length
+          ? db.select({ id: units.id, n: units.titleAr }).from(units).where(inArray(units.id, unitIds))
+          : [],
+        lessonIds.length
+          ? db
+              .select({ id: lessons.id, n: lessons.titleAr })
+              .from(lessons)
+              .where(inArray(lessons.id, lessonIds))
+          : [],
+      ]);
+      const map = (rows: { id: string; n: string }[]) => new Map(rows.map((r) => [r.id, r.n]));
+      return { subjects: map(s), tracks: map(t), units: map(u), lessons: map(l) };
+    },
+
     /**
      * Wrong → active with the streak reset (re-activates removed and mastered mistakes). Correct on
      * an active mistake → streak + 1, mastered at `masteryStreak`. Correct otherwise → no change.

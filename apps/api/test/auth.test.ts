@@ -76,7 +76,12 @@ describe('registration and email OTP', () => {
     const dup = await t.app.inject({
       method: 'POST',
       url: '/api/v1/auth/register',
-      payload: { fullName: 'مكرر', email, password: 'another-password-9' },
+      payload: {
+        fullName: 'مكرر',
+        email,
+        password: 'another-password-9',
+        educationLevelId: await levelId(t),
+      },
     });
     expect(body(dup)).toEqual({ success: true, data: { verificationRequired: true }, error: null });
     expect(t.email.outbox.length).toBe(outboxBefore);

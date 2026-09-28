@@ -1,5 +1,5 @@
 import { and, eq } from 'drizzle-orm';
-import { accounts, profiles, users, type Db, type Tx } from '@plengo/db';
+import { accounts, mediaFiles, profiles, users, type Db, type Tx } from '@plengo/db';
 
 type Conn = Db | Tx;
 
@@ -53,6 +53,7 @@ export function createUsersRepository(db: Db) {
         universityId: string | null;
         facultyId: string | null;
         academicYearId: string | null;
+        avatarMediaId: string | null;
       }>,
     ) {
       await db
@@ -80,9 +81,11 @@ export function createUsersRepository(db: Db) {
           universityId: profiles.universityId,
           facultyId: profiles.facultyId,
           academicYearId: profiles.academicYearId,
+          avatar: mediaFiles,
         })
         .from(users)
         .leftJoin(profiles, eq(profiles.userId, users.id))
+        .leftJoin(mediaFiles, eq(mediaFiles.id, profiles.avatarMediaId))
         .where(eq(users.id, userId))
         .limit(1);
       if (!row) return null;
@@ -96,7 +99,13 @@ export function createUsersRepository(db: Db) {
         universityId: row.universityId ?? null,
         facultyId: row.facultyId ?? null,
         academicYearId: row.academicYearId ?? null,
+        avatar: row.avatar && !row.avatar.deletedAt && row.avatar.status === 'ready' ? row.avatar : null,
       };
+    },
+
+    async getMedia(id: string) {
+      const [row] = await db.select().from(mediaFiles).where(eq(mediaFiles.id, id)).limit(1);
+      return row ?? null;
     },
 
     async setRoleAndVerified(userId: string, role: 'student' | 'admin', emailVerified: boolean) {

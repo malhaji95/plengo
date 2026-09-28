@@ -15,9 +15,9 @@ class CreateUploadResult {
     required this.headers,
     required this.expiresAt,
   });
-  
+
   factory CreateUploadResult.fromJson(Map<String, Object?> json) => _$CreateUploadResultFromJson(json);
-  
+
   final String id;
   final String uploadUrl;
   final String method;

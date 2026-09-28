@@ -3,8 +3,7 @@
 part of 'app_database.dart';
 
 // ignore_for_file: type=lint
-class $KeyValuesTable extends KeyValues
-    with TableInfo<$KeyValuesTable, KeyValue> {
+class $KeyValuesTable extends KeyValues with TableInfo<$KeyValuesTable, KeyValue> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -27,9 +26,7 @@ class $KeyValuesTable extends KeyValues
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
-    'updatedAt',
-  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta('updatedAt');
   @override
   late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
     'updated_at',
@@ -47,33 +44,21 @@ class $KeyValuesTable extends KeyValues
   String get actualTableName => $name;
   static const String $name = 'key_values';
   @override
-  VerificationContext validateIntegrity(
-    Insertable<KeyValue> instance, {
-    bool isInserting = false,
-  }) {
+  VerificationContext validateIntegrity(Insertable<KeyValue> instance, {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('key')) {
-      context.handle(
-        _keyMeta,
-        key.isAcceptableOrUnknown(data['key']!, _keyMeta),
-      );
+      context.handle(_keyMeta, key.isAcceptableOrUnknown(data['key']!, _keyMeta));
     } else if (isInserting) {
       context.missing(_keyMeta);
     }
     if (data.containsKey('value')) {
-      context.handle(
-        _valueMeta,
-        value.isAcceptableOrUnknown(data['value']!, _valueMeta),
-      );
+      context.handle(_valueMeta, value.isAcceptableOrUnknown(data['value']!, _valueMeta));
     } else if (isInserting) {
       context.missing(_valueMeta);
     }
     if (data.containsKey('updated_at')) {
-      context.handle(
-        _updatedAtMeta,
-        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
-      );
+      context.handle(_updatedAtMeta, updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
     }
     return context;
   }
@@ -84,18 +69,9 @@ class $KeyValuesTable extends KeyValues
   KeyValue map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return KeyValue(
-      key: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}key'],
-      )!,
-      value: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}value'],
-      )!,
-      updatedAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
-        data['${effectivePrefix}updated_at'],
-      )!,
+      key: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}key'])!,
+      value: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}value'])!,
+      updatedAt: attachedDatabase.typeMapping.read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
     );
   }
 
@@ -109,11 +85,7 @@ class KeyValue extends DataClass implements Insertable<KeyValue> {
   final String key;
   final String value;
   final DateTime updatedAt;
-  const KeyValue({
-    required this.key,
-    required this.value,
-    required this.updatedAt,
-  });
+  const KeyValue({required this.key, required this.value, required this.updatedAt});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -124,17 +96,10 @@ class KeyValue extends DataClass implements Insertable<KeyValue> {
   }
 
   KeyValuesCompanion toCompanion(bool nullToAbsent) {
-    return KeyValuesCompanion(
-      key: Value(key),
-      value: Value(value),
-      updatedAt: Value(updatedAt),
-    );
+    return KeyValuesCompanion(key: Value(key), value: Value(value), updatedAt: Value(updatedAt));
   }
 
-  factory KeyValue.fromJson(
-    Map<String, dynamic> json, {
-    ValueSerializer? serializer,
-  }) {
+  factory KeyValue.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return KeyValue(
       key: serializer.fromJson<String>(json['key']),
@@ -153,11 +118,7 @@ class KeyValue extends DataClass implements Insertable<KeyValue> {
   }
 
   KeyValue copyWith({String? key, String? value, DateTime? updatedAt}) =>
-      KeyValue(
-        key: key ?? this.key,
-        value: value ?? this.value,
-        updatedAt: updatedAt ?? this.updatedAt,
-      );
+      KeyValue(key: key ?? this.key, value: value ?? this.value, updatedAt: updatedAt ?? this.updatedAt);
   KeyValue copyWithCompanion(KeyValuesCompanion data) {
     return KeyValue(
       key: data.key.present ? data.key.value : this.key,
@@ -181,10 +142,7 @@ class KeyValue extends DataClass implements Insertable<KeyValue> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is KeyValue &&
-          other.key == this.key &&
-          other.value == this.value &&
-          other.updatedAt == this.updatedAt);
+      (other is KeyValue && other.key == this.key && other.value == this.value && other.updatedAt == this.updatedAt);
 }
 
 class KeyValuesCompanion extends UpdateCompanion<KeyValue> {
@@ -263,15 +221,12 @@ class KeyValuesCompanion extends UpdateCompanion<KeyValue> {
   }
 }
 
-class $SrsCardStatesTable extends SrsCardStates
-    with TableInfo<$SrsCardStatesTable, SrsCardState> {
+class $SrsCardStatesTable extends SrsCardStates with TableInfo<$SrsCardStatesTable, SrsCardState> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $SrsCardStatesTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _flashcardIdMeta = const VerificationMeta(
-    'flashcardId',
-  );
+  static const VerificationMeta _flashcardIdMeta = const VerificationMeta('flashcardId');
   @override
   late final GeneratedColumn<String> flashcardId = GeneratedColumn<String>(
     'flashcard_id',
@@ -307,9 +262,7 @@ class $SrsCardStatesTable extends SrsCardStates
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _intervalDaysMeta = const VerificationMeta(
-    'intervalDays',
-  );
+  static const VerificationMeta _intervalDaysMeta = const VerificationMeta('intervalDays');
   @override
   late final GeneratedColumn<int> intervalDays = GeneratedColumn<int>(
     'interval_days',
@@ -345,9 +298,7 @@ class $SrsCardStatesTable extends SrsCardStates
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _lastReviewedAtMeta = const VerificationMeta(
-    'lastReviewedAt',
-  );
+  static const VerificationMeta _lastReviewedAtMeta = const VerificationMeta('lastReviewedAt');
   @override
   late final GeneratedColumn<int> lastReviewedAt = GeneratedColumn<int>(
     'last_reviewed_at',
@@ -374,89 +325,53 @@ class $SrsCardStatesTable extends SrsCardStates
   String get actualTableName => $name;
   static const String $name = 'srs_card_states';
   @override
-  VerificationContext validateIntegrity(
-    Insertable<SrsCardState> instance, {
-    bool isInserting = false,
-  }) {
+  VerificationContext validateIntegrity(Insertable<SrsCardState> instance, {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('flashcard_id')) {
-      context.handle(
-        _flashcardIdMeta,
-        flashcardId.isAcceptableOrUnknown(
-          data['flashcard_id']!,
-          _flashcardIdMeta,
-        ),
-      );
+      context.handle(_flashcardIdMeta, flashcardId.isAcceptableOrUnknown(data['flashcard_id']!, _flashcardIdMeta));
     } else if (isInserting) {
       context.missing(_flashcardIdMeta);
     }
     if (data.containsKey('state')) {
-      context.handle(
-        _stateMeta,
-        state.isAcceptableOrUnknown(data['state']!, _stateMeta),
-      );
+      context.handle(_stateMeta, state.isAcceptableOrUnknown(data['state']!, _stateMeta));
     } else if (isInserting) {
       context.missing(_stateMeta);
     }
     if (data.containsKey('step')) {
-      context.handle(
-        _stepMeta,
-        step.isAcceptableOrUnknown(data['step']!, _stepMeta),
-      );
+      context.handle(_stepMeta, step.isAcceptableOrUnknown(data['step']!, _stepMeta));
     } else if (isInserting) {
       context.missing(_stepMeta);
     }
     if (data.containsKey('due_at')) {
-      context.handle(
-        _dueAtMeta,
-        dueAt.isAcceptableOrUnknown(data['due_at']!, _dueAtMeta),
-      );
+      context.handle(_dueAtMeta, dueAt.isAcceptableOrUnknown(data['due_at']!, _dueAtMeta));
     } else if (isInserting) {
       context.missing(_dueAtMeta);
     }
     if (data.containsKey('interval_days')) {
-      context.handle(
-        _intervalDaysMeta,
-        intervalDays.isAcceptableOrUnknown(
-          data['interval_days']!,
-          _intervalDaysMeta,
-        ),
-      );
+      context.handle(_intervalDaysMeta, intervalDays.isAcceptableOrUnknown(data['interval_days']!, _intervalDaysMeta));
     } else if (isInserting) {
       context.missing(_intervalDaysMeta);
     }
     if (data.containsKey('ease')) {
-      context.handle(
-        _easeMeta,
-        ease.isAcceptableOrUnknown(data['ease']!, _easeMeta),
-      );
+      context.handle(_easeMeta, ease.isAcceptableOrUnknown(data['ease']!, _easeMeta));
     } else if (isInserting) {
       context.missing(_easeMeta);
     }
     if (data.containsKey('reps')) {
-      context.handle(
-        _repsMeta,
-        reps.isAcceptableOrUnknown(data['reps']!, _repsMeta),
-      );
+      context.handle(_repsMeta, reps.isAcceptableOrUnknown(data['reps']!, _repsMeta));
     } else if (isInserting) {
       context.missing(_repsMeta);
     }
     if (data.containsKey('lapses')) {
-      context.handle(
-        _lapsesMeta,
-        lapses.isAcceptableOrUnknown(data['lapses']!, _lapsesMeta),
-      );
+      context.handle(_lapsesMeta, lapses.isAcceptableOrUnknown(data['lapses']!, _lapsesMeta));
     } else if (isInserting) {
       context.missing(_lapsesMeta);
     }
     if (data.containsKey('last_reviewed_at')) {
       context.handle(
         _lastReviewedAtMeta,
-        lastReviewedAt.isAcceptableOrUnknown(
-          data['last_reviewed_at']!,
-          _lastReviewedAtMeta,
-        ),
+        lastReviewedAt.isAcceptableOrUnknown(data['last_reviewed_at']!, _lastReviewedAtMeta),
       );
     }
     return context;
@@ -468,42 +383,15 @@ class $SrsCardStatesTable extends SrsCardStates
   SrsCardState map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return SrsCardState(
-      flashcardId: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}flashcard_id'],
-      )!,
-      state: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}state'],
-      )!,
-      step: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}step'],
-      )!,
-      dueAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}due_at'],
-      )!,
-      intervalDays: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}interval_days'],
-      )!,
-      ease: attachedDatabase.typeMapping.read(
-        DriftSqlType.double,
-        data['${effectivePrefix}ease'],
-      )!,
-      reps: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}reps'],
-      )!,
-      lapses: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}lapses'],
-      )!,
-      lastReviewedAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}last_reviewed_at'],
-      ),
+      flashcardId: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}flashcard_id'])!,
+      state: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}state'])!,
+      step: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${effectivePrefix}step'])!,
+      dueAt: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${effectivePrefix}due_at'])!,
+      intervalDays: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${effectivePrefix}interval_days'])!,
+      ease: attachedDatabase.typeMapping.read(DriftSqlType.double, data['${effectivePrefix}ease'])!,
+      reps: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${effectivePrefix}reps'])!,
+      lapses: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${effectivePrefix}lapses'])!,
+      lastReviewedAt: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${effectivePrefix}last_reviewed_at']),
     );
   }
 
@@ -561,16 +449,11 @@ class SrsCardState extends DataClass implements Insertable<SrsCardState> {
       ease: Value(ease),
       reps: Value(reps),
       lapses: Value(lapses),
-      lastReviewedAt: lastReviewedAt == null && nullToAbsent
-          ? const Value.absent()
-          : Value(lastReviewedAt),
+      lastReviewedAt: lastReviewedAt == null && nullToAbsent ? const Value.absent() : Value(lastReviewedAt),
     );
   }
 
-  factory SrsCardState.fromJson(
-    Map<String, dynamic> json, {
-    ValueSerializer? serializer,
-  }) {
+  factory SrsCardState.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return SrsCardState(
       flashcardId: serializer.fromJson<String>(json['flashcardId']),
@@ -619,27 +502,19 @@ class SrsCardState extends DataClass implements Insertable<SrsCardState> {
     ease: ease ?? this.ease,
     reps: reps ?? this.reps,
     lapses: lapses ?? this.lapses,
-    lastReviewedAt: lastReviewedAt.present
-        ? lastReviewedAt.value
-        : this.lastReviewedAt,
+    lastReviewedAt: lastReviewedAt.present ? lastReviewedAt.value : this.lastReviewedAt,
   );
   SrsCardState copyWithCompanion(SrsCardStatesCompanion data) {
     return SrsCardState(
-      flashcardId: data.flashcardId.present
-          ? data.flashcardId.value
-          : this.flashcardId,
+      flashcardId: data.flashcardId.present ? data.flashcardId.value : this.flashcardId,
       state: data.state.present ? data.state.value : this.state,
       step: data.step.present ? data.step.value : this.step,
       dueAt: data.dueAt.present ? data.dueAt.value : this.dueAt,
-      intervalDays: data.intervalDays.present
-          ? data.intervalDays.value
-          : this.intervalDays,
+      intervalDays: data.intervalDays.present ? data.intervalDays.value : this.intervalDays,
       ease: data.ease.present ? data.ease.value : this.ease,
       reps: data.reps.present ? data.reps.value : this.reps,
       lapses: data.lapses.present ? data.lapses.value : this.lapses,
-      lastReviewedAt: data.lastReviewedAt.present
-          ? data.lastReviewedAt.value
-          : this.lastReviewedAt,
+      lastReviewedAt: data.lastReviewedAt.present ? data.lastReviewedAt.value : this.lastReviewedAt,
     );
   }
 
@@ -660,17 +535,7 @@ class SrsCardState extends DataClass implements Insertable<SrsCardState> {
   }
 
   @override
-  int get hashCode => Object.hash(
-    flashcardId,
-    state,
-    step,
-    dueAt,
-    intervalDays,
-    ease,
-    reps,
-    lapses,
-    lastReviewedAt,
-  );
+  int get hashCode => Object.hash(flashcardId, state, step, dueAt, intervalDays, ease, reps, lapses, lastReviewedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -834,8 +699,7 @@ class SrsCardStatesCompanion extends UpdateCompanion<SrsCardState> {
   }
 }
 
-class $SrsReviewLogsTable extends SrsReviewLogs
-    with TableInfo<$SrsReviewLogsTable, SrsReviewLog> {
+class $SrsReviewLogsTable extends SrsReviewLogs with TableInfo<$SrsReviewLogsTable, SrsReviewLog> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -849,9 +713,7 @@ class $SrsReviewLogsTable extends SrsReviewLogs
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _flashcardIdMeta = const VerificationMeta(
-    'flashcardId',
-  );
+  static const VerificationMeta _flashcardIdMeta = const VerificationMeta('flashcardId');
   @override
   late final GeneratedColumn<String> flashcardId = GeneratedColumn<String>(
     'flashcard_id',
@@ -887,9 +749,7 @@ class $SrsReviewLogsTable extends SrsReviewLogs
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _reviewedAtMeta = const VerificationMeta(
-    'reviewedAt',
-  );
+  static const VerificationMeta _reviewedAtMeta = const VerificationMeta('reviewedAt');
   @override
   late final GeneratedColumn<int> reviewedAt = GeneratedColumn<int>(
     'reviewed_at',
@@ -898,9 +758,7 @@ class $SrsReviewLogsTable extends SrsReviewLogs
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _durationMsMeta = const VerificationMeta(
-    'durationMs',
-  );
+  static const VerificationMeta _durationMsMeta = const VerificationMeta('durationMs');
   @override
   late final GeneratedColumn<int> durationMs = GeneratedColumn<int>(
     'duration_ms',
@@ -917,9 +775,7 @@ class $SrsReviewLogsTable extends SrsReviewLogs
     false,
     type: DriftSqlType.bool,
     requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'CHECK ("undone" IN (0, 1))',
-    ),
+    defaultConstraints: GeneratedColumn.constraintIsAlways('CHECK ("undone" IN (0, 1))'),
     defaultValue: const Constant(false),
   );
   static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
@@ -930,9 +786,7 @@ class $SrsReviewLogsTable extends SrsReviewLogs
     false,
     type: DriftSqlType.bool,
     requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'CHECK ("synced" IN (0, 1))',
-    ),
+    defaultConstraints: GeneratedColumn.constraintIsAlways('CHECK ("synced" IN (0, 1))'),
     defaultValue: const Constant(false),
   );
   @override
@@ -953,10 +807,7 @@ class $SrsReviewLogsTable extends SrsReviewLogs
   String get actualTableName => $name;
   static const String $name = 'srs_review_logs';
   @override
-  VerificationContext validateIntegrity(
-    Insertable<SrsReviewLog> instance, {
-    bool isInserting = false,
-  }) {
+  VerificationContext validateIntegrity(Insertable<SrsReviewLog> instance, {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
@@ -965,65 +816,38 @@ class $SrsReviewLogsTable extends SrsReviewLogs
       context.missing(_idMeta);
     }
     if (data.containsKey('flashcard_id')) {
-      context.handle(
-        _flashcardIdMeta,
-        flashcardId.isAcceptableOrUnknown(
-          data['flashcard_id']!,
-          _flashcardIdMeta,
-        ),
-      );
+      context.handle(_flashcardIdMeta, flashcardId.isAcceptableOrUnknown(data['flashcard_id']!, _flashcardIdMeta));
     } else if (isInserting) {
       context.missing(_flashcardIdMeta);
     }
     if (data.containsKey('rating')) {
-      context.handle(
-        _ratingMeta,
-        rating.isAcceptableOrUnknown(data['rating']!, _ratingMeta),
-      );
+      context.handle(_ratingMeta, rating.isAcceptableOrUnknown(data['rating']!, _ratingMeta));
     } else if (isInserting) {
       context.missing(_ratingMeta);
     }
     if (data.containsKey('before')) {
-      context.handle(
-        _beforeMeta,
-        before.isAcceptableOrUnknown(data['before']!, _beforeMeta),
-      );
+      context.handle(_beforeMeta, before.isAcceptableOrUnknown(data['before']!, _beforeMeta));
     } else if (isInserting) {
       context.missing(_beforeMeta);
     }
     if (data.containsKey('after')) {
-      context.handle(
-        _afterMeta,
-        after.isAcceptableOrUnknown(data['after']!, _afterMeta),
-      );
+      context.handle(_afterMeta, after.isAcceptableOrUnknown(data['after']!, _afterMeta));
     } else if (isInserting) {
       context.missing(_afterMeta);
     }
     if (data.containsKey('reviewed_at')) {
-      context.handle(
-        _reviewedAtMeta,
-        reviewedAt.isAcceptableOrUnknown(data['reviewed_at']!, _reviewedAtMeta),
-      );
+      context.handle(_reviewedAtMeta, reviewedAt.isAcceptableOrUnknown(data['reviewed_at']!, _reviewedAtMeta));
     } else if (isInserting) {
       context.missing(_reviewedAtMeta);
     }
     if (data.containsKey('duration_ms')) {
-      context.handle(
-        _durationMsMeta,
-        durationMs.isAcceptableOrUnknown(data['duration_ms']!, _durationMsMeta),
-      );
+      context.handle(_durationMsMeta, durationMs.isAcceptableOrUnknown(data['duration_ms']!, _durationMsMeta));
     }
     if (data.containsKey('undone')) {
-      context.handle(
-        _undoneMeta,
-        undone.isAcceptableOrUnknown(data['undone']!, _undoneMeta),
-      );
+      context.handle(_undoneMeta, undone.isAcceptableOrUnknown(data['undone']!, _undoneMeta));
     }
     if (data.containsKey('synced')) {
-      context.handle(
-        _syncedMeta,
-        synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta),
-      );
+      context.handle(_syncedMeta, synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta));
     }
     return context;
   }
@@ -1034,42 +858,15 @@ class $SrsReviewLogsTable extends SrsReviewLogs
   SrsReviewLog map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return SrsReviewLog(
-      id: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}id'],
-      )!,
-      flashcardId: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}flashcard_id'],
-      )!,
-      rating: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}rating'],
-      )!,
-      before: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}before'],
-      )!,
-      after: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}after'],
-      )!,
-      reviewedAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}reviewed_at'],
-      )!,
-      durationMs: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}duration_ms'],
-      ),
-      undone: attachedDatabase.typeMapping.read(
-        DriftSqlType.bool,
-        data['${effectivePrefix}undone'],
-      )!,
-      synced: attachedDatabase.typeMapping.read(
-        DriftSqlType.bool,
-        data['${effectivePrefix}synced'],
-      )!,
+      id: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      flashcardId: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}flashcard_id'])!,
+      rating: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}rating'])!,
+      before: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}before'])!,
+      after: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}after'])!,
+      reviewedAt: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${effectivePrefix}reviewed_at'])!,
+      durationMs: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${effectivePrefix}duration_ms']),
+      undone: attachedDatabase.typeMapping.read(DriftSqlType.bool, data['${effectivePrefix}undone'])!,
+      synced: attachedDatabase.typeMapping.read(DriftSqlType.bool, data['${effectivePrefix}synced'])!,
     );
   }
 
@@ -1125,18 +922,13 @@ class SrsReviewLog extends DataClass implements Insertable<SrsReviewLog> {
       before: Value(before),
       after: Value(after),
       reviewedAt: Value(reviewedAt),
-      durationMs: durationMs == null && nullToAbsent
-          ? const Value.absent()
-          : Value(durationMs),
+      durationMs: durationMs == null && nullToAbsent ? const Value.absent() : Value(durationMs),
       undone: Value(undone),
       synced: Value(synced),
     );
   }
 
-  factory SrsReviewLog.fromJson(
-    Map<String, dynamic> json, {
-    ValueSerializer? serializer,
-  }) {
+  factory SrsReviewLog.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return SrsReviewLog(
       id: serializer.fromJson<String>(json['id']),
@@ -1190,18 +982,12 @@ class SrsReviewLog extends DataClass implements Insertable<SrsReviewLog> {
   SrsReviewLog copyWithCompanion(SrsReviewLogsCompanion data) {
     return SrsReviewLog(
       id: data.id.present ? data.id.value : this.id,
-      flashcardId: data.flashcardId.present
-          ? data.flashcardId.value
-          : this.flashcardId,
+      flashcardId: data.flashcardId.present ? data.flashcardId.value : this.flashcardId,
       rating: data.rating.present ? data.rating.value : this.rating,
       before: data.before.present ? data.before.value : this.before,
       after: data.after.present ? data.after.value : this.after,
-      reviewedAt: data.reviewedAt.present
-          ? data.reviewedAt.value
-          : this.reviewedAt,
-      durationMs: data.durationMs.present
-          ? data.durationMs.value
-          : this.durationMs,
+      reviewedAt: data.reviewedAt.present ? data.reviewedAt.value : this.reviewedAt,
+      durationMs: data.durationMs.present ? data.durationMs.value : this.durationMs,
       undone: data.undone.present ? data.undone.value : this.undone,
       synced: data.synced.present ? data.synced.value : this.synced,
     );
@@ -1224,17 +1010,7 @@ class SrsReviewLog extends DataClass implements Insertable<SrsReviewLog> {
   }
 
   @override
-  int get hashCode => Object.hash(
-    id,
-    flashcardId,
-    rating,
-    before,
-    after,
-    reviewedAt,
-    durationMs,
-    undone,
-    synced,
-  );
+  int get hashCode => Object.hash(id, flashcardId, rating, before, after, reviewedAt, durationMs, undone, synced);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1396,15 +1172,12 @@ class SrsReviewLogsCompanion extends UpdateCompanion<SrsReviewLog> {
   }
 }
 
-class $ExamDraftsTable extends ExamDrafts
-    with TableInfo<$ExamDraftsTable, ExamDraftRow> {
+class $ExamDraftsTable extends ExamDrafts with TableInfo<$ExamDraftsTable, ExamDraftRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $ExamDraftsTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _attemptIdMeta = const VerificationMeta(
-    'attemptId',
-  );
+  static const VerificationMeta _attemptIdMeta = const VerificationMeta('attemptId');
   @override
   late final GeneratedColumn<String> attemptId = GeneratedColumn<String>(
     'attempt_id',
@@ -1413,9 +1186,7 @@ class $ExamDraftsTable extends ExamDrafts
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _attemptMeta = const VerificationMeta(
-    'attempt',
-  );
+  static const VerificationMeta _attemptMeta = const VerificationMeta('attempt');
   @override
   late final GeneratedColumn<String> attempt = GeneratedColumn<String>(
     'attempt',
@@ -1424,9 +1195,7 @@ class $ExamDraftsTable extends ExamDrafts
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _submitPendingMeta = const VerificationMeta(
-    'submitPending',
-  );
+  static const VerificationMeta _submitPendingMeta = const VerificationMeta('submitPending');
   @override
   late final GeneratedColumn<bool> submitPending = GeneratedColumn<bool>(
     'submit_pending',
@@ -1434,14 +1203,10 @@ class $ExamDraftsTable extends ExamDrafts
     false,
     type: DriftSqlType.bool,
     requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'CHECK ("submit_pending" IN (0, 1))',
-    ),
+    defaultConstraints: GeneratedColumn.constraintIsAlways('CHECK ("submit_pending" IN (0, 1))'),
     defaultValue: const Constant(false),
   );
-  static const VerificationMeta _timeSpentMsMeta = const VerificationMeta(
-    'timeSpentMs',
-  );
+  static const VerificationMeta _timeSpentMsMeta = const VerificationMeta('timeSpentMs');
   @override
   late final GeneratedColumn<int> timeSpentMs = GeneratedColumn<int>(
     'time_spent_ms',
@@ -1450,9 +1215,7 @@ class $ExamDraftsTable extends ExamDrafts
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
-    'updatedAt',
-  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta('updatedAt');
   @override
   late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
     'updated_at',
@@ -1462,64 +1225,37 @@ class $ExamDraftsTable extends ExamDrafts
     requiredDuringInsert: true,
   );
   @override
-  List<GeneratedColumn> get $columns => [
-    attemptId,
-    attempt,
-    submitPending,
-    timeSpentMs,
-    updatedAt,
-  ];
+  List<GeneratedColumn> get $columns => [attemptId, attempt, submitPending, timeSpentMs, updatedAt];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
   static const String $name = 'exam_drafts';
   @override
-  VerificationContext validateIntegrity(
-    Insertable<ExamDraftRow> instance, {
-    bool isInserting = false,
-  }) {
+  VerificationContext validateIntegrity(Insertable<ExamDraftRow> instance, {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('attempt_id')) {
-      context.handle(
-        _attemptIdMeta,
-        attemptId.isAcceptableOrUnknown(data['attempt_id']!, _attemptIdMeta),
-      );
+      context.handle(_attemptIdMeta, attemptId.isAcceptableOrUnknown(data['attempt_id']!, _attemptIdMeta));
     } else if (isInserting) {
       context.missing(_attemptIdMeta);
     }
     if (data.containsKey('attempt')) {
-      context.handle(
-        _attemptMeta,
-        attempt.isAcceptableOrUnknown(data['attempt']!, _attemptMeta),
-      );
+      context.handle(_attemptMeta, attempt.isAcceptableOrUnknown(data['attempt']!, _attemptMeta));
     } else if (isInserting) {
       context.missing(_attemptMeta);
     }
     if (data.containsKey('submit_pending')) {
       context.handle(
         _submitPendingMeta,
-        submitPending.isAcceptableOrUnknown(
-          data['submit_pending']!,
-          _submitPendingMeta,
-        ),
+        submitPending.isAcceptableOrUnknown(data['submit_pending']!, _submitPendingMeta),
       );
     }
     if (data.containsKey('time_spent_ms')) {
-      context.handle(
-        _timeSpentMsMeta,
-        timeSpentMs.isAcceptableOrUnknown(
-          data['time_spent_ms']!,
-          _timeSpentMsMeta,
-        ),
-      );
+      context.handle(_timeSpentMsMeta, timeSpentMs.isAcceptableOrUnknown(data['time_spent_ms']!, _timeSpentMsMeta));
     }
     if (data.containsKey('updated_at')) {
-      context.handle(
-        _updatedAtMeta,
-        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
-      );
+      context.handle(_updatedAtMeta, updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
     } else if (isInserting) {
       context.missing(_updatedAtMeta);
     }
@@ -1532,26 +1268,11 @@ class $ExamDraftsTable extends ExamDrafts
   ExamDraftRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return ExamDraftRow(
-      attemptId: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}attempt_id'],
-      )!,
-      attempt: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}attempt'],
-      )!,
-      submitPending: attachedDatabase.typeMapping.read(
-        DriftSqlType.bool,
-        data['${effectivePrefix}submit_pending'],
-      )!,
-      timeSpentMs: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}time_spent_ms'],
-      ),
-      updatedAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}updated_at'],
-      )!,
+      attemptId: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}attempt_id'])!,
+      attempt: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}attempt'])!,
+      submitPending: attachedDatabase.typeMapping.read(DriftSqlType.bool, data['${effectivePrefix}submit_pending'])!,
+      timeSpentMs: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${effectivePrefix}time_spent_ms']),
+      updatedAt: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${effectivePrefix}updated_at'])!,
     );
   }
 
@@ -1592,17 +1313,12 @@ class ExamDraftRow extends DataClass implements Insertable<ExamDraftRow> {
       attemptId: Value(attemptId),
       attempt: Value(attempt),
       submitPending: Value(submitPending),
-      timeSpentMs: timeSpentMs == null && nullToAbsent
-          ? const Value.absent()
-          : Value(timeSpentMs),
+      timeSpentMs: timeSpentMs == null && nullToAbsent ? const Value.absent() : Value(timeSpentMs),
       updatedAt: Value(updatedAt),
     );
   }
 
-  factory ExamDraftRow.fromJson(
-    Map<String, dynamic> json, {
-    ValueSerializer? serializer,
-  }) {
+  factory ExamDraftRow.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return ExamDraftRow(
       attemptId: serializer.fromJson<String>(json['attemptId']),
@@ -1641,12 +1357,8 @@ class ExamDraftRow extends DataClass implements Insertable<ExamDraftRow> {
     return ExamDraftRow(
       attemptId: data.attemptId.present ? data.attemptId.value : this.attemptId,
       attempt: data.attempt.present ? data.attempt.value : this.attempt,
-      submitPending: data.submitPending.present
-          ? data.submitPending.value
-          : this.submitPending,
-      timeSpentMs: data.timeSpentMs.present
-          ? data.timeSpentMs.value
-          : this.timeSpentMs,
+      submitPending: data.submitPending.present ? data.submitPending.value : this.submitPending,
+      timeSpentMs: data.timeSpentMs.present ? data.timeSpentMs.value : this.timeSpentMs,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
@@ -1664,8 +1376,7 @@ class ExamDraftRow extends DataClass implements Insertable<ExamDraftRow> {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(attemptId, attempt, submitPending, timeSpentMs, updatedAt);
+  int get hashCode => Object.hash(attemptId, attempt, submitPending, timeSpentMs, updatedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1776,15 +1487,12 @@ class ExamDraftsCompanion extends UpdateCompanion<ExamDraftRow> {
   }
 }
 
-class $ExamAnswersTable extends ExamAnswers
-    with TableInfo<$ExamAnswersTable, ExamAnswerRow> {
+class $ExamAnswersTable extends ExamAnswers with TableInfo<$ExamAnswersTable, ExamAnswerRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $ExamAnswersTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _attemptIdMeta = const VerificationMeta(
-    'attemptId',
-  );
+  static const VerificationMeta _attemptIdMeta = const VerificationMeta('attemptId');
   @override
   late final GeneratedColumn<String> attemptId = GeneratedColumn<String>(
     'attempt_id',
@@ -1793,9 +1501,7 @@ class $ExamAnswersTable extends ExamAnswers
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _questionIdMeta = const VerificationMeta(
-    'questionId',
-  );
+  static const VerificationMeta _questionIdMeta = const VerificationMeta('questionId');
   @override
   late final GeneratedColumn<String> questionId = GeneratedColumn<String>(
     'question_id',
@@ -1804,9 +1510,7 @@ class $ExamAnswersTable extends ExamAnswers
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _selectedOptionIdMeta = const VerificationMeta(
-    'selectedOptionId',
-  );
+  static const VerificationMeta _selectedOptionIdMeta = const VerificationMeta('selectedOptionId');
   @override
   late final GeneratedColumn<String> selectedOptionId = GeneratedColumn<String>(
     'selected_option_id',
@@ -1815,9 +1519,7 @@ class $ExamAnswersTable extends ExamAnswers
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _writtenAnswerMeta = const VerificationMeta(
-    'writtenAnswer',
-  );
+  static const VerificationMeta _writtenAnswerMeta = const VerificationMeta('writtenAnswer');
   @override
   late final GeneratedColumn<String> writtenAnswer = GeneratedColumn<String>(
     'written_answer',
@@ -1826,9 +1528,7 @@ class $ExamAnswersTable extends ExamAnswers
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _flaggedMeta = const VerificationMeta(
-    'flagged',
-  );
+  static const VerificationMeta _flaggedMeta = const VerificationMeta('flagged');
   @override
   late final GeneratedColumn<bool> flagged = GeneratedColumn<bool>(
     'flagged',
@@ -1836,14 +1536,10 @@ class $ExamAnswersTable extends ExamAnswers
     false,
     type: DriftSqlType.bool,
     requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'CHECK ("flagged" IN (0, 1))',
-    ),
+    defaultConstraints: GeneratedColumn.constraintIsAlways('CHECK ("flagged" IN (0, 1))'),
     defaultValue: const Constant(false),
   );
-  static const VerificationMeta _timeSpentMsMeta = const VerificationMeta(
-    'timeSpentMs',
-  );
+  static const VerificationMeta _timeSpentMsMeta = const VerificationMeta('timeSpentMs');
   @override
   late final GeneratedColumn<int> timeSpentMs = GeneratedColumn<int>(
     'time_spent_ms',
@@ -1860,9 +1556,7 @@ class $ExamAnswersTable extends ExamAnswers
     false,
     type: DriftSqlType.bool,
     requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'CHECK ("dirty" IN (0, 1))',
-    ),
+    defaultConstraints: GeneratedColumn.constraintIsAlways('CHECK ("dirty" IN (0, 1))'),
     defaultValue: const Constant(true),
   );
   @override
@@ -1881,66 +1575,39 @@ class $ExamAnswersTable extends ExamAnswers
   String get actualTableName => $name;
   static const String $name = 'exam_answers';
   @override
-  VerificationContext validateIntegrity(
-    Insertable<ExamAnswerRow> instance, {
-    bool isInserting = false,
-  }) {
+  VerificationContext validateIntegrity(Insertable<ExamAnswerRow> instance, {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('attempt_id')) {
-      context.handle(
-        _attemptIdMeta,
-        attemptId.isAcceptableOrUnknown(data['attempt_id']!, _attemptIdMeta),
-      );
+      context.handle(_attemptIdMeta, attemptId.isAcceptableOrUnknown(data['attempt_id']!, _attemptIdMeta));
     } else if (isInserting) {
       context.missing(_attemptIdMeta);
     }
     if (data.containsKey('question_id')) {
-      context.handle(
-        _questionIdMeta,
-        questionId.isAcceptableOrUnknown(data['question_id']!, _questionIdMeta),
-      );
+      context.handle(_questionIdMeta, questionId.isAcceptableOrUnknown(data['question_id']!, _questionIdMeta));
     } else if (isInserting) {
       context.missing(_questionIdMeta);
     }
     if (data.containsKey('selected_option_id')) {
       context.handle(
         _selectedOptionIdMeta,
-        selectedOptionId.isAcceptableOrUnknown(
-          data['selected_option_id']!,
-          _selectedOptionIdMeta,
-        ),
+        selectedOptionId.isAcceptableOrUnknown(data['selected_option_id']!, _selectedOptionIdMeta),
       );
     }
     if (data.containsKey('written_answer')) {
       context.handle(
         _writtenAnswerMeta,
-        writtenAnswer.isAcceptableOrUnknown(
-          data['written_answer']!,
-          _writtenAnswerMeta,
-        ),
+        writtenAnswer.isAcceptableOrUnknown(data['written_answer']!, _writtenAnswerMeta),
       );
     }
     if (data.containsKey('flagged')) {
-      context.handle(
-        _flaggedMeta,
-        flagged.isAcceptableOrUnknown(data['flagged']!, _flaggedMeta),
-      );
+      context.handle(_flaggedMeta, flagged.isAcceptableOrUnknown(data['flagged']!, _flaggedMeta));
     }
     if (data.containsKey('time_spent_ms')) {
-      context.handle(
-        _timeSpentMsMeta,
-        timeSpentMs.isAcceptableOrUnknown(
-          data['time_spent_ms']!,
-          _timeSpentMsMeta,
-        ),
-      );
+      context.handle(_timeSpentMsMeta, timeSpentMs.isAcceptableOrUnknown(data['time_spent_ms']!, _timeSpentMsMeta));
     }
     if (data.containsKey('dirty')) {
-      context.handle(
-        _dirtyMeta,
-        dirty.isAcceptableOrUnknown(data['dirty']!, _dirtyMeta),
-      );
+      context.handle(_dirtyMeta, dirty.isAcceptableOrUnknown(data['dirty']!, _dirtyMeta));
     }
     return context;
   }
@@ -1951,34 +1618,16 @@ class $ExamAnswersTable extends ExamAnswers
   ExamAnswerRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return ExamAnswerRow(
-      attemptId: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}attempt_id'],
-      )!,
-      questionId: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}question_id'],
-      )!,
+      attemptId: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}attempt_id'])!,
+      questionId: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}question_id'])!,
       selectedOptionId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}selected_option_id'],
       ),
-      writtenAnswer: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}written_answer'],
-      ),
-      flagged: attachedDatabase.typeMapping.read(
-        DriftSqlType.bool,
-        data['${effectivePrefix}flagged'],
-      )!,
-      timeSpentMs: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}time_spent_ms'],
-      ),
-      dirty: attachedDatabase.typeMapping.read(
-        DriftSqlType.bool,
-        data['${effectivePrefix}dirty'],
-      )!,
+      writtenAnswer: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}written_answer']),
+      flagged: attachedDatabase.typeMapping.read(DriftSqlType.bool, data['${effectivePrefix}flagged'])!,
+      timeSpentMs: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${effectivePrefix}time_spent_ms']),
+      dirty: attachedDatabase.typeMapping.read(DriftSqlType.bool, data['${effectivePrefix}dirty'])!,
     );
   }
 
@@ -2028,24 +1677,15 @@ class ExamAnswerRow extends DataClass implements Insertable<ExamAnswerRow> {
     return ExamAnswersCompanion(
       attemptId: Value(attemptId),
       questionId: Value(questionId),
-      selectedOptionId: selectedOptionId == null && nullToAbsent
-          ? const Value.absent()
-          : Value(selectedOptionId),
-      writtenAnswer: writtenAnswer == null && nullToAbsent
-          ? const Value.absent()
-          : Value(writtenAnswer),
+      selectedOptionId: selectedOptionId == null && nullToAbsent ? const Value.absent() : Value(selectedOptionId),
+      writtenAnswer: writtenAnswer == null && nullToAbsent ? const Value.absent() : Value(writtenAnswer),
       flagged: Value(flagged),
-      timeSpentMs: timeSpentMs == null && nullToAbsent
-          ? const Value.absent()
-          : Value(timeSpentMs),
+      timeSpentMs: timeSpentMs == null && nullToAbsent ? const Value.absent() : Value(timeSpentMs),
       dirty: Value(dirty),
     );
   }
 
-  factory ExamAnswerRow.fromJson(
-    Map<String, dynamic> json, {
-    ValueSerializer? serializer,
-  }) {
+  factory ExamAnswerRow.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return ExamAnswerRow(
       attemptId: serializer.fromJson<String>(json['attemptId']),
@@ -2082,12 +1722,8 @@ class ExamAnswerRow extends DataClass implements Insertable<ExamAnswerRow> {
   }) => ExamAnswerRow(
     attemptId: attemptId ?? this.attemptId,
     questionId: questionId ?? this.questionId,
-    selectedOptionId: selectedOptionId.present
-        ? selectedOptionId.value
-        : this.selectedOptionId,
-    writtenAnswer: writtenAnswer.present
-        ? writtenAnswer.value
-        : this.writtenAnswer,
+    selectedOptionId: selectedOptionId.present ? selectedOptionId.value : this.selectedOptionId,
+    writtenAnswer: writtenAnswer.present ? writtenAnswer.value : this.writtenAnswer,
     flagged: flagged ?? this.flagged,
     timeSpentMs: timeSpentMs.present ? timeSpentMs.value : this.timeSpentMs,
     dirty: dirty ?? this.dirty,
@@ -2095,19 +1731,11 @@ class ExamAnswerRow extends DataClass implements Insertable<ExamAnswerRow> {
   ExamAnswerRow copyWithCompanion(ExamAnswersCompanion data) {
     return ExamAnswerRow(
       attemptId: data.attemptId.present ? data.attemptId.value : this.attemptId,
-      questionId: data.questionId.present
-          ? data.questionId.value
-          : this.questionId,
-      selectedOptionId: data.selectedOptionId.present
-          ? data.selectedOptionId.value
-          : this.selectedOptionId,
-      writtenAnswer: data.writtenAnswer.present
-          ? data.writtenAnswer.value
-          : this.writtenAnswer,
+      questionId: data.questionId.present ? data.questionId.value : this.questionId,
+      selectedOptionId: data.selectedOptionId.present ? data.selectedOptionId.value : this.selectedOptionId,
+      writtenAnswer: data.writtenAnswer.present ? data.writtenAnswer.value : this.writtenAnswer,
       flagged: data.flagged.present ? data.flagged.value : this.flagged,
-      timeSpentMs: data.timeSpentMs.present
-          ? data.timeSpentMs.value
-          : this.timeSpentMs,
+      timeSpentMs: data.timeSpentMs.present ? data.timeSpentMs.value : this.timeSpentMs,
       dirty: data.dirty.present ? data.dirty.value : this.dirty,
     );
   }
@@ -2127,15 +1755,7 @@ class ExamAnswerRow extends DataClass implements Insertable<ExamAnswerRow> {
   }
 
   @override
-  int get hashCode => Object.hash(
-    attemptId,
-    questionId,
-    selectedOptionId,
-    writtenAnswer,
-    flagged,
-    timeSpentMs,
-    dirty,
-  );
+  int get hashCode => Object.hash(attemptId, questionId, selectedOptionId, writtenAnswer, flagged, timeSpentMs, dirty);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -2278,8 +1898,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $ExamDraftsTable examDrafts = $ExamDraftsTable(this);
   late final $ExamAnswersTable examAnswers = $ExamAnswersTable(this);
   @override
-  Iterable<TableInfo<Table, Object?>> get allTables =>
-      allSchemaEntities.whereType<TableInfo<Table, Object?>>();
+  Iterable<TableInfo<Table, Object?>> get allTables => allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
     keyValues,
@@ -2298,15 +1917,9 @@ typedef $$KeyValuesTableCreateCompanionBuilder =
       Value<int> rowid,
     });
 typedef $$KeyValuesTableUpdateCompanionBuilder =
-    KeyValuesCompanion Function({
-      Value<String> key,
-      Value<String> value,
-      Value<DateTime> updatedAt,
-      Value<int> rowid,
-    });
+    KeyValuesCompanion Function({Value<String> key, Value<String> value, Value<DateTime> updatedAt, Value<int> rowid});
 
-class $$KeyValuesTableFilterComposer
-    extends Composer<_$AppDatabase, $KeyValuesTable> {
+class $$KeyValuesTableFilterComposer extends Composer<_$AppDatabase, $KeyValuesTable> {
   $$KeyValuesTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -2314,24 +1927,16 @@ class $$KeyValuesTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get key => $composableBuilder(
-    column: $table.key,
-    builder: (column) => ColumnFilters(column),
-  );
+  ColumnFilters<String> get key => $composableBuilder(column: $table.key, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get value => $composableBuilder(
-    column: $table.value,
-    builder: (column) => ColumnFilters(column),
-  );
+  ColumnFilters<String> get value =>
+      $composableBuilder(column: $table.value, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
-    column: $table.updatedAt,
-    builder: (column) => ColumnFilters(column),
-  );
+  ColumnFilters<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => ColumnFilters(column));
 }
 
-class $$KeyValuesTableOrderingComposer
-    extends Composer<_$AppDatabase, $KeyValuesTable> {
+class $$KeyValuesTableOrderingComposer extends Composer<_$AppDatabase, $KeyValuesTable> {
   $$KeyValuesTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -2339,24 +1944,17 @@ class $$KeyValuesTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get key => $composableBuilder(
-    column: $table.key,
-    builder: (column) => ColumnOrderings(column),
-  );
+  ColumnOrderings<String> get key =>
+      $composableBuilder(column: $table.key, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get value => $composableBuilder(
-    column: $table.value,
-    builder: (column) => ColumnOrderings(column),
-  );
+  ColumnOrderings<String> get value =>
+      $composableBuilder(column: $table.value, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
-    column: $table.updatedAt,
-    builder: (column) => ColumnOrderings(column),
-  );
+  ColumnOrderings<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
 }
 
-class $$KeyValuesTableAnnotationComposer
-    extends Composer<_$AppDatabase, $KeyValuesTable> {
+class $$KeyValuesTableAnnotationComposer extends Composer<_$AppDatabase, $KeyValuesTable> {
   $$KeyValuesTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -2364,14 +1962,11 @@ class $$KeyValuesTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<String> get key =>
-      $composableBuilder(column: $table.key, builder: (column) => column);
+  GeneratedColumn<String> get key => $composableBuilder(column: $table.key, builder: (column) => column);
 
-  GeneratedColumn<String> get value =>
-      $composableBuilder(column: $table.value, builder: (column) => column);
+  GeneratedColumn<String> get value => $composableBuilder(column: $table.value, builder: (column) => column);
 
-  GeneratedColumn<DateTime> get updatedAt =>
-      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+  GeneratedColumn<DateTime> get updatedAt => $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 }
 
 class $$KeyValuesTableTableManager
@@ -2394,45 +1989,28 @@ class $$KeyValuesTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () =>
-              $$KeyValuesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$KeyValuesTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$KeyValuesTableAnnotationComposer($db: db, $table: table),
+          createFilteringComposer: () => $$KeyValuesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () => $$KeyValuesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () => $$KeyValuesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
                 Value<String> key = const Value.absent(),
                 Value<String> value = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
-              }) => KeyValuesCompanion(
-                key: key,
-                value: value,
-                updatedAt: updatedAt,
-                rowid: rowid,
-              ),
+              }) => KeyValuesCompanion(key: key, value: value, updatedAt: updatedAt, rowid: rowid),
           createCompanionCallback:
               ({
                 required String key,
                 required String value,
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
-              }) => KeyValuesCompanion.insert(
-                key: key,
-                value: value,
-                updatedAt: updatedAt,
-                rowid: rowid,
-              ),
+              }) => KeyValuesCompanion.insert(key: key, value: value, updatedAt: updatedAt, rowid: rowid),
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
                   e.readTable<$KeyValuesTable, KeyValue>(table),
-                  BaseReferences<_$AppDatabase, $KeyValuesTable, KeyValue>(
-                    db,
-                    table,
-                    e,
-                  ),
+                  BaseReferences<_$AppDatabase, $KeyValuesTable, KeyValue>(db, table, e),
                 ),
               )
               .toList(),
@@ -2482,8 +2060,7 @@ typedef $$SrsCardStatesTableUpdateCompanionBuilder =
       Value<int> rowid,
     });
 
-class $$SrsCardStatesTableFilterComposer
-    extends Composer<_$AppDatabase, $SrsCardStatesTable> {
+class $$SrsCardStatesTableFilterComposer extends Composer<_$AppDatabase, $SrsCardStatesTable> {
   $$SrsCardStatesTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -2491,54 +2068,31 @@ class $$SrsCardStatesTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get flashcardId => $composableBuilder(
-    column: $table.flashcardId,
-    builder: (column) => ColumnFilters(column),
-  );
+  ColumnFilters<String> get flashcardId =>
+      $composableBuilder(column: $table.flashcardId, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get state => $composableBuilder(
-    column: $table.state,
-    builder: (column) => ColumnFilters(column),
-  );
+  ColumnFilters<String> get state =>
+      $composableBuilder(column: $table.state, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<int> get step => $composableBuilder(
-    column: $table.step,
-    builder: (column) => ColumnFilters(column),
-  );
+  ColumnFilters<int> get step => $composableBuilder(column: $table.step, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<int> get dueAt => $composableBuilder(
-    column: $table.dueAt,
-    builder: (column) => ColumnFilters(column),
-  );
+  ColumnFilters<int> get dueAt => $composableBuilder(column: $table.dueAt, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<int> get intervalDays => $composableBuilder(
-    column: $table.intervalDays,
-    builder: (column) => ColumnFilters(column),
-  );
+  ColumnFilters<int> get intervalDays =>
+      $composableBuilder(column: $table.intervalDays, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get ease => $composableBuilder(
-    column: $table.ease,
-    builder: (column) => ColumnFilters(column),
-  );
+  ColumnFilters<double> get ease => $composableBuilder(column: $table.ease, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<int> get reps => $composableBuilder(
-    column: $table.reps,
-    builder: (column) => ColumnFilters(column),
-  );
+  ColumnFilters<int> get reps => $composableBuilder(column: $table.reps, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<int> get lapses => $composableBuilder(
-    column: $table.lapses,
-    builder: (column) => ColumnFilters(column),
-  );
+  ColumnFilters<int> get lapses =>
+      $composableBuilder(column: $table.lapses, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<int> get lastReviewedAt => $composableBuilder(
-    column: $table.lastReviewedAt,
-    builder: (column) => ColumnFilters(column),
-  );
+  ColumnFilters<int> get lastReviewedAt =>
+      $composableBuilder(column: $table.lastReviewedAt, builder: (column) => ColumnFilters(column));
 }
 
-class $$SrsCardStatesTableOrderingComposer
-    extends Composer<_$AppDatabase, $SrsCardStatesTable> {
+class $$SrsCardStatesTableOrderingComposer extends Composer<_$AppDatabase, $SrsCardStatesTable> {
   $$SrsCardStatesTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -2546,54 +2100,35 @@ class $$SrsCardStatesTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get flashcardId => $composableBuilder(
-    column: $table.flashcardId,
-    builder: (column) => ColumnOrderings(column),
-  );
+  ColumnOrderings<String> get flashcardId =>
+      $composableBuilder(column: $table.flashcardId, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get state => $composableBuilder(
-    column: $table.state,
-    builder: (column) => ColumnOrderings(column),
-  );
+  ColumnOrderings<String> get state =>
+      $composableBuilder(column: $table.state, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<int> get step => $composableBuilder(
-    column: $table.step,
-    builder: (column) => ColumnOrderings(column),
-  );
+  ColumnOrderings<int> get step =>
+      $composableBuilder(column: $table.step, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<int> get dueAt => $composableBuilder(
-    column: $table.dueAt,
-    builder: (column) => ColumnOrderings(column),
-  );
+  ColumnOrderings<int> get dueAt =>
+      $composableBuilder(column: $table.dueAt, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<int> get intervalDays => $composableBuilder(
-    column: $table.intervalDays,
-    builder: (column) => ColumnOrderings(column),
-  );
+  ColumnOrderings<int> get intervalDays =>
+      $composableBuilder(column: $table.intervalDays, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<double> get ease => $composableBuilder(
-    column: $table.ease,
-    builder: (column) => ColumnOrderings(column),
-  );
+  ColumnOrderings<double> get ease =>
+      $composableBuilder(column: $table.ease, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<int> get reps => $composableBuilder(
-    column: $table.reps,
-    builder: (column) => ColumnOrderings(column),
-  );
+  ColumnOrderings<int> get reps =>
+      $composableBuilder(column: $table.reps, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<int> get lapses => $composableBuilder(
-    column: $table.lapses,
-    builder: (column) => ColumnOrderings(column),
-  );
+  ColumnOrderings<int> get lapses =>
+      $composableBuilder(column: $table.lapses, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<int> get lastReviewedAt => $composableBuilder(
-    column: $table.lastReviewedAt,
-    builder: (column) => ColumnOrderings(column),
-  );
+  ColumnOrderings<int> get lastReviewedAt =>
+      $composableBuilder(column: $table.lastReviewedAt, builder: (column) => ColumnOrderings(column));
 }
 
-class $$SrsCardStatesTableAnnotationComposer
-    extends Composer<_$AppDatabase, $SrsCardStatesTable> {
+class $$SrsCardStatesTableAnnotationComposer extends Composer<_$AppDatabase, $SrsCardStatesTable> {
   $$SrsCardStatesTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -2601,38 +2136,25 @@ class $$SrsCardStatesTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<String> get flashcardId => $composableBuilder(
-    column: $table.flashcardId,
-    builder: (column) => column,
-  );
+  GeneratedColumn<String> get flashcardId =>
+      $composableBuilder(column: $table.flashcardId, builder: (column) => column);
 
-  GeneratedColumn<String> get state =>
-      $composableBuilder(column: $table.state, builder: (column) => column);
+  GeneratedColumn<String> get state => $composableBuilder(column: $table.state, builder: (column) => column);
 
-  GeneratedColumn<int> get step =>
-      $composableBuilder(column: $table.step, builder: (column) => column);
+  GeneratedColumn<int> get step => $composableBuilder(column: $table.step, builder: (column) => column);
 
-  GeneratedColumn<int> get dueAt =>
-      $composableBuilder(column: $table.dueAt, builder: (column) => column);
+  GeneratedColumn<int> get dueAt => $composableBuilder(column: $table.dueAt, builder: (column) => column);
 
-  GeneratedColumn<int> get intervalDays => $composableBuilder(
-    column: $table.intervalDays,
-    builder: (column) => column,
-  );
+  GeneratedColumn<int> get intervalDays => $composableBuilder(column: $table.intervalDays, builder: (column) => column);
 
-  GeneratedColumn<double> get ease =>
-      $composableBuilder(column: $table.ease, builder: (column) => column);
+  GeneratedColumn<double> get ease => $composableBuilder(column: $table.ease, builder: (column) => column);
 
-  GeneratedColumn<int> get reps =>
-      $composableBuilder(column: $table.reps, builder: (column) => column);
+  GeneratedColumn<int> get reps => $composableBuilder(column: $table.reps, builder: (column) => column);
 
-  GeneratedColumn<int> get lapses =>
-      $composableBuilder(column: $table.lapses, builder: (column) => column);
+  GeneratedColumn<int> get lapses => $composableBuilder(column: $table.lapses, builder: (column) => column);
 
-  GeneratedColumn<int> get lastReviewedAt => $composableBuilder(
-    column: $table.lastReviewedAt,
-    builder: (column) => column,
-  );
+  GeneratedColumn<int> get lastReviewedAt =>
+      $composableBuilder(column: $table.lastReviewedAt, builder: (column) => column);
 }
 
 class $$SrsCardStatesTableTableManager
@@ -2646,10 +2168,7 @@ class $$SrsCardStatesTableTableManager
           $$SrsCardStatesTableAnnotationComposer,
           $$SrsCardStatesTableCreateCompanionBuilder,
           $$SrsCardStatesTableUpdateCompanionBuilder,
-          (
-            SrsCardState,
-            BaseReferences<_$AppDatabase, $SrsCardStatesTable, SrsCardState>,
-          ),
+          (SrsCardState, BaseReferences<_$AppDatabase, $SrsCardStatesTable, SrsCardState>),
           SrsCardState,
           PrefetchHooks Function()
         > {
@@ -2658,12 +2177,9 @@ class $$SrsCardStatesTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () =>
-              $$SrsCardStatesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$SrsCardStatesTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$SrsCardStatesTableAnnotationComposer($db: db, $table: table),
+          createFilteringComposer: () => $$SrsCardStatesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () => $$SrsCardStatesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () => $$SrsCardStatesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
                 Value<String> flashcardId = const Value.absent(),
@@ -2716,11 +2232,7 @@ class $$SrsCardStatesTableTableManager
               .map(
                 (e) => (
                   e.readTable<$SrsCardStatesTable, SrsCardState>(table),
-                  BaseReferences<
-                    _$AppDatabase,
-                    $SrsCardStatesTable,
-                    SrsCardState
-                  >(db, table, e),
+                  BaseReferences<_$AppDatabase, $SrsCardStatesTable, SrsCardState>(db, table, e),
                 ),
               )
               .toList(),
@@ -2739,10 +2251,7 @@ typedef $$SrsCardStatesTableProcessedTableManager =
       $$SrsCardStatesTableAnnotationComposer,
       $$SrsCardStatesTableCreateCompanionBuilder,
       $$SrsCardStatesTableUpdateCompanionBuilder,
-      (
-        SrsCardState,
-        BaseReferences<_$AppDatabase, $SrsCardStatesTable, SrsCardState>,
-      ),
+      (SrsCardState, BaseReferences<_$AppDatabase, $SrsCardStatesTable, SrsCardState>),
       SrsCardState,
       PrefetchHooks Function()
     >;
@@ -2773,8 +2282,7 @@ typedef $$SrsReviewLogsTableUpdateCompanionBuilder =
       Value<int> rowid,
     });
 
-class $$SrsReviewLogsTableFilterComposer
-    extends Composer<_$AppDatabase, $SrsReviewLogsTable> {
+class $$SrsReviewLogsTableFilterComposer extends Composer<_$AppDatabase, $SrsReviewLogsTable> {
   $$SrsReviewLogsTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -2782,54 +2290,34 @@ class $$SrsReviewLogsTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnFilters(column),
-  );
+  ColumnFilters<String> get id => $composableBuilder(column: $table.id, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get flashcardId => $composableBuilder(
-    column: $table.flashcardId,
-    builder: (column) => ColumnFilters(column),
-  );
+  ColumnFilters<String> get flashcardId =>
+      $composableBuilder(column: $table.flashcardId, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get rating => $composableBuilder(
-    column: $table.rating,
-    builder: (column) => ColumnFilters(column),
-  );
+  ColumnFilters<String> get rating =>
+      $composableBuilder(column: $table.rating, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get before => $composableBuilder(
-    column: $table.before,
-    builder: (column) => ColumnFilters(column),
-  );
+  ColumnFilters<String> get before =>
+      $composableBuilder(column: $table.before, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get after => $composableBuilder(
-    column: $table.after,
-    builder: (column) => ColumnFilters(column),
-  );
+  ColumnFilters<String> get after =>
+      $composableBuilder(column: $table.after, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<int> get reviewedAt => $composableBuilder(
-    column: $table.reviewedAt,
-    builder: (column) => ColumnFilters(column),
-  );
+  ColumnFilters<int> get reviewedAt =>
+      $composableBuilder(column: $table.reviewedAt, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<int> get durationMs => $composableBuilder(
-    column: $table.durationMs,
-    builder: (column) => ColumnFilters(column),
-  );
+  ColumnFilters<int> get durationMs =>
+      $composableBuilder(column: $table.durationMs, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<bool> get undone => $composableBuilder(
-    column: $table.undone,
-    builder: (column) => ColumnFilters(column),
-  );
+  ColumnFilters<bool> get undone =>
+      $composableBuilder(column: $table.undone, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<bool> get synced => $composableBuilder(
-    column: $table.synced,
-    builder: (column) => ColumnFilters(column),
-  );
+  ColumnFilters<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => ColumnFilters(column));
 }
 
-class $$SrsReviewLogsTableOrderingComposer
-    extends Composer<_$AppDatabase, $SrsReviewLogsTable> {
+class $$SrsReviewLogsTableOrderingComposer extends Composer<_$AppDatabase, $SrsReviewLogsTable> {
   $$SrsReviewLogsTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -2837,54 +2325,34 @@ class $$SrsReviewLogsTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnOrderings(column),
-  );
+  ColumnOrderings<String> get id => $composableBuilder(column: $table.id, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get flashcardId => $composableBuilder(
-    column: $table.flashcardId,
-    builder: (column) => ColumnOrderings(column),
-  );
+  ColumnOrderings<String> get flashcardId =>
+      $composableBuilder(column: $table.flashcardId, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get rating => $composableBuilder(
-    column: $table.rating,
-    builder: (column) => ColumnOrderings(column),
-  );
+  ColumnOrderings<String> get rating =>
+      $composableBuilder(column: $table.rating, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get before => $composableBuilder(
-    column: $table.before,
-    builder: (column) => ColumnOrderings(column),
-  );
+  ColumnOrderings<String> get before =>
+      $composableBuilder(column: $table.before, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get after => $composableBuilder(
-    column: $table.after,
-    builder: (column) => ColumnOrderings(column),
-  );
+  ColumnOrderings<String> get after =>
+      $composableBuilder(column: $table.after, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<int> get reviewedAt => $composableBuilder(
-    column: $table.reviewedAt,
-    builder: (column) => ColumnOrderings(column),
-  );
+  ColumnOrderings<int> get reviewedAt =>
+      $composableBuilder(column: $table.reviewedAt, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<int> get durationMs => $composableBuilder(
-    column: $table.durationMs,
-    builder: (column) => ColumnOrderings(column),
-  );
+  ColumnOrderings<int> get durationMs =>
+      $composableBuilder(column: $table.durationMs, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<bool> get undone => $composableBuilder(
-    column: $table.undone,
-    builder: (column) => ColumnOrderings(column),
-  );
+  ColumnOrderings<bool> get undone =>
+      $composableBuilder(column: $table.undone, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<bool> get synced => $composableBuilder(
-    column: $table.synced,
-    builder: (column) => ColumnOrderings(column),
-  );
+  ColumnOrderings<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => ColumnOrderings(column));
 }
 
-class $$SrsReviewLogsTableAnnotationComposer
-    extends Composer<_$AppDatabase, $SrsReviewLogsTable> {
+class $$SrsReviewLogsTableAnnotationComposer extends Composer<_$AppDatabase, $SrsReviewLogsTable> {
   $$SrsReviewLogsTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -2892,38 +2360,24 @@ class $$SrsReviewLogsTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<String> get id =>
-      $composableBuilder(column: $table.id, builder: (column) => column);
+  GeneratedColumn<String> get id => $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<String> get flashcardId => $composableBuilder(
-    column: $table.flashcardId,
-    builder: (column) => column,
-  );
+  GeneratedColumn<String> get flashcardId =>
+      $composableBuilder(column: $table.flashcardId, builder: (column) => column);
 
-  GeneratedColumn<String> get rating =>
-      $composableBuilder(column: $table.rating, builder: (column) => column);
+  GeneratedColumn<String> get rating => $composableBuilder(column: $table.rating, builder: (column) => column);
 
-  GeneratedColumn<String> get before =>
-      $composableBuilder(column: $table.before, builder: (column) => column);
+  GeneratedColumn<String> get before => $composableBuilder(column: $table.before, builder: (column) => column);
 
-  GeneratedColumn<String> get after =>
-      $composableBuilder(column: $table.after, builder: (column) => column);
+  GeneratedColumn<String> get after => $composableBuilder(column: $table.after, builder: (column) => column);
 
-  GeneratedColumn<int> get reviewedAt => $composableBuilder(
-    column: $table.reviewedAt,
-    builder: (column) => column,
-  );
+  GeneratedColumn<int> get reviewedAt => $composableBuilder(column: $table.reviewedAt, builder: (column) => column);
 
-  GeneratedColumn<int> get durationMs => $composableBuilder(
-    column: $table.durationMs,
-    builder: (column) => column,
-  );
+  GeneratedColumn<int> get durationMs => $composableBuilder(column: $table.durationMs, builder: (column) => column);
 
-  GeneratedColumn<bool> get undone =>
-      $composableBuilder(column: $table.undone, builder: (column) => column);
+  GeneratedColumn<bool> get undone => $composableBuilder(column: $table.undone, builder: (column) => column);
 
-  GeneratedColumn<bool> get synced =>
-      $composableBuilder(column: $table.synced, builder: (column) => column);
+  GeneratedColumn<bool> get synced => $composableBuilder(column: $table.synced, builder: (column) => column);
 }
 
 class $$SrsReviewLogsTableTableManager
@@ -2937,10 +2391,7 @@ class $$SrsReviewLogsTableTableManager
           $$SrsReviewLogsTableAnnotationComposer,
           $$SrsReviewLogsTableCreateCompanionBuilder,
           $$SrsReviewLogsTableUpdateCompanionBuilder,
-          (
-            SrsReviewLog,
-            BaseReferences<_$AppDatabase, $SrsReviewLogsTable, SrsReviewLog>,
-          ),
+          (SrsReviewLog, BaseReferences<_$AppDatabase, $SrsReviewLogsTable, SrsReviewLog>),
           SrsReviewLog,
           PrefetchHooks Function()
         > {
@@ -2949,12 +2400,9 @@ class $$SrsReviewLogsTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () =>
-              $$SrsReviewLogsTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$SrsReviewLogsTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$SrsReviewLogsTableAnnotationComposer($db: db, $table: table),
+          createFilteringComposer: () => $$SrsReviewLogsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () => $$SrsReviewLogsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () => $$SrsReviewLogsTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
                 Value<String> id = const Value.absent(),
@@ -3007,11 +2455,7 @@ class $$SrsReviewLogsTableTableManager
               .map(
                 (e) => (
                   e.readTable<$SrsReviewLogsTable, SrsReviewLog>(table),
-                  BaseReferences<
-                    _$AppDatabase,
-                    $SrsReviewLogsTable,
-                    SrsReviewLog
-                  >(db, table, e),
+                  BaseReferences<_$AppDatabase, $SrsReviewLogsTable, SrsReviewLog>(db, table, e),
                 ),
               )
               .toList(),
@@ -3030,10 +2474,7 @@ typedef $$SrsReviewLogsTableProcessedTableManager =
       $$SrsReviewLogsTableAnnotationComposer,
       $$SrsReviewLogsTableCreateCompanionBuilder,
       $$SrsReviewLogsTableUpdateCompanionBuilder,
-      (
-        SrsReviewLog,
-        BaseReferences<_$AppDatabase, $SrsReviewLogsTable, SrsReviewLog>,
-      ),
+      (SrsReviewLog, BaseReferences<_$AppDatabase, $SrsReviewLogsTable, SrsReviewLog>),
       SrsReviewLog,
       PrefetchHooks Function()
     >;
@@ -3056,8 +2497,7 @@ typedef $$ExamDraftsTableUpdateCompanionBuilder =
       Value<int> rowid,
     });
 
-class $$ExamDraftsTableFilterComposer
-    extends Composer<_$AppDatabase, $ExamDraftsTable> {
+class $$ExamDraftsTableFilterComposer extends Composer<_$AppDatabase, $ExamDraftsTable> {
   $$ExamDraftsTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -3065,34 +2505,23 @@ class $$ExamDraftsTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get attemptId => $composableBuilder(
-    column: $table.attemptId,
-    builder: (column) => ColumnFilters(column),
-  );
+  ColumnFilters<String> get attemptId =>
+      $composableBuilder(column: $table.attemptId, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get attempt => $composableBuilder(
-    column: $table.attempt,
-    builder: (column) => ColumnFilters(column),
-  );
+  ColumnFilters<String> get attempt =>
+      $composableBuilder(column: $table.attempt, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<bool> get submitPending => $composableBuilder(
-    column: $table.submitPending,
-    builder: (column) => ColumnFilters(column),
-  );
+  ColumnFilters<bool> get submitPending =>
+      $composableBuilder(column: $table.submitPending, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<int> get timeSpentMs => $composableBuilder(
-    column: $table.timeSpentMs,
-    builder: (column) => ColumnFilters(column),
-  );
+  ColumnFilters<int> get timeSpentMs =>
+      $composableBuilder(column: $table.timeSpentMs, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<int> get updatedAt => $composableBuilder(
-    column: $table.updatedAt,
-    builder: (column) => ColumnFilters(column),
-  );
+  ColumnFilters<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => ColumnFilters(column));
 }
 
-class $$ExamDraftsTableOrderingComposer
-    extends Composer<_$AppDatabase, $ExamDraftsTable> {
+class $$ExamDraftsTableOrderingComposer extends Composer<_$AppDatabase, $ExamDraftsTable> {
   $$ExamDraftsTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -3100,34 +2529,23 @@ class $$ExamDraftsTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get attemptId => $composableBuilder(
-    column: $table.attemptId,
-    builder: (column) => ColumnOrderings(column),
-  );
+  ColumnOrderings<String> get attemptId =>
+      $composableBuilder(column: $table.attemptId, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get attempt => $composableBuilder(
-    column: $table.attempt,
-    builder: (column) => ColumnOrderings(column),
-  );
+  ColumnOrderings<String> get attempt =>
+      $composableBuilder(column: $table.attempt, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<bool> get submitPending => $composableBuilder(
-    column: $table.submitPending,
-    builder: (column) => ColumnOrderings(column),
-  );
+  ColumnOrderings<bool> get submitPending =>
+      $composableBuilder(column: $table.submitPending, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<int> get timeSpentMs => $composableBuilder(
-    column: $table.timeSpentMs,
-    builder: (column) => ColumnOrderings(column),
-  );
+  ColumnOrderings<int> get timeSpentMs =>
+      $composableBuilder(column: $table.timeSpentMs, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<int> get updatedAt => $composableBuilder(
-    column: $table.updatedAt,
-    builder: (column) => ColumnOrderings(column),
-  );
+  ColumnOrderings<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
 }
 
-class $$ExamDraftsTableAnnotationComposer
-    extends Composer<_$AppDatabase, $ExamDraftsTable> {
+class $$ExamDraftsTableAnnotationComposer extends Composer<_$AppDatabase, $ExamDraftsTable> {
   $$ExamDraftsTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -3135,24 +2553,16 @@ class $$ExamDraftsTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<String> get attemptId =>
-      $composableBuilder(column: $table.attemptId, builder: (column) => column);
+  GeneratedColumn<String> get attemptId => $composableBuilder(column: $table.attemptId, builder: (column) => column);
 
-  GeneratedColumn<String> get attempt =>
-      $composableBuilder(column: $table.attempt, builder: (column) => column);
+  GeneratedColumn<String> get attempt => $composableBuilder(column: $table.attempt, builder: (column) => column);
 
-  GeneratedColumn<bool> get submitPending => $composableBuilder(
-    column: $table.submitPending,
-    builder: (column) => column,
-  );
+  GeneratedColumn<bool> get submitPending =>
+      $composableBuilder(column: $table.submitPending, builder: (column) => column);
 
-  GeneratedColumn<int> get timeSpentMs => $composableBuilder(
-    column: $table.timeSpentMs,
-    builder: (column) => column,
-  );
+  GeneratedColumn<int> get timeSpentMs => $composableBuilder(column: $table.timeSpentMs, builder: (column) => column);
 
-  GeneratedColumn<int> get updatedAt =>
-      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+  GeneratedColumn<int> get updatedAt => $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 }
 
 class $$ExamDraftsTableTableManager
@@ -3166,10 +2576,7 @@ class $$ExamDraftsTableTableManager
           $$ExamDraftsTableAnnotationComposer,
           $$ExamDraftsTableCreateCompanionBuilder,
           $$ExamDraftsTableUpdateCompanionBuilder,
-          (
-            ExamDraftRow,
-            BaseReferences<_$AppDatabase, $ExamDraftsTable, ExamDraftRow>,
-          ),
+          (ExamDraftRow, BaseReferences<_$AppDatabase, $ExamDraftsTable, ExamDraftRow>),
           ExamDraftRow,
           PrefetchHooks Function()
         > {
@@ -3178,12 +2585,9 @@ class $$ExamDraftsTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () =>
-              $$ExamDraftsTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$ExamDraftsTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$ExamDraftsTableAnnotationComposer($db: db, $table: table),
+          createFilteringComposer: () => $$ExamDraftsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () => $$ExamDraftsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () => $$ExamDraftsTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
                 Value<String> attemptId = const Value.absent(),
@@ -3220,11 +2624,7 @@ class $$ExamDraftsTableTableManager
               .map(
                 (e) => (
                   e.readTable<$ExamDraftsTable, ExamDraftRow>(table),
-                  BaseReferences<_$AppDatabase, $ExamDraftsTable, ExamDraftRow>(
-                    db,
-                    table,
-                    e,
-                  ),
+                  BaseReferences<_$AppDatabase, $ExamDraftsTable, ExamDraftRow>(db, table, e),
                 ),
               )
               .toList(),
@@ -3243,10 +2643,7 @@ typedef $$ExamDraftsTableProcessedTableManager =
       $$ExamDraftsTableAnnotationComposer,
       $$ExamDraftsTableCreateCompanionBuilder,
       $$ExamDraftsTableUpdateCompanionBuilder,
-      (
-        ExamDraftRow,
-        BaseReferences<_$AppDatabase, $ExamDraftsTable, ExamDraftRow>,
-      ),
+      (ExamDraftRow, BaseReferences<_$AppDatabase, $ExamDraftsTable, ExamDraftRow>),
       ExamDraftRow,
       PrefetchHooks Function()
     >;
@@ -3273,8 +2670,7 @@ typedef $$ExamAnswersTableUpdateCompanionBuilder =
       Value<int> rowid,
     });
 
-class $$ExamAnswersTableFilterComposer
-    extends Composer<_$AppDatabase, $ExamAnswersTable> {
+class $$ExamAnswersTableFilterComposer extends Composer<_$AppDatabase, $ExamAnswersTable> {
   $$ExamAnswersTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -3282,44 +2678,28 @@ class $$ExamAnswersTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get attemptId => $composableBuilder(
-    column: $table.attemptId,
-    builder: (column) => ColumnFilters(column),
-  );
+  ColumnFilters<String> get attemptId =>
+      $composableBuilder(column: $table.attemptId, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get questionId => $composableBuilder(
-    column: $table.questionId,
-    builder: (column) => ColumnFilters(column),
-  );
+  ColumnFilters<String> get questionId =>
+      $composableBuilder(column: $table.questionId, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get selectedOptionId => $composableBuilder(
-    column: $table.selectedOptionId,
-    builder: (column) => ColumnFilters(column),
-  );
+  ColumnFilters<String> get selectedOptionId =>
+      $composableBuilder(column: $table.selectedOptionId, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get writtenAnswer => $composableBuilder(
-    column: $table.writtenAnswer,
-    builder: (column) => ColumnFilters(column),
-  );
+  ColumnFilters<String> get writtenAnswer =>
+      $composableBuilder(column: $table.writtenAnswer, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<bool> get flagged => $composableBuilder(
-    column: $table.flagged,
-    builder: (column) => ColumnFilters(column),
-  );
+  ColumnFilters<bool> get flagged =>
+      $composableBuilder(column: $table.flagged, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<int> get timeSpentMs => $composableBuilder(
-    column: $table.timeSpentMs,
-    builder: (column) => ColumnFilters(column),
-  );
+  ColumnFilters<int> get timeSpentMs =>
+      $composableBuilder(column: $table.timeSpentMs, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<bool> get dirty => $composableBuilder(
-    column: $table.dirty,
-    builder: (column) => ColumnFilters(column),
-  );
+  ColumnFilters<bool> get dirty => $composableBuilder(column: $table.dirty, builder: (column) => ColumnFilters(column));
 }
 
-class $$ExamAnswersTableOrderingComposer
-    extends Composer<_$AppDatabase, $ExamAnswersTable> {
+class $$ExamAnswersTableOrderingComposer extends Composer<_$AppDatabase, $ExamAnswersTable> {
   $$ExamAnswersTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -3327,44 +2707,29 @@ class $$ExamAnswersTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get attemptId => $composableBuilder(
-    column: $table.attemptId,
-    builder: (column) => ColumnOrderings(column),
-  );
+  ColumnOrderings<String> get attemptId =>
+      $composableBuilder(column: $table.attemptId, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get questionId => $composableBuilder(
-    column: $table.questionId,
-    builder: (column) => ColumnOrderings(column),
-  );
+  ColumnOrderings<String> get questionId =>
+      $composableBuilder(column: $table.questionId, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get selectedOptionId => $composableBuilder(
-    column: $table.selectedOptionId,
-    builder: (column) => ColumnOrderings(column),
-  );
+  ColumnOrderings<String> get selectedOptionId =>
+      $composableBuilder(column: $table.selectedOptionId, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get writtenAnswer => $composableBuilder(
-    column: $table.writtenAnswer,
-    builder: (column) => ColumnOrderings(column),
-  );
+  ColumnOrderings<String> get writtenAnswer =>
+      $composableBuilder(column: $table.writtenAnswer, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<bool> get flagged => $composableBuilder(
-    column: $table.flagged,
-    builder: (column) => ColumnOrderings(column),
-  );
+  ColumnOrderings<bool> get flagged =>
+      $composableBuilder(column: $table.flagged, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<int> get timeSpentMs => $composableBuilder(
-    column: $table.timeSpentMs,
-    builder: (column) => ColumnOrderings(column),
-  );
+  ColumnOrderings<int> get timeSpentMs =>
+      $composableBuilder(column: $table.timeSpentMs, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<bool> get dirty => $composableBuilder(
-    column: $table.dirty,
-    builder: (column) => ColumnOrderings(column),
-  );
+  ColumnOrderings<bool> get dirty =>
+      $composableBuilder(column: $table.dirty, builder: (column) => ColumnOrderings(column));
 }
 
-class $$ExamAnswersTableAnnotationComposer
-    extends Composer<_$AppDatabase, $ExamAnswersTable> {
+class $$ExamAnswersTableAnnotationComposer extends Composer<_$AppDatabase, $ExamAnswersTable> {
   $$ExamAnswersTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -3372,34 +2737,21 @@ class $$ExamAnswersTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<String> get attemptId =>
-      $composableBuilder(column: $table.attemptId, builder: (column) => column);
+  GeneratedColumn<String> get attemptId => $composableBuilder(column: $table.attemptId, builder: (column) => column);
 
-  GeneratedColumn<String> get questionId => $composableBuilder(
-    column: $table.questionId,
-    builder: (column) => column,
-  );
+  GeneratedColumn<String> get questionId => $composableBuilder(column: $table.questionId, builder: (column) => column);
 
-  GeneratedColumn<String> get selectedOptionId => $composableBuilder(
-    column: $table.selectedOptionId,
-    builder: (column) => column,
-  );
+  GeneratedColumn<String> get selectedOptionId =>
+      $composableBuilder(column: $table.selectedOptionId, builder: (column) => column);
 
-  GeneratedColumn<String> get writtenAnswer => $composableBuilder(
-    column: $table.writtenAnswer,
-    builder: (column) => column,
-  );
+  GeneratedColumn<String> get writtenAnswer =>
+      $composableBuilder(column: $table.writtenAnswer, builder: (column) => column);
 
-  GeneratedColumn<bool> get flagged =>
-      $composableBuilder(column: $table.flagged, builder: (column) => column);
+  GeneratedColumn<bool> get flagged => $composableBuilder(column: $table.flagged, builder: (column) => column);
 
-  GeneratedColumn<int> get timeSpentMs => $composableBuilder(
-    column: $table.timeSpentMs,
-    builder: (column) => column,
-  );
+  GeneratedColumn<int> get timeSpentMs => $composableBuilder(column: $table.timeSpentMs, builder: (column) => column);
 
-  GeneratedColumn<bool> get dirty =>
-      $composableBuilder(column: $table.dirty, builder: (column) => column);
+  GeneratedColumn<bool> get dirty => $composableBuilder(column: $table.dirty, builder: (column) => column);
 }
 
 class $$ExamAnswersTableTableManager
@@ -3413,10 +2765,7 @@ class $$ExamAnswersTableTableManager
           $$ExamAnswersTableAnnotationComposer,
           $$ExamAnswersTableCreateCompanionBuilder,
           $$ExamAnswersTableUpdateCompanionBuilder,
-          (
-            ExamAnswerRow,
-            BaseReferences<_$AppDatabase, $ExamAnswersTable, ExamAnswerRow>,
-          ),
+          (ExamAnswerRow, BaseReferences<_$AppDatabase, $ExamAnswersTable, ExamAnswerRow>),
           ExamAnswerRow,
           PrefetchHooks Function()
         > {
@@ -3425,12 +2774,9 @@ class $$ExamAnswersTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () =>
-              $$ExamAnswersTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$ExamAnswersTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$ExamAnswersTableAnnotationComposer($db: db, $table: table),
+          createFilteringComposer: () => $$ExamAnswersTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () => $$ExamAnswersTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () => $$ExamAnswersTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
                 Value<String> attemptId = const Value.absent(),
@@ -3475,11 +2821,7 @@ class $$ExamAnswersTableTableManager
               .map(
                 (e) => (
                   e.readTable<$ExamAnswersTable, ExamAnswerRow>(table),
-                  BaseReferences<
-                    _$AppDatabase,
-                    $ExamAnswersTable,
-                    ExamAnswerRow
-                  >(db, table, e),
+                  BaseReferences<_$AppDatabase, $ExamAnswersTable, ExamAnswerRow>(db, table, e),
                 ),
               )
               .toList(),
@@ -3498,10 +2840,7 @@ typedef $$ExamAnswersTableProcessedTableManager =
       $$ExamAnswersTableAnnotationComposer,
       $$ExamAnswersTableCreateCompanionBuilder,
       $$ExamAnswersTableUpdateCompanionBuilder,
-      (
-        ExamAnswerRow,
-        BaseReferences<_$AppDatabase, $ExamAnswersTable, ExamAnswerRow>,
-      ),
+      (ExamAnswerRow, BaseReferences<_$AppDatabase, $ExamAnswersTable, ExamAnswerRow>),
       ExamAnswerRow,
       PrefetchHooks Function()
     >;
@@ -3509,14 +2848,9 @@ typedef $$ExamAnswersTableProcessedTableManager =
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
-  $$KeyValuesTableTableManager get keyValues =>
-      $$KeyValuesTableTableManager(_db, _db.keyValues);
-  $$SrsCardStatesTableTableManager get srsCardStates =>
-      $$SrsCardStatesTableTableManager(_db, _db.srsCardStates);
-  $$SrsReviewLogsTableTableManager get srsReviewLogs =>
-      $$SrsReviewLogsTableTableManager(_db, _db.srsReviewLogs);
-  $$ExamDraftsTableTableManager get examDrafts =>
-      $$ExamDraftsTableTableManager(_db, _db.examDrafts);
-  $$ExamAnswersTableTableManager get examAnswers =>
-      $$ExamAnswersTableTableManager(_db, _db.examAnswers);
+  $$KeyValuesTableTableManager get keyValues => $$KeyValuesTableTableManager(_db, _db.keyValues);
+  $$SrsCardStatesTableTableManager get srsCardStates => $$SrsCardStatesTableTableManager(_db, _db.srsCardStates);
+  $$SrsReviewLogsTableTableManager get srsReviewLogs => $$SrsReviewLogsTableTableManager(_db, _db.srsReviewLogs);
+  $$ExamDraftsTableTableManager get examDrafts => $$ExamDraftsTableTableManager(_db, _db.examDrafts);
+  $$ExamAnswersTableTableManager get examAnswers => $$ExamAnswersTableTableManager(_db, _db.examAnswers);
 }

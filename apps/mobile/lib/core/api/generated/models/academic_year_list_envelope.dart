@@ -10,14 +10,10 @@ part 'academic_year_list_envelope.g.dart';
 
 @JsonSerializable()
 class AcademicYearListEnvelope {
-  const AcademicYearListEnvelope({
-    required this.success,
-    required this.data,
-    required this.error,
-  });
-  
+  const AcademicYearListEnvelope({required this.success, required this.data, required this.error});
+
   factory AcademicYearListEnvelope.fromJson(Map<String, Object?> json) => _$AcademicYearListEnvelopeFromJson(json);
-  
+
   final bool success;
   final AcademicYearList data;
   final dynamic error;

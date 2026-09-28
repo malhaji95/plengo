@@ -15,9 +15,9 @@ class SavedAnswer {
     required this.flagged,
     required this.answeredAt,
   });
-  
+
   factory SavedAnswer.fromJson(Map<String, Object?> json) => _$SavedAnswerFromJson(json);
-  
+
   final String questionId;
   @JsonKey(includeIfNull: true)
   final String? selectedOptionId;

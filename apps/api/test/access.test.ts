@@ -151,6 +151,20 @@ describe('coupon batches (§9.6)', () => {
       expect(code).toMatch(/^[2-9A-HJKMNP-Z]{4}-[2-9A-HJKMNP-Z]{4}-[2-9A-HJKMNP-Z]{2}$/);
     expect(new Set(codes).size).toBe(12);
 
+    // The batch's codes page by cursor (§30.1).
+    type Page = { items: { codeLast4: string }[]; nextCursor: string | null };
+    const p1 = await adminCall<Page>('GET', `/coupon-batches/${id}/coupons?limit=5`);
+    const p2 = await adminCall<Page>(
+      'GET',
+      `/coupon-batches/${id}/coupons?limit=5&cursor=${p1.data.nextCursor}`,
+    );
+    const p3 = await adminCall<Page>(
+      'GET',
+      `/coupon-batches/${id}/coupons?limit=5&cursor=${p2.data.nextCursor}`,
+    );
+    expect([p1, p2, p3].map((p) => p.data.items.length)).toEqual([5, 5, 2]);
+    expect(p3.data.nextCursor).toBeNull();
+
     const got = await adminCall<{
       generatedCount: number;
       redeemedCount: number;
@@ -655,8 +669,25 @@ describe('entitlement lifecycle', () => {
   it('searches students', async () => {
     const s = await student();
     const [u] = await t.c.db.select({ email: users.email }).from(users).where(eq(users.id, s.id));
-    const res = await adminCall<{ id: string }[]>('GET', `/students?q=${encodeURIComponent(u!.email)}`);
-    expect(res.data.map((x) => x.id)).toEqual([s.id]);
+    const res = await adminCall<{ items: { id: string }[] }>(
+      'GET',
+      `/students?q=${encodeURIComponent(u!.email)}`,
+    );
+    expect(res.data.items.map((x) => x.id)).toEqual([s.id]);
+    // Cursor pagination (§30.1).
+    await student();
+    await student();
+    const first = await adminCall<{ items: { id: string }[]; nextCursor: string | null }>(
+      'GET',
+      '/students?limit=2',
+    );
+    expect(first.data.items).toHaveLength(2);
+    expect(first.data.nextCursor).not.toBeNull();
+    const second = await adminCall<{ items: { id: string }[] }>(
+      'GET',
+      `/students?limit=2&cursor=${first.data.nextCursor}`,
+    );
+    expect(second.data.items.some((x) => first.data.items.some((y) => y.id === x.id))).toBe(false);
     expect((await adminCall('GET', `/students/${randomUUID()}`)).status).toBe(404);
   });
 });

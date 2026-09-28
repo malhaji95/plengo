@@ -241,7 +241,7 @@ export function learningRoutes(c: Container): FastifyPluginAsyncZod {
           response: { 200: successEnvelope(bookmarkListSchema) },
         },
       },
-      async (request) => ok(await c.learning.bookmarks(user(request), request.query.itemType)),
+      async (request) => ok(await c.learning.bookmarks(user(request), request.query)),
     );
     app.get(
       '/bookmarks/keys',

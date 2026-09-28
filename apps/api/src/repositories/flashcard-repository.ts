@@ -230,6 +230,52 @@ export function createFlashcardRepository(db: Db) {
           .where(and(eq(flashcards.deckId, deckId), liveCard))
       ).map((r) => r.id),
 
+    /** Of the given ids, those that exist (deleted cards included). */
+    async existingCardIds(ids: string[]) {
+      if (!ids.length) return [];
+      return (await db.select({ id: flashcards.id }).from(flashcards).where(inArray(flashcards.id, ids))).map(
+        (r) => r.id,
+      );
+    },
+
+    /** The deck a card belongs to (deleted ones included). */
+    async deckOfCard(conn: Conn, cardId: string) {
+      const [row] = await conn
+        .select({ d: flashcardDecks })
+        .from(flashcards)
+        .innerJoin(flashcardDecks, eq(flashcardDecks.id, flashcards.deckId))
+        .where(eq(flashcards.id, cardId));
+      return row?.d ?? null;
+    },
+
+    /** Live published cards of live published decks in one subject scope, with their deck. */
+    publishedCardsInScope: (subjectId: string, teacherTrackId: string | null) =>
+      db
+        .select({ id: flashcards.id, deck: flashcardDecks })
+        .from(flashcards)
+        .innerJoin(flashcardDecks, eq(flashcardDecks.id, flashcards.deckId))
+        .where(
+          and(
+            eq(flashcardDecks.subjectId, subjectId),
+            teacherTrackId
+              ? eq(flashcardDecks.teacherTrackId, teacherTrackId)
+              : isNull(flashcardDecks.teacherTrackId),
+            isNull(flashcardDecks.deletedAt),
+            eq(flashcardDecks.status, 'published'),
+            isNull(flashcards.deletedAt),
+            eq(flashcards.status, 'published'),
+          ),
+        ),
+
+    /** Titles of live decks. */
+    async deckTitles(ids: string[]) {
+      if (!ids.length) return [];
+      return db
+        .select({ id: flashcardDecks.id, t: flashcardDecks.titleAr })
+        .from(flashcardDecks)
+        .where(and(inArray(flashcardDecks.id, ids), isNull(flashcardDecks.deletedAt)));
+    },
+
     async getMedia(id: string) {
       const [row] = await db.select().from(mediaFiles).where(eq(mediaFiles.id, id)).limit(1);
       return row ?? null;

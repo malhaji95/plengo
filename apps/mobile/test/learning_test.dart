@@ -391,8 +391,13 @@ void main() {
       '/review/mistakes',
       arrange: (l) {
         when(() => l.mistakes(status: any(named: 'status'))).thenAnswer(
-          (_) async =>
-              MistakeList(items: [mistake('m1', 'الميكانيك')], activeCount: 1, masteredCount: 3, masteryStreak: 2),
+          (_) async => MistakeList(
+            items: [mistake('m1', 'الميكانيك')],
+            activeCount: 1,
+            masteredCount: 3,
+            masteryStreak: 2,
+            nextCursor: null,
+          ),
         );
         when(() => l.removeMistake('m1')).thenAnswer((_) async {});
       },
@@ -429,6 +434,7 @@ void main() {
                 card: null,
               ),
             ],
+            nextCursor: null,
             urlsExpireAt: '',
           ),
         );

@@ -22,9 +22,9 @@ class Subject {
     required this.sortOrder,
     required this.isActive,
   });
-  
+
   factory Subject.fromJson(Map<String, Object?> json) => _$SubjectFromJson(json);
-  
+
   final String id;
   final String educationLevelId;
   @JsonKey(includeIfNull: true)

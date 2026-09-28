@@ -19,9 +19,9 @@ class AttemptFilters {
     this.count,
     this.questionIds,
   });
-  
+
   factory AttemptFilters.fromJson(Map<String, Object?> json) => _$AttemptFiltersFromJson(json);
-  
+
   @JsonKey(includeIfNull: false)
   final String? subjectId;
   @JsonKey(includeIfNull: false)

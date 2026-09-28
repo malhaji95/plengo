@@ -10,13 +10,10 @@ part 'submit_attempt_request.g.dart';
 
 @JsonSerializable()
 class SubmitAttemptRequest {
-  const SubmitAttemptRequest({
-    required this.answers,
-    this.timeSpentMs,
-  });
-  
+  const SubmitAttemptRequest({required this.answers, this.timeSpentMs});
+
   factory SubmitAttemptRequest.fromJson(Map<String, Object?> json) => _$SubmitAttemptRequestFromJson(json);
-  
+
   final List<SubmitAnswer> answers;
   @JsonKey(includeIfNull: false)
   final int? timeSpentMs;

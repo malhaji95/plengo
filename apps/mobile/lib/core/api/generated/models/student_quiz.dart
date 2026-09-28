@@ -35,9 +35,9 @@ class StudentQuiz {
     required this.bestScorePercent,
     required this.inProgressAttemptId,
   });
-  
+
   factory StudentQuiz.fromJson(Map<String, Object?> json) => _$StudentQuizFromJson(json);
-  
+
   final String id;
   final String subjectId;
   @JsonKey(includeIfNull: true)

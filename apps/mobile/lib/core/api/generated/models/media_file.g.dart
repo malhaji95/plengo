@@ -30,6 +30,7 @@ const _$MediaKindEnumMap = {
   MediaKind.teacher: 'teacher',
   MediaKind.cover: 'cover',
   MediaKind.userCard: 'user-card',
+  MediaKind.avatar: 'avatar',
 };
 
 const _$MediaFileStatusEnumMap = {

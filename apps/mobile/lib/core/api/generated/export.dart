@@ -197,6 +197,7 @@ export 'models/latest_version.dart';
 export 'models/features.dart';
 export 'models/srs_defaults.dart';
 export 'models/support.dart';
+export 'models/store_urls.dart';
 export 'models/mistakes.dart';
 export 'models/access_scope_scope_type.dart';
 export 'models/attempt_filters_types.dart';
@@ -224,4 +225,3 @@ export 'models/student_quiz_allowed_modes.dart';
 export 'models/type_accuracy_type.dart';
 // Root client
 export 'plengo_api.dart';
-

@@ -7,16 +7,36 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { formatDate } from '@/lib/access';
 import { api, unwrap } from '@/lib/api';
+import { Button } from '@/components/ui/button';
+import type { components } from '@/lib/api-schema';
 import { useLoad } from '@/lib/use-load';
+
+type AdminStudent = components['schemas']['AdminStudent'];
 
 /** Student search by email, name or id (spec §26.2). */
 export default function StudentsPage() {
   const [q, setQ] = useState('');
   const [query, setQuery] = useState('');
-  const students = useLoad(
-    () => unwrap(api.GET('/api/v1/admin/students', { params: { query: query ? { q: query } : {} } })),
-    [query],
-  );
+  const [pages, setPages] = useState<string[]>([]);
+  const [more, setMore] = useState<AdminStudent[]>([]);
+  const students = useLoad(async () => {
+    setMore([]);
+    setPages([]);
+    return unwrap(api.GET('/api/v1/admin/students', { params: { query: query ? { q: query } : {} } }));
+  }, [query]);
+  const nextCursor = pages.length ? pages[pages.length - 1] : students.data?.nextCursor;
+  const list = [...(students.data?.items ?? []), ...more];
+
+  async function loadMore() {
+    if (!nextCursor) return;
+    const page = await unwrap(
+      api.GET('/api/v1/admin/students', {
+        params: { query: { ...(query ? { q: query } : {}), cursor: nextCursor } },
+      }),
+    );
+    setMore((m) => [...m, ...page.items]);
+    setPages((p) => [...p, page.nextCursor ?? '']);
+  }
 
   return (
     <div className="mx-auto max-w-5xl space-y-4">
@@ -46,7 +66,7 @@ export default function StudentsPage() {
             </tr>
           </thead>
           <tbody>
-            {(students.data ?? []).map((s) => (
+            {list.map((s) => (
               <tr key={s.id} className="border-b border-border last:border-0">
                 <td className="p-3">
                   <Link href={`/students/${s.id}`} className="text-brand hover:underline">
@@ -60,7 +80,7 @@ export default function StudentsPage() {
                 <td className="p-3">{formatDate(s.createdAt)}</td>
               </tr>
             ))}
-            {students.data?.length === 0 ? (
+            {students.data?.items.length === 0 ? (
               <tr>
                 <td colSpan={3} className="p-6 text-center text-muted">
                   لا يوجد طلاب مطابقون
@@ -70,6 +90,11 @@ export default function StudentsPage() {
           </tbody>
         </table>
       </Card>
+      {nextCursor ? (
+        <Button variant="outline" onClick={() => void loadMore()}>
+          تحميل المزيد
+        </Button>
+      ) : null}
     </div>
   );
 }

@@ -11,8 +11,7 @@ SrsDefaults _$SrsDefaultsFromJson(Map<String, dynamic> json) => SrsDefaults(
   maxReviewsPerDay: (json['maxReviewsPerDay'] as num).toInt(),
 );
 
-Map<String, dynamic> _$SrsDefaultsToJson(SrsDefaults instance) =>
-    <String, dynamic>{
-      'newCardsPerDay': instance.newCardsPerDay,
-      'maxReviewsPerDay': instance.maxReviewsPerDay,
-    };
+Map<String, dynamic> _$SrsDefaultsToJson(SrsDefaults instance) => <String, dynamic>{
+  'newCardsPerDay': instance.newCardsPerDay,
+  'maxReviewsPerDay': instance.maxReviewsPerDay,
+};

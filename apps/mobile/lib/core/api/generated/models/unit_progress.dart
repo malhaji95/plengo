@@ -19,9 +19,9 @@ class UnitProgress {
     required this.completionPercent,
     required this.unitId,
   });
-  
+
   factory UnitProgress.fromJson(Map<String, Object?> json) => _$UnitProgressFromJson(json);
-  
+
   final int questionsAttempted;
   final int questionsCorrect;
   final int questionsTotal;

@@ -21,7 +21,21 @@ export default function CouponBatchPage() {
     [id],
   );
   const codes = useLoad(
-    () => unwrap(api.GET('/api/v1/admin/coupon-batches/{id}/coupons', { params: { path: { id } } })),
+    // Up to 5,000 codes: read every page (1,000 per request).
+    async () => {
+      const all = [];
+      let cursor: string | undefined;
+      do {
+        const page = await unwrap(
+          api.GET('/api/v1/admin/coupon-batches/{id}/coupons', {
+            params: { path: { id }, query: { limit: 1000, ...(cursor ? { cursor } : {}) } },
+          }),
+        );
+        all.push(...page.items);
+        cursor = page.nextCursor ?? undefined;
+      } while (cursor);
+      return all;
+    },
     [id],
   );
   const [error, setError] = useState<string | null>(null);

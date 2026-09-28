@@ -79,6 +79,7 @@ const testMe = Me(
   universityId: null,
   facultyId: null,
   academicYearId: null,
+  avatarUrl: null,
 );
 
 Subject subject(String id, String name, {String levelId = 'l12', String? description}) => Subject(

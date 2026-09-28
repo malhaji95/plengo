@@ -18,7 +18,9 @@ import {
   verifyEmailBodySchema,
   webLoginBodySchema,
 } from '@plengo/contracts';
-import { ok } from '../lib/app-error.js';
+import type { FastifyRequest } from 'fastify';
+import { AppError, ok } from '../lib/app-error.js';
+import { WindowLimiter } from '../lib/window-limiter.js';
 import type { Container } from '../container.js';
 import { emailKey, forwardCookies, ipAndEmailKey, requestMeta } from './helpers.js';
 
@@ -28,14 +30,18 @@ const HOUR = 60 * 60 * 1000;
 /** Student authentication: email + password only (spec §11.1). */
 export function authRoutes(c: Container): FastifyPluginAsyncZod {
   const loginLimit = { max: 10, timeWindow: FIFTEEN_MIN, keyGenerator: ipAndEmailKey };
-  const otpLimit = { max: 5, timeWindow: HOUR, keyGenerator: emailKey };
+  // §31: 5 OTP emails per hour per address, across register, resend and password reset together.
+  const otpEmails = new WindowLimiter(5, HOUR);
+  const otpLimit = async (request: FastifyRequest) => {
+    if (!otpEmails.hit(emailKey(request))) throw new AppError('RATE_LIMITED');
+  };
   const tags = ['auth'];
 
   return async (app) => {
     app.post(
       '/register',
       {
-        config: { rateLimit: otpLimit },
+        preHandler: otpLimit,
         schema: {
           operationId: 'register',
           tags,
@@ -63,7 +69,7 @@ export function authRoutes(c: Container): FastifyPluginAsyncZod {
     app.post(
       '/resend-otp',
       {
-        config: { rateLimit: otpLimit },
+        preHandler: otpLimit,
         schema: {
           operationId: 'resendOtp',
           tags,
@@ -77,7 +83,7 @@ export function authRoutes(c: Container): FastifyPluginAsyncZod {
     app.post(
       '/forgot-password',
       {
-        config: { rateLimit: otpLimit },
+        preHandler: otpLimit,
         schema: {
           operationId: 'forgotPassword',
           tags,

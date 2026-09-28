@@ -16,6 +16,7 @@ Me _$MeFromJson(Map<String, dynamic> json) => Me(
   universityId: json['universityId'] as String?,
   facultyId: json['facultyId'] as String?,
   academicYearId: json['academicYearId'] as String?,
+  avatarUrl: json['avatarUrl'] as String?,
 );
 
 Map<String, dynamic> _$MeToJson(Me instance) => <String, dynamic>{
@@ -28,6 +29,7 @@ Map<String, dynamic> _$MeToJson(Me instance) => <String, dynamic>{
   'universityId': instance.universityId,
   'facultyId': instance.facultyId,
   'academicYearId': instance.academicYearId,
+  'avatarUrl': instance.avatarUrl,
 };
 
 const _$MeRoleEnumMap = {MeRole.student: 'student', MeRole.admin: 'admin'};

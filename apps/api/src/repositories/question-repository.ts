@@ -297,6 +297,55 @@ export function createQuestionRepository(db: Db) {
         .from(questionAnswers)
         .where(and(eq(questionAnswers.isActive, true), ne(questionAnswers.normalizationVersion, version))),
 
+    /**
+     * Random practice draw (§15.3): ids of live published questions in one subject scope, in random
+     * order; only free ones unless the scope is open.
+     */
+    randomPublishedIds: (
+      f: {
+        subjectId: string;
+        teacherTrackId: string | null;
+        unitId?: string | null | undefined;
+        lessonId?: string | null | undefined;
+        types?: QuestionRow['type'][] | undefined;
+        freeOnly: boolean;
+      },
+      limit: number,
+    ) =>
+      db
+        .select({ id: questions.id })
+        .from(questions)
+        .where(
+          and(
+            isNull(questions.deletedAt),
+            eq(questions.status, 'published'),
+            eq(questions.subjectId, f.subjectId),
+            f.teacherTrackId
+              ? eq(questions.teacherTrackId, f.teacherTrackId)
+              : isNull(questions.teacherTrackId),
+            f.unitId ? eq(questions.unitId, f.unitId) : undefined,
+            f.lessonId ? eq(questions.lessonId, f.lessonId) : undefined,
+            f.types?.length ? inArray(questions.type, f.types) : undefined,
+            f.freeOnly ? eq(questions.isFree, true) : undefined,
+          ),
+        )
+        .orderBy(sql`random()`)
+        .limit(limit),
+
+    /** Live published questions of one subject scope (a null track is general content). */
+    publishedRowsInScope: (subjectId: string, teacherTrackId: string | null) =>
+      db
+        .select()
+        .from(questions)
+        .where(
+          and(
+            eq(questions.subjectId, subjectId),
+            teacherTrackId ? eq(questions.teacherTrackId, teacherTrackId) : isNull(questions.teacherTrackId),
+            isNull(questions.deletedAt),
+            eq(questions.status, 'published'),
+          ),
+        ),
+
     names: async (subjectIds: string[], trackIds: string[]) => {
       const [s, t] = await Promise.all([
         subjectIds.length

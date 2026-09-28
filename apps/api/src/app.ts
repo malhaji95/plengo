@@ -17,6 +17,7 @@ import { registerErrorHandling } from './plugins/error-handler.js';
 import { registerVersionGate } from './plugins/version-gate.js';
 import { accessRoutes } from './routes/access.js';
 import { adminAccessRoutes } from './routes/admin/access.js';
+import { adminAccountRoutes } from './routes/admin/admins.js';
 import { adminAuthRoutes } from './routes/admin/auth.js';
 import { adminFlashcardRoutes } from './routes/admin/flashcards.js';
 import { adminQuestionRoutes } from './routes/admin/questions.js';
@@ -44,14 +45,20 @@ export function loggerOptions(level: string, pretty: boolean): FastifyServerOpti
   };
 }
 
-export function createFastify(options: FastifyServerOptions = {}) {
+/**
+ * `trustProxy` is a hop count, not `true`: only the address added by our own proxy is trusted, so
+ * a client cannot choose its IP (and so its rate-limit key) with a forged `X-Forwarded-For` (§31).
+ */
+export function createFastify(options: FastifyServerOptions & { proxyHops?: number } = {}) {
+  const { proxyHops = 1, ...rest } = options;
   return Fastify({
-    trustProxy: true,
+    // Trust only the nearest `proxyHops` addresses (our own load balancer).
+    trustProxy: (_address: string, hop: number) => hop < proxyHops,
     genReqId: (req) => {
       const incoming = req.headers['x-request-id'];
       return typeof incoming === 'string' && /^[\w-]{8,64}$/.test(incoming) ? incoming : randomUUID();
     },
-    ...options,
+    ...rest,
   }).withTypeProvider<ZodTypeProvider>();
 }
 
@@ -62,8 +69,11 @@ export async function buildApp(app: App, c: Container): Promise<App> {
   app.setValidatorCompiler(validatorCompiler);
   app.setSerializerCompiler(serializerCompiler);
   app.decorateRequest('auth', null);
+  const https = c.env.APP_ENV === 'staging' || c.env.APP_ENV === 'production';
   app.addHook('onRequest', async (request, reply) => {
     void reply.header('x-request-id', request.id);
+    // HTTPS only in deployed environments (§31).
+    if (https) void reply.header('strict-transport-security', 'max-age=31536000; includeSubDomains');
   });
 
   registerErrorHandling(app);
@@ -129,6 +139,7 @@ export async function buildApp(app: App, c: Container): Promise<App> {
   await app.register(adminQuestionRoutes(c), { prefix: '/api/v1/admin' });
   await app.register(adminFlashcardRoutes(c), { prefix: '/api/v1/admin' });
   await app.register(adminQuizRoutes(c), { prefix: '/api/v1/admin' });
+  await app.register(adminAccountRoutes(c), { prefix: '/api/v1/admin' });
 
   return app;
 }

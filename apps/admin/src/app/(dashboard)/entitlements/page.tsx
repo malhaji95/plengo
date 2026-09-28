@@ -23,7 +23,7 @@ export default function EntitlementsPage() {
   const students = useLoad(
     () =>
       query
-        ? unwrap(api.GET('/api/v1/admin/students', { params: { query: { q: query } } }))
+        ? unwrap(api.GET('/api/v1/admin/students', { params: { query: { q: query } } })).then((p) => p.items)
         : Promise.resolve([]),
     [query],
   );

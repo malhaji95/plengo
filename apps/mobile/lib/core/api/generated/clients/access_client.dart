@@ -19,7 +19,5 @@ abstract class AccessClient {
   Future<MyEntitlementListEnvelope> listMyEntitlements();
 
   @POST('/api/v1/coupons/redeem')
-  Future<RedeemResultEnvelope> redeemCoupon({
-    @Body() required RedeemCouponRequest body,
-  });
+  Future<RedeemResultEnvelope> redeemCoupon({@Body() required RedeemCouponRequest body});
 }

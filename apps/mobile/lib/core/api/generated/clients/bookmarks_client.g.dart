@@ -22,10 +22,16 @@ class _BookmarksClient implements BookmarksClient {
 
   @override
   Future<BookmarkListEnvelope> listBookmarks({
+    int? limit = 50,
     BookmarkItemType? itemType,
+    String? cursor,
   }) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{r'itemType': itemType?.toJson()};
+    final queryParameters = <String, dynamic>{
+      r'limit': limit,
+      r'itemType': itemType?.toJson(),
+      r'cursor': cursor,
+    };
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;

@@ -28,9 +28,33 @@ class PlengoApp extends ConsumerWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       builder: (context, child) => MediaQuery(
-        data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(appearance.textScale)),
+        // The app's size setting multiplies the phone's own text size; it never replaces it.
+        data: MediaQuery.of(
+          context,
+        ).copyWith(textScaler: _ScaledBy(MediaQuery.textScalerOf(context), appearance.textScale)),
         child: child!,
       ),
     );
   }
+}
+
+/// The system text scaler multiplied by the in-app font-size factor (spec §25).
+class _ScaledBy extends TextScaler {
+  const _ScaledBy(this.system, this.factor);
+
+  final TextScaler system;
+  final double factor;
+
+  @override
+  double scale(double fontSize) => system.scale(fontSize) * factor;
+
+  @override
+  // ignore: deprecated_member_use
+  double get textScaleFactor => system.scale(14) / 14 * factor;
+
+  @override
+  bool operator ==(Object other) => other is _ScaledBy && other.system == system && other.factor == factor;
+
+  @override
+  int get hashCode => Object.hash(system, factor);
 }

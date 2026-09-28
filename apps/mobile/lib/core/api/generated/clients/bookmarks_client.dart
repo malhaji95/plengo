@@ -20,13 +20,13 @@ abstract class BookmarksClient {
 
   @GET('/api/v1/bookmarks')
   Future<BookmarkListEnvelope> listBookmarks({
+    @Query('limit') int? limit = 50,
     @Query('itemType') BookmarkItemType? itemType,
+    @Query('cursor') String? cursor,
   });
 
   @PUT('/api/v1/bookmarks')
-  Future<BookmarkEnvelope> addBookmark({
-    @Body() required BookmarkRequest body,
-  });
+  Future<BookmarkEnvelope> addBookmark({@Body() required BookmarkRequest body});
 
   @GET('/api/v1/bookmarks/keys')
   Future<BookmarkKeyListEnvelope> listBookmarkKeys();

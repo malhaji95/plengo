@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 /** Image kinds accepted by the upload flow (spec §12.3). CSV/XLSX `import` uploads arrive with Phase 11. */
-export const MEDIA_KINDS = ['flashcard', 'banner', 'teacher', 'cover', 'user-card'] as const;
+export const MEDIA_KINDS = ['flashcard', 'banner', 'teacher', 'cover', 'user-card', 'avatar'] as const;
 export const mediaKindSchema = z.enum(MEDIA_KINDS);
 export type MediaKind = z.infer<typeof mediaKindSchema>;
 

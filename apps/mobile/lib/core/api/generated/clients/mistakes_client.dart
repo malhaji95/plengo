@@ -18,16 +18,16 @@ abstract class MistakesClient {
 
   @GET('/api/v1/mistakes')
   Future<MistakeListEnvelope> listMistakes({
+    @Query('limit') int? limit = 100,
     @Query('status') MistakeFilterStatus? status,
     @Query('subjectId') String? subjectId,
     @Query('teacherTrackId') String? teacherTrackId,
     @Query('unitId') String? unitId,
     @Query('lessonId') String? lessonId,
     @Query('type') MistakeFilterType? type,
+    @Query('cursor') String? cursor,
   });
 
   @DELETE('/api/v1/mistakes/{questionId}')
-  Future<DeletedResultEnvelope> removeMistake({
-    @Path('questionId') required String questionId,
-  });
+  Future<DeletedResultEnvelope> removeMistake({@Path('questionId') required String questionId});
 }

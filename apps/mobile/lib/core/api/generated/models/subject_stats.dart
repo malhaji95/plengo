@@ -23,9 +23,9 @@ class SubjectStats {
     required this.tracks,
     required this.byType,
   });
-  
+
   factory SubjectStats.fromJson(Map<String, Object?> json) => _$SubjectStatsFromJson(json);
-  
+
   final String subjectId;
   final String subjectNameAr;
   final Accuracy totals;

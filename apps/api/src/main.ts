@@ -7,7 +7,10 @@ import { PgBossQueue } from './jobs/queue.js';
 const env = loadEnv();
 if (env.SENTRY_DSN) Sentry.init({ dsn: env.SENTRY_DSN, environment: env.APP_ENV, tracesSampleRate: 0.1 });
 
-const app = createFastify({ logger: loggerOptions(env.LOG_LEVEL, env.NODE_ENV === 'development') });
+const app = createFastify({
+  logger: loggerOptions(env.LOG_LEVEL, env.NODE_ENV === 'development'),
+  proxyHops: env.TRUST_PROXY_HOPS,
+});
 const queue = new PgBossQueue(env.DATABASE_URL, app.log);
 const container = createContainer(env, app.log, { jobs: queue });
 await buildApp(app, container);

@@ -12,19 +12,18 @@ class RegisterRequest {
     required this.fullName,
     required this.email,
     required this.password,
-    this.educationLevelId,
+    required this.educationLevelId,
     this.universityId,
     this.facultyId,
     this.academicYearId,
   });
-  
+
   factory RegisterRequest.fromJson(Map<String, Object?> json) => _$RegisterRequestFromJson(json);
-  
+
   final String fullName;
   final String email;
   final String password;
-  @JsonKey(includeIfNull: false)
-  final String? educationLevelId;
+  final String educationLevelId;
   @JsonKey(includeIfNull: false)
   final String? universityId;
   @JsonKey(includeIfNull: false)

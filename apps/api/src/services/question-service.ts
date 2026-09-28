@@ -66,6 +66,10 @@ export function createQuestionService(deps: {
   access: AccessService;
   freeRules: FreeRuleService;
   audit: AuditService;
+  /** Exams give no feedback until the end (§15.2): the stateless check is refused meanwhile. */
+  inOpenExam?: (userId: string, questionId: string) => Promise<boolean>;
+  /** Publishing, unpublishing or deleting a question changes the quizzes that contain it. */
+  onVisibilityChange?: (questionId: string) => Promise<void>;
   now?: () => Date;
 }) {
   const { db, repo, structureRepo, teacherRepo, access, freeRules, audit } = deps;
@@ -191,6 +195,7 @@ export function createQuestionService(deps: {
     if (status === 'published' && current.freeSource === 'rule') {
       await repo.update(db, id, { isFree: await ruleFree({ ...current, status }) });
     }
+    if (current.status === 'published' || status === 'published') await deps.onVisibilityChange?.(id);
     await record(
       actor,
       `question.${status === 'published' ? 'published' : status === 'archived' ? 'archived' : 'unpublished'}`,
@@ -424,6 +429,7 @@ export function createQuestionService(deps: {
     async remove(actor: AdminActor, id: string) {
       if (!(await repo.get(id))) notFound();
       await repo.update(db, id, { deletedAt: now(), updatedByAdminId: actor.adminId });
+      await deps.onVisibilityChange?.(id);
       await record(actor, 'question.deleted', id);
       return { deleted: true };
     },
@@ -496,6 +502,9 @@ export function createQuestionService(deps: {
     async check(userId: string, id: string, input: AnswerInput): Promise<CheckResult> {
       const q = await publishedQuestion(id);
       await access.assertCanAccessItem(userId, q);
+      if (await deps.inOpenExam?.(userId, id)) {
+        throw new AppError('VALIDATION_ERROR', { details: { field: 'id', reason: 'exam_in_progress' } });
+      }
       return grade(q, input);
     },
   };

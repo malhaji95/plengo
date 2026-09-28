@@ -1,10 +1,10 @@
-import { and, asc, eq, gt, inArray, isNotNull, lt, ne, or, sql } from 'drizzle-orm';
-import { cardStates, flashcardDecks, flashcards, reviewLogs, subjects, type Db } from '@plengo/db';
+import type { Db } from '@plengo/db';
 import type { SrsCardState, SrsStateInput } from '@plengo/contracts';
 import { businessDay, startOfBusinessDay } from '@plengo/srs';
 import { AppError } from '../lib/app-error.js';
-import type { FlashcardRepository } from '../repositories/flashcard-repository.js';
+import type { DeckRow, FlashcardRepository } from '../repositories/flashcard-repository.js';
 import type { LearningRepository } from '../repositories/learning-repository.js';
+import type { CardStateRow, SrsRepository } from '../repositories/srs-repository.js';
 import type { StructureRepository } from '../repositories/structure-repository.js';
 import type { TeacherRepository } from '../repositories/teacher-repository.js';
 import type { AccessService } from './access-service.js';
@@ -12,7 +12,7 @@ import { assertVisibleScope } from './content-placement.js';
 import type { FlashcardService } from './flashcard-service.js';
 import { SIGNED_URL_TTL_SECONDS } from './flashcard-service.js';
 
-type StateRow = typeof cardStates.$inferSelect;
+type StateRow = CardStateRow;
 type LogInput = {
   id: string;
   flashcardId: string;
@@ -67,6 +67,7 @@ function decode(cursor: string | undefined) {
  */
 export function createSrsService(deps: {
   db: Db;
+  repo: SrsRepository;
   flashcardRepo: FlashcardRepository;
   learningRepo: LearningRepository;
   flashcards: FlashcardService;
@@ -75,12 +76,21 @@ export function createSrsService(deps: {
   access: AccessService;
   now?: () => Date;
 }) {
-  const { db, flashcardRepo, learningRepo, flashcards: cards, structureRepo, teacherRepo, access } = deps;
+  const {
+    db,
+    repo,
+    flashcardRepo,
+    learningRepo,
+    flashcards: cards,
+    structureRepo,
+    teacherRepo,
+    access,
+  } = deps;
   const now = deps.now ?? (() => new Date());
 
   async function assertCardsExist(ids: string[]) {
     if (!ids.length) return;
-    const found = await db.select({ id: flashcards.id }).from(flashcards).where(inArray(flashcards.id, ids));
+    const found = await flashcardRepo.existingCardIds(ids);
     if (found.length !== ids.length)
       throw new AppError('VALIDATION_ERROR', { details: { field: 'flashcardId' } });
   }
@@ -89,23 +99,7 @@ export function createSrsService(deps: {
     /** States changed since `since` (other devices' reviews, §13.8). */
     async states(userId: string, since: string | undefined, limit: number) {
       const after = decode(since);
-      const rows = await db
-        .select()
-        .from(cardStates)
-        .where(
-          and(
-            eq(cardStates.userId, userId),
-            isNotNull(cardStates.flashcardId),
-            after
-              ? or(
-                  gt(cardStates.updatedAt, after.at),
-                  and(eq(cardStates.updatedAt, after.at), gt(cardStates.id, after.id)),
-                )
-              : undefined,
-          ),
-        )
-        .orderBy(asc(cardStates.updatedAt), asc(cardStates.id))
-        .limit(limit);
+      const rows = await repo.statesSince(userId, after, limit);
       return { items: rows.map(toApi), nextCursor: rows.length ? encode(rows[rows.length - 1]!) : null };
     },
 
@@ -127,79 +121,63 @@ export function createSrsService(deps: {
       const result = await db.transaction(async (tx) => {
         let acceptedLogs = 0;
         for (const log of body.logs) {
-          const inserted = await tx
-            .insert(reviewLogs)
-            .values({
-              id: log.id,
-              userId,
-              flashcardId: log.flashcardId,
-              rating: log.rating,
-              stateBefore: log.stateBefore,
-              stateAfter: log.stateAfter,
-              reviewedAt: new Date(log.reviewedAt),
-              durationMs: log.durationMs ?? null,
-              undone: log.undone ?? false,
-              devicePlatform: platform,
-            })
-            .onConflictDoNothing({ target: reviewLogs.id })
-            .returning({ id: reviewLogs.id });
-          acceptedLogs += inserted.length;
+          const inserted = await repo.insertLog(tx, {
+            id: log.id,
+            userId,
+            flashcardId: log.flashcardId,
+            rating: log.rating,
+            stateBefore: log.stateBefore,
+            stateAfter: log.stateAfter,
+            reviewedAt: new Date(log.reviewedAt),
+            durationMs: log.durationMs ?? null,
+            undone: log.undone ?? false,
+            devicePlatform: platform,
+          });
+          if (inserted) acceptedLogs += 1;
 
           if (!log.undone) continue;
-          const [mine] = await tx
-            .update(reviewLogs)
-            .set({ undone: true })
-            .where(and(eq(reviewLogs.id, log.id), eq(reviewLogs.userId, userId)))
-            .returning({ id: reviewLogs.id });
-          if (!mine) continue;
-          const [current] = await tx
-            .select()
-            .from(cardStates)
-            .where(and(eq(cardStates.userId, userId), eq(cardStates.flashcardId, log.flashcardId)))
-            .for('update');
+          if (!(await repo.markLogUndone(tx, log.id, userId))) continue;
+          const current = await repo.stateForUpdate(tx, userId, log.flashcardId);
           const undoneAt = log.stateAfter.lastReviewedAt ? Date.parse(log.stateAfter.lastReviewedAt) : null;
           if (current && current.lastReviewedAt?.getTime() === undoneAt) {
-            await tx
-              .update(cardStates)
-              .set({ ...toColumns(log.stateBefore), updatedAt: at })
-              .where(eq(cardStates.id, current.id));
+            await repo.updateState(tx, current.id, { ...toColumns(log.stateBefore), updatedAt: at });
           }
         }
 
         let appliedStates = 0;
         for (const s of body.states) {
           if (!s.lastReviewedAt) continue; // an unreviewed card has nothing to store
-          const applied = await tx
-            .insert(cardStates)
-            .values({ userId, flashcardId: s.flashcardId, ...toColumns(s), updatedAt: at })
-            .onConflictDoUpdate({
-              target: [cardStates.userId, cardStates.flashcardId],
-              set: { ...toColumns(s), updatedAt: at },
-              setWhere: sql`${cardStates.lastReviewedAt} is null or ${cardStates.lastReviewedAt} < ${new Date(s.lastReviewedAt)}`,
-            })
-            .returning({ id: cardStates.id });
-          appliedStates += applied.length;
+          const applied = await repo.upsertIfNewer(
+            tx,
+            userId,
+            s.flashcardId,
+            toColumns(s),
+            new Date(s.lastReviewedAt),
+            at,
+          );
+          if (applied) appliedStates += 1;
         }
         // The resume pointer follows the latest reviewed deck (§18).
         const latest = body.logs
           .filter((l) => !l.undone)
           .sort((a, b) => Date.parse(b.reviewedAt) - Date.parse(a.reviewedAt))[0];
         if (latest) {
-          const [deck] = await tx
-            .select({ d: flashcardDecks })
-            .from(flashcards)
-            .innerJoin(flashcardDecks, eq(flashcardDecks.id, flashcards.deckId))
-            .where(eq(flashcards.id, latest.flashcardId));
+          const deck = await flashcardRepo.deckOfCard(tx, latest.flashcardId);
           const reviewedAt = new Date(latest.reviewedAt);
-          if (deck && reviewedAt.getTime() <= at.getTime() + 60_000) {
+          // Only decks the student can open become the resume pointer.
+          if (
+            deck &&
+            reviewedAt.getTime() <= at.getTime() + 60_000 &&
+            (await access.canAccessItem(userId, deck))
+          ) {
             await learningRepo.touchProgress(tx, {
               userId,
-              subjectId: deck.d.subjectId,
-              teacherTrackId: deck.d.teacherTrackId,
-              unitId: deck.d.unitId,
-              lessonId: deck.d.lessonId,
+              subjectId: deck.subjectId,
+              teacherTrackId: deck.teacherTrackId,
+              unitId: deck.unitId,
+              lessonId: deck.lessonId,
               type: 'deck',
-              itemId: deck.d.id,
+              itemId: deck.id,
               at: reviewedAt,
             });
           }
@@ -207,12 +185,7 @@ export function createSrsService(deps: {
         return { acceptedLogs, appliedStates };
       });
 
-      const states = ids.length
-        ? await db
-            .select()
-            .from(cardStates)
-            .where(and(eq(cardStates.userId, userId), inArray(cardStates.flashcardId, ids)))
-        : [];
+      const states = await repo.statesFor(userId, ids);
       return { ...result, states: states.map(toApi) };
     },
 
@@ -223,31 +196,12 @@ export function createSrsService(deps: {
     async due(userId: string, subjectId: string | undefined) {
       const at = now();
       const endOfToday = new Date(startOfBusinessDay(businessDay(at.getTime()) + 1));
-      const rows = await db
-        .select({ state: cardStates, deck: flashcardDecks, subjectNameAr: subjects.nameAr })
-        .from(cardStates)
-        .innerJoin(flashcards, eq(flashcards.id, cardStates.flashcardId))
-        .innerJoin(flashcardDecks, eq(flashcardDecks.id, flashcards.deckId))
-        .innerJoin(subjects, eq(subjects.id, flashcardDecks.subjectId))
-        .where(
-          and(
-            eq(cardStates.userId, userId),
-            ne(cardStates.state, 'new'),
-            lt(cardStates.dueAt, endOfToday),
-            sql`${flashcards.deletedAt} is null`,
-            eq(flashcards.status, 'published'),
-            sql`${flashcardDecks.deletedAt} is null`,
-            eq(flashcardDecks.status, 'published'),
-            subjectId ? eq(flashcardDecks.subjectId, subjectId) : undefined,
-          ),
-        )
-        .orderBy(asc(cardStates.dueAt))
-        .limit(MAX_DUE);
+      const rows = await repo.due(userId, endOfToday, subjectId, MAX_DUE);
 
       // Only cards the student can open, in visible subjects and tracks (§13.5).
       const ctx = await access.context(userId);
       const visible = new Map<string, boolean>();
-      const isVisible = async (deck: typeof flashcardDecks.$inferSelect) => {
+      const isVisible = async (deck: DeckRow) => {
         const key = `${deck.subjectId}:${deck.teacherTrackId}`;
         if (!visible.has(key)) {
           visible.set(

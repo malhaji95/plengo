@@ -10,14 +10,10 @@ part 'due_cards_envelope.g.dart';
 
 @JsonSerializable()
 class DueCardsEnvelope {
-  const DueCardsEnvelope({
-    required this.success,
-    required this.data,
-    required this.error,
-  });
-  
+  const DueCardsEnvelope({required this.success, required this.data, required this.error});
+
   factory DueCardsEnvelope.fromJson(Map<String, Object?> json) => _$DueCardsEnvelopeFromJson(json);
-  
+
   final bool success;
   final DueCards data;
   final dynamic error;

@@ -14,10 +14,11 @@ class UpdateProfileRequest {
     this.universityId,
     this.facultyId,
     this.academicYearId,
+    this.avatarMediaId,
   });
-  
+
   factory UpdateProfileRequest.fromJson(Map<String, Object?> json) => _$UpdateProfileRequestFromJson(json);
-  
+
   @JsonKey(includeIfNull: false)
   final String? fullName;
   @JsonKey(includeIfNull: false)
@@ -28,6 +29,8 @@ class UpdateProfileRequest {
   final String? facultyId;
   @JsonKey(includeIfNull: false)
   final String? academicYearId;
+  @JsonKey(includeIfNull: false)
+  final String? avatarMediaId;
 
   Map<String, Object?> toJson() => _$UpdateProfileRequestToJson(this);
 }

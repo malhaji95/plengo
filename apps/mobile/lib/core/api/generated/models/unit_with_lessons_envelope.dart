@@ -10,14 +10,10 @@ part 'unit_with_lessons_envelope.g.dart';
 
 @JsonSerializable()
 class UnitWithLessonsEnvelope {
-  const UnitWithLessonsEnvelope({
-    required this.success,
-    required this.data,
-    required this.error,
-  });
-  
+  const UnitWithLessonsEnvelope({required this.success, required this.data, required this.error});
+
   factory UnitWithLessonsEnvelope.fromJson(Map<String, Object?> json) => _$UnitWithLessonsEnvelopeFromJson(json);
-  
+
   final bool success;
   final UnitWithLessons data;
   final dynamic error;

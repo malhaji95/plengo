@@ -8,12 +8,10 @@ part 'sent_result.g.dart';
 
 @JsonSerializable()
 class SentResult {
-  const SentResult({
-    required this.sent,
-  });
-  
+  const SentResult({required this.sent});
+
   factory SentResult.fromJson(Map<String, Object?> json) => _$SentResultFromJson(json);
-  
+
   final bool sent;
 
   Map<String, Object?> toJson() => _$SentResultToJson(this);

@@ -1,4 +1,3 @@
-import { and, desc, eq, inArray, isNotNull, isNull, ne, sql } from 'drizzle-orm';
 import type {
   Bookmark,
   Mistake,
@@ -7,27 +6,19 @@ import type {
   ScopeProgress,
   StudentQuestion,
 } from '@plengo/contracts';
-import {
-  bookmarks,
-  cardStates,
-  flashcardDecks,
-  flashcards,
-  lessons,
-  questions,
-  quizAttemptAnswers,
-  quizAttempts,
-  quizzes,
-  subjects,
-  teacherTracks,
-  units,
-  userMistakes,
-  userProgress,
-  type Db,
-} from '@plengo/db';
 import { AppError } from '../lib/app-error.js';
+import type { AttemptRepository } from '../repositories/attempt-repository.js';
+import type { BookmarkRepository, BookmarkRow } from '../repositories/bookmark-repository.js';
 import type { FlashcardRepository } from '../repositories/flashcard-repository.js';
-import type { QuestionRepository, QuestionRow } from '../repositories/question-repository.js';
+import type { LearningRepository } from '../repositories/learning-repository.js';
+import {
+  decodeCursor,
+  encodeCursor,
+  type QuestionRepository,
+  type QuestionRow,
+} from '../repositories/question-repository.js';
 import type { QuizRepository } from '../repositories/quiz-repository.js';
+import type { SrsRepository } from '../repositories/srs-repository.js';
 import type { StructureRepository } from '../repositories/structure-repository.js';
 import type { TeacherRepository } from '../repositories/teacher-repository.js';
 import type { AccessService } from './access-service.js';
@@ -46,7 +37,10 @@ const percent = (done: number, total: number) => (total ? Math.round((done * 100
  * (bookmarks) or left out of totals (progress), never deleted.
  */
 export function createLearningService(deps: {
-  db: Db;
+  repo: LearningRepository;
+  bookmarkRepo: BookmarkRepository;
+  attemptRepo: AttemptRepository;
+  srsRepo: SrsRepository;
   questionRepo: QuestionRepository;
   quizRepo: QuizRepository;
   flashcardRepo: FlashcardRepository;
@@ -58,7 +52,10 @@ export function createLearningService(deps: {
   now?: () => Date;
 }) {
   const {
-    db,
+    repo,
+    bookmarkRepo,
+    attemptRepo,
+    srsRepo,
     questionRepo,
     quizRepo,
     flashcardRepo,
@@ -89,34 +86,7 @@ export function createLearningService(deps: {
 
   async function names(subjectIds: string[], trackIds: string[], unitIds: string[], lessonIds: string[]) {
     const uniq = (xs: string[]) => [...new Set(xs)];
-    const [s, t, u, l] = await Promise.all([
-      subjectIds.length
-        ? db
-            .select({ id: subjects.id, n: subjects.nameAr })
-            .from(subjects)
-            .where(inArray(subjects.id, uniq(subjectIds)))
-        : [],
-      trackIds.length
-        ? db
-            .select({ id: teacherTracks.id, n: teacherTracks.titleAr })
-            .from(teacherTracks)
-            .where(inArray(teacherTracks.id, uniq(trackIds)))
-        : [],
-      unitIds.length
-        ? db
-            .select({ id: units.id, n: units.titleAr })
-            .from(units)
-            .where(inArray(units.id, uniq(unitIds)))
-        : [],
-      lessonIds.length
-        ? db
-            .select({ id: lessons.id, n: lessons.titleAr })
-            .from(lessons)
-            .where(inArray(lessons.id, uniq(lessonIds)))
-        : [],
-    ]);
-    const map = (rows: { id: string; n: string }[]) => new Map(rows.map((r) => [r.id, r.n]));
-    return { subjects: map(s), tracks: map(t), units: map(u), lessons: map(l) };
+    return repo.names(uniq(subjectIds), uniq(trackIds), uniq(unitIds), uniq(lessonIds));
   }
 
   const ids = <T>(rows: T[], pick: (r: T) => string | null) =>
@@ -125,19 +95,7 @@ export function createLearningService(deps: {
   // ---- mistakes ----
 
   async function mistakeRows(userId: string) {
-    const rows = await db
-      .select({ m: userMistakes, q: questions })
-      .from(userMistakes)
-      .innerJoin(questions, eq(questions.id, userMistakes.questionId))
-      .where(
-        and(
-          eq(userMistakes.userId, userId),
-          ne(userMistakes.status, 'removed'),
-          isNull(questions.deletedAt),
-          eq(questions.status, 'published'),
-        ),
-      )
-      .orderBy(desc(userMistakes.lastWrongAt));
+    const rows = await repo.mistakes(userId);
     const ctx = await access.context(userId);
     const isVisible = visibility();
     const open = [];
@@ -196,7 +154,7 @@ export function createLearningService(deps: {
     }
   }
 
-  async function bookmarkViews(userId: string, rows: (typeof bookmarks.$inferSelect)[]): Promise<Bookmark[]> {
+  async function bookmarkViews(userId: string, rows: BookmarkRow[]): Promise<Bookmark[]> {
     const ctx = await access.context(userId);
     const isVisible = visibility();
     const byType = (t: BookmarkType) => rows.filter((r) => r.itemType === t).map((r) => r.itemId);
@@ -318,6 +276,8 @@ export function createLearningService(deps: {
         unitId?: string | undefined;
         lessonId?: string | undefined;
         type?: QuestionRow['type'] | undefined;
+        cursor?: string | undefined;
+        limit?: number | undefined;
       },
     ) {
       const open = await mistakeRows(userId);
@@ -330,7 +290,9 @@ export function createLearningService(deps: {
           (!f.lessonId || q.lessonId === f.lessonId) &&
           (!f.type || q.type === f.type),
       );
-      const shown = picked.slice(0, 500);
+      const offset = decodeCursor(f.cursor);
+      const limit = f.limit ?? 100;
+      const shown = picked.slice(offset, offset + limit);
       const n = await names(
         ids(shown, (r) => r.q.subjectId),
         ids(shown, (r) => r.q.teacherTrackId),
@@ -360,59 +322,52 @@ export function createLearningService(deps: {
         activeCount: open.filter((r) => r.m.status === 'active').length,
         masteredCount: open.filter((r) => r.m.status === 'mastered').length,
         masteryStreak: (await config.getLearningSettings()).mistakeMasteryStreak,
+        nextCursor: picked.length > offset + limit ? encodeCursor(offset + limit) : null,
+      };
+    },
+
+    /** Active and mastered counts over the questions the student can still open (§16.1). */
+    async mistakeCounts(userId: string) {
+      const open = await mistakeRows(userId);
+      return {
+        active: open.filter((r) => r.m.status === 'active').length,
+        mastered: open.filter((r) => r.m.status === 'mastered').length,
       };
     },
 
     /** Manual removal (§16.1); a later wrong answer re-activates it. */
     async removeMistake(userId: string, questionId: string) {
-      const rows = await db
-        .update(userMistakes)
-        .set({ status: 'removed', updatedAt: now() })
-        .where(and(eq(userMistakes.userId, userId), eq(userMistakes.questionId, questionId)))
-        .returning({ id: userMistakes.questionId });
-      if (!rows.length) throw new AppError('NOT_FOUND');
+      if (!(await repo.removeMistake(userId, questionId, now()))) throw new AppError('NOT_FOUND');
       return { deleted: true };
     },
 
-    async bookmarks(userId: string, itemType: BookmarkType | undefined) {
-      const rows = await db
-        .select()
-        .from(bookmarks)
-        .where(and(eq(bookmarks.userId, userId), itemType ? eq(bookmarks.itemType, itemType) : undefined))
-        .orderBy(desc(bookmarks.createdAt))
-        .limit(500);
+    async bookmarks(
+      userId: string,
+      q: { itemType?: BookmarkType | undefined; cursor?: string | undefined; limit?: number | undefined },
+    ) {
+      const offset = decodeCursor(q.cursor);
+      const limit = q.limit ?? 50;
+      const rows = await bookmarkRepo.list(userId, q.itemType, limit + 1, offset);
       return {
-        items: await bookmarkViews(userId, rows),
+        items: await bookmarkViews(userId, rows.slice(0, limit)),
+        nextCursor: rows.length > limit ? encodeCursor(offset + limit) : null,
         urlsExpireAt: new Date(now().getTime() + SIGNED_URL_TTL_SECONDS * 1000).toISOString(),
       };
     },
 
     async bookmarkKeys(userId: string) {
-      return db
-        .select({ itemType: bookmarks.itemType, itemId: bookmarks.itemId })
-        .from(bookmarks)
-        .where(eq(bookmarks.userId, userId));
+      return bookmarkRepo.keys(userId);
     },
 
     /** Idempotent. Locked items can be saved; they show as locked (§17). */
     async addBookmark(userId: string, itemType: BookmarkType, itemId: string) {
       await assertBookmarkable(itemType, itemId);
-      await db.insert(bookmarks).values({ userId, itemType, itemId }).onConflictDoNothing();
-      const [row] = await db
-        .select()
-        .from(bookmarks)
-        .where(
-          and(eq(bookmarks.userId, userId), eq(bookmarks.itemType, itemType), eq(bookmarks.itemId, itemId)),
-        );
-      return (await bookmarkViews(userId, [row!]))[0]!;
+      const row = await bookmarkRepo.add(userId, itemType, itemId);
+      return (await bookmarkViews(userId, [row]))[0]!;
     },
 
     async removeBookmark(userId: string, itemType: BookmarkType, itemId: string) {
-      await db
-        .delete(bookmarks)
-        .where(
-          and(eq(bookmarks.userId, userId), eq(bookmarks.itemType, itemType), eq(bookmarks.itemId, itemId)),
-        );
+      await bookmarkRepo.remove(userId, itemType, itemId);
       return { deleted: true };
     },
 
@@ -423,53 +378,17 @@ export function createLearningService(deps: {
     async progress(userId: string, subjectId: string, teacherTrackId: string | null): Promise<ScopeProgress> {
       await assertVisibleScope({ structureRepo, teacherRepo }, subjectId, teacherTrackId);
       const ctx = await access.context(userId);
-      const trackWhere = <T extends typeof questions | typeof quizzes | typeof flashcardDecks>(t: T) =>
-        teacherTrackId ? eq(t.teacherTrackId, teacherTrackId) : isNull(t.teacherTrackId);
 
       const [qRows, zRows, cRows, pointer] = await Promise.all([
-        db
-          .select()
-          .from(questions)
-          .where(
-            and(
-              eq(questions.subjectId, subjectId),
-              trackWhere(questions),
-              isNull(questions.deletedAt),
-              eq(questions.status, 'published'),
-            ),
-          ),
+        questionRepo.publishedRowsInScope(subjectId, teacherTrackId),
         quizRepo.list({
           subjectId,
           teacherTrackId: teacherTrackId ?? undefined,
           generalOnly: !teacherTrackId,
           status: 'published',
         }),
-        db
-          .select({ id: flashcards.id, deck: flashcardDecks })
-          .from(flashcards)
-          .innerJoin(flashcardDecks, eq(flashcardDecks.id, flashcards.deckId))
-          .where(
-            and(
-              eq(flashcardDecks.subjectId, subjectId),
-              trackWhere(flashcardDecks),
-              isNull(flashcardDecks.deletedAt),
-              eq(flashcardDecks.status, 'published'),
-              isNull(flashcards.deletedAt),
-              eq(flashcards.status, 'published'),
-            ),
-          ),
-        db
-          .select()
-          .from(userProgress)
-          .where(
-            and(
-              eq(userProgress.userId, userId),
-              eq(userProgress.subjectId, subjectId),
-              teacherTrackId
-                ? eq(userProgress.teacherTrackId, teacherTrackId)
-                : isNull(userProgress.teacherTrackId),
-            ),
-          ),
+        flashcardRepo.publishedCardsInScope(subjectId, teacherTrackId),
+        repo.progressPointer(userId, subjectId, teacherTrackId),
       ]);
 
       const qs = qRows.filter((q) => ctx.canAccessItem(q));
@@ -487,55 +406,18 @@ export function createLearningService(deps: {
         .map((c) => ({ id: c.id, unitId: c.deck.unitId, lessonId: c.deck.lessonId }));
 
       const [answered, submitted, studied] = await Promise.all([
-        qs.length
-          ? db
-              .select({
-                id: quizAttemptAnswers.questionId,
-                ok: sql<boolean>`bool_or(${quizAttemptAnswers.isCorrect})`,
-              })
-              .from(quizAttemptAnswers)
-              .where(
-                and(
-                  eq(quizAttemptAnswers.userId, userId),
-                  isNotNull(quizAttemptAnswers.gradedAt),
-                  inArray(
-                    quizAttemptAnswers.questionId,
-                    qs.map((q) => q.id),
-                  ),
-                ),
-              )
-              .groupBy(quizAttemptAnswers.questionId)
-          : [],
-        zs.length
-          ? db
-              .selectDistinct({ id: quizAttempts.quizId })
-              .from(quizAttempts)
-              .where(
-                and(
-                  eq(quizAttempts.userId, userId),
-                  eq(quizAttempts.status, 'submitted'),
-                  inArray(
-                    quizAttempts.quizId,
-                    zs.map((z) => z.id),
-                  ),
-                ),
-              )
-          : [],
-        cs.length
-          ? db
-              .select({ id: cardStates.flashcardId })
-              .from(cardStates)
-              .where(
-                and(
-                  eq(cardStates.userId, userId),
-                  isNotNull(cardStates.lastReviewedAt),
-                  inArray(
-                    cardStates.flashcardId,
-                    cs.map((c) => c.id),
-                  ),
-                ),
-              )
-          : [],
+        attemptRepo.correctnessByQuestion(
+          userId,
+          qs.map((q) => q.id),
+        ),
+        attemptRepo.submittedQuizIds(
+          userId,
+          zs.map((z) => z.id),
+        ),
+        srsRepo.studiedCardIds(
+          userId,
+          cs.map((c) => c.id),
+        ),
       ]);
       const attempted = new Map(answered.map((r) => [r.id, r.ok]));
       const completed = new Set(submitted.map((r) => r.id!));
@@ -556,12 +438,7 @@ export function createLearningService(deps: {
 
     /** "متابعة التعلم" (§18): the latest activity per subject scope, newest first. */
     async resume(userId: string, limit = 5): Promise<ResumeItem[]> {
-      const rows = await db
-        .select()
-        .from(userProgress)
-        .where(eq(userProgress.userId, userId))
-        .orderBy(desc(userProgress.lastActivityAt))
-        .limit(20);
+      const rows = await repo.recentProgress(userId, 20);
       const isVisible = visibility();
       const visibleRows = [];
       for (const r of rows) if (await isVisible(r.subjectId, r.teacherTrackId)) visibleRows.push(r);
@@ -579,31 +456,9 @@ export function createLearningService(deps: {
         .filter((r) => r.lastActivityType === 'deck' && r.lastItemId)
         .map((r) => r.lastItemId!);
       const [quizTitles, deckTitles, open] = await Promise.all([
-        quizIds.length
-          ? db
-              .select({ id: quizzes.id, t: quizzes.titleAr })
-              .from(quizzes)
-              .where(and(inArray(quizzes.id, quizIds), isNull(quizzes.deletedAt)))
-          : [],
-        deckIds.length
-          ? db
-              .select({ id: flashcardDecks.id, t: flashcardDecks.titleAr })
-              .from(flashcardDecks)
-              .where(and(inArray(flashcardDecks.id, deckIds), isNull(flashcardDecks.deletedAt)))
-          : [],
-        quizIds.length
-          ? db
-              .select({ id: quizAttempts.id, quizId: quizAttempts.quizId })
-              .from(quizAttempts)
-              .where(
-                and(
-                  eq(quizAttempts.userId, userId),
-                  eq(quizAttempts.status, 'in_progress'),
-                  inArray(quizAttempts.quizId, quizIds),
-                ),
-              )
-              .orderBy(desc(quizAttempts.lastActivityAt))
-          : [],
+        quizRepo.titles(quizIds),
+        flashcardRepo.deckTitles(deckIds),
+        attemptRepo.inProgressFor(userId, quizIds),
       ]);
       const titles = new Map([...quizTitles, ...deckTitles].map((r) => [r.id, r.t]));
       return shown.map((r) => ({

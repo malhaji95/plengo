@@ -29,49 +29,31 @@ abstract class AuthClient {
   factory AuthClient(Dio dio, {String? baseUrl}) = _AuthClient;
 
   @POST('/api/v1/auth/register')
-  Future<VerificationRequiredResultEnvelope> register({
-    @Body() required RegisterRequest body,
-  });
+  Future<VerificationRequiredResultEnvelope> register({@Body() required RegisterRequest body});
 
   @POST('/api/v1/auth/verify-email')
-  Future<VerifiedResultEnvelope> verifyEmail({
-    @Body() required VerifyEmailRequest body,
-  });
+  Future<VerifiedResultEnvelope> verifyEmail({@Body() required VerifyEmailRequest body});
 
   @POST('/api/v1/auth/resend-otp')
-  Future<SentResultEnvelope> resendOtp({
-    @Body() required ResendOtpRequest body,
-  });
+  Future<SentResultEnvelope> resendOtp({@Body() required ResendOtpRequest body});
 
   @POST('/api/v1/auth/forgot-password')
-  Future<SentResultEnvelope> forgotPassword({
-    @Body() required ForgotPasswordRequest body,
-  });
+  Future<SentResultEnvelope> forgotPassword({@Body() required ForgotPasswordRequest body});
 
   @POST('/api/v1/auth/reset-password')
-  Future<ResetResultEnvelope> resetPassword({
-    @Body() required ResetPasswordRequest body,
-  });
+  Future<ResetResultEnvelope> resetPassword({@Body() required ResetPasswordRequest body});
 
   @POST('/api/v1/auth/mobile/login')
-  Future<TokenPairEnvelope> mobileLogin({
-    @Body() required MobileLoginRequest body,
-  });
+  Future<TokenPairEnvelope> mobileLogin({@Body() required MobileLoginRequest body});
 
   @POST('/api/v1/auth/mobile/refresh')
-  Future<TokenPairEnvelope> mobileRefresh({
-    @Body() required MobileRefreshRequest body,
-  });
+  Future<TokenPairEnvelope> mobileRefresh({@Body() required MobileRefreshRequest body});
 
   @POST('/api/v1/auth/mobile/logout')
-  Future<SignedOutResultEnvelope> mobileLogout({
-    @Body() required MobileLogoutRequest body,
-  });
+  Future<SignedOutResultEnvelope> mobileLogout({@Body() required MobileLogoutRequest body});
 
   @POST('/api/v1/auth/web/login')
-  Future<SignedInResultEnvelope> webLogin({
-    @Body() required WebLoginRequest body,
-  });
+  Future<SignedInResultEnvelope> webLogin({@Body() required WebLoginRequest body});
 
   @POST('/api/v1/auth/web/logout')
   Future<SignedOutResultEnvelope> webLogout();

@@ -11,9 +11,12 @@ import { createIpHasher } from './lib/crypto.js';
 import { createAccessRepository } from './repositories/access-repository.js';
 import { createFlashcardRepository } from './repositories/flashcard-repository.js';
 import { createAttemptRepository } from './repositories/attempt-repository.js';
+import { createBookmarkRepository } from './repositories/bookmark-repository.js';
 import { createLearningRepository } from './repositories/learning-repository.js';
 import { createQuestionRepository } from './repositories/question-repository.js';
 import { createQuizRepository } from './repositories/quiz-repository.js';
+import { createSrsRepository } from './repositories/srs-repository.js';
+import { createStatsRepository } from './repositories/stats-repository.js';
 import { createSessionsRepository, type SessionsRepository } from './repositories/sessions-repository.js';
 import { createStructureRepository, type StructureRepository } from './repositories/structure-repository.js';
 import { createTeacherRepository } from './repositories/teacher-repository.js';
@@ -29,6 +32,7 @@ import {
 import { createFreeRuleService, type FreeRuleService } from './services/free-rule-service.js';
 import { createSrsService, type SrsService } from './services/srs-service.js';
 import { createAttemptService, type AttemptService } from './services/attempt-service.js';
+import { createAdminService, type AdminService } from './services/admin-service.js';
 import { createLearningService, type LearningService } from './services/learning-service.js';
 import { createQuizService, quizFreeSource, type QuizService } from './services/quiz-service.js';
 import { createStatsService, type StatsService } from './services/stats-service.js';
@@ -81,6 +85,7 @@ export interface Container {
   attempts: AttemptService;
   learning: LearningService;
   stats: StatsService;
+  admins: AdminService;
   media: MediaProcessor;
   guards: Guards;
   jobHandlers: JobHandlers;
@@ -168,7 +173,8 @@ export function createContainer(
   const flashcardRepo = createFlashcardRepository(db);
   const quizRepo = createQuizRepository(db);
   const attemptRepo = createAttemptRepository(db);
-  const learningRepo = createLearningRepository();
+  const learningRepo = createLearningRepository(db);
+  const srsRepo = createSrsRepository(db);
   // Each content table registers its free-content source (§8.4).
   const freeRules = createFreeRuleService({
     db,
@@ -187,6 +193,8 @@ export function createContainer(
     access,
     freeRules,
     audit,
+    inOpenExam: (userId, questionId) => attemptRepo.inOpenExam(userId, questionId),
+    onVisibilityChange: (questionId) => quizRepo.bumpContaining(questionId),
     now: overrides.now,
   });
   const flashcards = createFlashcardService({
@@ -202,6 +210,7 @@ export function createContainer(
   });
   const srs = createSrsService({
     db,
+    repo: srsRepo,
     flashcardRepo,
     learningRepo,
     flashcards,
@@ -236,7 +245,10 @@ export function createContainer(
     now: overrides.now,
   });
   const learning = createLearningService({
-    db,
+    repo: learningRepo,
+    bookmarkRepo: createBookmarkRepository(db),
+    attemptRepo,
+    srsRepo,
     questionRepo,
     quizRepo,
     flashcardRepo,
@@ -247,7 +259,14 @@ export function createContainer(
     config: configService,
     now: overrides.now,
   });
-  const stats = createStatsService({ db, structureRepo, teacherRepo, access, now: overrides.now });
+  const stats = createStatsService({
+    repo: createStatsRepository(db),
+    structureRepo,
+    teacherRepo,
+    access,
+    mistakeCounts: (userId) => learning.mistakeCounts(userId),
+    now: overrides.now,
+  });
   const teachers = createTeacherService({
     repo: teacherRepo,
     structureRepo,
@@ -301,6 +320,7 @@ export function createContainer(
     attempts,
     learning,
     stats,
+    admins: createAdminService({ db, auth, usersRepo, sessionsRepo, audit }),
     guards: createGuards({ auth, sessionsRepo, mobileTokens, now: overrides.now }),
     jobHandlers: {
       'media.process': (data) => media.process(data),
