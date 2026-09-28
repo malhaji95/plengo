@@ -6,6 +6,7 @@ import '../../app/router.dart';
 import '../../core/api/api_exception.dart';
 import '../../core/api/generated/export.dart';
 import '../../core/learning/learning_repository.dart';
+import '../../shared/text/bidi.dart';
 import '../../shared/widgets/async_view.dart';
 import '../access/access_banner.dart';
 import '../questions/question_providers.dart';
@@ -58,7 +59,7 @@ class QuizzesScreen extends ConsumerWidget {
                                 availabilityLabel(q),
                                 quizModesLabel(q),
                                 if (q.isMockExam) 'امتحان تجريبي',
-                                if (q.bestScorePercent != null) 'أفضل نتيجة ${q.bestScorePercent}%',
+                                if (q.bestScorePercent != null) 'أفضل نتيجة ${percent(q.bestScorePercent!)}',
                               ].join(' · '),
                             ),
                             trailing: Icon(
@@ -138,7 +139,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
                   Text(
                     [
                       if (q.timeLimitSeconds != null) 'مدة الامتحان ${humanDuration(q.timeLimitSeconds! * 1000)}',
-                      if (q.passingScorePercent != null) 'علامة النجاح ${q.passingScorePercent}%',
+                      if (q.passingScorePercent != null) 'علامة النجاح ${percent(q.passingScorePercent!)}',
                       if (q.maxAttempts != null) 'المحاولات ${q.attemptsUsed} من ${q.maxAttempts}',
                     ].join(' · '),
                     style: text.bodySmall,
@@ -208,7 +209,9 @@ class _History extends ConsumerWidget {
           Card(
             margin: const EdgeInsets.only(bottom: 8),
             child: ListTile(
-              title: Text('${a.scorePercent ?? 0}% · ${a.mode == AttemptSummaryMode.exam ? 'امتحان' : 'تدريب'}'),
+              title: Text(
+                '${percent(a.scorePercent ?? 0)} · ${a.mode == AttemptSummaryMode.exam ? 'امتحان' : 'تدريب'}',
+              ),
               subtitle: Text(
                 [
                   '${a.correctCount ?? 0} صحيحة من ${a.totalCount}',

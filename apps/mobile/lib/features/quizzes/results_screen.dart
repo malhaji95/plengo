@@ -158,13 +158,13 @@ class _Summary extends StatelessWidget {
             Text(summary.titleAr, style: text.titleMedium, textAlign: TextAlign.center),
             const SizedBox(height: 8),
             Text(
-              isolateLtr('${summary.scorePercent ?? 0}%'),
+              percent(summary.scorePercent ?? 0),
               key: const Key('score'),
               style: text.displaySmall?.copyWith(fontWeight: FontWeight.bold, color: scheme.primary),
             ),
             if (passed != null)
               Text(
-                passed ? 'ناجح' : 'لم تبلغ علامة النجاح (${summary.passingScorePercent}%)',
+                passed ? 'ناجح' : 'لم تبلغ علامة النجاح (${percent(summary.passingScorePercent ?? 0)})',
                 style: TextStyle(color: passed ? Colors.green.shade700 : scheme.error, fontWeight: FontWeight.w600),
               ),
             const SizedBox(height: 12),

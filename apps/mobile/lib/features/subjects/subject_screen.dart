@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../app/router.dart';
 
 import '../../core/api/generated/export.dart';
+import '../../shared/text/bidi.dart';
 import '../../shared/widgets/async_view.dart';
 import '../../shared/widgets/network_avatar.dart';
 import '../access/access_banner.dart';
@@ -102,7 +103,7 @@ class _OutlineView extends ConsumerWidget {
                   subtitle: Text(
                     [
                       lessonCountLabel(unit.lessons.length),
-                      if ((unitPercent(unit.id) ?? 0) > 0) 'أنجزت ${unitPercent(unit.id)}%',
+                      if ((unitPercent(unit.id) ?? 0) > 0) 'أنجزت ${percent(unitPercent(unit.id)!)}',
                     ].join(' · '),
                   ),
                   children: [

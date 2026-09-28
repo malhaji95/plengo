@@ -291,6 +291,11 @@ void main() {
     expect((await store.pendingSubmissions()).single.attempt.attempt.id, 'a1');
     expect((await store.answers('a1'))['q1']?.selectedOptionId, 'q1-a');
 
+    // Still offline: "إرسال الآن" keeps it pending.
+    await tester.tap(find.text('إرسال الآن'));
+    await tester.pumpAndSettle();
+    expect((await store.pendingSubmissions()), hasLength(1));
+
     // The connection returns: the background sync sends the stored answers.
     online = true;
     await app.container.read(examSyncProvider).syncNow();
@@ -298,6 +303,39 @@ void main() {
     expect(body.answers.single.questionId, 'q1');
     expect(body.answers.single.selectedOptionId, 'q1-a');
     expect(body.answers.single.flagged, isTrue);
+    expect(await store.pendingSubmissions(), isEmpty);
+    expect(await store.answers('a1'), isEmpty);
+  });
+
+  testWidgets('exam: "إرسال الآن" after reconnecting shows results and clears the device copy', (tester) async {
+    var online = false;
+    var submitted = false;
+    final app = await open(
+      tester,
+      '/attempts/a1',
+      arrange: (l) {
+        when(() => l.attempt('a1')).thenAnswer((_) async => submitted ? graded() : attempt());
+        when(() => l.save('a1', any(), any())).thenAnswer((_) async => throw offline);
+        when(() => l.submit('a1', any())).thenAnswer((_) async {
+          if (!online) throw offline;
+          submitted = true;
+          return graded();
+        });
+      },
+    );
+    await tester.tap(find.text('خيار أ الأول'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('التالي'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('إنهاء الامتحان'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'إنهاء الامتحان').last);
+    await tester.pumpAndSettle();
+    online = true;
+    await tester.tap(find.text('إرسال الآن'));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('score')), findsOneWidget);
+    final store = ExamStore(app.db);
     expect(await store.pendingSubmissions(), isEmpty);
     expect(await store.answers('a1'), isEmpty);
   });

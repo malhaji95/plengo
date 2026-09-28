@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../app/providers.dart';
 import '../../app/router.dart';
 import '../../core/api/generated/export.dart';
+import '../../shared/text/bidi.dart';
 import '../quizzes/quiz_providers.dart';
 
 typedef ProgressQuery = ({String subjectId, String? teacherTrackId});
@@ -102,7 +103,7 @@ class ProgressCard extends StatelessWidget {
               children: [
                 Text('تقدّمي', style: Theme.of(context).textTheme.titleSmall),
                 const Spacer(),
-                Text('${p.completionPercent}%', key: const Key('completion')),
+                Text(percent(p.completionPercent), key: const Key('completion')),
               ],
             ),
             const SizedBox(height: 8),

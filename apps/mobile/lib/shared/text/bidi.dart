@@ -4,3 +4,6 @@
 String isolateLtr(String text) => text.replaceAllMapped(_ltrRun, (m) => '\u2066${m[0]}\u2069');
 
 final _ltrRun = RegExp(r'[A-Za-z0-9](?:[A-Za-z0-9.,/²³^×*+=\-() ]*[A-Za-z0-9²³)])?');
+
+/// "67%" as one left-to-right run, so the sign stays after the number in Arabic text.
+String percent(int value) => '\u2066$value%\u2069';

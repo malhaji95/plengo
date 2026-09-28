@@ -4,25 +4,27 @@
  *   pnpm --filter @plengo/api seed
  */
 import { randomUUID } from 'node:crypto';
-import { and, eq, isNull } from 'drizzle-orm';
+import { and, asc, eq, isNull } from 'drizzle-orm';
 import sharp from 'sharp';
 import {
-  couponBatches,
-  flashcardDecks,
-  mediaFiles,
-  coupons,
-  promotions,
-  questions,
-  users,
   academicYears,
+  couponBatches,
+  coupons,
   educationLevels,
   faculties,
+  flashcardDecks,
   lessons,
+  mediaFiles,
+  promotions,
+  questions,
+  quizAttempts,
+  quizzes,
   subjects,
-  teacherTracks,
   teachers,
+  teacherTracks,
   units,
   universities,
+  users,
   type Db,
 } from '@plengo/db';
 import { createFastify } from '../app.js';
@@ -691,6 +693,131 @@ export async function seedFlashcards(c: Container) {
   return created;
 }
 
+/**
+ * §40 quizzes on Grade 12 Physics: a curated quiz (both modes), a mixed free/premium quiz and a
+ * timed exam-only mock exam. Student 1 also gets a finished attempt (so mistakes and statistics
+ * have data) and two bookmarks.
+ */
+export async function seedLearning(c: Container) {
+  const [admin] = await c.db.select().from(users).where(eq(users.email, 'seed-admin1@example.com'));
+  const actor = { adminId: admin!.id, ip: null };
+  const physics = (
+    await c.db
+      .select()
+      .from(subjects)
+      .where(and(eq(subjects.code, 'g12-physics'), isNull(subjects.deletedAt)))
+  )[0]!;
+  const general = await c.db
+    .select()
+    .from(questions)
+    .where(
+      and(
+        eq(questions.subjectId, physics.id),
+        isNull(questions.teacherTrackId),
+        eq(questions.status, 'published'),
+        isNull(questions.deletedAt),
+      ),
+    )
+    .orderBy(asc(questions.sortOrder));
+  const physicsLessons = await c.db
+    .select()
+    .from(lessons)
+    .where(and(eq(lessons.subjectId, physics.id), isNull(lessons.deletedAt)));
+  const motion = physicsLessons.find((l) => l.code === 'motion');
+  const free = general.filter((q) => q.isFree);
+
+  const QUIZZES = [
+    {
+      titleAr: 'مراجعة درس الحركة',
+      lessonId: motion?.id ?? null,
+      questionIds: free.slice(0, 3).map((q) => q.id),
+      settings: { allowedModes: 'both' as const, passingScorePercent: 60 },
+      free: 'free' as const,
+    },
+    {
+      titleAr: 'اختبار شامل في الفيزياء',
+      lessonId: null,
+      questionIds: general.map((q) => q.id),
+      settings: { allowedModes: 'both' as const, shuffleOptions: true },
+      free: 'paid' as const,
+    },
+    {
+      titleAr: 'امتحان تجريبي — فيزياء البكالوريا',
+      lessonId: null,
+      questionIds: general.map((q) => q.id),
+      settings: {
+        isMockExam: true,
+        allowedModes: 'exam' as const,
+        timeLimitSeconds: 20 * 60,
+        passingScorePercent: 50,
+        shuffleQuestions: true,
+      },
+      free: 'paid' as const,
+    },
+  ];
+  let created = 0;
+  for (const q of QUIZZES) {
+    const [existing] = await c.db
+      .select({ id: quizzes.id })
+      .from(quizzes)
+      .where(and(eq(quizzes.titleAr, q.titleAr), isNull(quizzes.deletedAt)));
+    if (existing) continue;
+    const detail = await c.quizzes.create(actor, {
+      subjectId: physics.id,
+      teacherTrackId: null,
+      lessonId: q.lessonId,
+      titleAr: q.titleAr,
+      questionIds: q.questionIds,
+      ...q.settings,
+    });
+    await c.quizzes.setStatus(actor, detail.quiz.id, 'published');
+    await c.quizzes.setFree(actor, detail.quiz.id, q.free);
+    created++;
+  }
+
+  // Student 1: one finished practice attempt with a mistake, and two bookmarks.
+  const [s1] = await c.db.select().from(users).where(eq(users.email, 'student1@example.com'));
+  const [mixed] = await c.db
+    .select()
+    .from(quizzes)
+    .where(and(eq(quizzes.titleAr, QUIZZES[1]!.titleAr), isNull(quizzes.deletedAt)));
+  const [done] = await c.db
+    .select({ id: quizAttempts.id })
+    .from(quizAttempts)
+    .where(eq(quizAttempts.userId, s1!.id));
+  if (!done && mixed) {
+    const a = await c.attempts.start(s1!.id, {
+      clientAttemptId: randomUUID(),
+      source: 'curated',
+      mode: 'practice',
+      quizId: mixed.id,
+    });
+    for (const [i, q] of a.questions.slice(0, 4).entries()) {
+      const correct = q.options.length
+        ? (await c.questions.adminGet(q.questionId)).options.find((o) => o.isCorrect)
+        : null;
+      const wrong = q.options.find((o) => o.id !== correct?.id);
+      // Two right, two wrong: the wrong ones land in the mistake bank.
+      const pick = i % 2 === 0 ? correct : wrong;
+      if (q.type === 'written') {
+        await c.attempts.check(s1!.id, a.attempt.id, q.questionId, {
+          writtenAnswer: i % 2 === 0 ? 'نيوتن' : 'لا أعرف',
+        });
+      } else if (pick) {
+        await c.attempts.check(s1!.id, a.attempt.id, q.questionId, { selectedOptionId: pick.id });
+      }
+    }
+    await c.attempts.submit(s1!.id, a.attempt.id, { answers: [] });
+  }
+  const [firstDeck] = await c.db
+    .select({ id: flashcardDecks.id })
+    .from(flashcardDecks)
+    .where(and(eq(flashcardDecks.subjectId, physics.id), isNull(flashcardDecks.teacherTrackId)));
+  if (general[0]) await c.learning.addBookmark(s1!.id, 'question', general[0].id);
+  if (firstDeck) await c.learning.addBookmark(s1!.id, 'deck', firstDeck.id);
+  return created;
+}
+
 if (import.meta.url === `file://${process.argv[1]}`) {
   const env = loadEnv();
   const queue = new InlineQueue();
@@ -701,8 +828,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     const access = await seedAccess(c, queue);
     const createdQuestions = await seedQuestions(c);
     const createdDecks = await seedFlashcards(c);
+    const createdQuizzes = await seedLearning(c);
     console.log(
-      `structure, teachers, access, questions and flashcards seeded (${createdQuestions} new questions, ${createdDecks} new decks)`,
+      `structure, teachers, access, questions, flashcards and quizzes seeded (${createdQuestions} new questions, ${createdDecks} new decks, ${createdQuizzes} new quizzes)`,
     );
     console.log(`students: ${access.students.join(', ')} · admins: ${access.admins.join(', ')}`);
     console.log(`password for all seed accounts: ${SEED_PASSWORD} (admins enroll in 2FA at first login)`);

@@ -17,6 +17,34 @@ Flutter student app (Android · iOS · Web)      Next.js admin (browser)
    (Neon)          `pgboss`)            public + private buckets
 ```
 
+## Phase 7 status (learning)
+
+Done:
+
+- Schema (migration 0007): `quizzes` (with `content_version` and `allow_offline`), `quiz_questions`,
+  `quiz_attempts`, `quiz_attempt_answers`, `user_mistakes`, `user_subject_stats`, `question_stats`,
+  `bookmarks`, `user_progress`.
+- Admin: quizzes by subject/scope/unit/lesson with settings (modes, timer, passing score, max
+  attempts, shuffles, mock exam, offline), a question picker limited to the quiz's own scope with
+  ordering, publish/archive, free override and delete. `GET/PUT /admin/settings/learning` stores
+  `mistakeMasteryStreak` (default 2).
+- Students: quiz lists on subject and track pages, quiz detail ("12 من 30 سؤال متاح", locked CTA,
+  mode choice, "متابعة الاختبار", past attempts); practice mode with server checks; exam mode with
+  question grid, flags, review before "إنهاء الامتحان" and a server-deadline timer; results with
+  الكل/الخاطئة/المتروكة/المعلّمة, "أعد الأخطاء فقط" and "أعد الاختبار"; random practice builder; mistake
+  bank with "اختبر أخطائي"; إحصائياتي (overview, weekly trend, per subject/unit/lesson/type,
+  flashcards); the Saved tab and bookmark buttons; progress on subject/track pages and "متابعة التعلم"
+  on Home.
+- Exams continue through connection drops: answers are stored locally (Drift schema 3) before they
+  are sent; a submission made offline stays pending and is retried every minute while signed in.
+- Nightly `attempts.abandon-stale` job; `question_stats` auto-flag rule.
+- Seed: a curated quiz (both modes, free), a mixed free/premium quiz and a timed exam-only mock
+  exam on Grade 12 Physics; Student 1 has a finished attempt (mistakes, statistics) and bookmarks.
+
+Deferred: offline packs and local grading with server re-grade (Phase 9, which uses
+`allow_offline`), student-card bookmarks (Phase 8, `user_card`), question analytics UI (Phase 11),
+daily goal and streak on Home (Phase 10; statistics already show study days and the current streak).
+
 ## Phase 6 status (flashcards)
 
 Done:
@@ -368,3 +396,45 @@ from Phase 1; Phase 2 adds the college hierarchy and admin CRUD.
 - **Dev storage**: `STORAGE_DRIVER=memory` with `LOCAL_STORAGE_DIR` also writes objects to disk, so
   uploads and seeded images survive API restarts and the seed script can create processed images the
   API then serves. Tests keep the pure in-memory store.
+
+### ADR-016 — Quizzes, attempts and learning data
+
+- **One attempt machine** serves curated quizzes, random practice and mistake reviews (`source`).
+  The spec's `/practice/random` is `POST /attempts` with `source: "random"`; the app never needs a
+  second endpoint. Starting is idempotent per `(user, client_attempt_id)`.
+- **What an attempt contains** is fixed at start: question order and option order (shuffled once),
+  only questions the student could open then (§8.8), and `deadline_at` for timed exams. Questions a
+  quiz loses later stay in started attempts; results use the snapshot stored at grading, so admin
+  edits never rewrite history. Skipped questions get a snapshot at submit for the results screen.
+- **Quiz access**: a quiz the student can open (free, promoted or entitled) opens all its questions,
+  which share its scope (§15.1.1); otherwise only free questions count. A mock exam is locked unless
+  every question is open. Marking a quiz free is therefore how an admin shares premium questions as
+  a free quiz.
+- **Membership**: `PUT /admin/quizzes/{id}/questions` replaces the list in order (add, import,
+  remove and reorder in one call) and checks the scope rule each time; publishing re-checks it and
+  also requires every member to be published. Deleted or archived questions simply stop appearing.
+- **Submission**: one batch with every answer, safe to repeat. Already-graded practice answers keep
+  their grade; everything else is graded against the latest answer. A different batch after
+  submission → `ATTEMPT_ALREADY_SUBMITTED`. Late = received after `deadline_at` + 2 minutes; there is
+  no penalty. An option that no longer exists grades as wrong instead of failing the submission.
+  Abandoned attempts can still be submitted (an exam finished offline for a week is not lost).
+- **Grading side effects** run in the grading transaction as single-statement upserts: the answer
+  and snapshot, `user_mistakes` (wrong → active, streak 0; correct on active → streak + 1, mastered
+  at `mistakeMasteryStreak`), `user_subject_stats`, `question_stats` (auto-flagged at ≥ 30 attempts
+  with < 20 % correct or a wrong option chosen more than the correct one; the flag stays until an
+  admin clears it) and the `user_progress` pointer.
+- **Statistics** use `user_subject_stats` for totals and graded answers (indexed by user and grading
+  time, joined to the question's current placement) for breakdowns and trends. Weeks are rolling
+  7-business-day windows ending today; study days and the streak count business days with graded
+  answers or reviews.
+- **Progress** percentages are computed on request from current accessible content (questions
+  answered, quizzes submitted, official cards reviewed); `user_progress` only stores the resume
+  pointer per subject scope (updated by grading, starting an attempt and SRS sync).
+- **Bookmarks** accept locked items (shown locked, metadata only) but not unknown or unpublished ones;
+  `user_card` bookmarks arrive with Phase 8.
+- **Web storage**: where the browser lacks OPFS support (seen in headless Chromium), Drift picks
+  `sharedIndexedDb`, which can lose its most recent writes if the page reloads right away. A cleared
+  exam draft can then come back and be submitted again; this is harmless because submission (like SRS
+  sync) is idempotent and the server returns the same result. Phase 12 revisits web persistence.
+- **Generated enums** in the Dart client use `enums_to_json`, so enum path and query parameters
+  are sent as their JSON values (`user_card`, not `userCard`).

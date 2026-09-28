@@ -27,7 +27,7 @@ const _typeNames = {
   TypeAccuracyType.written: 'إجابة مكتوبة',
 };
 
-String _pct(int? p) => p == null ? '—' : isolateLtr('$p%');
+String _pct(int? p) => p == null ? '—' : percent(p);
 
 /// إحصائياتي (spec §16.2).
 class StatsScreen extends ConsumerWidget {

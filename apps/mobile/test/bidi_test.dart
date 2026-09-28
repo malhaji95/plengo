@@ -8,4 +8,8 @@ void main() {
     expect(isolateLtr('F = m × a = 2 × 1.75 = 3.5 N'), '\u2066F = m × a = 2 × 1.75 = 3.5 N\u2069');
     expect(isolateLtr('الأوم'), 'الأوم');
   });
+
+  test('percent keeps the sign after the number', () {
+    expect(percent(67), '\u206667%\u2069');
+  });
 }
