@@ -138,14 +138,18 @@ export const adminBannerListSchema = z.array(adminBannerSchema);
 const bannerShape = {
   titleAr: z.string().trim().min(1).max(200),
   imageMediaId: z.uuid(),
-  action: bannerActionSchema.default('none'),
+  action: bannerActionSchema,
   actionTarget: z.string().trim().max(500).nullable().optional(),
   educationLevelId: z.uuid().nullable().optional(),
   startsAt: z.iso.datetime({ offset: true }).nullable().optional(),
   endsAt: z.iso.datetime({ offset: true }).nullable().optional(),
   isActive: z.boolean().optional(),
 };
-export const createBannerBodySchema = z.object(bannerShape);
+export const createBannerBodySchema = z.object({
+  ...bannerShape,
+  action: bannerActionSchema.default('none'),
+});
+/** No defaults here: a partial update must leave omitted fields alone. */
 export const updateBannerBodySchema = z.object(bannerShape).partial();
 export const bannerReorderBodySchema = z.object({ ids: z.array(z.uuid()).min(1).max(200) });
 

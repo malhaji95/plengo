@@ -12,6 +12,7 @@ import {
   remoteConfigSchema,
   successEnvelope,
 } from '../src/index.js';
+import * as contracts from '../src/index.js';
 
 const uuid = '0190a8e4-6a1e-7c3e-9d2f-6b1c2d3e4f50';
 const arabic = /[؀-ۿ]/;
@@ -85,6 +86,19 @@ describe('request schemas', () => {
     expect(remoteConfigSchema.safeParse(config).success).toBe(true);
     const bad = { ...config, latestVersion: { ...v, web: '1.0' } };
     expect(remoteConfigSchema.safeParse(bad).success).toBe(false);
+  });
+});
+
+describe('partial updates', () => {
+  it('never inject defaults, so omitted fields keep their stored values', () => {
+    const updates = Object.entries(contracts).filter(
+      ([name, schema]) => /^(update|patch)/i.test(name) && schema instanceof z.ZodObject,
+    );
+    expect(updates.length).toBeGreaterThan(5);
+    for (const [name, schema] of updates) {
+      const parsed = (schema as z.ZodObject).safeParse({});
+      if (parsed.success) expect({ name, data: parsed.data }).toEqual({ name, data: {} });
+    }
   });
 });
 

@@ -302,6 +302,10 @@ describe('banners and exam countdown (§19.2, §19.3)', () => {
 
     await adminCall('PATCH', `/banners/${all.id}`, { isActive: false });
     expect((await home(s)).banners.map((b) => b.id)).not.toContain(all.id);
+    // A partial update leaves the tap action alone.
+    await adminCall('PATCH', `/banners/${mine.id}`, { isActive: false });
+    await adminCall('PATCH', `/banners/${mine.id}`, { isActive: true });
+    expect((await home(s)).banners.find((b) => b.id === mine.id)).toMatchObject({ action: 'external_url' });
     await adminCall('DELETE', `/banners/${mine.id}`);
     expect((await home(s)).banners.map((b) => b.id)).not.toContain(mine.id);
     const logs = await t.c.db.select().from(auditLogs).where(eq(auditLogs.resourceId, all.id));

@@ -5236,8 +5236,7 @@ export interface components {
             titleAr?: string;
             /** Format: uuid */
             imageMediaId?: string;
-            /** @default none */
-            action: components["schemas"]["BannerAction"];
+            action?: components["schemas"]["BannerAction"];
             actionTarget?: string | null;
             educationLevelId?: string | null;
             startsAt?: string | null;
