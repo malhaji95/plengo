@@ -273,6 +273,81 @@ describe('SRS sync (§13.6–§13.8)', () => {
     return { w, deck, cards, s: await student() };
   }
 
+  it('flashcard statistics count states, due cards and retention; locked decks never become the resume pointer', async () => {
+    const { deck, cards, s, w } = await setup();
+    const at = Date.now() - 2 * 60 * 60_000;
+    const logs = [];
+    const states = [];
+    // Card 0: a review card rated Again (a lapse). Card 1: a review card rated Good. Card 2: new → learning.
+    for (const [i, rating] of (['again', 'good', 'good'] as const).entries()) {
+      const id = cards[i]!.id;
+      const base =
+        i < 2
+          ? {
+              ...newCardState(at - 10 * 86_400_000),
+              state: 'review' as const,
+              intervalDays: 5,
+              reps: 3,
+              dueAt: at - 1,
+              lastReviewedAt: at - 5 * 86_400_000,
+            }
+          : newCardState(at);
+      const next = schedule(base, rating, at, id);
+      logs.push({
+        id: randomUUID(),
+        flashcardId: id,
+        rating,
+        stateBefore: iso(base),
+        stateAfter: iso(next),
+        reviewedAt: new Date(at).toISOString(),
+      });
+      states.push({ flashcardId: id, ...iso(next) });
+    }
+    await studentCall(s, 'POST', '/srs/sync', { logs, states });
+    const stats = await studentCall<{
+      dueToday: number;
+      retentionPercent: number | null;
+      byState: Record<string, number>;
+      reviewsPerDay: { count: number }[];
+      forecast: { count: number }[];
+    }>(s, 'GET', '/stats/flashcards');
+    expect(stats.data.byState).toEqual({ new: 0, learning: 1, review: 1, relearning: 1 });
+    // Two review-state ratings, one of them Again.
+    expect(stats.data.retentionPercent).toBe(50);
+    expect(stats.data.reviewsPerDay.reduce((n, d) => n + d.count, 0)).toBe(3);
+    expect(stats.data.dueToday).toBeGreaterThanOrEqual(2); // the relearning and learning cards
+    expect(stats.data.forecast[0]!.count).toBe(stats.data.dueToday);
+
+    const resume = await studentCall<{ activityType: string; itemId: string }[]>(
+      s,
+      'GET',
+      '/progress/resume',
+    );
+    expect(resume.data[0]).toMatchObject({ activityType: 'deck', itemId: deck.id });
+
+    // A premium deck the student cannot open does not move the pointer.
+    const locked = await deckWithCards({ subjectId: w.subjectId }, 1);
+    await adminCall('PUT', `/decks/${locked.deck.id}/free`, { mode: 'paid' });
+    const id = locked.cards[0]!.id;
+    const base = newCardState(at + 60_000);
+    const next = schedule(base, 'good', at + 60_000, id);
+    await studentCall(s, 'POST', '/srs/sync', {
+      logs: [
+        {
+          id: randomUUID(),
+          flashcardId: id,
+          rating: 'good',
+          stateBefore: iso(base),
+          stateAfter: iso(next),
+          reviewedAt: new Date(at + 60_000).toISOString(),
+        },
+      ],
+      states: [],
+    });
+    const after = await studentCall<{ itemId: string }[]>(s, 'GET', '/progress/resume');
+    expect(after.data[0]!.itemId).toBe(deck.id);
+  });
+
   it('stores logs idempotently and keeps the latest review per card', async () => {
     const { cards, s } = await setup();
     const card = cards[0]!.id;

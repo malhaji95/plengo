@@ -250,6 +250,18 @@ describe('students: teachers, tracks and following', () => {
     ).not.toContain(teacher.id);
   });
 
+  it('following a teacher never grants access to their tracks (§7.4)', async () => {
+    const { teacher, track } = await teacherWithTrack();
+    const before = await studentCall<{ access: { hasAccess: boolean } }>(
+      'GET',
+      `/teacher-tracks/${track.id}`,
+    );
+    await studentCall('PUT', `/teachers/${teacher.id}/follow`);
+    const after = await studentCall<{ access: { hasAccess: boolean } }>('GET', `/teacher-tracks/${track.id}`);
+    expect(before.data.access.hasAccess).toBe(false);
+    expect(after.data.access).toMatchObject({ hasAccess: false, reason: null });
+  });
+
   it('shows the track page and lists tracks on the subject outline', async () => {
     const { teacher, subject: subj, track } = await teacherWithTrack();
     const page = await studentCall<{

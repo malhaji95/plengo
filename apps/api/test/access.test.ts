@@ -308,6 +308,27 @@ describe('redemption (§9.4)', () => {
     expect(page.data.access).toMatchObject({ hasAccess: true, reason: 'entitlement', isPermanent: false });
   });
 
+  it('revoking a batch refuses unused codes but keeps entitlements already granted (§9.6)', async () => {
+    const { subjectId } = await subjectWithTrack();
+    const b = await batch({ subjectId }, 2);
+    const s = await student();
+    const used = await redeem(s, b.codes[0]!);
+    expect(used.status).toBe(200);
+    await adminCall('POST', `/coupon-batches/${b.id}/revoke`);
+    const [e] = await t.c.db.select().from(entitlements).where(eq(entitlements.id, used.data.entitlement.id));
+    expect(e!.status).toBe('active');
+    expect(await t.c.access.canAccessItem(s.id, { subjectId, teacherTrackId: null })).toBe(true);
+    expect((await redeem(await student(), b.codes[1]!)).error?.code).toBe('COUPON_REVOKED');
+  });
+
+  it('a burst of parallel attempts from one student cannot pass the per-minute limit (§9.5)', async () => {
+    const s = await student();
+    const results = await Promise.all(Array.from({ length: 8 }, () => redeem(s, 'ZZZZ-ZZZZ-ZZ')));
+    const codes = results.map((r) => r.error?.code);
+    expect(codes.filter((c) => c === 'COUPON_NOT_FOUND')).toHaveLength(5);
+    expect(codes.filter((c) => c === 'RATE_LIMITED')).toHaveLength(3);
+  });
+
   it('answers COUPON_NOT_FOUND for malformed and unknown codes, and logs both', async () => {
     const s = await student();
     expect((await redeem(s, 'ABC')).error?.code).toBe('COUPON_NOT_FOUND');
@@ -689,6 +710,51 @@ describe('entitlement lifecycle', () => {
     );
     expect(second.data.items.some((x) => first.data.items.some((y) => y.id === x.id))).toBe(false);
     expect((await adminCall('GET', `/students/${randomUUID()}`)).status).toBe(404);
+  });
+});
+
+describe('canAccessItem matrix (§8.6, §37.1)', () => {
+  it('free / promoted / subject-entitled / track-entitled / none × general / track content', async () => {
+    const { subjectId, trackId } = await subjectWithTrack();
+    const general = { subjectId, teacherTrackId: null };
+    const track = { subjectId, teacherTrackId: trackId };
+    const none = await student();
+    const bySubject = await student();
+    const byTrack = await student();
+    const promoted = await student();
+    await adminCall('POST', `/students/${bySubject.id}/entitlements`, {
+      scopeType: 'subject',
+      subjectId,
+      permanentAccess: true,
+    });
+    await adminCall('POST', `/students/${byTrack.id}/entitlements`, {
+      scopeType: 'teacher_track',
+      teacherTrackId: trackId,
+      permanentAccess: true,
+    });
+    const can = (s: Student, item: object) => t.c.access.canAccessItem(s.id, item as never);
+    const row = async (s: Student) => [
+      await can(s, { ...general, isFree: false }),
+      await can(s, { ...track, isFree: false }),
+      await can(s, { ...general, isFree: true }),
+      await can(s, { ...track, isFree: true }),
+    ];
+    // [premium general, premium track, free general, free track]
+    expect(await row(none)).toEqual([false, false, true, true]);
+    expect(await row(bySubject)).toEqual([true, false, true, true]);
+    expect(await row(byTrack)).toEqual([false, true, true, true]);
+
+    // A running promotion on the general scope opens it for everyone, and only it.
+    const now = Date.now();
+    await adminCall('POST', '/promotions', {
+      scopeType: 'subject',
+      subjectId,
+      titleAr: 'عرض',
+      startsAt: new Date(now - DAY).toISOString(),
+      endsAt: new Date(now + DAY).toISOString(),
+    });
+    expect(await row(promoted)).toEqual([true, false, true, true]);
+    expect(await row(byTrack)).toEqual([true, true, true, true]);
   });
 });
 

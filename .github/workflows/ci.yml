@@ -53,6 +53,8 @@ jobs:
         run: pnpm --filter @plengo/arabic-normalizer --filter @plengo/srs test
       - name: API tests (Postgres)
         run: pnpm --filter @plengo/api test
+      - name: Admin tests
+        run: pnpm --filter @plengo/admin test
       - name: Build
         run: pnpm build && pnpm --filter @plengo/admin build
         env:

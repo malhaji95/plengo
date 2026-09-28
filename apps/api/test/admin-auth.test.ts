@@ -147,6 +147,38 @@ describe('admin 2FA', () => {
     expect(body(await mobileLogin(t, email)).error?.code).toBe('AUTH_INVALID_CREDENTIALS');
   });
 
+  it('rate-limits admin logins and TOTP attempts (§31)', async () => {
+    const email = await makeAdmin(t);
+    const statuses = [];
+    for (let i = 0; i < 11; i++) {
+      const res = await t.app.inject({
+        method: 'POST',
+        url: '/api/v1/admin/auth/login',
+        headers: h,
+        remoteAddress: '192.0.2.44',
+        payload: { email, password: 'wrong-password-1' },
+      });
+      statuses.push(res.statusCode);
+    }
+    expect(statuses.slice(0, 10).every((c) => c === 401)).toBe(true);
+    expect(statuses[10]).toBe(429);
+
+    const { email: enrolled } = await enrolledAdmin();
+    const cookie = cookieHeader(await adminLogin(enrolled));
+    const codes = [];
+    for (let i = 0; i < 11; i++) {
+      const res = await t.app.inject({
+        method: 'POST',
+        url: '/api/v1/admin/auth/2fa/verify',
+        headers: { cookie, ...h },
+        remoteAddress: '192.0.2.45',
+        payload: { code: '000000' },
+      });
+      codes.push(res.statusCode);
+    }
+    expect(codes[10]).toBe(429);
+  });
+
   it('never lets a student reach admin endpoints', async () => {
     const student = await tokensFor(t);
     const res = await t.app.inject({

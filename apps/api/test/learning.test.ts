@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { and, eq } from 'drizzle-orm';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { questionStats, quizAttempts, userMistakes, users } from '@plengo/db';
+import { entitlements, questionStats, quizAttempts, userMistakes, users } from '@plengo/db';
 import { streak } from '../src/services/stats-service.js';
 import {
   body,
@@ -788,6 +788,175 @@ describe('statistics, bookmarks and progress (§16.2–§18)', () => {
     });
     const [row] = await t.c.db.select().from(questionStats).where(eq(questionStats.questionId, w.free.id));
     expect(row).toMatchObject({ attemptCount: 30, flaggedForReview: true });
+  });
+});
+
+describe('audit follow-ups', () => {
+  it('refuses the stateless question check while the question is in an open exam (§15.2)', async () => {
+    const w = await world();
+    const s = await student();
+    const q = await quiz(w, { questionIds: [w.free.id], allowedModes: 'exam' });
+    expect(
+      (await call(s, 'POST', `/questions/${w.free.id}/check`, { selectedOptionId: w.correct(w.free) }))
+        .status,
+    ).toBe(200);
+    const a = (await start(s, { source: 'curated', mode: 'exam', quizId: q.id })).data;
+    const blocked = await call(s, 'POST', `/questions/${w.free.id}/check`, {
+      selectedOptionId: w.correct(w.free),
+    });
+    expect(blocked.error?.details).toMatchObject({ reason: 'exam_in_progress' });
+    expect(blocked.raw).not.toContain('correctOptionId');
+    await call(s, 'POST', `/attempts/${a.attempt.id}/submit`, { answers: [] });
+    expect(
+      (await call(s, 'POST', `/questions/${w.free.id}/check`, { selectedOptionId: w.correct(w.free) }))
+        .status,
+    ).toBe(200);
+  });
+
+  it('bumps the quiz version when a member question is unpublished or deleted (§22.3)', async () => {
+    const w = await world();
+    const q = await quiz(w, { questionIds: [w.free.id, w.premium.id] });
+    const version = async () =>
+      (await adminCall<{ quiz: { contentVersion: number } }>('GET', `/quizzes/${q.id}`)).data.quiz
+        .contentVersion;
+    const v0 = await version();
+    await adminCall('POST', `/questions/${w.premium.id}/status`, { status: 'archived' });
+    expect(await version()).toBe(v0 + 1);
+    await adminCall('DELETE', `/questions/${w.free.id}`);
+    expect(await version()).toBe(v0 + 2);
+  });
+
+  it('max_attempts holds under concurrent starts', async () => {
+    const w = await world();
+    const q = await quiz(w, { questionIds: [w.free.id], maxAttempts: 2 });
+    const s = await student();
+    const results = await Promise.all(
+      Array.from({ length: 5 }, () => start(s, { source: 'curated', mode: 'practice', quizId: q.id })),
+    );
+    expect(results.filter((r) => r.status === 200)).toHaveLength(2);
+    const rows = await t.c.db.select().from(quizAttempts).where(eq(quizAttempts.quizId, q.id));
+    expect(rows).toHaveLength(2);
+  });
+
+  it('attempt payloads never carry accepted answers before grading (§37.5)', async () => {
+    const w = await world();
+    const s = await student();
+    await entitle(s, { scopeType: 'subject', subjectId: w.subjectId });
+    const q = await quiz(w, { questionIds: [w.written.id], allowedModes: 'exam' });
+    const a = await start(s, { source: 'curated', mode: 'exam', quizId: q.id });
+    expect(a.raw).not.toContain('دمشق');
+    expect(a.raw).not.toContain('دِمَشْق');
+    expect((await call(s, 'GET', `/attempts/${a.data.attempt.id}`)).raw).not.toContain('دِمَشْق');
+  });
+
+  it('mastery streak comes from the admin learning setting (§16.1, §26.2)', async () => {
+    const before = await adminCall<{ mistakeMasteryStreak: number }>('GET', '/settings/learning');
+    expect(before.data.mistakeMasteryStreak).toBe(2);
+    await adminCall('PUT', '/settings/learning', { mistakeMasteryStreak: 1 });
+    try {
+      const w = await world();
+      const s = await student();
+      const q = await quiz(w, { questionIds: [w.free.id] });
+      const a = (await start(s, { source: 'curated', mode: 'practice', quizId: q.id })).data;
+      await call(s, 'POST', `/attempts/${a.attempt.id}/answers/${w.free.id}/check`, {
+        selectedOptionId: w.wrong(w.free),
+      });
+      const m = (await start(s, { source: 'mistakes', mode: 'practice' })).data;
+      await call(s, 'POST', `/attempts/${m.attempt.id}/answers/${w.free.id}/check`, {
+        selectedOptionId: w.correct(w.free),
+      });
+      const list = await call<{ activeCount: number; masteredCount: number; masteryStreak: number }>(
+        s,
+        'GET',
+        '/mistakes',
+      );
+      expect(list.data).toMatchObject({ activeCount: 0, masteredCount: 1, masteryStreak: 1 });
+      expect((await adminCall('PUT', '/settings/learning', { mistakeMasteryStreak: 0 })).error?.code).toBe(
+        'VALIDATION_ERROR',
+      );
+    } finally {
+      await adminCall('PUT', '/settings/learning', { mistakeMasteryStreak: 2 });
+    }
+  });
+
+  it('pages the mistake bank and bookmarks by cursor (§30.1)', async () => {
+    const w = await world();
+    const s = await student();
+    await entitle(s, { scopeType: 'subject', subjectId: w.subjectId });
+    const q = await quiz(w, { questionIds: [w.free.id, w.premium.id, w.tf.id], allowedModes: 'exam' });
+    const a = (await start(s, { source: 'curated', mode: 'exam', quizId: q.id })).data;
+    await call(s, 'POST', `/attempts/${a.attempt.id}/submit`, {
+      answers: [
+        { questionId: w.free.id, selectedOptionId: w.wrong(w.free) },
+        { questionId: w.premium.id, selectedOptionId: w.wrong(w.premium) },
+        { questionId: w.tf.id, selectedOptionId: w.wrong(w.tf) },
+      ],
+    });
+    type Page = { items: { questionId: string }[]; nextCursor: string | null };
+    const p1 = await call<Page>(s, 'GET', '/mistakes?limit=2');
+    const p2 = await call<Page>(s, 'GET', `/mistakes?limit=2&cursor=${p1.data.nextCursor}`);
+    expect([p1.data.items.length, p2.data.items.length, p2.data.nextCursor]).toEqual([2, 1, null]);
+    for (const id of [w.free.id, w.premium.id, w.tf.id])
+      await call(s, 'PUT', '/bookmarks', { itemType: 'question', itemId: id });
+    const b1 = await call<{ items: unknown[]; nextCursor: string | null }>(s, 'GET', '/bookmarks?limit=2');
+    const b2 = await call<{ items: unknown[]; nextCursor: string | null }>(
+      s,
+      'GET',
+      `/bookmarks?limit=2&cursor=${b1.data.nextCursor}`,
+    );
+    expect([b1.data.items.length, b2.data.items.length, b2.data.nextCursor]).toEqual([2, 1, null]);
+  });
+
+  it('statistics: weakest units need 10 answers; mistake counts match the bank', async () => {
+    const w = await world();
+    const s = await student();
+    await entitle(s, { scopeType: 'subject', subjectId: w.subjectId });
+    const ids = [w.free.id, w.premium.id, w.tf.id];
+    const answerAll = async (right: boolean) => {
+      const q = await quiz(w, { questionIds: ids, allowedModes: 'exam' });
+      const a = (await start(s, { source: 'curated', mode: 'exam', quizId: q.id })).data;
+      await call(s, 'POST', `/attempts/${a.attempt.id}/submit`, {
+        answers: [
+          { questionId: w.free.id, selectedOptionId: right ? w.correct(w.free) : w.wrong(w.free) },
+          { questionId: w.premium.id, selectedOptionId: w.wrong(w.premium) },
+          { questionId: w.tf.id, selectedOptionId: w.correct(w.tf) },
+        ],
+      });
+    };
+    type Overview = {
+      weakestUnits: { unitId: string; answered: number; accuracyPercent: number }[];
+      mistakes: { active: number };
+    };
+    for (let i = 0; i < 3; i++) await answerAll(false);
+    expect((await call<Overview>(s, 'GET', '/stats/overview')).data.weakestUnits).toEqual([]); // 9 answers
+    await answerAll(true);
+    const o = (await call<Overview>(s, 'GET', '/stats/overview')).data;
+    expect(o.weakestUnits).toMatchObject([{ unitId: w.unitId, answered: 12, accuracyPercent: 42 }]);
+    const bank = await call<{ activeCount: number }>(s, 'GET', '/mistakes');
+    expect(o.mistakes.active).toBe(bank.data.activeCount);
+    // Losing access hides mistakes from the bank and from the statistics alike.
+    await t.c.db.update(entitlements).set({ status: 'revoked' }).where(eq(entitlements.userId, s.id));
+    const after = (await call<Overview>(s, 'GET', '/stats/overview')).data;
+    expect(after.mistakes.active).toBe(
+      (await call<{ activeCount: number }>(s, 'GET', '/mistakes')).data.activeCount,
+    );
+  });
+
+  it('time totals are bigint: huge sums do not overflow the grading transaction', async () => {
+    const w = await world();
+    await t.c.db
+      .insert(questionStats)
+      .values({ questionId: w.free.id, attemptCount: 1, correctCount: 1, totalTimeMs: 2_147_000_000 });
+    const s = await student();
+    const q = await quiz(w, { questionIds: [w.free.id] });
+    const a = (await start(s, { source: 'curated', mode: 'practice', quizId: q.id })).data;
+    const res = await call(s, 'POST', `/attempts/${a.attempt.id}/answers/${w.free.id}/check`, {
+      selectedOptionId: w.correct(w.free),
+      timeSpentMs: 20 * 60_000,
+    });
+    expect(res.status).toBe(200);
+    const [row] = await t.c.db.select().from(questionStats).where(eq(questionStats.questionId, w.free.id));
+    expect(row!.totalTimeMs).toBe(2_147_000_000 + 20 * 60_000);
   });
 });
 

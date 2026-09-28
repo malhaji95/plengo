@@ -172,6 +172,91 @@ describe('student uploads', () => {
   });
 });
 
+describe('upload limits and budgets (§12.4, §31)', () => {
+  it('limits a student to 60 upload requests per hour', async () => {
+    const { accessToken } = await tokensFor(t);
+    const bytes = await png(10, 10);
+    const codes = [];
+    for (let i = 0; i < 61; i++) codes.push((await studentUpload(accessToken, bytes)).statusCode);
+    expect(codes.slice(0, 60).every((c) => c === 200)).toBe(true);
+    expect(codes[60]).toBe(429);
+  });
+
+  it('steps quality down until a detailed image fits its budget', async () => {
+    const { accessToken } = await tokensFor(t);
+    // Random noise barely compresses: at the default quality it is far over 200 KB.
+    const noise = Buffer.alloc(1080 * 1080 * 3);
+    for (let i = 0; i < noise.length; i++) noise[i] = (i * 2654435761) >>> 24;
+    const bytes = await sharp(noise, { raw: { width: 1080, height: 1080, channels: 3 } })
+      .jpeg({ quality: 70 })
+      .toBuffer();
+    expect(bytes.length).toBeLessThan(2 * 1024 * 1024);
+    const created = body<{ id: string; uploadUrl: string }>(
+      await studentUpload(accessToken, bytes, 'image/jpeg'),
+    ).data;
+    await t.storage.put('private', keyFromUrl(created.uploadUrl), bytes, 'image/jpeg');
+    await t.app.inject({
+      method: 'POST',
+      url: `/api/v1/uploads/${created.id}/complete`,
+      headers: { authorization: `Bearer ${accessToken}` },
+    });
+    await t.queue.drain(t.c.jobHandlers);
+    const [row] = await t.c.db.select().from(mediaFiles).where(eq(mediaFiles.id, created.id));
+    const atDefault = await sharp(bytes).resize({ width: 1080 }).webp({ quality: 75 }).toBuffer();
+    expect(row!.status).toBe('ready');
+    expect(row!.optimizedSize!).toBeLessThan(atDefault.length);
+  });
+});
+
+describe('avatars (§11.1)', () => {
+  it('a student uploads an avatar, sets it on the profile and gets a signed URL', async () => {
+    const { accessToken } = await tokensFor(t);
+    const auth = { authorization: `Bearer ${accessToken}` };
+    const bytes = await png(900, 900);
+    const created = await t.app.inject({
+      method: 'POST',
+      url: '/api/v1/uploads',
+      headers: auth,
+      payload: { kind: 'avatar', contentType: 'image/png', size: bytes.length },
+    });
+    const up = body<{ id: string; uploadUrl: string }>(created).data;
+    await t.storage.put('private', keyFromUrl(up.uploadUrl), bytes, 'image/png');
+    await t.app.inject({ method: 'POST', url: `/api/v1/uploads/${up.id}/complete`, headers: auth });
+    await t.queue.drain(t.c.jobHandlers);
+    const [row] = await t.c.db.select().from(mediaFiles).where(eq(mediaFiles.id, up.id));
+    expect(row).toMatchObject({ status: 'ready', bucket: 'private' });
+    expect(row!.variants.full!.width).toBe(400);
+
+    const set = await t.app.inject({
+      method: 'PATCH',
+      url: '/api/v1/me',
+      headers: auth,
+      payload: { avatarMediaId: up.id },
+    });
+    expect(body<{ avatarUrl: string | null }>(set).data.avatarUrl).toMatch(/^memory:\/\/private\//);
+    const me = await t.app.inject({ method: 'GET', url: '/api/v1/me', headers: auth });
+    expect(body<{ avatarUrl: string | null }>(me).data.avatarUrl).not.toBeNull();
+
+    // Someone else's upload, or a non-avatar image, is refused.
+    const other = (await tokensFor(t)).accessToken;
+    const steal = await t.app.inject({
+      method: 'PATCH',
+      url: '/api/v1/me',
+      headers: { authorization: `Bearer ${other}` },
+      payload: { avatarMediaId: up.id },
+    });
+    expect(body(steal).error?.code).toBe('VALIDATION_ERROR');
+
+    const cleared = await t.app.inject({
+      method: 'PATCH',
+      url: '/api/v1/me',
+      headers: auth,
+      payload: { avatarMediaId: null },
+    });
+    expect(body<{ avatarUrl: string | null }>(cleared).data.avatarUrl).toBeNull();
+  });
+});
+
 describe('orphan cleanup', () => {
   it('deletes pending uploads older than 24 hours and their originals', async () => {
     const { accessToken } = await tokensFor(t);
