@@ -27,10 +27,11 @@ export function createCatalogService(deps: {
   access: AccessService;
   questionCounts: (scope: ReturnType<typeof subjectScope>) => Promise<SubjectOutline['questionCount']>;
   deckCounts: (scope: ReturnType<typeof subjectScope>) => Promise<SubjectOutline['deckCount']>;
+  quizCounts: (scope: ReturnType<typeof subjectScope>) => Promise<SubjectOutline['quizCount']>;
   /** Tracks of a subject, supplied by the teacher service (kept separate to avoid a cycle). */
   subjectTracks: (subjectId: string) => Promise<Omit<SubjectOutline['tracks'][number], 'hasAccess'>[]>;
 }) {
-  const { repo, usersRepo, storage, access, questionCounts, deckCounts, subjectTracks } = deps;
+  const { repo, usersRepo, storage, access, questionCounts, deckCounts, quizCounts, subjectTracks } = deps;
   const notFound = (): never => {
     throw new AppError('NOT_FOUND');
   };
@@ -73,13 +74,14 @@ export function createCatalogService(deps: {
 
     async outline(userId: string, subjectId: string): Promise<SubjectOutline> {
       const subject = await visibleSubject(subjectId);
-      const [unitRows, lessonRows, tracks, ctx, questionCount, deckCount] = await Promise.all([
+      const [unitRows, lessonRows, tracks, ctx, questionCount, deckCount, quizCount] = await Promise.all([
         repo.listUnits(subjectId),
         repo.listLessons(subjectId),
         subjectTracks(subjectId),
         access.context(userId),
         questionCounts(subjectScope(subjectId)),
         deckCounts(subjectScope(subjectId)),
+        quizCounts(subjectScope(subjectId)),
       ]);
       const lessons = lessonRows.map(toLesson);
       return {
@@ -90,6 +92,7 @@ export function createCatalogService(deps: {
         access: ctx.scopeAccess(subjectScope(subjectId)),
         questionCount,
         deckCount,
+        quizCount,
       };
     },
 

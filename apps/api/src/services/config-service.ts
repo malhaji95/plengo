@@ -2,8 +2,10 @@ import { eq } from 'drizzle-orm';
 import { appSettings, type Db } from '@plengo/db';
 import {
   accessSettingsSchema,
+  learningSettingsSchema,
   remoteConfigSchema,
   type AccessSettings,
+  type LearningSettings,
   type RemoteConfig,
 } from '@plengo/contracts';
 
@@ -25,6 +27,10 @@ export const DEFAULT_REMOTE_CONFIG: RemoteConfig = {
 
 const REMOTE_CONFIG_KEY = 'remote_config';
 const ACCESS_SETTINGS_KEY = 'access';
+const LEARNING_SETTINGS_KEY = 'learning';
+
+/** spec §16.1: two correct answers in a row master a mistake. */
+export const DEFAULT_LEARNING_SETTINGS: LearningSettings = { mistakeMasteryStreak: 2 };
 
 /** spec §8.3: a permanent code may replace an active temporary entitlement unless an admin disables it. */
 export const DEFAULT_ACCESS_SETTINGS: AccessSettings = { allowTemporaryToPermanentUpgrade: true };
@@ -75,6 +81,16 @@ export function createConfigService(db: Db) {
     async getAccessSettings(): Promise<AccessSettings> {
       const stored = ((await read(ACCESS_SETTINGS_KEY)) ?? {}) as Partial<AccessSettings>;
       return accessSettingsSchema.parse({ ...DEFAULT_ACCESS_SETTINGS, ...stored });
+    },
+
+    async getLearningSettings(): Promise<LearningSettings> {
+      const stored = ((await read(LEARNING_SETTINGS_KEY)) ?? {}) as Partial<LearningSettings>;
+      return learningSettingsSchema.parse({ ...DEFAULT_LEARNING_SETTINGS, ...stored });
+    },
+
+    async setLearningSettings(value: LearningSettings, adminId: string | null) {
+      await write(LEARNING_SETTINGS_KEY, value, adminId);
+      return value;
     },
 
     async setAccessSettings(value: AccessSettings, adminId: string | null) {

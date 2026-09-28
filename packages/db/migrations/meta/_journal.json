@@ -50,6 +50,13 @@
       "when": 1790549790647,
       "tag": "0006_flashcards",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1790587344833,
+      "tag": "0007_learning",
+      "breakpoints": true
     }
   ]
 }

@@ -21,8 +21,9 @@ export function createTeacherService(deps: {
   access: AccessService;
   questionCounts: (scope: ReturnType<typeof trackScope>) => Promise<{ total: number; free: number }>;
   deckCounts: (scope: ReturnType<typeof trackScope>) => Promise<{ total: number; free: number }>;
+  quizCounts: (scope: ReturnType<typeof trackScope>) => Promise<{ total: number; free: number }>;
 }) {
-  const { repo, structureRepo, structure, storage, access, questionCounts, deckCounts } = deps;
+  const { repo, structureRepo, structure, storage, access, questionCounts, deckCounts, quizCounts } = deps;
   const notFound = (): never => {
     throw new AppError('NOT_FOUND');
   };
@@ -227,14 +228,16 @@ export function createTeacherService(deps: {
 
     async track(userId: string, trackId: string) {
       const track = (await repo.getTrack(trackId, { visibleOnly: true })) ?? notFound();
-      const [teacher, subject, followed, scopeAccess, questionCount, deckCount] = await Promise.all([
-        repo.getTeacher(track.teacherId, { visibleOnly: true }),
-        structureRepo.getSubject(track.subjectId, { studentVisible: true }),
-        repo.followedIds(userId),
-        access.scopeAccess(userId, trackScope(track.id)),
-        questionCounts(trackScope(track.id)),
-        deckCounts(trackScope(track.id)),
-      ]);
+      const [teacher, subject, followed, scopeAccess, questionCount, deckCount, quizCount] =
+        await Promise.all([
+          repo.getTeacher(track.teacherId, { visibleOnly: true }),
+          structureRepo.getSubject(track.subjectId, { studentVisible: true }),
+          repo.followedIds(userId),
+          access.scopeAccess(userId, trackScope(track.id)),
+          questionCounts(trackScope(track.id)),
+          deckCounts(trackScope(track.id)),
+          quizCounts(trackScope(track.id)),
+        ]);
       if (!teacher || !subject) notFound();
       return {
         track: toTrack(track),
@@ -243,6 +246,7 @@ export function createTeacherService(deps: {
         access: scopeAccess,
         questionCount,
         deckCount,
+        quizCount,
       };
     },
 

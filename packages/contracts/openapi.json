@@ -180,6 +180,39 @@
         ],
         "additionalProperties": false
       },
+      "Accuracy": {
+        "type": "object",
+        "properties": {
+          "answered": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "correct": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "accuracyPercent": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "answered",
+          "correct",
+          "accuracyPercent"
+        ],
+        "additionalProperties": false
+      },
       "AdminAcceptedAnswer": {
         "type": "object",
         "properties": {
@@ -967,6 +1000,299 @@
         ],
         "additionalProperties": false
       },
+      "AdminQuiz": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "subjectId": {
+            "type": "string"
+          },
+          "subjectNameAr": {
+            "type": "string"
+          },
+          "teacherTrackId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "trackTitleAr": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "unitId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "lessonId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "titleAr": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "allowedModes": {
+            "type": "string",
+            "enum": [
+              "practice",
+              "exam",
+              "both"
+            ]
+          },
+          "timeLimitSeconds": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "shuffleQuestions": {
+            "type": "boolean"
+          },
+          "shuffleOptions": {
+            "type": "boolean"
+          },
+          "passingScorePercent": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "maxAttempts": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "isMockExam": {
+            "type": "boolean"
+          },
+          "allowOffline": {
+            "type": "boolean"
+          },
+          "isFree": {
+            "type": "boolean"
+          },
+          "freeSource": {
+            "type": "string",
+            "enum": [
+              "rule",
+              "manual_override"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published",
+              "archived"
+            ]
+          },
+          "sortOrder": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "contentVersion": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "questionCount": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "subjectId",
+          "subjectNameAr",
+          "teacherTrackId",
+          "trackTitleAr",
+          "unitId",
+          "lessonId",
+          "titleAr",
+          "description",
+          "allowedModes",
+          "timeLimitSeconds",
+          "shuffleQuestions",
+          "shuffleOptions",
+          "passingScorePercent",
+          "maxAttempts",
+          "isMockExam",
+          "allowOffline",
+          "isFree",
+          "freeSource",
+          "status",
+          "sortOrder",
+          "contentVersion",
+          "questionCount",
+          "createdAt",
+          "updatedAt"
+        ],
+        "additionalProperties": false
+      },
+      "AdminQuizDetail": {
+        "type": "object",
+        "properties": {
+          "quiz": {
+            "$ref": "#/components/schemas/AdminQuiz"
+          },
+          "questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminQuizQuestion"
+            }
+          }
+        },
+        "required": [
+          "quiz",
+          "questions"
+        ],
+        "additionalProperties": false
+      },
+      "AdminQuizDetailEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/AdminQuizDetail"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "AdminQuizList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/AdminQuiz"
+        }
+      },
+      "AdminQuizListEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/AdminQuizList"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "AdminQuizQuestion": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "mcq",
+              "true_false",
+              "written"
+            ]
+          },
+          "questionText": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published",
+              "archived"
+            ]
+          },
+          "isFree": {
+            "type": "boolean"
+          },
+          "unitId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "lessonId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "deleted": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "questionText",
+          "status",
+          "isFree",
+          "unitId",
+          "lessonId",
+          "deleted"
+        ],
+        "additionalProperties": false
+      },
       "AdminStudent": {
         "type": "object",
         "properties": {
@@ -1306,6 +1632,468 @@
         ],
         "additionalProperties": false
       },
+      "Attempt": {
+        "type": "object",
+        "properties": {
+          "attempt": {
+            "$ref": "#/components/schemas/AttemptSummary"
+          },
+          "questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AttemptQuestion"
+            }
+          },
+          "serverTime": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "attempt",
+          "questions",
+          "serverTime"
+        ],
+        "additionalProperties": false
+      },
+      "AttemptEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/Attempt"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "AttemptFilters": {
+        "type": "object",
+        "properties": {
+          "subjectId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "teacherTrackId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "unitId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "lessonId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "types": {
+            "maxItems": 3,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "mcq",
+                "true_false",
+                "written"
+              ]
+            }
+          },
+          "count": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          }
+        },
+        "additionalProperties": false
+      },
+      "AttemptOption": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "isCorrect": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "text",
+          "isCorrect"
+        ],
+        "additionalProperties": false
+      },
+      "AttemptQuestion": {
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "mcq",
+              "true_false",
+              "written"
+            ]
+          },
+          "unitId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "lessonId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "questionText": {
+            "type": "string"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AttemptOption"
+            }
+          },
+          "selectedOptionId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "writtenAnswer": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "flagged": {
+            "type": "boolean"
+          },
+          "answeredAt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "timeSpentMs": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CheckResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "questionId",
+          "type",
+          "unitId",
+          "lessonId",
+          "questionText",
+          "options",
+          "selectedOptionId",
+          "writtenAnswer",
+          "flagged",
+          "answeredAt",
+          "timeSpentMs",
+          "result"
+        ],
+        "additionalProperties": false
+      },
+      "AttemptSummary": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "clientAttemptId": {
+            "type": "string"
+          },
+          "quizId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "curated",
+              "random",
+              "mistakes"
+            ]
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "practice",
+              "exam"
+            ]
+          },
+          "titleAr": {
+            "type": "string"
+          },
+          "subjectId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "teacherTrackId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "in_progress",
+              "submitted",
+              "abandoned"
+            ]
+          },
+          "startedAt": {
+            "type": "string"
+          },
+          "deadlineAt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "submittedAt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "submittedLate": {
+            "type": "boolean"
+          },
+          "totalCount": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "answeredCount": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "correctCount": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "wrongCount": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "skippedCount": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "scorePercent": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "passingScorePercent": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "passed": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "timeSpentMs": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "clientAttemptId",
+          "quizId",
+          "source",
+          "mode",
+          "titleAr",
+          "subjectId",
+          "teacherTrackId",
+          "status",
+          "startedAt",
+          "deadlineAt",
+          "submittedAt",
+          "submittedLate",
+          "totalCount",
+          "answeredCount",
+          "correctCount",
+          "wrongCount",
+          "skippedCount",
+          "scorePercent",
+          "passingScorePercent",
+          "passed",
+          "timeSpentMs"
+        ],
+        "additionalProperties": false
+      },
+      "AttemptSummaryPage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AttemptSummary"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "additionalProperties": false
+      },
+      "AttemptSummaryPageEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/AttemptSummaryPage"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
       "BackupCodeRequest": {
         "type": "object",
         "properties": {
@@ -1317,6 +2105,232 @@
         },
         "required": [
           "code"
+        ],
+        "additionalProperties": false
+      },
+      "Bookmark": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "itemType": {
+            "type": "string",
+            "enum": [
+              "question",
+              "flashcard",
+              "user_card",
+              "deck"
+            ]
+          },
+          "itemId": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "locked": {
+            "type": "boolean"
+          },
+          "available": {
+            "type": "boolean"
+          },
+          "titleAr": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "subjectId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "subjectNameAr": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "question": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StudentQuestion"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "deck": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StudentDeck"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "card": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StudentCard"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "itemType",
+          "itemId",
+          "createdAt",
+          "locked",
+          "available",
+          "titleAr",
+          "subjectId",
+          "subjectNameAr",
+          "question",
+          "deck",
+          "card"
+        ],
+        "additionalProperties": false
+      },
+      "BookmarkEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/Bookmark"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "BookmarkKey": {
+        "type": "object",
+        "properties": {
+          "itemType": {
+            "type": "string",
+            "enum": [
+              "question",
+              "flashcard",
+              "user_card",
+              "deck"
+            ]
+          },
+          "itemId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "itemType",
+          "itemId"
+        ],
+        "additionalProperties": false
+      },
+      "BookmarkKeyList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/BookmarkKey"
+        }
+      },
+      "BookmarkKeyListEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/BookmarkKeyList"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "BookmarkList": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Bookmark"
+            }
+          },
+          "urlsExpireAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "items",
+          "urlsExpireAt"
+        ],
+        "additionalProperties": false
+      },
+      "BookmarkListEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/BookmarkList"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "BookmarkRequest": {
+        "type": "object",
+        "properties": {
+          "itemType": {
+            "type": "string",
+            "enum": [
+              "question",
+              "flashcard",
+              "user_card",
+              "deck"
+            ]
+          },
+          "itemId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          }
+        },
+        "required": [
+          "itemType",
+          "itemId"
         ],
         "additionalProperties": false
       },
@@ -1381,6 +2395,47 @@
           "writtenAnswer": {
             "type": "string",
             "maxLength": 500
+          }
+        },
+        "additionalProperties": false
+      },
+      "CheckAttemptAnswerRequest": {
+        "type": "object",
+        "properties": {
+          "selectedOptionId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "writtenAnswer": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "timeSpentMs": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 86400000
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "additionalProperties": false
@@ -2177,6 +3232,138 @@
         ],
         "additionalProperties": false
       },
+      "CreateQuizRequest": {
+        "type": "object",
+        "properties": {
+          "subjectId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "teacherTrackId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "unitId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "lessonId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "titleAr": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "allowedModes": {
+            "type": "string",
+            "enum": [
+              "practice",
+              "exam",
+              "both"
+            ]
+          },
+          "timeLimitSeconds": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 30,
+                "maximum": 21600
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "shuffleQuestions": {
+            "type": "boolean"
+          },
+          "shuffleOptions": {
+            "type": "boolean"
+          },
+          "passingScorePercent": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "maxAttempts": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "isMockExam": {
+            "type": "boolean"
+          },
+          "allowOffline": {
+            "type": "boolean"
+          },
+          "questionIds": {
+            "maxItems": 200,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          }
+        },
+        "required": [
+          "subjectId",
+          "titleAr"
+        ],
+        "additionalProperties": false
+      },
       "CreateSubjectRequest": {
         "type": "object",
         "properties": {
@@ -2494,6 +3681,24 @@
           "success",
           "data",
           "error"
+        ],
+        "additionalProperties": false
+      },
+      "DayCount": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "date",
+          "count"
         ],
         "additionalProperties": false
       },
@@ -2840,6 +4045,101 @@
           },
           "data": {
             "$ref": "#/components/schemas/FacultyList"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "FlashcardStats": {
+        "type": "object",
+        "properties": {
+          "dueToday": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "forecast": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DayCount"
+            }
+          },
+          "reviewsPerDay": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DayCount"
+            }
+          },
+          "retentionPercent": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "byState": {
+            "type": "object",
+            "properties": {
+              "new": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "learning": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "review": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "relearning": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              }
+            },
+            "required": [
+              "new",
+              "learning",
+              "review",
+              "relearning"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "dueToday",
+          "forecast",
+          "reviewsPerDay",
+          "retentionPercent",
+          "byState"
+        ],
+        "additionalProperties": false
+      },
+      "FlashcardStatsEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/FlashcardStats"
           },
           "error": {
             "type": "null"
@@ -3203,6 +4503,41 @@
         ],
         "additionalProperties": false
       },
+      "LearningSettings": {
+        "type": "object",
+        "properties": {
+          "mistakeMasteryStreak": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10
+          }
+        },
+        "required": [
+          "mistakeMasteryStreak"
+        ],
+        "additionalProperties": false
+      },
+      "LearningSettingsEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/LearningSettings"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
       "Lesson": {
         "type": "object",
         "properties": {
@@ -3235,6 +4570,47 @@
           "code",
           "titleAr",
           "sortOrder"
+        ],
+        "additionalProperties": false
+      },
+      "LessonAccuracy": {
+        "type": "object",
+        "properties": {
+          "answered": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "correct": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "accuracyPercent": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "lessonId": {
+            "type": "string"
+          },
+          "lessonNameAr": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "answered",
+          "correct",
+          "accuracyPercent",
+          "lessonId",
+          "lessonNameAr"
         ],
         "additionalProperties": false
       },
@@ -3283,6 +4659,66 @@
           "success",
           "data",
           "error"
+        ],
+        "additionalProperties": false
+      },
+      "LessonProgress": {
+        "type": "object",
+        "properties": {
+          "questionsAttempted": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "questionsCorrect": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "questionsTotal": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "quizzesCompleted": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "quizzesTotal": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "flashcardsStudied": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "flashcardsTotal": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "completionPercent": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "lessonId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "questionsAttempted",
+          "questionsCorrect",
+          "questionsTotal",
+          "quizzesCompleted",
+          "quizzesTotal",
+          "flashcardsStudied",
+          "flashcardsTotal",
+          "completionPercent",
+          "lessonId"
         ],
         "additionalProperties": false
       },
@@ -3445,6 +4881,190 @@
           },
           "data": {
             "$ref": "#/components/schemas/Me"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "MissedQuestion": {
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "string"
+          },
+          "questionText": {
+            "type": "string"
+          },
+          "subjectNameAr": {
+            "type": "string"
+          },
+          "wrongCount": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "questionId",
+          "questionText",
+          "subjectNameAr",
+          "wrongCount"
+        ],
+        "additionalProperties": false
+      },
+      "Mistake": {
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "mcq",
+              "true_false",
+              "written"
+            ]
+          },
+          "questionText": {
+            "type": "string"
+          },
+          "subjectId": {
+            "type": "string"
+          },
+          "subjectNameAr": {
+            "type": "string"
+          },
+          "teacherTrackId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "trackTitleAr": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "unitId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "unitNameAr": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "lessonId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "lessonNameAr": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "mastered",
+              "removed"
+            ]
+          },
+          "wrongCount": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "correctStreak": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "firstWrongAt": {
+            "type": "string"
+          },
+          "lastWrongAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "questionId",
+          "type",
+          "questionText",
+          "subjectId",
+          "subjectNameAr",
+          "teacherTrackId",
+          "trackTitleAr",
+          "unitId",
+          "unitNameAr",
+          "lessonId",
+          "lessonNameAr",
+          "status",
+          "wrongCount",
+          "correctStreak",
+          "firstWrongAt",
+          "lastWrongAt"
+        ],
+        "additionalProperties": false
+      },
+      "MistakeList": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Mistake"
+            }
+          },
+          "activeCount": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "masteredCount": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "masteryStreak": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "items",
+          "activeCount",
+          "masteredCount",
+          "masteryStreak"
+        ],
+        "additionalProperties": false
+      },
+      "MistakeListEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/MistakeList"
           },
           "error": {
             "type": "null"
@@ -3846,6 +5466,24 @@
         ],
         "additionalProperties": false
       },
+      "QuizQuestionsRequest": {
+        "type": "object",
+        "properties": {
+          "questionIds": {
+            "maxItems": 200,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          }
+        },
+        "required": [
+          "questionIds"
+        ],
+        "additionalProperties": false
+      },
       "RedeemCouponRequest": {
         "type": "object",
         "properties": {
@@ -4203,6 +5841,125 @@
         ],
         "additionalProperties": false
       },
+      "ResumeItem": {
+        "type": "object",
+        "properties": {
+          "subjectId": {
+            "type": "string"
+          },
+          "subjectNameAr": {
+            "type": "string"
+          },
+          "teacherTrackId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "trackTitleAr": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "unitId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "unitNameAr": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "lessonId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "lessonNameAr": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "activityType": {
+            "type": "string",
+            "enum": [
+              "question",
+              "quiz",
+              "deck"
+            ]
+          },
+          "itemId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "itemTitleAr": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "attemptId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "lastActivityAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "subjectId",
+          "subjectNameAr",
+          "teacherTrackId",
+          "trackTitleAr",
+          "unitId",
+          "unitNameAr",
+          "lessonId",
+          "lessonNameAr",
+          "activityType",
+          "itemId",
+          "itemTitleAr",
+          "attemptId",
+          "lastActivityAt"
+        ],
+        "additionalProperties": false
+      },
+      "ResumeList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/ResumeItem"
+        }
+      },
+      "ResumeListEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/ResumeList"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
       "ReviewLog": {
         "type": "object",
         "properties": {
@@ -4311,6 +6068,108 @@
         },
         "additionalProperties": false
       },
+      "SaveAnswerRequest": {
+        "type": "object",
+        "properties": {
+          "selectedOptionId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "writtenAnswer": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "timeSpentMs": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 86400000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "flagged": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SavedAnswer": {
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "string"
+          },
+          "selectedOptionId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "writtenAnswer": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "flagged": {
+            "type": "boolean"
+          },
+          "answeredAt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "questionId",
+          "selectedOptionId",
+          "writtenAnswer",
+          "flagged",
+          "answeredAt"
+        ],
+        "additionalProperties": false
+      },
+      "SavedAnswerEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/SavedAnswer"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
       "ScopeAccess": {
         "type": "object",
         "properties": {
@@ -4360,6 +6219,115 @@
           "entitlementExpiresAt",
           "promotionTitleAr",
           "promotionEndsAt"
+        ],
+        "additionalProperties": false
+      },
+      "ScopeProgress": {
+        "type": "object",
+        "properties": {
+          "questionsAttempted": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "questionsCorrect": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "questionsTotal": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "quizzesCompleted": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "quizzesTotal": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "flashcardsStudied": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "flashcardsTotal": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "completionPercent": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "subjectId": {
+            "type": "string"
+          },
+          "teacherTrackId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "lastActivityAt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "units": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UnitProgress"
+            }
+          },
+          "lessons": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LessonProgress"
+            }
+          }
+        },
+        "required": [
+          "questionsAttempted",
+          "questionsCorrect",
+          "questionsTotal",
+          "quizzesCompleted",
+          "quizzesTotal",
+          "flashcardsStudied",
+          "flashcardsTotal",
+          "completionPercent",
+          "subjectId",
+          "teacherTrackId",
+          "lastActivityAt",
+          "units",
+          "lessons"
+        ],
+        "additionalProperties": false
+      },
+      "ScopeProgressEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/ScopeProgress"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
         ],
         "additionalProperties": false
       },
@@ -4874,6 +6842,194 @@
         ],
         "additionalProperties": false
       },
+      "StartAttemptRequest": {
+        "type": "object",
+        "properties": {
+          "clientAttemptId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "curated",
+              "random",
+              "mistakes"
+            ]
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "practice",
+              "exam"
+            ]
+          },
+          "quizId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "filters": {
+            "$ref": "#/components/schemas/AttemptFilters"
+          }
+        },
+        "required": [
+          "clientAttemptId",
+          "source",
+          "mode"
+        ],
+        "additionalProperties": false
+      },
+      "StatsOverview": {
+        "type": "object",
+        "properties": {
+          "totals": {
+            "$ref": "#/components/schemas/Accuracy"
+          },
+          "quizzesCompleted": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "studyDays": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "currentStreak": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "averageTimeMs": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "mistakes": {
+            "type": "object",
+            "properties": {
+              "active": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "mastered": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              }
+            },
+            "required": [
+              "active",
+              "mastered"
+            ],
+            "additionalProperties": false
+          },
+          "subjects": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubjectAccuracy"
+            }
+          },
+          "byType": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TypeAccuracy"
+            }
+          },
+          "weakestUnits": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UnitAccuracy"
+            }
+          },
+          "mostMissed": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MissedQuestion"
+            }
+          }
+        },
+        "required": [
+          "totals",
+          "quizzesCompleted",
+          "studyDays",
+          "currentStreak",
+          "averageTimeMs",
+          "mistakes",
+          "subjects",
+          "byType",
+          "weakestUnits",
+          "mostMissed"
+        ],
+        "additionalProperties": false
+      },
+      "StatsOverviewEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/StatsOverview"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "StatsTrend": {
+        "type": "object",
+        "properties": {
+          "weeks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TrendWeek"
+            }
+          }
+        },
+        "required": [
+          "weeks"
+        ],
+        "additionalProperties": false
+      },
+      "StatsTrendEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/StatsTrend"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
       "StudentCard": {
         "type": "object",
         "properties": {
@@ -5226,6 +7382,222 @@
         ],
         "additionalProperties": false
       },
+      "StudentQuiz": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "subjectId": {
+            "type": "string"
+          },
+          "teacherTrackId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "unitId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "lessonId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "titleAr": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "allowedModes": {
+            "type": "string",
+            "enum": [
+              "practice",
+              "exam",
+              "both"
+            ]
+          },
+          "timeLimitSeconds": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "passingScorePercent": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "maxAttempts": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "isMockExam": {
+            "type": "boolean"
+          },
+          "allowOffline": {
+            "type": "boolean"
+          },
+          "isFree": {
+            "type": "boolean"
+          },
+          "sortOrder": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "contentVersion": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "totalCount": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "accessibleCount": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "lockedCount": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "locked": {
+            "type": "boolean"
+          },
+          "attemptsUsed": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "bestScorePercent": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "inProgressAttemptId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "subjectId",
+          "teacherTrackId",
+          "unitId",
+          "lessonId",
+          "titleAr",
+          "description",
+          "allowedModes",
+          "timeLimitSeconds",
+          "passingScorePercent",
+          "maxAttempts",
+          "isMockExam",
+          "allowOffline",
+          "isFree",
+          "sortOrder",
+          "contentVersion",
+          "totalCount",
+          "accessibleCount",
+          "lockedCount",
+          "locked",
+          "attemptsUsed",
+          "bestScorePercent",
+          "inProgressAttemptId"
+        ],
+        "additionalProperties": false
+      },
+      "StudentQuizEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/StudentQuiz"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "StudentQuizList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/StudentQuiz"
+        }
+      },
+      "StudentQuizListEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/StudentQuizList"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
       "Subject": {
         "type": "object",
         "properties": {
@@ -5297,6 +7669,61 @@
           "coverUrl",
           "sortOrder",
           "isActive"
+        ],
+        "additionalProperties": false
+      },
+      "SubjectAccuracy": {
+        "type": "object",
+        "properties": {
+          "answered": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "correct": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "accuracyPercent": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "subjectId": {
+            "type": "string"
+          },
+          "subjectNameAr": {
+            "type": "string"
+          },
+          "teacherTrackId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "trackTitleAr": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "answered",
+          "correct",
+          "accuracyPercent",
+          "subjectId",
+          "subjectNameAr",
+          "teacherTrackId",
+          "trackTitleAr"
         ],
         "additionalProperties": false
       },
@@ -5380,6 +7807,9 @@
           },
           "deckCount": {
             "$ref": "#/components/schemas/ContentCount"
+          },
+          "quizCount": {
+            "$ref": "#/components/schemas/ContentCount"
           }
         },
         "required": [
@@ -5389,7 +7819,8 @@
           "tracks",
           "access",
           "questionCount",
-          "deckCount"
+          "deckCount",
+          "quizCount"
         ],
         "additionalProperties": false
       },
@@ -5402,6 +7833,75 @@
           },
           "data": {
             "$ref": "#/components/schemas/SubjectOutline"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "SubjectStats": {
+        "type": "object",
+        "properties": {
+          "subjectId": {
+            "type": "string"
+          },
+          "subjectNameAr": {
+            "type": "string"
+          },
+          "totals": {
+            "$ref": "#/components/schemas/Accuracy"
+          },
+          "units": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UnitBreakdown"
+            }
+          },
+          "lessons": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LessonAccuracy"
+            }
+          },
+          "tracks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubjectAccuracy"
+            }
+          },
+          "byType": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TypeAccuracy"
+            }
+          }
+        },
+        "required": [
+          "subjectId",
+          "subjectNameAr",
+          "totals",
+          "units",
+          "lessons",
+          "tracks",
+          "byType"
+        ],
+        "additionalProperties": false
+      },
+      "SubjectStatsEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/SubjectStats"
           },
           "error": {
             "type": "null"
@@ -5460,6 +7960,79 @@
           "description",
           "coverUrl",
           "hasAccess"
+        ],
+        "additionalProperties": false
+      },
+      "SubmitAnswer": {
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "selectedOptionId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "writtenAnswer": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "timeSpentMs": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 86400000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "flagged": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "questionId"
+        ],
+        "additionalProperties": false
+      },
+      "SubmitAttemptRequest": {
+        "type": "object",
+        "properties": {
+          "answers": {
+            "maxItems": 200,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubmitAnswer"
+            }
+          },
+          "timeSpentMs": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 86400000
+          }
+        },
+        "required": [
+          "answers"
         ],
         "additionalProperties": false
       },
@@ -5797,6 +8370,9 @@
           },
           "deckCount": {
             "$ref": "#/components/schemas/ContentCount"
+          },
+          "quizCount": {
+            "$ref": "#/components/schemas/ContentCount"
           }
         },
         "required": [
@@ -5805,7 +8381,8 @@
           "subject",
           "access",
           "questionCount",
-          "deckCount"
+          "deckCount",
+          "quizCount"
         ],
         "additionalProperties": false
       },
@@ -5827,6 +8404,85 @@
           "success",
           "data",
           "error"
+        ],
+        "additionalProperties": false
+      },
+      "TrendWeek": {
+        "type": "object",
+        "properties": {
+          "answered": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "correct": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "accuracyPercent": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "weekStart": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "answered",
+          "correct",
+          "accuracyPercent",
+          "weekStart"
+        ],
+        "additionalProperties": false
+      },
+      "TypeAccuracy": {
+        "type": "object",
+        "properties": {
+          "answered": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "correct": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "accuracyPercent": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "mcq",
+              "true_false",
+              "written"
+            ]
+          }
+        },
+        "required": [
+          "answered",
+          "correct",
+          "accuracyPercent",
+          "type"
         ],
         "additionalProperties": false
       },
@@ -5855,6 +8511,103 @@
           "code",
           "titleAr",
           "sortOrder"
+        ],
+        "additionalProperties": false
+      },
+      "UnitAccuracy": {
+        "type": "object",
+        "properties": {
+          "answered": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "correct": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "accuracyPercent": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "unitId": {
+            "type": "string"
+          },
+          "unitNameAr": {
+            "type": "string"
+          },
+          "subjectId": {
+            "type": "string"
+          },
+          "subjectNameAr": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "answered",
+          "correct",
+          "accuracyPercent",
+          "unitId",
+          "unitNameAr",
+          "subjectId",
+          "subjectNameAr"
+        ],
+        "additionalProperties": false
+      },
+      "UnitBreakdown": {
+        "type": "object",
+        "properties": {
+          "answered": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "correct": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "accuracyPercent": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "unitId": {
+            "type": "string"
+          },
+          "unitNameAr": {
+            "type": "string"
+          },
+          "lessons": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LessonAccuracy"
+            }
+          }
+        },
+        "required": [
+          "answered",
+          "correct",
+          "accuracyPercent",
+          "unitId",
+          "unitNameAr",
+          "lessons"
         ],
         "additionalProperties": false
       },
@@ -5903,6 +8656,66 @@
           "success",
           "data",
           "error"
+        ],
+        "additionalProperties": false
+      },
+      "UnitProgress": {
+        "type": "object",
+        "properties": {
+          "questionsAttempted": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "questionsCorrect": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "questionsTotal": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "quizzesCompleted": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "quizzesTotal": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "flashcardsStudied": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "flashcardsTotal": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "completionPercent": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "unitId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "questionsAttempted",
+          "questionsCorrect",
+          "questionsTotal",
+          "quizzesCompleted",
+          "quizzesTotal",
+          "flashcardsStudied",
+          "flashcardsTotal",
+          "completionPercent",
+          "unitId"
         ],
         "additionalProperties": false
       },
@@ -6345,6 +9158,108 @@
               "minLength": 1,
               "maxLength": 300
             }
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateQuizRequest": {
+        "type": "object",
+        "properties": {
+          "unitId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "lessonId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "titleAr": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "allowedModes": {
+            "type": "string",
+            "enum": [
+              "practice",
+              "exam",
+              "both"
+            ]
+          },
+          "timeLimitSeconds": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 30,
+                "maximum": 21600
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "shuffleQuestions": {
+            "type": "boolean"
+          },
+          "shuffleOptions": {
+            "type": "boolean"
+          },
+          "passingScorePercent": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "maxAttempts": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "isMockExam": {
+            "type": "boolean"
+          },
+          "allowOffline": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -8010,6 +10925,788 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/DueCardsEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/quizzes": {
+      "get": {
+        "operationId": "listQuizzes",
+        "tags": [
+          "quizzes"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "subjectId",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "teacherTrackId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "unitId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "lessonId",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudentQuizListEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/quizzes/{id}": {
+      "get": {
+        "operationId": "getQuiz",
+        "tags": [
+          "quizzes"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudentQuizEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/attempts": {
+      "post": {
+        "operationId": "startAttempt",
+        "tags": [
+          "attempts"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartAttemptRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttemptEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "listAttempts",
+        "tags": [
+          "attempts"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "in_progress",
+                "submitted",
+                "abandoned"
+              ]
+            },
+            "in": "query",
+            "name": "status",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "quizId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false
+          },
+          {
+            "schema": {
+              "default": 20,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttemptSummaryPageEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/attempts/{id}": {
+      "get": {
+        "operationId": "getAttempt",
+        "tags": [
+          "attempts"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttemptEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/attempts/{id}/answers/{questionId}": {
+      "put": {
+        "operationId": "saveAttemptAnswer",
+        "tags": [
+          "attempts"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveAnswerRequest"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "questionId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SavedAnswerEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/attempts/{id}/answers/{questionId}/check": {
+      "post": {
+        "operationId": "checkAttemptAnswer",
+        "tags": [
+          "attempts"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckAttemptAnswerRequest"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "questionId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckResultEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/attempts/{id}/submit": {
+      "post": {
+        "operationId": "submitAttempt",
+        "tags": [
+          "attempts"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitAttemptRequest"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttemptEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/mistakes": {
+      "get": {
+        "operationId": "listMistakes",
+        "tags": [
+          "mistakes"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "default": "active",
+              "type": "string",
+              "enum": [
+                "active",
+                "mastered"
+              ]
+            },
+            "in": "query",
+            "name": "status",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "subjectId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "teacherTrackId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "unitId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "lessonId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "mcq",
+                "true_false",
+                "written"
+              ]
+            },
+            "in": "query",
+            "name": "type",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MistakeListEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/mistakes/{questionId}": {
+      "delete": {
+        "operationId": "removeMistake",
+        "tags": [
+          "mistakes"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "questionId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeletedResultEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/stats/overview": {
+      "get": {
+        "operationId": "getStatsOverview",
+        "tags": [
+          "stats"
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatsOverviewEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/stats/subjects/{id}": {
+      "get": {
+        "operationId": "getSubjectStats",
+        "tags": [
+          "stats"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubjectStatsEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/stats/trend": {
+      "get": {
+        "operationId": "getStatsTrend",
+        "tags": [
+          "stats"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "default": 12,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 52
+            },
+            "in": "query",
+            "name": "weeks",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatsTrendEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/stats/flashcards": {
+      "get": {
+        "operationId": "getFlashcardStats",
+        "tags": [
+          "stats"
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlashcardStatsEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/bookmarks": {
+      "get": {
+        "operationId": "listBookmarks",
+        "tags": [
+          "bookmarks"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "question",
+                "flashcard",
+                "user_card",
+                "deck"
+              ]
+            },
+            "in": "query",
+            "name": "itemType",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookmarkListEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "addBookmark",
+        "tags": [
+          "bookmarks"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BookmarkRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookmarkEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/bookmarks/keys": {
+      "get": {
+        "operationId": "listBookmarkKeys",
+        "tags": [
+          "bookmarks"
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookmarkKeyListEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/bookmarks/{itemType}/{itemId}": {
+      "delete": {
+        "operationId": "removeBookmark",
+        "tags": [
+          "bookmarks"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "question",
+                "flashcard",
+                "user_card",
+                "deck"
+              ]
+            },
+            "in": "path",
+            "name": "itemType",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "itemId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeletedResultEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/progress": {
+      "get": {
+        "operationId": "getProgress",
+        "tags": [
+          "progress"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "subjectId",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "teacherTrackId",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScopeProgressEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/progress/resume": {
+      "get": {
+        "operationId": "getResume",
+        "tags": [
+          "progress"
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResumeListEnvelope"
                 }
               }
             }
@@ -10217,6 +13914,54 @@
         }
       }
     },
+    "/api/v1/admin/settings/learning": {
+      "get": {
+        "operationId": "adminGetLearningSettings",
+        "tags": [
+          "admin-access"
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LearningSettingsEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "adminUpdateLearningSettings",
+        "tags": [
+          "admin-access"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LearningSettings"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LearningSettingsEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/admin/promotions": {
       "get": {
         "operationId": "adminListPromotions",
@@ -11360,6 +15105,379 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/DeletedResultEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/quizzes": {
+      "get": {
+        "operationId": "adminListQuizzes",
+        "tags": [
+          "admin-quizzes"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "subjectId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "teacherTrackId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            },
+            "in": "query",
+            "name": "generalOnly",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "unitId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "lessonId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "draft",
+                "published",
+                "archived"
+              ]
+            },
+            "in": "query",
+            "name": "status",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminQuizListEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "adminCreateQuiz",
+        "tags": [
+          "admin-quizzes"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateQuizRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminQuizDetailEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/quizzes/{id}": {
+      "get": {
+        "operationId": "adminGetQuiz",
+        "tags": [
+          "admin-quizzes"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminQuizDetailEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "adminUpdateQuiz",
+        "tags": [
+          "admin-quizzes"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateQuizRequest"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminQuizDetailEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "adminDeleteQuiz",
+        "tags": [
+          "admin-quizzes"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeletedResultEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/quizzes/{id}/questions": {
+      "put": {
+        "operationId": "adminSetQuizQuestions",
+        "tags": [
+          "admin-quizzes"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuizQuestionsRequest"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminQuizDetailEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/quizzes/{id}/status": {
+      "post": {
+        "operationId": "adminSetQuizStatus",
+        "tags": [
+          "admin-quizzes"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionStatusRequest"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminQuizDetailEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/quizzes/{id}/free": {
+      "put": {
+        "operationId": "adminSetQuizFree",
+        "tags": [
+          "admin-quizzes"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionFreeRequest"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminQuizDetailEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/quizzes/reorder": {
+      "post": {
+        "operationId": "adminReorderQuizzes",
+        "tags": [
+          "admin-quizzes"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionReorderRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReorderedResultEnvelope"
                 }
               }
             }

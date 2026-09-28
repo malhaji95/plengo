@@ -4,6 +4,7 @@ import type { SrsCardState, SrsStateInput } from '@plengo/contracts';
 import { businessDay, startOfBusinessDay } from '@plengo/srs';
 import { AppError } from '../lib/app-error.js';
 import type { FlashcardRepository } from '../repositories/flashcard-repository.js';
+import type { LearningRepository } from '../repositories/learning-repository.js';
 import type { StructureRepository } from '../repositories/structure-repository.js';
 import type { TeacherRepository } from '../repositories/teacher-repository.js';
 import type { AccessService } from './access-service.js';
@@ -67,13 +68,14 @@ function decode(cursor: string | undefined) {
 export function createSrsService(deps: {
   db: Db;
   flashcardRepo: FlashcardRepository;
+  learningRepo: LearningRepository;
   flashcards: FlashcardService;
   structureRepo: StructureRepository;
   teacherRepo: TeacherRepository;
   access: AccessService;
   now?: () => Date;
 }) {
-  const { db, flashcardRepo, flashcards: cards, structureRepo, teacherRepo, access } = deps;
+  const { db, flashcardRepo, learningRepo, flashcards: cards, structureRepo, teacherRepo, access } = deps;
   const now = deps.now ?? (() => new Date());
 
   async function assertCardsExist(ids: string[]) {
@@ -177,6 +179,30 @@ export function createSrsService(deps: {
             })
             .returning({ id: cardStates.id });
           appliedStates += applied.length;
+        }
+        // The resume pointer follows the latest reviewed deck (§18).
+        const latest = body.logs
+          .filter((l) => !l.undone)
+          .sort((a, b) => Date.parse(b.reviewedAt) - Date.parse(a.reviewedAt))[0];
+        if (latest) {
+          const [deck] = await tx
+            .select({ d: flashcardDecks })
+            .from(flashcards)
+            .innerJoin(flashcardDecks, eq(flashcardDecks.id, flashcards.deckId))
+            .where(eq(flashcards.id, latest.flashcardId));
+          const reviewedAt = new Date(latest.reviewedAt);
+          if (deck && reviewedAt.getTime() <= at.getTime() + 60_000) {
+            await learningRepo.touchProgress(tx, {
+              userId,
+              subjectId: deck.d.subjectId,
+              teacherTrackId: deck.d.teacherTrackId,
+              unitId: deck.d.unitId,
+              lessonId: deck.d.lessonId,
+              type: 'deck',
+              itemId: deck.d.id,
+              at: reviewedAt,
+            });
+          }
         }
         return { acceptedLogs, appliedStates };
       });

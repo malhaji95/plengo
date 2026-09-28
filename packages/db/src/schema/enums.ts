@@ -55,3 +55,19 @@ export const difficultyEnum = pgEnum('difficulty', ['easy', 'medium', 'hard']);
 /* Spaced repetition (spec §13.4, §13.7). */
 export const srsStateEnum = pgEnum('srs_state', ['new', 'learning', 'review', 'relearning']);
 export const srsRatingEnum = pgEnum('srs_rating', ['again', 'good', 'easy']);
+
+/* Quizzes and attempts (spec §15). */
+export const quizModesEnum = pgEnum('quiz_modes', ['practice', 'exam', 'both']);
+export const attemptModeEnum = pgEnum('attempt_mode', ['practice', 'exam']);
+export const attemptSourceEnum = pgEnum('attempt_source', ['curated', 'random', 'mistakes']);
+export const attemptStatusEnum = pgEnum('attempt_status', ['in_progress', 'submitted', 'abandoned']);
+
+/* Mistake bank, bookmarks, progress (spec §16–§18). */
+export const mistakeStatusEnum = pgEnum('mistake_status', ['active', 'mastered', 'removed']);
+export const bookmarkItemTypeEnum = pgEnum('bookmark_item_type', [
+  'question',
+  'flashcard',
+  'user_card',
+  'deck',
+]);
+export const activityTypeEnum = pgEnum('activity_type', ['question', 'quiz', 'deck']);

@@ -3,6 +3,7 @@ import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
 import {
   accessSettingsSchema,
+  learningSettingsSchema,
   adminCouponListSchema,
   adminEntitlementSchema,
   adminStudentDetailSchema,
@@ -262,6 +263,42 @@ export function adminAccessRoutes(c: Container): FastifyPluginAsyncZod {
           action: 'settings.changed',
           resourceType: 'app_setting',
           resourceId: 'access',
+          metadata: { from: before, to: saved },
+          ip: request.ip,
+        });
+        return ok(saved);
+      },
+    );
+
+    app.get(
+      '/settings/learning',
+      {
+        schema: {
+          operationId: 'adminGetLearningSettings',
+          tags,
+          response: { 200: successEnvelope(learningSettingsSchema) },
+        },
+      },
+      async () => ok(await c.configService.getLearningSettings()),
+    );
+    app.put(
+      '/settings/learning',
+      {
+        schema: {
+          operationId: 'adminUpdateLearningSettings',
+          tags,
+          body: learningSettingsSchema,
+          response: { 200: successEnvelope(learningSettingsSchema) },
+        },
+      },
+      async (request) => {
+        const before = await c.configService.getLearningSettings();
+        const saved = await c.configService.setLearningSettings(request.body, authOf(request).userId);
+        await c.audit.record({
+          actorAdminId: authOf(request).userId,
+          action: 'settings.changed',
+          resourceType: 'app_setting',
+          resourceId: 'learning',
           metadata: { from: before, to: saved },
           ip: request.ip,
         });

@@ -9,3 +9,5 @@ export * from './teachers.js';
 export * from './access.js';
 export * from './questions.js';
 export * from './flashcards.js';
+export * from './quizzes.js';
+export * from './learning.js';

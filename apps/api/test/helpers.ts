@@ -82,7 +82,7 @@ export function body<T = Record<string, unknown>>(
 ): {
   success: boolean;
   data: T;
-  error: { code: string; message: string } | null;
+  error: { code: string; message: string; details?: unknown } | null;
 } {
   return res.json();
 }

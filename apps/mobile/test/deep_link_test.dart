@@ -21,6 +21,7 @@ void main() {
           access: noAccess,
           questionCount: noQuestions,
           deckCount: noQuestions,
+          quizCount: noQuestions,
         ),
       ),
     );

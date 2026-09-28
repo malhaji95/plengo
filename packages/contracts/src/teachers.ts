@@ -50,6 +50,8 @@ export const trackDetailSchema = z.object({
   questionCount: contentCountSchema,
   /** Published flashcard decks of the track. */
   deckCount: contentCountSchema,
+  /** Published quizzes of the track. */
+  quizCount: contentCountSchema,
 });
 
 export const followResultSchema = z.object({ following: z.boolean(), followerCount: z.number() });

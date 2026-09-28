@@ -8,3 +8,4 @@ export * from './teachers.js';
 export * from './access.js';
 export * from './content.js';
 export * from './srs.js';
+export * from './learning.js';

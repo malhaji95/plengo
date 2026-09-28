@@ -96,6 +96,10 @@ export function createQuestionRepository(db: Db) {
       return row ? (await attachContent([row], conn))[0]! : null;
     },
 
+    /** Rows by id, including deleted ones (attempt history and membership checks). */
+    byIds: async (ids: string[], conn: Conn = db): Promise<QuestionRow[]> =>
+      ids.length ? conn.select().from(questions).where(inArray(questions.id, ids)) : [],
+
     async getForUpdate(tx: Tx, id: string) {
       const [row] = await tx
         .select()

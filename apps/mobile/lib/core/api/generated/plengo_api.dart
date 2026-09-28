@@ -15,6 +15,12 @@ import 'clients/access_client.dart';
 import 'clients/questions_client.dart';
 import 'clients/flashcards_client.dart';
 import 'clients/srs_client.dart';
+import 'clients/quizzes_client.dart';
+import 'clients/attempts_client.dart';
+import 'clients/mistakes_client.dart';
+import 'clients/stats_client.dart';
+import 'clients/bookmarks_client.dart';
+import 'clients/progress_client.dart';
 
 /// Plengo API `v1.0.0`
 class PlengoApi {
@@ -40,6 +46,12 @@ class PlengoApi {
   QuestionsClient? _questions;
   FlashcardsClient? _flashcards;
   SrsClient? _srs;
+  QuizzesClient? _quizzes;
+  AttemptsClient? _attempts;
+  MistakesClient? _mistakes;
+  StatsClient? _stats;
+  BookmarksClient? _bookmarks;
+  ProgressClient? _progress;
 
   ConfigClient get config => _config ??= ConfigClient(_dio, baseUrl: _baseUrl);
 
@@ -62,4 +74,16 @@ class PlengoApi {
   FlashcardsClient get flashcards => _flashcards ??= FlashcardsClient(_dio, baseUrl: _baseUrl);
 
   SrsClient get srs => _srs ??= SrsClient(_dio, baseUrl: _baseUrl);
+
+  QuizzesClient get quizzes => _quizzes ??= QuizzesClient(_dio, baseUrl: _baseUrl);
+
+  AttemptsClient get attempts => _attempts ??= AttemptsClient(_dio, baseUrl: _baseUrl);
+
+  MistakesClient get mistakes => _mistakes ??= MistakesClient(_dio, baseUrl: _baseUrl);
+
+  StatsClient get stats => _stats ??= StatsClient(_dio, baseUrl: _baseUrl);
+
+  BookmarksClient get bookmarks => _bookmarks ??= BookmarksClient(_dio, baseUrl: _baseUrl);
+
+  ProgressClient get progress => _progress ??= ProgressClient(_dio, baseUrl: _baseUrl);
 }

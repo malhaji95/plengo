@@ -48,6 +48,7 @@ SubjectOutline outline(ScopeAccess access) => SubjectOutline(
   access: access,
   questionCount: noQuestions,
   deckCount: noQuestions,
+  quizCount: noQuestions,
 );
 
 Future<void> openSubject(dynamic app, WidgetTester tester) async {

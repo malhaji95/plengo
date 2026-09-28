@@ -10,7 +10,10 @@ import { createCouponCrypto } from './lib/coupon-code.js';
 import { createIpHasher } from './lib/crypto.js';
 import { createAccessRepository } from './repositories/access-repository.js';
 import { createFlashcardRepository } from './repositories/flashcard-repository.js';
+import { createAttemptRepository } from './repositories/attempt-repository.js';
+import { createLearningRepository } from './repositories/learning-repository.js';
 import { createQuestionRepository } from './repositories/question-repository.js';
+import { createQuizRepository } from './repositories/quiz-repository.js';
 import { createSessionsRepository, type SessionsRepository } from './repositories/sessions-repository.js';
 import { createStructureRepository, type StructureRepository } from './repositories/structure-repository.js';
 import { createTeacherRepository } from './repositories/teacher-repository.js';
@@ -25,6 +28,10 @@ import {
 } from './services/flashcard-service.js';
 import { createFreeRuleService, type FreeRuleService } from './services/free-rule-service.js';
 import { createSrsService, type SrsService } from './services/srs-service.js';
+import { createAttemptService, type AttemptService } from './services/attempt-service.js';
+import { createLearningService, type LearningService } from './services/learning-service.js';
+import { createQuizService, quizFreeSource, type QuizService } from './services/quiz-service.js';
+import { createStatsService, type StatsService } from './services/stats-service.js';
 import { createPromotionService, type PromotionService } from './services/promotion-service.js';
 import {
   createQuestionService,
@@ -70,6 +77,10 @@ export interface Container {
   questions: QuestionService;
   flashcards: FlashcardService;
   srs: SrsService;
+  quizzes: QuizService;
+  attempts: AttemptService;
+  learning: LearningService;
+  stats: StatsService;
   media: MediaProcessor;
   guards: Guards;
   jobHandlers: JobHandlers;
@@ -155,14 +166,17 @@ export function createContainer(
   const promotions = createPromotionService({ db, accessRepo, audit, now: overrides.now });
   const questionRepo = createQuestionRepository(db);
   const flashcardRepo = createFlashcardRepository(db);
-  // Each content table registers its free-content source (questions now; decks and quizzes later).
+  const quizRepo = createQuizRepository(db);
+  const attemptRepo = createAttemptRepository(db);
+  const learningRepo = createLearningRepository();
+  // Each content table registers its free-content source (§8.4).
   const freeRules = createFreeRuleService({
     db,
     accessRepo,
     structureRepo,
     audit,
     jobs: overrides.jobs,
-    sources: [questionFreeSource(questionRepo), deckFreeSource(flashcardRepo)],
+    sources: [questionFreeSource(questionRepo), deckFreeSource(flashcardRepo), quizFreeSource(quizRepo)],
   });
   const teacherRepo = createTeacherRepository(db);
   const questions = createQuestionService({
@@ -189,12 +203,51 @@ export function createContainer(
   const srs = createSrsService({
     db,
     flashcardRepo,
+    learningRepo,
     flashcards,
     structureRepo,
     teacherRepo,
     access,
     now: overrides.now,
   });
+  const quizzes = createQuizService({
+    db,
+    repo: quizRepo,
+    questionRepo,
+    attemptRepo,
+    structureRepo,
+    teacherRepo,
+    access,
+    freeRules,
+    audit,
+    now: overrides.now,
+  });
+  const attempts = createAttemptService({
+    db,
+    repo: attemptRepo,
+    questionRepo,
+    learningRepo,
+    quizRepo,
+    quizService: quizzes,
+    structureRepo,
+    teacherRepo,
+    access,
+    config: configService,
+    now: overrides.now,
+  });
+  const learning = createLearningService({
+    db,
+    questionRepo,
+    quizRepo,
+    flashcardRepo,
+    flashcards,
+    structureRepo,
+    teacherRepo,
+    access,
+    config: configService,
+    now: overrides.now,
+  });
+  const stats = createStatsService({ db, structureRepo, teacherRepo, access, now: overrides.now });
   const teachers = createTeacherService({
     repo: teacherRepo,
     structureRepo,
@@ -203,6 +256,7 @@ export function createContainer(
     access,
     questionCounts: (scope) => questions.counts(scope),
     deckCounts: (scope) => flashcards.counts(scope),
+    quizCounts: (scope) => quizzes.counts(scope),
   });
   const catalog = createCatalogService({
     repo: structureRepo,
@@ -211,6 +265,7 @@ export function createContainer(
     access,
     questionCounts: (scope) => questions.counts(scope),
     deckCounts: (scope) => flashcards.counts(scope),
+    quizCounts: (scope) => quizzes.counts(scope),
     subjectTracks: (id) => teachers.subjectTracks(id),
   });
 
@@ -242,6 +297,10 @@ export function createContainer(
     questions,
     flashcards,
     srs,
+    quizzes,
+    attempts,
+    learning,
+    stats,
     guards: createGuards({ auth, sessionsRepo, mobileTokens, now: overrides.now }),
     jobHandlers: {
       'media.process': (data) => media.process(data),
@@ -260,6 +319,9 @@ export function createContainer(
       },
       'questions.renormalize': async () => {
         await questions.renormalizeAnswers();
+      },
+      'attempts.abandon-stale': async () => {
+        await attempts.abandonStale();
       },
     },
   };

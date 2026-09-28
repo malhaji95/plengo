@@ -660,6 +660,294 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/quizzes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listQuizzes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/quizzes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getQuiz"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/attempts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listAttempts"];
+        put?: never;
+        post: operations["startAttempt"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/attempts/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getAttempt"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/attempts/{id}/answers/{questionId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["saveAttemptAnswer"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/attempts/{id}/answers/{questionId}/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["checkAttemptAnswer"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/attempts/{id}/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["submitAttempt"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/mistakes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listMistakes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/mistakes/{questionId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["removeMistake"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/stats/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getStatsOverview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/stats/subjects/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getSubjectStats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/stats/trend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getStatsTrend"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/stats/flashcards": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getFlashcardStats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/bookmarks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listBookmarks"];
+        put: operations["addBookmark"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/bookmarks/keys": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listBookmarkKeys"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/bookmarks/{itemType}/{itemId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["removeBookmark"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/progress": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getProgress"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/progress/resume": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getResume"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/auth/login": {
         parameters: {
             query?: never;
@@ -1445,6 +1733,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/settings/learning": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminGetLearningSettings"];
+        put: operations["adminUpdateLearningSettings"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/promotions": {
         parameters: {
             query?: never;
@@ -1749,6 +2053,102 @@ export interface paths {
         patch: operations["adminUpdateCard"];
         trace?: never;
     };
+    "/api/v1/admin/quizzes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminListQuizzes"];
+        put?: never;
+        post: operations["adminCreateQuiz"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/quizzes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminGetQuiz"];
+        put?: never;
+        post?: never;
+        delete: operations["adminDeleteQuiz"];
+        options?: never;
+        head?: never;
+        patch: operations["adminUpdateQuiz"];
+        trace?: never;
+    };
+    "/api/v1/admin/quizzes/{id}/questions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["adminSetQuizQuestions"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/quizzes/{id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["adminSetQuizStatus"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/quizzes/{id}/free": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["adminSetQuizFree"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/quizzes/reorder": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["adminReorderQuizzes"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1792,6 +2192,11 @@ export interface components {
             success: true;
             data: components["schemas"]["AccessSettings"];
             error: null;
+        };
+        Accuracy: {
+            answered: number;
+            correct: number;
+            accuracyPercent: number | null;
         };
         AdminAcceptedAnswer: {
             id: string;
@@ -1967,6 +2372,65 @@ export interface components {
             data: components["schemas"]["AdminQuestionPage"];
             error: null;
         };
+        AdminQuiz: {
+            id: string;
+            subjectId: string;
+            subjectNameAr: string;
+            teacherTrackId: string | null;
+            trackTitleAr: string | null;
+            unitId: string | null;
+            lessonId: string | null;
+            titleAr: string;
+            description: string | null;
+            /** @enum {string} */
+            allowedModes: "practice" | "exam" | "both";
+            timeLimitSeconds: number | null;
+            shuffleQuestions: boolean;
+            shuffleOptions: boolean;
+            passingScorePercent: number | null;
+            maxAttempts: number | null;
+            isMockExam: boolean;
+            allowOffline: boolean;
+            isFree: boolean;
+            /** @enum {string} */
+            freeSource: "rule" | "manual_override";
+            /** @enum {string} */
+            status: "draft" | "published" | "archived";
+            sortOrder: number;
+            contentVersion: number;
+            questionCount: number;
+            createdAt: string;
+            updatedAt: string;
+        };
+        AdminQuizDetail: {
+            quiz: components["schemas"]["AdminQuiz"];
+            questions: components["schemas"]["AdminQuizQuestion"][];
+        };
+        AdminQuizDetailEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AdminQuizDetail"];
+            error: null;
+        };
+        AdminQuizList: components["schemas"]["AdminQuiz"][];
+        AdminQuizListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AdminQuizList"];
+            error: null;
+        };
+        AdminQuizQuestion: {
+            id: string;
+            /** @enum {string} */
+            type: "mcq" | "true_false" | "written";
+            questionText: string;
+            /** @enum {string} */
+            status: "draft" | "published" | "archived";
+            isFree: boolean;
+            unitId: string | null;
+            lessonId: string | null;
+            deleted: boolean;
+        };
         AdminStudent: {
             id: string;
             email: string;
@@ -2048,8 +2512,133 @@ export interface components {
             data: components["schemas"]["AdminTrackList"];
             error: null;
         };
+        Attempt: {
+            attempt: components["schemas"]["AttemptSummary"];
+            questions: components["schemas"]["AttemptQuestion"][];
+            serverTime: string;
+        };
+        AttemptEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["Attempt"];
+            error: null;
+        };
+        AttemptFilters: {
+            subjectId?: string | null;
+            teacherTrackId?: string | null;
+            unitId?: string | null;
+            lessonId?: string | null;
+            types?: ("mcq" | "true_false" | "written")[];
+            count?: number;
+        };
+        AttemptOption: {
+            id: string;
+            text: string;
+            isCorrect: boolean | null;
+        };
+        AttemptQuestion: {
+            questionId: string;
+            /** @enum {string} */
+            type: "mcq" | "true_false" | "written";
+            unitId: string | null;
+            lessonId: string | null;
+            questionText: string;
+            options: components["schemas"]["AttemptOption"][];
+            selectedOptionId: string | null;
+            writtenAnswer: string | null;
+            flagged: boolean;
+            answeredAt: string | null;
+            timeSpentMs: number | null;
+            result: components["schemas"]["CheckResult"] | null;
+        };
+        AttemptSummary: {
+            id: string;
+            clientAttemptId: string;
+            quizId: string | null;
+            /** @enum {string} */
+            source: "curated" | "random" | "mistakes";
+            /** @enum {string} */
+            mode: "practice" | "exam";
+            titleAr: string;
+            subjectId: string | null;
+            teacherTrackId: string | null;
+            /** @enum {string} */
+            status: "in_progress" | "submitted" | "abandoned";
+            startedAt: string;
+            deadlineAt: string | null;
+            submittedAt: string | null;
+            submittedLate: boolean;
+            totalCount: number;
+            answeredCount: number;
+            correctCount: number | null;
+            wrongCount: number | null;
+            skippedCount: number | null;
+            scorePercent: number | null;
+            passingScorePercent: number | null;
+            passed: boolean | null;
+            timeSpentMs: number | null;
+        };
+        AttemptSummaryPage: {
+            items: components["schemas"]["AttemptSummary"][];
+            nextCursor: string | null;
+        };
+        AttemptSummaryPageEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AttemptSummaryPage"];
+            error: null;
+        };
         BackupCodeRequest: {
             code: string;
+        };
+        Bookmark: {
+            id: string;
+            /** @enum {string} */
+            itemType: "question" | "flashcard" | "user_card" | "deck";
+            itemId: string;
+            createdAt: string;
+            locked: boolean;
+            available: boolean;
+            titleAr: string | null;
+            subjectId: string | null;
+            subjectNameAr: string | null;
+            question: components["schemas"]["StudentQuestion"] | null;
+            deck: components["schemas"]["StudentDeck"] | null;
+            card: components["schemas"]["StudentCard"] | null;
+        };
+        BookmarkEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["Bookmark"];
+            error: null;
+        };
+        BookmarkKey: {
+            /** @enum {string} */
+            itemType: "question" | "flashcard" | "user_card" | "deck";
+            itemId: string;
+        };
+        BookmarkKeyList: components["schemas"]["BookmarkKey"][];
+        BookmarkKeyListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["BookmarkKeyList"];
+            error: null;
+        };
+        BookmarkList: {
+            items: components["schemas"]["Bookmark"][];
+            urlsExpireAt: string;
+        };
+        BookmarkListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["BookmarkList"];
+            error: null;
+        };
+        BookmarkRequest: {
+            /** @enum {string} */
+            itemType: "question" | "flashcard" | "user_card" | "deck";
+            /** Format: uuid */
+            itemId: string;
         };
         CardImage: {
             mediaId: string;
@@ -2063,6 +2652,11 @@ export interface components {
             /** Format: uuid */
             selectedOptionId?: string;
             writtenAnswer?: string;
+        };
+        CheckAttemptAnswerRequest: {
+            selectedOptionId?: string | null;
+            writtenAnswer?: string | null;
+            timeSpentMs?: number | null;
         };
         CheckResult: {
             isCorrect: boolean;
@@ -2212,6 +2806,25 @@ export interface components {
             acceptedAnswers?: string[];
             publish?: boolean;
         };
+        CreateQuizRequest: {
+            /** Format: uuid */
+            subjectId: string;
+            teacherTrackId?: string | null;
+            unitId?: string | null;
+            lessonId?: string | null;
+            titleAr: string;
+            description?: string | null;
+            /** @enum {string} */
+            allowedModes?: "practice" | "exam" | "both";
+            timeLimitSeconds?: number | null;
+            shuffleQuestions?: boolean;
+            shuffleOptions?: boolean;
+            passingScorePercent?: number | null;
+            maxAttempts?: number | null;
+            isMockExam?: boolean;
+            allowOffline?: boolean;
+            questionIds?: string[];
+        };
         CreateSubjectRequest: {
             /** Format: uuid */
             educationLevelId: string;
@@ -2276,6 +2889,10 @@ export interface components {
             success: true;
             data: components["schemas"]["CreateUploadResult"];
             error: null;
+        };
+        DayCount: {
+            date: string;
+            count: number;
         };
         DeckCards: {
             deck: components["schemas"]["StudentDeck"];
@@ -2368,6 +2985,24 @@ export interface components {
             data: components["schemas"]["FacultyList"];
             error: null;
         };
+        FlashcardStats: {
+            dueToday: number;
+            forecast: components["schemas"]["DayCount"][];
+            reviewsPerDay: components["schemas"]["DayCount"][];
+            retentionPercent: number | null;
+            byState: {
+                new: number;
+                learning: number;
+                review: number;
+                relearning: number;
+            };
+        };
+        FlashcardStatsEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["FlashcardStats"];
+            error: null;
+        };
         FollowResult: {
             following: boolean;
             followerCount: number;
@@ -2440,6 +3075,15 @@ export interface components {
             accessDurationDays?: number | null;
             accessExpiresOn?: string | null;
         };
+        LearningSettings: {
+            mistakeMasteryStreak: number;
+        };
+        LearningSettingsEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["LearningSettings"];
+            error: null;
+        };
         Lesson: {
             id: string;
             subjectId: string;
@@ -2447,6 +3091,13 @@ export interface components {
             code: string;
             titleAr: string;
             sortOrder: number;
+        };
+        LessonAccuracy: {
+            answered: number;
+            correct: number;
+            accuracyPercent: number | null;
+            lessonId: string;
+            lessonNameAr: string;
         };
         LessonEnvelope: {
             /** @constant */
@@ -2460,6 +3111,17 @@ export interface components {
             success: true;
             data: components["schemas"]["LessonList"];
             error: null;
+        };
+        LessonProgress: {
+            questionsAttempted: number;
+            questionsCorrect: number;
+            questionsTotal: number;
+            quizzesCompleted: number;
+            quizzesTotal: number;
+            flashcardsStudied: number;
+            flashcardsTotal: number;
+            completionPercent: number;
+            lessonId: string;
         };
         Me: {
             id: string;
@@ -2495,6 +3157,44 @@ export interface components {
             /** @constant */
             success: true;
             data: components["schemas"]["Me"];
+            error: null;
+        };
+        MissedQuestion: {
+            questionId: string;
+            questionText: string;
+            subjectNameAr: string;
+            wrongCount: number;
+        };
+        Mistake: {
+            questionId: string;
+            /** @enum {string} */
+            type: "mcq" | "true_false" | "written";
+            questionText: string;
+            subjectId: string;
+            subjectNameAr: string;
+            teacherTrackId: string | null;
+            trackTitleAr: string | null;
+            unitId: string | null;
+            unitNameAr: string | null;
+            lessonId: string | null;
+            lessonNameAr: string | null;
+            /** @enum {string} */
+            status: "active" | "mastered" | "removed";
+            wrongCount: number;
+            correctStreak: number;
+            firstWrongAt: string;
+            lastWrongAt: string;
+        };
+        MistakeList: {
+            items: components["schemas"]["Mistake"][];
+            activeCount: number;
+            masteredCount: number;
+            masteryStreak: number;
+        };
+        MistakeListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["MistakeList"];
             error: null;
         };
         MobileLoginRequest: {
@@ -2588,6 +3288,9 @@ export interface components {
             /** @enum {string} */
             status: "draft" | "published" | "archived";
         };
+        QuizQuestionsRequest: {
+            questionIds: string[];
+        };
         RedeemCouponRequest: {
             code: string;
         };
@@ -2678,6 +3381,29 @@ export interface components {
             data: components["schemas"]["ResetResult"];
             error: null;
         };
+        ResumeItem: {
+            subjectId: string;
+            subjectNameAr: string;
+            teacherTrackId: string | null;
+            trackTitleAr: string | null;
+            unitId: string | null;
+            unitNameAr: string | null;
+            lessonId: string | null;
+            lessonNameAr: string | null;
+            /** @enum {string} */
+            activityType: "question" | "quiz" | "deck";
+            itemId: string | null;
+            itemTitleAr: string | null;
+            attemptId: string | null;
+            lastActivityAt: string;
+        };
+        ResumeList: components["schemas"]["ResumeItem"][];
+        ResumeListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["ResumeList"];
+            error: null;
+        };
         ReviewLog: {
             /** Format: uuid */
             id: string;
@@ -2704,6 +3430,25 @@ export interface components {
         RevokeEntitlementRequest: {
             reason?: string | null;
         };
+        SaveAnswerRequest: {
+            selectedOptionId?: string | null;
+            writtenAnswer?: string | null;
+            timeSpentMs?: number | null;
+            flagged?: boolean;
+        };
+        SavedAnswer: {
+            questionId: string;
+            selectedOptionId: string | null;
+            writtenAnswer: string | null;
+            flagged: boolean;
+            answeredAt: string | null;
+        };
+        SavedAnswerEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["SavedAnswer"];
+            error: null;
+        };
         ScopeAccess: {
             hasAccess: boolean;
             reason: ("entitlement" | "promotion") | null;
@@ -2711,6 +3456,27 @@ export interface components {
             entitlementExpiresAt: string | null;
             promotionTitleAr: string | null;
             promotionEndsAt: string | null;
+        };
+        ScopeProgress: {
+            questionsAttempted: number;
+            questionsCorrect: number;
+            questionsTotal: number;
+            quizzesCompleted: number;
+            quizzesTotal: number;
+            flashcardsStudied: number;
+            flashcardsTotal: number;
+            completionPercent: number;
+            subjectId: string;
+            teacherTrackId: string | null;
+            lastActivityAt: string | null;
+            units: components["schemas"]["UnitProgress"][];
+            lessons: components["schemas"]["LessonProgress"][];
+        };
+        ScopeProgressEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["ScopeProgress"];
+            error: null;
         };
         SentResult: {
             sent: boolean;
@@ -2824,6 +3590,47 @@ export interface components {
             /** Format: uuid */
             flashcardId: string;
         };
+        StartAttemptRequest: {
+            /** Format: uuid */
+            clientAttemptId: string;
+            /** @enum {string} */
+            source: "curated" | "random" | "mistakes";
+            /** @enum {string} */
+            mode: "practice" | "exam";
+            /** Format: uuid */
+            quizId?: string;
+            filters?: components["schemas"]["AttemptFilters"];
+        };
+        StatsOverview: {
+            totals: components["schemas"]["Accuracy"];
+            quizzesCompleted: number;
+            studyDays: number;
+            currentStreak: number;
+            averageTimeMs: number | null;
+            mistakes: {
+                active: number;
+                mastered: number;
+            };
+            subjects: components["schemas"]["SubjectAccuracy"][];
+            byType: components["schemas"]["TypeAccuracy"][];
+            weakestUnits: components["schemas"]["UnitAccuracy"][];
+            mostMissed: components["schemas"]["MissedQuestion"][];
+        };
+        StatsOverviewEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["StatsOverview"];
+            error: null;
+        };
+        StatsTrend: {
+            weeks: components["schemas"]["TrendWeek"][];
+        };
+        StatsTrendEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["StatsTrend"];
+            error: null;
+        };
         StudentCard: {
             id: string;
             deckId: string;
@@ -2897,6 +3704,45 @@ export interface components {
             data: components["schemas"]["StudentQuestionPage"];
             error: null;
         };
+        StudentQuiz: {
+            id: string;
+            subjectId: string;
+            teacherTrackId: string | null;
+            unitId: string | null;
+            lessonId: string | null;
+            titleAr: string;
+            description: string | null;
+            /** @enum {string} */
+            allowedModes: "practice" | "exam" | "both";
+            timeLimitSeconds: number | null;
+            passingScorePercent: number | null;
+            maxAttempts: number | null;
+            isMockExam: boolean;
+            allowOffline: boolean;
+            isFree: boolean;
+            sortOrder: number;
+            contentVersion: number;
+            totalCount: number;
+            accessibleCount: number;
+            lockedCount: number;
+            locked: boolean;
+            attemptsUsed: number;
+            bestScorePercent: number | null;
+            inProgressAttemptId: string | null;
+        };
+        StudentQuizEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["StudentQuiz"];
+            error: null;
+        };
+        StudentQuizList: components["schemas"]["StudentQuiz"][];
+        StudentQuizListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["StudentQuizList"];
+            error: null;
+        };
         Subject: {
             id: string;
             educationLevelId: string;
@@ -2910,6 +3756,15 @@ export interface components {
             coverUrl: string | null;
             sortOrder: number;
             isActive: boolean;
+        };
+        SubjectAccuracy: {
+            answered: number;
+            correct: number;
+            accuracyPercent: number | null;
+            subjectId: string;
+            subjectNameAr: string;
+            teacherTrackId: string | null;
+            trackTitleAr: string | null;
         };
         SubjectEnvelope: {
             /** @constant */
@@ -2932,11 +3787,27 @@ export interface components {
             access: components["schemas"]["ScopeAccess"];
             questionCount: components["schemas"]["ContentCount"];
             deckCount: components["schemas"]["ContentCount"];
+            quizCount: components["schemas"]["ContentCount"];
         };
         SubjectOutlineEnvelope: {
             /** @constant */
             success: true;
             data: components["schemas"]["SubjectOutline"];
+            error: null;
+        };
+        SubjectStats: {
+            subjectId: string;
+            subjectNameAr: string;
+            totals: components["schemas"]["Accuracy"];
+            units: components["schemas"]["UnitBreakdown"][];
+            lessons: components["schemas"]["LessonAccuracy"][];
+            tracks: components["schemas"]["SubjectAccuracy"][];
+            byType: components["schemas"]["TypeAccuracy"][];
+        };
+        SubjectStatsEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["SubjectStats"];
             error: null;
         };
         SubjectTrack: {
@@ -2948,6 +3819,18 @@ export interface components {
             description: string | null;
             coverUrl: string | null;
             hasAccess: boolean;
+        };
+        SubmitAnswer: {
+            /** Format: uuid */
+            questionId: string;
+            selectedOptionId?: string | null;
+            writtenAnswer?: string | null;
+            timeSpentMs?: number | null;
+            flagged?: boolean;
+        };
+        SubmitAttemptRequest: {
+            answers: components["schemas"]["SubmitAnswer"][];
+            timeSpentMs?: number;
         };
         Teacher: {
             id: string;
@@ -3031,6 +3914,7 @@ export interface components {
             access: components["schemas"]["ScopeAccess"];
             questionCount: components["schemas"]["ContentCount"];
             deckCount: components["schemas"]["ContentCount"];
+            quizCount: components["schemas"]["ContentCount"];
         };
         TrackDetailEnvelope: {
             /** @constant */
@@ -3038,12 +3922,42 @@ export interface components {
             data: components["schemas"]["TrackDetail"];
             error: null;
         };
+        TrendWeek: {
+            answered: number;
+            correct: number;
+            accuracyPercent: number | null;
+            weekStart: string;
+        };
+        TypeAccuracy: {
+            answered: number;
+            correct: number;
+            accuracyPercent: number | null;
+            /** @enum {string} */
+            type: "mcq" | "true_false" | "written";
+        };
         Unit: {
             id: string;
             subjectId: string;
             code: string;
             titleAr: string;
             sortOrder: number;
+        };
+        UnitAccuracy: {
+            answered: number;
+            correct: number;
+            accuracyPercent: number | null;
+            unitId: string;
+            unitNameAr: string;
+            subjectId: string;
+            subjectNameAr: string;
+        };
+        UnitBreakdown: {
+            answered: number;
+            correct: number;
+            accuracyPercent: number | null;
+            unitId: string;
+            unitNameAr: string;
+            lessons: components["schemas"]["LessonAccuracy"][];
         };
         UnitEnvelope: {
             /** @constant */
@@ -3057,6 +3971,17 @@ export interface components {
             success: true;
             data: components["schemas"]["UnitList"];
             error: null;
+        };
+        UnitProgress: {
+            questionsAttempted: number;
+            questionsCorrect: number;
+            questionsTotal: number;
+            quizzesCompleted: number;
+            quizzesTotal: number;
+            flashcardsStudied: number;
+            flashcardsTotal: number;
+            completionPercent: number;
+            unitId: string;
         };
         UnitWithLessons: {
             id: string;
@@ -3151,6 +4076,21 @@ export interface components {
             options?: components["schemas"]["QuestionOption"][];
             trueFalseAnswer?: boolean;
             acceptedAnswers?: string[];
+        };
+        UpdateQuizRequest: {
+            unitId?: string | null;
+            lessonId?: string | null;
+            titleAr?: string;
+            description?: string | null;
+            /** @enum {string} */
+            allowedModes?: "practice" | "exam" | "both";
+            timeLimitSeconds?: number | null;
+            shuffleQuestions?: boolean;
+            shuffleOptions?: boolean;
+            passingScorePercent?: number | null;
+            maxAttempts?: number | null;
+            isMockExam?: boolean;
+            allowOffline?: boolean;
         };
         UpdateSubjectRequest: {
             /** Format: uuid */
@@ -4189,6 +5129,469 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DueCardsEnvelope"];
+                };
+            };
+        };
+    };
+    listQuizzes: {
+        parameters: {
+            query: {
+                subjectId: string;
+                teacherTrackId?: string;
+                unitId?: string;
+                lessonId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentQuizListEnvelope"];
+                };
+            };
+        };
+    };
+    getQuiz: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentQuizEnvelope"];
+                };
+            };
+        };
+    };
+    listAttempts: {
+        parameters: {
+            query?: {
+                status?: "in_progress" | "submitted" | "abandoned";
+                quizId?: string;
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AttemptSummaryPageEnvelope"];
+                };
+            };
+        };
+    };
+    startAttempt: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StartAttemptRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AttemptEnvelope"];
+                };
+            };
+        };
+    };
+    getAttempt: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AttemptEnvelope"];
+                };
+            };
+        };
+    };
+    saveAttemptAnswer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                questionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveAnswerRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SavedAnswerEnvelope"];
+                };
+            };
+        };
+    };
+    checkAttemptAnswer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                questionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CheckAttemptAnswerRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CheckResultEnvelope"];
+                };
+            };
+        };
+    };
+    submitAttempt: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SubmitAttemptRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AttemptEnvelope"];
+                };
+            };
+        };
+    };
+    listMistakes: {
+        parameters: {
+            query?: {
+                status?: "active" | "mastered";
+                subjectId?: string;
+                teacherTrackId?: string;
+                unitId?: string;
+                lessonId?: string;
+                type?: "mcq" | "true_false" | "written";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MistakeListEnvelope"];
+                };
+            };
+        };
+    };
+    removeMistake: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                questionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeletedResultEnvelope"];
+                };
+            };
+        };
+    };
+    getStatsOverview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StatsOverviewEnvelope"];
+                };
+            };
+        };
+    };
+    getSubjectStats: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubjectStatsEnvelope"];
+                };
+            };
+        };
+    };
+    getStatsTrend: {
+        parameters: {
+            query?: {
+                weeks?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StatsTrendEnvelope"];
+                };
+            };
+        };
+    };
+    getFlashcardStats: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FlashcardStatsEnvelope"];
+                };
+            };
+        };
+    };
+    listBookmarks: {
+        parameters: {
+            query?: {
+                itemType?: "question" | "flashcard" | "user_card" | "deck";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BookmarkListEnvelope"];
+                };
+            };
+        };
+    };
+    addBookmark: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BookmarkRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BookmarkEnvelope"];
+                };
+            };
+        };
+    };
+    listBookmarkKeys: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BookmarkKeyListEnvelope"];
+                };
+            };
+        };
+    };
+    removeBookmark: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                itemType: "question" | "flashcard" | "user_card" | "deck";
+                itemId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeletedResultEnvelope"];
+                };
+            };
+        };
+    };
+    getProgress: {
+        parameters: {
+            query: {
+                subjectId: string;
+                teacherTrackId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScopeProgressEnvelope"];
+                };
+            };
+        };
+    };
+    getResume: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResumeListEnvelope"];
                 };
             };
         };
@@ -5796,6 +7199,50 @@ export interface operations {
             };
         };
     };
+    adminGetLearningSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LearningSettingsEnvelope"];
+                };
+            };
+        };
+    };
+    adminUpdateLearningSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LearningSettings"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LearningSettingsEnvelope"];
+                };
+            };
+        };
+    };
     adminListPromotions: {
         parameters: {
             query?: never;
@@ -6518,6 +7965,229 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AdminCardEnvelope"];
+                };
+            };
+        };
+    };
+    adminListQuizzes: {
+        parameters: {
+            query?: {
+                subjectId?: string;
+                teacherTrackId?: string;
+                generalOnly?: "true" | "false";
+                unitId?: string;
+                lessonId?: string;
+                status?: "draft" | "published" | "archived";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminQuizListEnvelope"];
+                };
+            };
+        };
+    };
+    adminCreateQuiz: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateQuizRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminQuizDetailEnvelope"];
+                };
+            };
+        };
+    };
+    adminGetQuiz: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminQuizDetailEnvelope"];
+                };
+            };
+        };
+    };
+    adminDeleteQuiz: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeletedResultEnvelope"];
+                };
+            };
+        };
+    };
+    adminUpdateQuiz: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateQuizRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminQuizDetailEnvelope"];
+                };
+            };
+        };
+    };
+    adminSetQuizQuestions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuizQuestionsRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminQuizDetailEnvelope"];
+                };
+            };
+        };
+    };
+    adminSetQuizStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuestionStatusRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminQuizDetailEnvelope"];
+                };
+            };
+        };
+    };
+    adminSetQuizFree: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuestionFreeRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminQuizDetailEnvelope"];
+                };
+            };
+        };
+    };
+    adminReorderQuizzes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuestionReorderRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReorderedResultEnvelope"];
                 };
             };
         };

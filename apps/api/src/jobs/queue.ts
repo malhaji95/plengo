@@ -8,6 +8,7 @@ export const QUEUES = {
   recomputeFree: 'access.recompute-free',
   expireEntitlements: 'access.expire-entitlements',
   renormalizeAnswers: 'questions.renormalize',
+  abandonAttempts: 'attempts.abandon-stale',
 } as const;
 
 export type QueueName = (typeof QUEUES)[keyof typeof QUEUES];
@@ -23,6 +24,7 @@ export interface JobPayloads {
   };
   'access.expire-entitlements': Record<string, never>;
   'questions.renormalize': Record<string, never>;
+  'attempts.abandon-stale': Record<string, never>;
 }
 
 /** What services depend on: enqueueing only. Workers are registered at process start. */
@@ -57,6 +59,8 @@ export class PgBossQueue implements JobQueue {
     await this.boss.schedule(QUEUES.mediaCleanup, '17 * * * *');
     // Reporting only: access already follows the clock on every request (spec §8.2).
     await this.boss.schedule(QUEUES.expireEntitlements, '5 0 * * *', {}, { tz: 'Asia/Damascus' });
+    // Attempts idle for 7 days become abandoned (§15.5).
+    await this.boss.schedule(QUEUES.abandonAttempts, '20 3 * * *', {}, { tz: 'Asia/Damascus' });
     // After a deploy that bumps the normalizer version, stored accepted answers catch up (§14.5).
     await this.boss.send(QUEUES.renormalizeAnswers, {}, { singletonKey: 'startup' });
     for (const name of Object.values(QUEUES)) {

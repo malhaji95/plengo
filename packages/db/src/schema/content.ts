@@ -6,12 +6,19 @@ import {
   index,
   integer,
   pgTable,
+  primaryKey,
   text,
   timestamp,
   uniqueIndex,
   uuid,
 } from 'drizzle-orm/pg-core';
-import { contentStatusEnum, difficultyEnum, freeSourceEnum, questionTypeEnum } from './enums.js';
+import {
+  contentStatusEnum,
+  difficultyEnum,
+  freeSourceEnum,
+  questionTypeEnum,
+  quizModesEnum,
+} from './enums.js';
 import { users } from './identity.js';
 import { mediaFiles } from './media.js';
 import { lessons, subjects, units } from './structure.js';
@@ -186,4 +193,88 @@ export const flashcards = pgTable(
     deletedAt: timestamp('deleted_at', { withTimezone: true }),
   },
   (t) => [index('flashcards_deck_sort_idx').on(t.deckId, t.sortOrder)],
+);
+
+/**
+ * Curated quizzes (spec §15.1). Every question of a quiz has the quiz's access scope (§15.1.1); the
+ * service enforces it on add and reorder and again before publishing.
+ */
+export const quizzes = pgTable(
+  'quizzes',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    titleAr: text('title_ar').notNull(),
+    description: text('description'),
+    subjectId: uuid('subject_id')
+      .notNull()
+      .references(() => subjects.id),
+    teacherTrackId: uuid('teacher_track_id'),
+    unitId: uuid('unit_id'),
+    lessonId: uuid('lesson_id'),
+    allowedModes: quizModesEnum('allowed_modes').notNull().default('both'),
+    /** Exam mode only; the server sets each attempt's `deadline_at` from it. */
+    timeLimitSeconds: integer('time_limit_seconds'),
+    shuffleQuestions: boolean('shuffle_questions').notNull().default(false),
+    shuffleOptions: boolean('shuffle_options').notNull().default(false),
+    passingScorePercent: integer('passing_score_percent'),
+    maxAttempts: integer('max_attempts'),
+    /** A mock exam is all-or-nothing: one inaccessible question locks the whole quiz (§8.6). */
+    isMockExam: boolean('is_mock_exam').notNull().default(false),
+    /** Whether the quiz's answers may be included in offline packs (§22). */
+    allowOffline: boolean('allow_offline').notNull().default(true),
+    isFree: boolean('is_free').notNull().default(false),
+    freeSource: freeSourceEnum('free_source').notNull().default('rule'),
+    status: contentStatusEnum('status').notNull().default('draft'),
+    sortOrder: integer('sort_order').notNull().default(0),
+    /** Bumped by metadata, `allow_offline`, membership and question order changes (§22.3). */
+    contentVersion: integer('content_version').notNull().default(1),
+    createdByAdminId: uuid('created_by_admin_id').references(() => users.id, { onDelete: 'set null' }),
+    updatedByAdminId: uuid('updated_by_admin_id').references(() => users.id, { onDelete: 'set null' }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+    deletedAt: timestamp('deleted_at', { withTimezone: true }),
+  },
+  (t) => [
+    foreignKey({
+      name: 'quizzes_track_subject_fk',
+      columns: [t.teacherTrackId, t.subjectId],
+      foreignColumns: [teacherTracks.id, teacherTracks.subjectId],
+    }),
+    foreignKey({
+      name: 'quizzes_unit_subject_fk',
+      columns: [t.unitId, t.subjectId],
+      foreignColumns: [units.id, units.subjectId],
+    }),
+    foreignKey({
+      name: 'quizzes_lesson_subject_fk',
+      columns: [t.lessonId, t.subjectId],
+      foreignColumns: [lessons.id, lessons.subjectId],
+    }),
+    check('quizzes_time_limit_ck', sql`${t.timeLimitSeconds} is null or ${t.timeLimitSeconds} > 0`),
+    check(
+      'quizzes_passing_ck',
+      sql`${t.passingScorePercent} is null or ${t.passingScorePercent} between 0 and 100`,
+    ),
+    check('quizzes_max_attempts_ck', sql`${t.maxAttempts} is null or ${t.maxAttempts} > 0`),
+    index('quizzes_scope_idx').on(t.subjectId, t.teacherTrackId, t.status, t.sortOrder),
+    index('quizzes_unit_idx').on(t.unitId),
+    index('quizzes_lesson_idx').on(t.lessonId),
+  ],
+);
+
+export const quizQuestions = pgTable(
+  'quiz_questions',
+  {
+    quizId: uuid('quiz_id')
+      .notNull()
+      .references(() => quizzes.id, { onDelete: 'cascade' }),
+    questionId: uuid('question_id')
+      .notNull()
+      .references(() => questions.id),
+    sortOrder: integer('sort_order').notNull().default(0),
+  },
+  (t) => [
+    primaryKey({ name: 'quiz_questions_pk', columns: [t.quizId, t.questionId] }),
+    index('quiz_questions_question_idx').on(t.questionId),
+  ],
 );

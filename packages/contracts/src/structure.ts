@@ -93,6 +93,8 @@ export const subjectOutlineSchema = z.object({
   questionCount: contentCountSchema,
   /** Published general flashcard decks of the subject. */
   deckCount: contentCountSchema,
+  /** Published general quizzes of the subject. */
+  quizCount: contentCountSchema,
 });
 
 export const universityListSchema = z.array(universitySchema);
