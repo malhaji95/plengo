@@ -21,6 +21,7 @@ import { createSessionsRepository, type SessionsRepository } from './repositorie
 import { createStructureRepository, type StructureRepository } from './repositories/structure-repository.js';
 import { createTeacherRepository } from './repositories/teacher-repository.js';
 import { createUsersRepository, type UsersRepository } from './repositories/users-repository.js';
+import { createOfflineRepository } from './repositories/offline-repository.js';
 import { createReportRepository } from './repositories/report-repository.js';
 import { createUserContentRepository } from './repositories/user-content-repository.js';
 import { createAccessService, type AccessService } from './services/access-service.js';
@@ -52,6 +53,7 @@ import { createMobileTokenService, type MobileTokenService } from './services/mo
 import { createStructureService, type StructureService } from './services/structure-service.js';
 import { createTeacherService, type TeacherService } from './services/teacher-service.js';
 import { createUploadService, type UploadService } from './services/upload-service.js';
+import { createOfflineService, type OfflineService } from './services/offline-service.js';
 import { createReportService, type ReportService } from './services/report-service.js';
 import { createUserContentService, type UserContentService } from './services/user-content-service.js';
 import { MemoryStorage } from './storage/memory-storage.js';
@@ -92,6 +94,7 @@ export interface Container {
   admins: AdminService;
   userContent: UserContentService;
   reports: ReportService;
+  offline: OfflineService;
   media: MediaProcessor;
   guards: Guards;
   jobHandlers: JobHandlers;
@@ -340,6 +343,16 @@ export function createContainer(
     stats,
     admins: createAdminService({ db, auth, usersRepo, sessionsRepo, audit }),
     userContent,
+    offline: createOfflineService({
+      repo: createOfflineRepository(db),
+      questionRepo,
+      structureRepo,
+      teacherRepo,
+      access,
+      attempts,
+      storage,
+      now: overrides.now,
+    }),
     reports: createReportService({
       repo: createReportRepository(db),
       questionRepo,

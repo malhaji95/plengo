@@ -34,6 +34,7 @@ import { flashcardRoutes } from './routes/flashcards.js';
 import { healthRoutes } from './routes/health.js';
 import { learningRoutes } from './routes/learning.js';
 import { myDeckRoutes } from './routes/my-decks.js';
+import { offlineRoutes } from './routes/offline.js';
 import { meRoutes } from './routes/me.js';
 import { questionRoutes } from './routes/questions.js';
 import { teacherRoutes } from './routes/teachers.js';
@@ -134,6 +135,7 @@ export async function buildApp(app: App, c: Container): Promise<App> {
   await app.register(flashcardRoutes(c), { prefix: '/api/v1' });
   await app.register(learningRoutes(c), { prefix: '/api/v1' });
   await app.register(myDeckRoutes(c), { prefix: '/api/v1' });
+  await app.register(offlineRoutes(c), { prefix: '/api/v1' });
   await app.register(adminAuthRoutes(c), { prefix: '/api/v1/admin' });
   await app.register(uploadRoutes(c, 'admin'), { prefix: '/api/v1/admin' });
   await app.register(adminStructureRoutes(c), { prefix: '/api/v1/admin' });

@@ -13,3 +13,4 @@ export * from './quizzes.js';
 export * from './learning.js';
 export * from './admins.js';
 export * from './reports.js';
+export * from './offline.js';

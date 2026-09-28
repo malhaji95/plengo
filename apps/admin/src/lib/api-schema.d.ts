@@ -1028,6 +1028,102 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/offline/catalog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["offlineCatalog"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/offline/catalog/scope": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["offlineScopeCatalog"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/offline/packs/{packKey}/manifest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["offlineManifest"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/offline/packs/{packKey}/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["offlineItems"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/offline/licenses/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["refreshOfflineLicenses"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/offline/sync": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["syncOffline"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/auth/login": {
         parameters: {
             query?: never;
@@ -3601,6 +3697,226 @@ export interface components {
         NormalizePreviewRequest: {
             answers: string[];
         };
+        OfflineAnswer: {
+            /** Format: uuid */
+            questionId: string;
+            selectedOptionId?: string | null;
+            writtenAnswer?: string | null;
+            flagged?: boolean;
+            timeSpentMs?: number | null;
+            localIsCorrect?: boolean | null;
+        };
+        OfflineAttempt: {
+            /** Format: uuid */
+            clientAttemptId: string;
+            /** @enum {string} */
+            source: "curated" | "random" | "mistakes";
+            /** @enum {string} */
+            mode: "practice" | "exam";
+            quizId?: string | null;
+            subjectId?: string | null;
+            teacherTrackId?: string | null;
+            questionIds: string[];
+            /** Format: date-time */
+            startedAt: string;
+            /** Format: date-time */
+            submittedAt: string;
+            timeSpentMs?: number | null;
+            answers: components["schemas"]["OfflineAnswer"][];
+        };
+        OfflineCard: {
+            id: string;
+            deckId: string;
+            sortOrder: number;
+            front: components["schemas"]["OfflineImage"];
+            back: components["schemas"]["OfflineImage"];
+        };
+        OfflineCatalog: {
+            scopes: {
+                scope: components["schemas"]["OfflineScope"];
+                titleAr: string;
+                sizeBytes: number;
+                packCount: number;
+            }[];
+        };
+        OfflineCatalogEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["OfflineCatalog"];
+            error: null;
+        };
+        OfflineDeck: {
+            id: string;
+            subjectId: string;
+            teacherTrackId: string | null;
+            unitId: string | null;
+            lessonId: string | null;
+            titleAr: string;
+            description: string | null;
+            isFree: boolean;
+            sortOrder: number;
+            cardIds: string[];
+        };
+        OfflineImage: {
+            mediaId: string;
+            version: number;
+            url: string;
+            width: number | null;
+            height: number | null;
+            sizeBytes: number;
+        };
+        OfflineItem: {
+            type: components["schemas"]["OfflineItemType"];
+            id: string;
+            version: number;
+            question: components["schemas"]["OfflineQuestion"] | null;
+            deck: components["schemas"]["OfflineDeck"] | null;
+            card: components["schemas"]["OfflineCard"] | null;
+            quiz: components["schemas"]["OfflineQuiz"] | null;
+        };
+        OfflineItemsPage: {
+            items: components["schemas"]["OfflineItem"][];
+            nextCursor: string | null;
+            urlsExpireAt: string;
+        };
+        OfflineItemsPageEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["OfflineItemsPage"];
+            error: null;
+        };
+        /** @enum {string} */
+        OfflineItemType: "question" | "deck" | "card" | "quiz";
+        OfflineLease: {
+            /** @enum {string} */
+            scopeType: "subject" | "teacher_track";
+            subjectId: string | null;
+            teacherTrackId: string | null;
+            /** @enum {string} */
+            status: "active" | "none";
+            expiresAt: string | null;
+        };
+        OfflineLeases: {
+            serverTime: string;
+            leases: components["schemas"]["OfflineLease"][];
+        };
+        OfflineLeasesEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["OfflineLeases"];
+            error: null;
+        };
+        OfflineManifest: {
+            packKey: string;
+            version: string;
+            premium: boolean;
+            normalizationVersion: number;
+            items: {
+                type: components["schemas"]["OfflineItemType"];
+                id: string;
+                version: number;
+            }[];
+        };
+        OfflineManifestEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["OfflineManifest"];
+            error: null;
+        };
+        OfflinePack: {
+            packKey: string;
+            kind: components["schemas"]["OfflinePackKind"];
+            unitId: string | null;
+            deckId: string | null;
+            titleAr: string;
+            itemCount: number;
+            sizeBytes: number;
+            version: string;
+            premium: boolean;
+        };
+        /** @enum {string} */
+        OfflinePackKind: "questions" | "decks" | "quizzes" | "deck";
+        OfflineQuestion: {
+            id: string;
+            /** @enum {string} */
+            type: "mcq" | "true_false" | "written";
+            subjectId: string;
+            teacherTrackId: string | null;
+            unitId: string | null;
+            lessonId: string | null;
+            sortOrder: number;
+            difficulty: ("easy" | "medium" | "hard") | null;
+            isFree: boolean;
+            questionText: string;
+            explanation: string | null;
+            options: {
+                id: string;
+                text: string;
+                isCorrect: boolean;
+            }[];
+            acceptedAnswers: {
+                original: string;
+                normalized: string;
+                normalizationVersion: number;
+            }[];
+        };
+        OfflineQuiz: {
+            id: string;
+            subjectId: string;
+            teacherTrackId: string | null;
+            unitId: string | null;
+            lessonId: string | null;
+            titleAr: string;
+            description: string | null;
+            /** @enum {string} */
+            allowedModes: "practice" | "exam" | "both";
+            timeLimitSeconds: number | null;
+            passingScore: number | null;
+            shuffleQuestions: boolean;
+            shuffleOptions: boolean;
+            isFree: boolean;
+            questionIds: string[];
+        };
+        OfflineScope: {
+            /** @enum {string} */
+            scopeType: "subject" | "teacher_track";
+            subjectId: string | null;
+            teacherTrackId: string | null;
+        };
+        OfflineScopeCatalog: {
+            scope: components["schemas"]["OfflineScope"];
+            titleAr: string;
+            entitled: boolean;
+            packs: components["schemas"]["OfflinePack"][];
+            sizeBytes: number;
+        };
+        OfflineScopeCatalogEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["OfflineScopeCatalog"];
+            error: null;
+        };
+        OfflineSyncRequest: {
+            attempts: components["schemas"]["OfflineAttempt"][];
+        };
+        OfflineSyncResult: {
+            results: {
+                clientAttemptId: string;
+                /** @enum {string} */
+                status: "accepted" | "rejected";
+                reason: string | null;
+                attemptId: string | null;
+                correctCount: number | null;
+                totalCount: number | null;
+                mismatches: number;
+            }[];
+        };
+        OfflineSyncResultEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["OfflineSyncResult"];
+            error: null;
+        };
         PasswordConfirmRequest: {
             password: string;
         };
@@ -3660,6 +3976,14 @@ export interface components {
             success: true;
             data: components["schemas"]["RedeemResult"];
             error: null;
+        };
+        RefreshLeasesRequest: {
+            scopes: {
+                /** @enum {string} */
+                scopeType: "subject" | "teacher_track";
+                subjectId?: string | null;
+                teacherTrackId?: string | null;
+            }[];
         };
         RegisterRequest: {
             fullName: string;
@@ -6246,6 +6570,144 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ReportEnvelope"];
+                };
+            };
+        };
+    };
+    offlineCatalog: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OfflineCatalogEnvelope"];
+                };
+            };
+        };
+    };
+    offlineScopeCatalog: {
+        parameters: {
+            query: {
+                subjectId: string;
+                teacherTrackId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OfflineScopeCatalogEnvelope"];
+                };
+            };
+        };
+    };
+    offlineManifest: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                packKey: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OfflineManifestEnvelope"];
+                };
+            };
+        };
+    };
+    offlineItems: {
+        parameters: {
+            query?: {
+                ids?: string;
+                cursor?: string;
+            };
+            header?: never;
+            path: {
+                packKey: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OfflineItemsPageEnvelope"];
+                };
+            };
+        };
+    };
+    refreshOfflineLicenses: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RefreshLeasesRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OfflineLeasesEnvelope"];
+                };
+            };
+        };
+    };
+    syncOffline: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OfflineSyncRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OfflineSyncResultEnvelope"];
                 };
             };
         };

@@ -635,6 +635,128 @@ export function createAttemptService(deps: {
       return view(final);
     },
 
+    /**
+     * An attempt taken offline from downloaded packs (§22.6), idempotent by `clientAttemptId`. The
+     * server re-grades every answer; its grade is what counts. Only questions the student may use
+     * ([canUse]) are kept. Returns the attempt and the answers the device graded differently.
+     */
+    async importOffline(
+      userId: string,
+      input: {
+        clientAttemptId: string;
+        source: AttemptRow['source'];
+        mode: AttemptRow['mode'];
+        quizId?: string | null | undefined;
+        subjectId?: string | null | undefined;
+        teacherTrackId?: string | null | undefined;
+        questionIds: string[];
+        startedAt: string;
+        timeSpentMs?: number | null | undefined;
+        answers: (Answer & {
+          questionId: string;
+          flagged?: boolean | undefined;
+          localIsCorrect?: boolean | null | undefined;
+        })[];
+      },
+      canUse: (q: QuestionWithContent) => Promise<boolean>,
+    ): Promise<{
+      view: AttemptView;
+      mismatches: { questionId: string; localCorrect: boolean; serverCorrect: boolean }[];
+    }> {
+      let attempt = await repo.byClientId(userId, input.clientAttemptId);
+      if (attempt?.status === 'submitted') return { view: await view(attempt), mismatches: [] };
+      if (!attempt) {
+        let meta: Pick<
+          AttemptRow,
+          'quizId' | 'quizContentVersion' | 'titleAr' | 'subjectId' | 'teacherTrackId'
+        >;
+        if (input.source === 'curated') {
+          if (!input.quizId) invalid('quizId');
+          const quiz = await quizService.publishedQuiz(input.quizId!);
+          if (!quiz.allowOffline) invalid('quizId', 'quiz_unavailable');
+          if (quiz.allowedModes !== 'both' && quiz.allowedModes !== input.mode)
+            invalid('mode', 'not_allowed');
+          if (quiz.maxAttempts !== null) {
+            const used = (await repo.quizStats(userId, [quiz.id])).get(quiz.id)?.used ?? 0;
+            if (used >= quiz.maxAttempts) invalid('quizId', 'max_attempts');
+          }
+          meta = {
+            quizId: quiz.id,
+            quizContentVersion: quiz.contentVersion,
+            titleAr: quiz.titleAr,
+            subjectId: quiz.subjectId,
+            teacherTrackId: quiz.teacherTrackId,
+          };
+        } else {
+          meta = {
+            quizId: null,
+            quizContentVersion: null,
+            titleAr: input.source === 'random' ? 'تدريب عشوائي' : 'مراجعة الأخطاء',
+            subjectId: input.subjectId ?? null,
+            teacherTrackId: input.teacherTrackId ?? null,
+          };
+        }
+        const content = await withContent([...new Set(input.questionIds)]);
+        const usable: QuestionWithContent[] = [];
+        for (const id of new Set(input.questionIds)) {
+          const q = content.get(id);
+          if (q && !q.deletedAt && q.status === 'published' && (await canUse(q))) usable.push(q);
+        }
+        if (!usable.length) invalid('questionIds', 'no_questions');
+        const at = now();
+        const startedAt = new Date(Math.min(Date.parse(input.startedAt), at.getTime()));
+        await db.transaction(async (tx) => {
+          await repo.insert(tx, {
+            clientAttemptId: input.clientAttemptId,
+            userId,
+            ...meta,
+            source: input.source,
+            mode: input.mode,
+            filters:
+              input.source === 'curated'
+                ? null
+                : {
+                    subjectId: meta.subjectId,
+                    teacherTrackId: meta.teacherTrackId,
+                    questionIds: usable.map((q) => q.id),
+                  },
+            questionOrder: usable.map((q) => q.id),
+            optionOrders: optionOrders(usable, false),
+            startedAt,
+            // Offline attempts have no server deadline: lateness cannot be judged (§22.6).
+            deadlineAt: null,
+            totalCount: usable.length,
+            lastActivityAt: at,
+          });
+        });
+        attempt = (await repo.byClientId(userId, input.clientAttemptId))!;
+      }
+      // Answers that no longer fit the question (it changed type, or left the attempt) are skipped.
+      const content = await withContent(attempt.questionOrder);
+      const inAttempt = new Set(attempt.questionOrder);
+      const seen = new Set<string>();
+      const answers = input.answers.filter((a) => {
+        const q = content.get(a.questionId);
+        if (!q || !inAttempt.has(a.questionId) || seen.has(a.questionId)) return false;
+        seen.add(a.questionId);
+        return q.type === 'written' ? !a.selectedOptionId : a.writtenAnswer == null;
+      });
+      const submitted = await this.submit(userId, attempt.id, {
+        answers: answers.map(({ localIsCorrect: _l, ...a }) => a),
+        timeSpentMs: input.timeSpentMs ?? undefined,
+      });
+      const graded = new Map((await repo.answers(attempt.id)).map((a) => [a.questionId, a.isCorrect]));
+      const mismatches = answers.flatMap((a) => {
+        const server = graded.get(a.questionId);
+        return typeof a.localIsCorrect === 'boolean' &&
+          typeof server === 'boolean' &&
+          server !== a.localIsCorrect
+          ? [{ questionId: a.questionId, localCorrect: a.localIsCorrect, serverCorrect: server }]
+          : [];
+      });
+      return { view: submitted, mismatches };
+    },
+
     /** Nightly job (§15.5). */
     abandonStale: () => repo.abandonStale(new Date(now().getTime() - ABANDON_AFTER_MS)),
   };

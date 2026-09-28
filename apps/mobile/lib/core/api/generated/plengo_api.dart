@@ -23,6 +23,7 @@ import 'clients/bookmarks_client.dart';
 import 'clients/progress_client.dart';
 import 'clients/my_decks_client.dart';
 import 'clients/reports_client.dart';
+import 'clients/offline_client.dart';
 
 /// Plengo API `v1.0.0`
 class PlengoApi {
@@ -56,6 +57,7 @@ class PlengoApi {
   ProgressClient? _progress;
   MyDecksClient? _myDecks;
   ReportsClient? _reports;
+  OfflineClient? _offline;
 
   ConfigClient get config => _config ??= ConfigClient(_dio, baseUrl: _baseUrl);
 
@@ -94,4 +96,6 @@ class PlengoApi {
   MyDecksClient get myDecks => _myDecks ??= MyDecksClient(_dio, baseUrl: _baseUrl);
 
   ReportsClient get reports => _reports ??= ReportsClient(_dio, baseUrl: _baseUrl);
+
+  OfflineClient get offline => _offline ??= OfflineClient(_dio, baseUrl: _baseUrl);
 }
