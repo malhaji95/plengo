@@ -23,10 +23,10 @@ OfflineQuestion _$OfflineQuestionFromJson(Map<String, dynamic> json) =>
       questionText: json['questionText'] as String,
       explanation: json['explanation'] as String?,
       options: (json['options'] as List<dynamic>)
-          .map((e) => Options.fromJson(e as Map<String, dynamic>))
+          .map((e) => OfflineOption.fromJson(e as Map<String, dynamic>))
           .toList(),
       acceptedAnswers: (json['acceptedAnswers'] as List<dynamic>)
-          .map((e) => AcceptedAnswers.fromJson(e as Map<String, dynamic>))
+          .map((e) => OfflineAcceptedAnswer.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 

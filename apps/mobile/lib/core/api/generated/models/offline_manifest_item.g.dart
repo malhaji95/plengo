@@ -1,18 +1,21 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'items2.dart';
+part of 'offline_manifest_item.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-Items2 _$Items2FromJson(Map<String, dynamic> json) => Items2(
-  type: $enumDecode(_$OfflineItemTypeEnumMap, json['type']),
-  id: json['id'] as String,
-  version: (json['version'] as num).toInt(),
-);
+OfflineManifestItem _$OfflineManifestItemFromJson(Map<String, dynamic> json) =>
+    OfflineManifestItem(
+      type: $enumDecode(_$OfflineItemTypeEnumMap, json['type']),
+      id: json['id'] as String,
+      version: (json['version'] as num).toInt(),
+    );
 
-Map<String, dynamic> _$Items2ToJson(Items2 instance) => <String, dynamic>{
+Map<String, dynamic> _$OfflineManifestItemToJson(
+  OfflineManifestItem instance,
+) => <String, dynamic>{
   'type': instance.type,
   'id': instance.id,
   'version': instance.version,

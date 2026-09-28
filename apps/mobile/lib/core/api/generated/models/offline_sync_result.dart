@@ -4,7 +4,7 @@
 
 import 'package:json_annotation/json_annotation.dart';
 
-import 'results.dart';
+import 'offline_sync_outcome.dart';
 
 part 'offline_sync_result.g.dart';
 
@@ -16,7 +16,7 @@ class OfflineSyncResult {
   
   factory OfflineSyncResult.fromJson(Map<String, Object?> json) => _$OfflineSyncResultFromJson(json);
   
-  final List<Results> results;
+  final List<OfflineSyncOutcome> results;
 
   Map<String, Object?> toJson() => _$OfflineSyncResultToJson(this);
 }

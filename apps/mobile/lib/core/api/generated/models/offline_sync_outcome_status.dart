@@ -5,13 +5,13 @@
 import 'package:json_annotation/json_annotation.dart';
 
 @JsonEnum()
-enum ScopeType {
-  @JsonValue('subject')
-  subject('subject'),
-  @JsonValue('teacher_track')
-  teacherTrack('teacher_track');
+enum OfflineSyncOutcomeStatus {
+  @JsonValue('accepted')
+  accepted('accepted'),
+  @JsonValue('rejected')
+  rejected('rejected');
 
-  const ScopeType(this.json);
+  const OfflineSyncOutcomeStatus(this.json);
 
   final String? json;
   String toJson() {

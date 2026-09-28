@@ -9,7 +9,7 @@ part of 'offline_sync_result.dart';
 OfflineSyncResult _$OfflineSyncResultFromJson(Map<String, dynamic> json) =>
     OfflineSyncResult(
       results: (json['results'] as List<dynamic>)
-          .map((e) => Results.fromJson(e as Map<String, dynamic>))
+          .map((e) => OfflineSyncOutcome.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 

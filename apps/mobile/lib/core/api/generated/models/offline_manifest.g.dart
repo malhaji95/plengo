@@ -13,7 +13,7 @@ OfflineManifest _$OfflineManifestFromJson(Map<String, dynamic> json) =>
       premium: json['premium'] as bool,
       normalizationVersion: (json['normalizationVersion'] as num).toInt(),
       items: (json['items'] as List<dynamic>)
-          .map((e) => Items2.fromJson(e as Map<String, dynamic>))
+          .map((e) => OfflineManifestItem.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 

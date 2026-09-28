@@ -4,25 +4,25 @@
 
 import 'package:json_annotation/json_annotation.dart';
 
-import 'scope_type.dart';
+import 'lease_scope_scope_type.dart';
 
-part 'scopes2.g.dart';
+part 'lease_scope.g.dart';
 
 @JsonSerializable()
-class Scopes2 {
-  const Scopes2({
+class LeaseScope {
+  const LeaseScope({
     required this.scopeType,
     this.subjectId,
     this.teacherTrackId,
   });
   
-  factory Scopes2.fromJson(Map<String, Object?> json) => _$Scopes2FromJson(json);
+  factory LeaseScope.fromJson(Map<String, Object?> json) => _$LeaseScopeFromJson(json);
   
-  final ScopeType scopeType;
+  final LeaseScopeScopeType scopeType;
   @JsonKey(includeIfNull: false)
   final String? subjectId;
   @JsonKey(includeIfNull: false)
   final String? teacherTrackId;
 
-  Map<String, Object?> toJson() => _$Scopes2ToJson(this);
+  Map<String, Object?> toJson() => _$LeaseScopeToJson(this);
 }

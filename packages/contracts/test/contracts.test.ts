@@ -111,4 +111,19 @@ describe('openapi.json', () => {
       }
     }
   });
+
+  it('names nested objects whose generated Dart class would clash with dio or Flutter types', () => {
+    // swagger_parser names an unnamed nested object after its property (`options` → `Options`).
+    const reserved = new Set(['options', 'headers', 'response', 'data', 'error', 'image', 'text', 'icon']);
+    type Schema = { type?: string; properties?: Record<string, Schema>; items?: Schema };
+    const offenders: string[] = [];
+    for (const [name, schema] of Object.entries(doc.components.schemas as Record<string, Schema>)) {
+      for (const [prop, value] of Object.entries(schema.properties ?? {})) {
+        const inline = value.type === 'array' ? value.items : value;
+        if (inline?.type === 'object' && inline.properties && reserved.has(prop))
+          offenders.push(`${name}.${prop}`);
+      }
+    }
+    expect(offenders).toEqual([]);
+  });
 });

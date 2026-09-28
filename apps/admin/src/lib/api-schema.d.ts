@@ -3531,6 +3531,12 @@ export interface components {
             data: components["schemas"]["LearningSettings"];
             error: null;
         };
+        LeaseScope: {
+            /** @enum {string} */
+            scopeType: "subject" | "teacher_track";
+            subjectId?: string | null;
+            teacherTrackId?: string | null;
+        };
         Lesson: {
             id: string;
             subjectId: string;
@@ -3697,6 +3703,11 @@ export interface components {
         NormalizePreviewRequest: {
             answers: string[];
         };
+        OfflineAcceptedAnswer: {
+            original: string;
+            normalized: string;
+            normalizationVersion: number;
+        };
         OfflineAnswer: {
             /** Format: uuid */
             questionId: string;
@@ -3732,12 +3743,7 @@ export interface components {
             back: components["schemas"]["OfflineImage"];
         };
         OfflineCatalog: {
-            scopes: {
-                scope: components["schemas"]["OfflineScope"];
-                titleAr: string;
-                sizeBytes: number;
-                packCount: number;
-            }[];
+            scopes: components["schemas"]["OfflineScopeSummary"][];
         };
         OfflineCatalogEnvelope: {
             /** @constant */
@@ -3811,17 +3817,23 @@ export interface components {
             version: string;
             premium: boolean;
             normalizationVersion: number;
-            items: {
-                type: components["schemas"]["OfflineItemType"];
-                id: string;
-                version: number;
-            }[];
+            items: components["schemas"]["OfflineManifestItem"][];
         };
         OfflineManifestEnvelope: {
             /** @constant */
             success: true;
             data: components["schemas"]["OfflineManifest"];
             error: null;
+        };
+        OfflineManifestItem: {
+            type: components["schemas"]["OfflineItemType"];
+            id: string;
+            version: number;
+        };
+        OfflineOption: {
+            id: string;
+            text: string;
+            isCorrect: boolean;
         };
         OfflinePack: {
             packKey: string;
@@ -3849,16 +3861,8 @@ export interface components {
             isFree: boolean;
             questionText: string;
             explanation: string | null;
-            options: {
-                id: string;
-                text: string;
-                isCorrect: boolean;
-            }[];
-            acceptedAnswers: {
-                original: string;
-                normalized: string;
-                normalizationVersion: number;
-            }[];
+            options: components["schemas"]["OfflineOption"][];
+            acceptedAnswers: components["schemas"]["OfflineAcceptedAnswer"][];
         };
         OfflineQuiz: {
             id: string;
@@ -3896,20 +3900,27 @@ export interface components {
             data: components["schemas"]["OfflineScopeCatalog"];
             error: null;
         };
+        OfflineScopeSummary: {
+            scope: components["schemas"]["OfflineScope"];
+            titleAr: string;
+            sizeBytes: number;
+            packCount: number;
+        };
+        OfflineSyncOutcome: {
+            clientAttemptId: string;
+            /** @enum {string} */
+            status: "accepted" | "rejected";
+            reason: string | null;
+            attemptId: string | null;
+            correctCount: number | null;
+            totalCount: number | null;
+            mismatches: number;
+        };
         OfflineSyncRequest: {
             attempts: components["schemas"]["OfflineAttempt"][];
         };
         OfflineSyncResult: {
-            results: {
-                clientAttemptId: string;
-                /** @enum {string} */
-                status: "accepted" | "rejected";
-                reason: string | null;
-                attemptId: string | null;
-                correctCount: number | null;
-                totalCount: number | null;
-                mismatches: number;
-            }[];
+            results: components["schemas"]["OfflineSyncOutcome"][];
         };
         OfflineSyncResultEnvelope: {
             /** @constant */
@@ -3978,12 +3989,7 @@ export interface components {
             error: null;
         };
         RefreshLeasesRequest: {
-            scopes: {
-                /** @enum {string} */
-                scopeType: "subject" | "teacher_track";
-                subjectId?: string | null;
-                teacherTrackId?: string | null;
-            }[];
+            scopes: components["schemas"]["LeaseScope"][];
         };
         RegisterRequest: {
             fullName: string;

@@ -4,21 +4,21 @@
 
 import 'package:json_annotation/json_annotation.dart';
 
-part 'options.g.dart';
+part 'offline_option.g.dart';
 
 @JsonSerializable()
-class Options {
-  const Options({
+class OfflineOption {
+  const OfflineOption({
     required this.id,
     required this.text,
     required this.isCorrect,
   });
   
-  factory Options.fromJson(Map<String, Object?> json) => _$OptionsFromJson(json);
+  factory OfflineOption.fromJson(Map<String, Object?> json) => _$OfflineOptionFromJson(json);
   
   final String id;
   final String text;
   final bool isCorrect;
 
-  Map<String, Object?> toJson() => _$OptionsToJson(this);
+  Map<String, Object?> toJson() => _$OfflineOptionToJson(this);
 }

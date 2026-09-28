@@ -6,21 +6,21 @@ import 'package:json_annotation/json_annotation.dart';
 
 import 'offline_item_type.dart';
 
-part 'items2.g.dart';
+part 'offline_manifest_item.g.dart';
 
 @JsonSerializable()
-class Items2 {
-  const Items2({
+class OfflineManifestItem {
+  const OfflineManifestItem({
     required this.type,
     required this.id,
     required this.version,
   });
   
-  factory Items2.fromJson(Map<String, Object?> json) => _$Items2FromJson(json);
+  factory OfflineManifestItem.fromJson(Map<String, Object?> json) => _$OfflineManifestItemFromJson(json);
   
   final OfflineItemType type;
   final String id;
   final int version;
 
-  Map<String, Object?> toJson() => _$Items2ToJson(this);
+  Map<String, Object?> toJson() => _$OfflineManifestItemToJson(this);
 }

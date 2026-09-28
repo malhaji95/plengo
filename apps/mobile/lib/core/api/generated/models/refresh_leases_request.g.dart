@@ -10,7 +10,7 @@ RefreshLeasesRequest _$RefreshLeasesRequestFromJson(
   Map<String, dynamic> json,
 ) => RefreshLeasesRequest(
   scopes: (json['scopes'] as List<dynamic>)
-      .map((e) => Scopes2.fromJson(e as Map<String, dynamic>))
+      .map((e) => LeaseScope.fromJson(e as Map<String, dynamic>))
       .toList(),
 );
 

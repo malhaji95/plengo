@@ -6,23 +6,23 @@ import 'package:json_annotation/json_annotation.dart';
 
 import 'offline_scope.dart';
 
-part 'scopes.g.dart';
+part 'offline_scope_summary.g.dart';
 
 @JsonSerializable()
-class Scopes {
-  const Scopes({
+class OfflineScopeSummary {
+  const OfflineScopeSummary({
     required this.scope,
     required this.titleAr,
     required this.sizeBytes,
     required this.packCount,
   });
   
-  factory Scopes.fromJson(Map<String, Object?> json) => _$ScopesFromJson(json);
+  factory OfflineScopeSummary.fromJson(Map<String, Object?> json) => _$OfflineScopeSummaryFromJson(json);
   
   final OfflineScope scope;
   final String titleAr;
   final int sizeBytes;
   final int packCount;
 
-  Map<String, Object?> toJson() => _$ScopesToJson(this);
+  Map<String, Object?> toJson() => _$OfflineScopeSummaryToJson(this);
 }

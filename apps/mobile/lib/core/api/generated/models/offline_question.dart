@@ -4,10 +4,10 @@
 
 import 'package:json_annotation/json_annotation.dart';
 
-import 'accepted_answers.dart';
+import 'offline_accepted_answer.dart';
+import 'offline_option.dart';
 import 'offline_question_difficulty.dart';
 import 'offline_question_type.dart';
-import 'options.dart';
 
 part 'offline_question.g.dart';
 
@@ -47,8 +47,8 @@ class OfflineQuestion {
   final String questionText;
   @JsonKey(includeIfNull: true)
   final String? explanation;
-  final List<Options> options;
-  final List<AcceptedAnswers> acceptedAnswers;
+  final List<OfflineOption> options;
+  final List<OfflineAcceptedAnswer> acceptedAnswers;
 
   Map<String, Object?> toJson() => _$OfflineQuestionToJson(this);
 }

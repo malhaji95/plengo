@@ -4,13 +4,13 @@
 
 import 'package:json_annotation/json_annotation.dart';
 
-import 'status.dart';
+import 'offline_sync_outcome_status.dart';
 
-part 'results.g.dart';
+part 'offline_sync_outcome.g.dart';
 
 @JsonSerializable()
-class Results {
-  const Results({
+class OfflineSyncOutcome {
+  const OfflineSyncOutcome({
     required this.clientAttemptId,
     required this.status,
     required this.reason,
@@ -20,10 +20,10 @@ class Results {
     required this.mismatches,
   });
   
-  factory Results.fromJson(Map<String, Object?> json) => _$ResultsFromJson(json);
+  factory OfflineSyncOutcome.fromJson(Map<String, Object?> json) => _$OfflineSyncOutcomeFromJson(json);
   
   final String clientAttemptId;
-  final Status status;
+  final OfflineSyncOutcomeStatus status;
   @JsonKey(includeIfNull: true)
   final String? reason;
   @JsonKey(includeIfNull: true)
@@ -34,5 +34,5 @@ class Results {
   final int? totalCount;
   final int mismatches;
 
-  Map<String, Object?> toJson() => _$ResultsToJson(this);
+  Map<String, Object?> toJson() => _$OfflineSyncOutcomeToJson(this);
 }

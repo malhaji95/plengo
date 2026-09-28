@@ -5,13 +5,13 @@
 import 'package:json_annotation/json_annotation.dart';
 
 @JsonEnum()
-enum Status {
-  @JsonValue('accepted')
-  accepted('accepted'),
-  @JsonValue('rejected')
-  rejected('rejected');
+enum LeaseScopeScopeType {
+  @JsonValue('subject')
+  subject('subject'),
+  @JsonValue('teacher_track')
+  teacherTrack('teacher_track');
 
-  const Status(this.json);
+  const LeaseScopeScopeType(this.json);
 
   final String? json;
   String toJson() {

@@ -52,13 +52,21 @@ export const offlineScopeQuerySchema = z.object({
 });
 
 /** Scopes the student holds an entitlement for, with their total size (after redemption, §22.2). */
-export const offlineCatalogSchema = z.object({
-  scopes: z.array(
-    z.object({ scope: offlineScopeSchema, titleAr: z.string(), sizeBytes: int(), packCount: int() }),
-  ),
+export const offlineScopeSummarySchema = z.object({
+  scope: offlineScopeSchema,
+  titleAr: z.string(),
+  sizeBytes: int(),
+  packCount: int(),
 });
+export const offlineCatalogSchema = z.object({ scopes: z.array(offlineScopeSummarySchema) });
 
 export const offlineItemTypeSchema = z.enum(['question', 'deck', 'card', 'quiz']);
+
+export const offlineManifestItemSchema = z.object({
+  type: offlineItemTypeSchema,
+  id: z.string(),
+  version: int(),
+});
 
 export const offlineManifestSchema = z.object({
   packKey: z.string(),
@@ -66,7 +74,14 @@ export const offlineManifestSchema = z.object({
   premium: z.boolean(),
   /** The normalizer version the accepted answers were computed with (§22.6). */
   normalizationVersion: int(),
-  items: z.array(z.object({ type: offlineItemTypeSchema, id: z.string(), version: int() })),
+  items: z.array(offlineManifestItemSchema),
+});
+
+export const offlineOptionSchema = z.object({ id: z.string(), text: z.string(), isCorrect: z.boolean() });
+export const offlineAcceptedAnswerSchema = z.object({
+  original: z.string(),
+  normalized: z.string(),
+  normalizationVersion: int(),
 });
 
 export const offlineQuestionSchema = z.object({
@@ -81,10 +96,8 @@ export const offlineQuestionSchema = z.object({
   isFree: z.boolean(),
   questionText: z.string(),
   explanation: z.string().nullable(),
-  options: z.array(z.object({ id: z.string(), text: z.string(), isCorrect: z.boolean() })),
-  acceptedAnswers: z.array(
-    z.object({ original: z.string(), normalized: z.string(), normalizationVersion: int() }),
-  ),
+  options: z.array(offlineOptionSchema),
+  acceptedAnswers: z.array(offlineAcceptedAnswerSchema),
 });
 
 export const offlineImageSchema = z.object({
@@ -164,17 +177,12 @@ export const packKeyParamsSchema = z.object({ packKey: z.string().min(5).max(200
 
 // ---- leases ----
 
-export const refreshLeasesBodySchema = z.object({
-  scopes: z
-    .array(
-      z.object({
-        scopeType: scopeTypeSchema,
-        subjectId: z.uuid().nullable().optional(),
-        teacherTrackId: z.uuid().nullable().optional(),
-      }),
-    )
-    .max(200),
+export const leaseScopeInputSchema = z.object({
+  scopeType: scopeTypeSchema,
+  subjectId: z.uuid().nullable().optional(),
+  teacherTrackId: z.uuid().nullable().optional(),
 });
+export const refreshLeasesBodySchema = z.object({ scopes: z.array(leaseScopeInputSchema).max(200) });
 
 export const offlineLeaseSchema = offlineScopeSchema.extend({
   /** `none`: no active entitlement any more; delete this scope's premium pack data (§22.4). */
@@ -217,21 +225,18 @@ export const offlineAttemptSchema = z.object({
 
 export const offlineSyncBodySchema = z.object({ attempts: z.array(offlineAttemptSchema).max(20) });
 
-export const offlineSyncResultSchema = z.object({
-  results: z.array(
-    z.object({
-      clientAttemptId: z.string(),
-      status: z.enum(['accepted', 'rejected']),
-      /** Why an attempt was refused (e.g. `quiz_unavailable`, `no_questions`). */
-      reason: z.string().nullable(),
-      attemptId: z.string().nullable(),
-      correctCount: int().nullable(),
-      totalCount: int().nullable(),
-      /** Answers the server graded differently from the device. */
-      mismatches: int(),
-    }),
-  ),
+export const offlineSyncOutcomeSchema = z.object({
+  clientAttemptId: z.string(),
+  status: z.enum(['accepted', 'rejected']),
+  /** Why an attempt was refused (e.g. `quiz_unavailable`, `no_questions`). */
+  reason: z.string().nullable(),
+  attemptId: z.string().nullable(),
+  correctCount: int().nullable(),
+  totalCount: int().nullable(),
+  /** Answers the server graded differently from the device. */
+  mismatches: int(),
 });
+export const offlineSyncResultSchema = z.object({ results: z.array(offlineSyncOutcomeSchema) });
 
 export type OfflineScope = z.infer<typeof offlineScopeSchema>;
 export type OfflinePack = z.infer<typeof offlinePackSchema>;
@@ -243,6 +248,12 @@ const named: [z.ZodType, string][] = [
   [offlinePackKindSchema, 'OfflinePackKind'],
   [offlinePackSchema, 'OfflinePack'],
   [offlineScopeCatalogSchema, 'OfflineScopeCatalog'],
+  [offlineScopeSummarySchema, 'OfflineScopeSummary'],
+  [offlineManifestItemSchema, 'OfflineManifestItem'],
+  [offlineOptionSchema, 'OfflineOption'],
+  [offlineAcceptedAnswerSchema, 'OfflineAcceptedAnswer'],
+  [leaseScopeInputSchema, 'LeaseScopeInput'],
+  [offlineSyncOutcomeSchema, 'OfflineSyncOutcome'],
   [offlineCatalogSchema, 'OfflineCatalog'],
   [offlineItemTypeSchema, 'OfflineItemType'],
   [offlineManifestSchema, 'OfflineManifest'],

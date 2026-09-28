@@ -4,7 +4,7 @@
 
 import 'package:json_annotation/json_annotation.dart';
 
-import 'items2.dart';
+import 'offline_manifest_item.dart';
 
 part 'offline_manifest.g.dart';
 
@@ -24,7 +24,7 @@ class OfflineManifest {
   final String version;
   final bool premium;
   final int normalizationVersion;
-  final List<Items2> items;
+  final List<OfflineManifestItem> items;
 
   Map<String, Object?> toJson() => _$OfflineManifestToJson(this);
 }

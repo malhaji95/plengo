@@ -4,7 +4,7 @@
 
 import 'package:json_annotation/json_annotation.dart';
 
-import 'scopes.dart';
+import 'offline_scope_summary.dart';
 
 part 'offline_catalog.g.dart';
 
@@ -16,7 +16,7 @@ class OfflineCatalog {
   
   factory OfflineCatalog.fromJson(Map<String, Object?> json) => _$OfflineCatalogFromJson(json);
   
-  final List<Scopes> scopes;
+  final List<OfflineScopeSummary> scopes;
 
   Map<String, Object?> toJson() => _$OfflineCatalogToJson(this);
 }

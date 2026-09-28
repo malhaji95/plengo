@@ -4,7 +4,7 @@
 
 import 'package:json_annotation/json_annotation.dart';
 
-import 'scopes2.dart';
+import 'lease_scope.dart';
 
 part 'refresh_leases_request.g.dart';
 
@@ -16,7 +16,7 @@ class RefreshLeasesRequest {
   
   factory RefreshLeasesRequest.fromJson(Map<String, Object?> json) => _$RefreshLeasesRequestFromJson(json);
   
-  final List<Scopes2> scopes;
+  final List<LeaseScope> scopes;
 
   Map<String, Object?> toJson() => _$RefreshLeasesRequestToJson(this);
 }
