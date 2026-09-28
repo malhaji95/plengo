@@ -48,4 +48,8 @@ class CatalogRepository {
       ),
     )).data,
   );
+
+  /// Sets (or with null, removes) the profile photo; the upload must be processed first.
+  Future<Me> updateAvatar(String? mediaId) =>
+      guardApi(() async => (await client.api.me.updateMe(body: UpdateProfileRequest(avatarMediaId: mediaId))).data);
 }

@@ -21,6 +21,8 @@ import 'clients/mistakes_client.dart';
 import 'clients/stats_client.dart';
 import 'clients/bookmarks_client.dart';
 import 'clients/progress_client.dart';
+import 'clients/my_decks_client.dart';
+import 'clients/reports_client.dart';
 
 /// Plengo API `v1.0.0`
 class PlengoApi {
@@ -52,6 +54,8 @@ class PlengoApi {
   StatsClient? _stats;
   BookmarksClient? _bookmarks;
   ProgressClient? _progress;
+  MyDecksClient? _myDecks;
+  ReportsClient? _reports;
 
   ConfigClient get config => _config ??= ConfigClient(_dio, baseUrl: _baseUrl);
 
@@ -86,4 +90,8 @@ class PlengoApi {
   BookmarksClient get bookmarks => _bookmarks ??= BookmarksClient(_dio, baseUrl: _baseUrl);
 
   ProgressClient get progress => _progress ??= ProgressClient(_dio, baseUrl: _baseUrl);
+
+  MyDecksClient get myDecks => _myDecks ??= MyDecksClient(_dio, baseUrl: _baseUrl);
+
+  ReportsClient get reports => _reports ??= ReportsClient(_dio, baseUrl: _baseUrl);
 }

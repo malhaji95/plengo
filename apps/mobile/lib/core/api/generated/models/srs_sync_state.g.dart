@@ -17,7 +17,8 @@ SrsSyncState _$SrsSyncStateFromJson(Map<String, dynamic> json) => SrsSyncState(
   lastReviewedAt: json['lastReviewedAt'] == null
       ? null
       : DateTime.parse(json['lastReviewedAt'] as String),
-  flashcardId: json['flashcardId'] as String,
+  flashcardId: json['flashcardId'] as String?,
+  userCardId: json['userCardId'] as String?,
 );
 
 Map<String, dynamic> _$SrsSyncStateToJson(SrsSyncState instance) =>
@@ -30,7 +31,8 @@ Map<String, dynamic> _$SrsSyncStateToJson(SrsSyncState instance) =>
       'reps': instance.reps,
       'lapses': instance.lapses,
       'lastReviewedAt': instance.lastReviewedAt?.toIso8601String(),
-      'flashcardId': instance.flashcardId,
+      'flashcardId': ?instance.flashcardId,
+      'userCardId': ?instance.userCardId,
     };
 
 const _$SrsSyncStateStateEnumMap = {

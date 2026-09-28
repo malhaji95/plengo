@@ -1,11 +1,13 @@
-import { and, desc, eq, gt, inArray, isNull, lte, or, sql, type SQL } from 'drizzle-orm';
+import { and, count, desc, eq, gt, ilike, inArray, isNull, lte, or, sql, type SQL } from 'drizzle-orm';
 import {
   coupons,
   entitlements,
+  profiles,
   promotions,
   subjects,
   teacherTracks,
   teachers,
+  users,
   type Db,
   type Tx,
 } from '@plengo/db';
@@ -57,6 +59,27 @@ export const promotionRunningAt = (now: Date) =>
   and(eq(promotions.isActive, true), lte(promotions.startsAt, now), gt(promotions.endsAt, now))!;
 
 export type EntitlementRow = typeof entitlements.$inferSelect;
+
+const studentColumns = {
+  id: users.id,
+  email: users.email,
+  name: users.name,
+  fullName: profiles.fullName,
+  educationLevelId: profiles.educationLevelId,
+  emailVerified: users.emailVerified,
+  status: users.status,
+  createdAt: users.createdAt,
+};
+export type StudentRow = {
+  id: string;
+  email: string;
+  name: string;
+  fullName: string | null;
+  educationLevelId: string | null;
+  emailVerified: boolean;
+  status: 'active' | 'disabled';
+  createdAt: Date;
+};
 
 export function createAccessRepository(db: Db) {
   return {
@@ -203,6 +226,60 @@ export function createAccessRepository(db: Db) {
         .where(and(eq(entitlements.status, 'active'), lte(entitlements.expiresAt, now)))
         .returning({ id: entitlements.id });
       return rows.length;
+    },
+
+    // ---- students (admin views, §26.2) ----
+
+    async isStudent(userId: string) {
+      const [row] = await db
+        .select({ id: users.id })
+        .from(users)
+        .where(and(eq(users.id, userId), eq(users.role, 'student')))
+        .limit(1);
+      return Boolean(row);
+    },
+
+    /** Students by email, name or exact id, newest first. */
+    searchStudents: (term: string | undefined, limit: number, offset: number) =>
+      db
+        .select(studentColumns)
+        .from(users)
+        .leftJoin(profiles, eq(profiles.userId, users.id))
+        .where(
+          and(
+            eq(users.role, 'student'),
+            term
+              ? or(
+                  ilike(users.email, `%${term}%`),
+                  ilike(profiles.fullName, `%${term}%`),
+                  sql`${users.id}::text = ${term}`,
+                )
+              : undefined,
+          ),
+        )
+        .orderBy(desc(users.createdAt), desc(users.id))
+        .limit(limit)
+        .offset(offset),
+
+    async student(userId: string) {
+      const [row] = await db
+        .select(studentColumns)
+        .from(users)
+        .leftJoin(profiles, eq(profiles.userId, users.id))
+        .where(and(eq(users.id, userId), eq(users.role, 'student')))
+        .limit(1);
+      return row ?? null;
+    },
+
+    /** Active entitlements per student at `at`. */
+    async activeCounts(userIds: string[], at: Date) {
+      if (!userIds.length) return new Map<string, number>();
+      const rows = await db
+        .select({ userId: entitlements.userId, n: count() })
+        .from(entitlements)
+        .where(and(inArray(entitlements.userId, userIds), entitlementActiveAt(at)))
+        .groupBy(entitlements.userId);
+      return new Map(rows.map((r) => [r.userId, r.n]));
     },
   };
 }

@@ -22,6 +22,9 @@ import '../features/bookmarks/saved_tab.dart';
 import '../features/learning/home_tab.dart';
 import '../features/learning/mistakes_screen.dart';
 import '../features/learning/stats_screen.dart';
+import '../features/my_decks/card_editor_screen.dart';
+import '../features/my_decks/my_deck_screen.dart';
+import '../features/my_decks/my_decks_screen.dart';
 import '../features/quizzes/attempt_route.dart';
 import '../features/quizzes/quizzes_screen.dart';
 import '../features/quizzes/random_practice_screen.dart';
@@ -61,6 +64,10 @@ abstract final class Routes {
   static const dueStudy = '/review/study';
   static const mistakes = '/review/mistakes';
   static const stats = '/review/stats';
+  static const myDecks = '/review/my-decks';
+
+  /// Full-screen study and browse of the student's decks: `/my-decks/<id>/study|browse`.
+  static const myDeckStudy = '/my-decks';
   static const quizzes = '/quizzes';
   static const attempts = '/attempts';
   static const randomPractice = '/practice/random';
@@ -213,6 +220,29 @@ GoRouter buildRouter(Ref ref, {required bool couponRedemption}) {
                 routes: [
                   GoRoute(path: 'mistakes', builder: (_, _) => const MistakesScreen()),
                   GoRoute(
+                    path: 'my-decks',
+                    builder: (_, _) => const MyDecksScreen(),
+                    routes: [
+                      GoRoute(
+                        path: ':id',
+                        builder: (_, state) => MyDeckScreen(deckId: state.pathParameters['id']!),
+                        routes: [
+                          GoRoute(
+                            path: 'cards/new',
+                            builder: (_, state) => CardEditorScreen(deckId: state.pathParameters['id']!),
+                          ),
+                          GoRoute(
+                            path: 'cards/:cardId',
+                            builder: (_, state) => CardEditorScreen(
+                              deckId: state.pathParameters['id']!,
+                              cardId: state.pathParameters['cardId'],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  GoRoute(
                     path: 'stats',
                     builder: (_, _) => const StatsScreen(),
                     routes: [
@@ -252,13 +282,26 @@ GoRouter buildRouter(Ref ref, {required bool couponRedemption}) {
       ),
       GoRoute(
         path: '${Routes.decks}/:id/study',
-        builder: (_, state) =>
-            StudyScreen(source: (deckId: state.pathParameters['id']!, subjectId: null), title: 'مراجعة'),
+        builder: (_, state) => StudyScreen(
+          source: (deckId: state.pathParameters['id']!, myDeckId: null, subjectId: null),
+          title: 'مراجعة',
+        ),
+      ),
+      GoRoute(
+        path: '${Routes.myDeckStudy}/:id/study',
+        builder: (_, state) => StudyScreen(
+          source: (deckId: null, myDeckId: state.pathParameters['id']!, subjectId: null),
+          title: 'مراجعة',
+        ),
+      ),
+      GoRoute(
+        path: '${Routes.myDeckStudy}/:id/browse',
+        builder: (_, state) => MyBrowseScreen(deckId: state.pathParameters['id']!),
       ),
       GoRoute(
         path: Routes.dueStudy,
         builder: (_, state) => StudyScreen(
-          source: (deckId: null, subjectId: state.uri.queryParameters['subjectId']),
+          source: (deckId: null, myDeckId: null, subjectId: state.uri.queryParameters['subjectId']),
           title: 'كل البطاقات المستحقة',
         ),
       ),

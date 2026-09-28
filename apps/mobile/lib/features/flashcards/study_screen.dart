@@ -30,9 +30,7 @@ class StudyScreen extends ConsumerWidget {
           final previews = s.flipped ? ctl.previews() : null;
           if (card != null) {
             final upcoming = q.next == null ? const <String>[] : s.order.where((id) => id != q.next).take(3);
-            ref.read(cardImagePrefetchProvider)(context, [
-              for (final id in upcoming) ...[s.cards[id]!.front, s.cards[id]!.back],
-            ]);
+            ref.read(cardImagePrefetchProvider)(context, [for (final id in upcoming) ...s.cards[id]!.images]);
           }
           return CallbackShortcuts(
             bindings: {

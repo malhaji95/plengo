@@ -182,6 +182,7 @@ void main() {
       lapses: 0,
       lastReviewedAt: DateTime.fromMillisecondsSinceEpoch(t0 - 3 * 86400000, isUtc: true),
       flashcardId: id,
+      userCardId: null,
       updatedAt: '2026-09-24T09:00:00Z',
     );
     DueCard due(int i, String subjectId, String name) =>
@@ -192,6 +193,7 @@ void main() {
       arrangeFlashcards: (f) => when(() => f.due(subjectId: any(named: 'subjectId'))).thenAnswer(
         (_) async => DueCards(
           cards: [due(0, 'p', 'الفيزياء'), due(1, 'p', 'الفيزياء'), due(2, 'm', 'الرياضيات')],
+          userCards: const [],
           urlsExpireAt: '',
         ),
       ),

@@ -464,8 +464,44 @@ from Phase 1; Phase 2 adds the college hierarchy and admin CRUD.
   deleting a question bumps every quiz containing it. SRS sync only moves the resume pointer for
   decks the student can open.
 - **Images** meet the §12 size budgets. The full variant lowers its quality until it fits (never
-  below 45). Avatars are a media kind (400 px / 120 px); the API accepts and signs them now, and the
-  app's avatar picker comes with Phase 8.
-- **Services** reach the database only through repositories (`access-service` is the remaining
-  exception and moves with Phase 8).
+  below 45). Avatars are a media kind (400 px / 120 px); the app's picker arrived with Phase 8.
+- **Repositories**: the learning, attempt, stats, SRS, access, student-deck and report services reach
+  the database only through repositories. Older services (coupons, free rules, promotions, uploads,
+  admins, config, mobile tokens, media processing) still query directly; each moves when it is next
+  changed.
 - **Admin tests** run in CI with Vitest + Testing Library (jsdom).
+
+### ADR-018 — Student decks, student-card reviews and content reports (Phase 8)
+
+- **Ids from the device.** Decks and cards get their UUIDs on the device so they can be created
+  offline (§13.9). `POST /my-decks/sync` takes a batch of whole rows and keeps the newer one by the
+  client's `updated_at` (clamped to the server clock, so a device whose clock runs ahead cannot win
+  every later conflict). Refused items (quota, empty face, someone else's image, a locked official
+  card) come back in `rejected` instead of failing the batch; the app drops them locally and fetches
+  the feed again.
+- **Changes feed.** Every accepted write takes the next value of a per-table sequence (`sync_seq`)
+  while holding a per-student advisory lock, so one student's writes are numbered in commit order
+  and `GET /my-decks/changes?since=` never skips a row. Timestamps were rejected as the cursor:
+  rows written in the same millisecond could be skipped. Deletions stay in the feed as tombstones.
+- **Quotas** (§12.8) are counted inside the locked transaction: 50 live decks, 5,000 live cards.
+  Deleting a deck deletes its cards. Images that no live card uses any more are soft-deleted, which
+  frees the 300-image quota.
+- **"أضف إلى بطاقاتي"** stores an `official_ref` card. Adding needs access to the source card;
+  afterwards the card shows the official images only while the student can open them (`locked`
+  otherwise), leaves the due queue when locked, and can still be moved or deleted.
+- **Reviews of student cards** use the same SRS sync with `userCardId` instead of `flashcardId`
+  (exactly one per log and state). On the device, SRS rows are keyed `u:<id>` for student cards.
+  The app sends a student card's reviews only once the card itself has synced, and drops reviews
+  of cards the server refused.
+- **App storage.** `local_decks`/`local_cards` (schema v4) mirror the server rows plus a `dirty` flag
+  and the picked image bytes. Images are scaled on the device by the picker (≤ 1080 px, JPEG 80),
+  uploaded by the sync before the card is sent, and shown from the local bytes until the processed
+  image arrives. Browse and Study of the student's own decks work without a connection.
+- **Content reports** (§21): one open report per student and item (a repeat returns it), at most 20
+  new reports in any 24 hours, on published questions and cards the student can see. Admins list
+  them with filters (and the deck id for "jump to edit") and resolve or dismiss them, audited. The
+  inbox page and the optional "resolved" notification to the student come with Phases 11 and 10.
+- **Remote flags** `studentDecks` and `contentReports` hide the entry points in the app; the API stays
+  available so data syncs if a flag is turned back on.
+- **Avatars**: the account screen picks an image (≤ 800 px), uploads it as `avatar`, waits for
+  processing and then sets `avatarMediaId`.

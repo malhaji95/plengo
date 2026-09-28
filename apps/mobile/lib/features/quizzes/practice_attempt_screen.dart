@@ -6,6 +6,7 @@ import '../../core/api/api_exception.dart';
 import '../../core/api/generated/export.dart';
 import '../../shared/widgets/form_widgets.dart';
 import '../bookmarks/bookmark_button.dart';
+import '../reports/report_sheet.dart';
 import '../questions/question_view.dart';
 import 'attempt_widgets.dart';
 import 'quiz_providers.dart';
@@ -96,6 +97,7 @@ class _PracticeAttemptScreenState extends ConsumerState<PracticeAttemptScreen> {
       appBar: AppBar(
         title: Text(widget.attempt.attempt.titleAr),
         actions: [
+          ReportButton(type: ReportItemType.question, id: _q.questionId),
           BookmarkButton(type: BookmarkItemType.question, id: _q.questionId),
           TextButton(onPressed: _busy ? null : _finish, child: const Text('إنهاء')),
         ],

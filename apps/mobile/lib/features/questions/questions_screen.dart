@@ -7,6 +7,7 @@ import '../../shared/text/bidi.dart';
 import '../../shared/widgets/async_view.dart';
 import '../access/access_banner.dart';
 import '../bookmarks/bookmark_button.dart';
+import '../reports/report_sheet.dart';
 import '../subjects/catalog_providers.dart';
 import '../teachers/teacher_providers.dart';
 import 'question_providers.dart';
@@ -143,7 +144,10 @@ class _PracticeScreenState extends State<PracticeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
-        actions: [BookmarkButton(type: BookmarkItemType.question, id: q.id)],
+        actions: [
+          ReportButton(type: ReportItemType.question, id: q.id),
+          BookmarkButton(type: BookmarkItemType.question, id: q.id),
+        ],
       ),
       body: Center(
         child: ConstrainedBox(

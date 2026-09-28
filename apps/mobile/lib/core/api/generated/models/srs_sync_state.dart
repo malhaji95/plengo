@@ -19,7 +19,8 @@ class SrsSyncState {
     required this.reps,
     required this.lapses,
     required this.lastReviewedAt,
-    required this.flashcardId,
+    this.flashcardId,
+    this.userCardId,
   });
   
   factory SrsSyncState.fromJson(Map<String, Object?> json) => _$SrsSyncStateFromJson(json);
@@ -33,7 +34,10 @@ class SrsSyncState {
   final int lapses;
   @JsonKey(includeIfNull: true)
   final DateTime? lastReviewedAt;
-  final String flashcardId;
+  @JsonKey(includeIfNull: false)
+  final String? flashcardId;
+  @JsonKey(includeIfNull: false)
+  final String? userCardId;
 
   Map<String, Object?> toJson() => _$SrsSyncStateToJson(this);
 }

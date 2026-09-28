@@ -1,10 +1,12 @@
 import 'dart:math' as math;
+import 'dart:typed_data';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/api/generated/export.dart';
+import '../../core/content/study_card.dart';
 
 typedef CardImageBuilder = Widget Function(BuildContext context, CardImage image);
 
@@ -21,6 +23,12 @@ final cardImageBuilderProvider = Provider<CardImageBuilder>(
       ),
 );
 
+/// Draws an image picked on this device that has not been uploaded yet.
+final localImageBuilderProvider = Provider<Widget Function(BuildContext, Uint8List)>(
+  (ref) =>
+      (context, bytes) => Image.memory(bytes, fit: BoxFit.contain),
+);
+
 /// Warms the image cache for the next cards (spec §22.9: prefetch the next 3).
 final cardImagePrefetchProvider = Provider<void Function(BuildContext, Iterable<CardImage>)>(
   (ref) => (context, images) {
@@ -30,17 +38,17 @@ final cardImagePrefetchProvider = Provider<void Function(BuildContext, Iterable<
   },
 );
 
-/// A flashcard that flips between its front and back images.
+/// A flashcard that flips between its two faces. Official cards are images; the student's own
+/// cards can have text, an image or both on each face (spec §13.9).
 class FlashcardView extends ConsumerWidget {
   const FlashcardView({super.key, required this.card, required this.flipped, required this.onTap});
 
-  final StudentCard card;
+  final StudyCard card;
   final bool flipped;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final build = ref.watch(cardImageBuilderProvider);
     final face = flipped ? card.back : card.front;
     return Semantics(
       button: true,
@@ -61,10 +69,48 @@ class FlashcardView extends ConsumerWidget {
             ),
           ),
           child: Card(
-            key: ValueKey('${card.id}:$flipped'),
+            key: ValueKey('${card.key}:$flipped'),
             clipBehavior: Clip.antiAlias,
-            child: AspectRatio(aspectRatio: (face.width ?? 3) / (face.height ?? 2), child: build(context, face)),
+            child: CardFace(face: face),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// One face: an image-only face keeps the image's aspect ratio; text is centred below any image.
+class CardFace extends ConsumerWidget {
+  const CardFace({super.key, required this.face});
+
+  final CardFaceView face;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final build = ref.watch(cardImageBuilderProvider);
+    final image = face.localImage != null
+        ? ref.watch(localImageBuilderProvider)(context, face.localImage!)
+        : face.image != null
+        ? build(context, face.image!)
+        : null;
+    final text = face.text?.trim();
+    if (text == null || text.isEmpty) {
+      if (image == null) return const AspectRatio(aspectRatio: 3 / 2, child: SizedBox());
+      return AspectRatio(aspectRatio: (face.image?.width ?? 3) / (face.image?.height ?? 2), child: image);
+    }
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: 220),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (image != null) ...[
+              ConstrainedBox(constraints: const BoxConstraints(maxHeight: 280), child: image),
+              const SizedBox(height: 16),
+            ],
+            Text(text, textAlign: TextAlign.center, style: Theme.of(context).textTheme.titleLarge),
+          ],
         ),
       ),
     );

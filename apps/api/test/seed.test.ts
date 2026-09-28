@@ -7,6 +7,7 @@ import {
   seedLearning,
   seedQuestions,
   seedStructure,
+  seedStudentContent,
   seedTeachers,
 } from '../src/scripts/seed.js';
 import { createTestApp, type TestContext } from './helpers.js';
@@ -30,6 +31,7 @@ describe('development seed (§40)', () => {
         questions: await seedQuestions(t.c),
         decks: await seedFlashcards(t.c),
         quizzes: await seedLearning(t.c),
+        studentContent: await seedStudentContent(t.c),
       };
     };
     const first = await run();
@@ -79,6 +81,14 @@ describe('development seed (§40)', () => {
     const mistakes = await t.c.learning.mistakes(s1!.id, { status: 'active' });
     expect(mistakes.activeCount).toBeGreaterThan(0);
     expect(await t.c.learning.bookmarkKeys(s1!.id)).toHaveLength(2);
+
+    // Student 1's private deck (§13.9) and an open report (§21); the second run changes nothing.
+    expect(first.studentContent).toMatchObject({ appliedDecks: 1, appliedCards: 3, rejected: [] });
+    expect(second.studentContent).toMatchObject({ appliedDecks: 0, appliedCards: 0, rejected: [] });
+    expect(await t.c.userContent.listDecks(s1!.id)).toMatchObject([
+      { name: 'قوانين الفيزياء', cardCount: 3 },
+    ]);
+    expect(await t.c.reports.mine(s1!.id)).toMatchObject([{ status: 'open', reason: 'unclear' }]);
 
     const promos = await t.c.promotions.list();
     expect(promos.filter((p) => p.titleAr === 'عرض تجريبي منتهٍ')).toMatchObject([{ state: 'disabled' }]);

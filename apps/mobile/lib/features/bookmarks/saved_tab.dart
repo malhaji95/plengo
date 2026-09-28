@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../app/router.dart';
 import '../../core/api/generated/export.dart';
+import '../../core/content/study_card.dart';
 import '../../shared/text/bidi.dart';
 import '../../shared/widgets/async_view.dart';
 import '../flashcards/card_face.dart';
@@ -16,6 +17,7 @@ const _filters = <BookmarkItemType?, String>{
   BookmarkItemType.question: 'الأسئلة',
   BookmarkItemType.deck: 'المجموعات',
   BookmarkItemType.flashcard: 'البطاقات',
+  BookmarkItemType.userCard: 'بطاقاتي',
 };
 
 /// The Saved tab (المحفوظات, spec §17). Items the student can no longer open show as locked.
@@ -87,6 +89,7 @@ class _BookmarkTile extends StatelessWidget {
     final (IconData icon, String kind) = switch (b.itemType) {
       BookmarkItemType.question => (Icons.quiz_outlined, 'سؤال'),
       BookmarkItemType.deck => (Icons.style_outlined, 'مجموعة بطاقات'),
+      BookmarkItemType.userCard => (Icons.collections_bookmark_outlined, 'من بطاقاتي'),
       _ => (Icons.crop_portrait, 'بطاقة'),
     };
     final title = !b.available
@@ -105,7 +108,11 @@ class _BookmarkTile extends StatelessWidget {
         BookmarkItemType.deck => () => context.go('${Routes.decks}/${b.itemId}'),
         BookmarkItemType.flashcard when b.card != null => () => showDialog<void>(
           context: context,
-          builder: (_) => Dialog(child: _CardPreview(card: b.card!)),
+          builder: (_) => Dialog(child: _CardPreview(card: StudyCard.official(b.card!))),
+        ),
+        BookmarkItemType.userCard when b.userCard != null => () => showDialog<void>(
+          context: context,
+          builder: (_) => Dialog(child: _CardPreview(card: _ownCard(b.userCard!))),
         ),
         _ => null,
       };
@@ -134,7 +141,7 @@ class _BookmarkTile extends StatelessWidget {
 class _CardPreview extends StatefulWidget {
   const _CardPreview({required this.card});
 
-  final StudentCard card;
+  final StudyCard card;
 
   @override
   State<_CardPreview> createState() => _CardPreviewState();
@@ -158,3 +165,11 @@ class _CardPreviewState extends State<_CardPreview> {
     ),
   );
 }
+
+/// A saved card of the student's own, as the server sent it.
+StudyCard _ownCard(UserCard c) => StudyCard(
+  key: c.id,
+  officialId: c.officialFlashcardId,
+  front: CardFaceView(text: c.front.text, image: c.front.image),
+  back: CardFaceView(text: c.back.text, image: c.back.image),
+);

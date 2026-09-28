@@ -4,7 +4,13 @@ import 'package:go_router/go_router.dart';
 
 import '../../app/providers.dart';
 import '../../app/router.dart';
+import '../../core/api/api_exception.dart';
+import '../../core/api/generated/export.dart';
+import '../../core/content/media_uploader.dart';
+import '../../shared/widgets/network_avatar.dart';
 import '../access/access_providers.dart';
+import '../my_decks/card_editor_screen.dart';
+import '../subjects/catalog_providers.dart';
 import '../teachers/teacher_providers.dart';
 
 class AccountScreen extends ConsumerWidget {
@@ -23,7 +29,7 @@ class AccountScreen extends ConsumerWidget {
         children: [
           if (me != null)
             ListTile(
-              leading: const CircleAvatar(child: Icon(Icons.person)),
+              leading: _AvatarButton(me: me),
               title: Text(me.fullName),
               subtitle: Text(me.email, textDirection: TextDirection.ltr, textAlign: TextAlign.right),
             ),
@@ -110,4 +116,56 @@ class _SectionTitle extends StatelessWidget {
       child: Text(text, style: Theme.of(context).textTheme.titleSmall),
     );
   }
+}
+
+/// Profile photo: tap to choose a new one (uploaded, processed to 400 px, then attached).
+class _AvatarButton extends ConsumerStatefulWidget {
+  const _AvatarButton({required this.me});
+
+  final Me me;
+
+  @override
+  ConsumerState<_AvatarButton> createState() => _AvatarButtonState();
+}
+
+class _AvatarButtonState extends ConsumerState<_AvatarButton> {
+  bool _busy = false;
+
+  Future<void> _change() async {
+    final bytes = await pickImage(context, ref, maxSide: 800);
+    if (bytes == null || !mounted) return;
+    setState(() => _busy = true);
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      final uploader = MediaUploader(ref.read(apiClientProvider));
+      final id = await uploader.upload(bytes, MediaKind.avatar);
+      final media = await uploader.waitReady(id);
+      if (media.status != MediaFileStatus.ready) {
+        throw const ApiException('VALIDATION_ERROR', 'تعذرت معالجة الصورة، جرّب صورة أخرى');
+      }
+      final me = await ref.read(catalogRepositoryProvider).updateAvatar(id);
+      ref.read(authControllerProvider.notifier).setMe(me);
+    } on ApiException catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text(e.message)));
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    button: true,
+    label: 'تغيير الصورة الشخصية',
+    child: InkWell(
+      customBorder: const CircleBorder(),
+      onTap: _busy ? null : _change,
+      child: _busy
+          ? const SizedBox(
+              width: 48,
+              height: 48,
+              child: Padding(padding: EdgeInsets.all(12), child: CircularProgressIndicator()),
+            )
+          : NetworkAvatar(url: widget.me.avatarUrl, name: widget.me.fullName),
+    ),
+  );
 }

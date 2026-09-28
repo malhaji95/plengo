@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,6 +14,8 @@ import 'package:plengo/core/auth/token_store.dart';
 import 'package:plengo/core/catalog/catalog_repository.dart';
 import 'package:plengo/core/catalog/teacher_repository.dart';
 import 'package:plengo/core/content/flashcard_repository.dart';
+import 'package:plengo/core/content/my_decks_repository.dart';
+import 'package:plengo/core/content/my_decks_store.dart';
 import 'package:plengo/core/content/question_repository.dart';
 import 'package:plengo/core/db/app_database.dart';
 import 'package:plengo/core/learning/learning_repository.dart';
@@ -19,6 +23,9 @@ import 'package:plengo/core/srs/srs_store.dart';
 import 'package:plengo/features/access/access_providers.dart';
 import 'package:plengo/features/flashcards/card_face.dart';
 import 'package:plengo/features/flashcards/flashcard_providers.dart';
+import 'package:plengo/features/my_decks/card_editor_screen.dart';
+import 'package:plengo/features/my_decks/my_decks_providers.dart';
+import 'package:plengo/features/reports/report_sheet.dart';
 import 'package:plengo/features/questions/question_providers.dart';
 import 'package:plengo/features/quizzes/quiz_providers.dart';
 import 'package:plengo/features/subjects/catalog_providers.dart';
@@ -37,6 +44,10 @@ class MockQuestionRepository extends Mock implements QuestionRepository {}
 class MockFlashcardRepository extends Mock implements FlashcardRepository {}
 
 class MockLearningRepository extends Mock implements LearningRepository {}
+
+class MockMyDecksRepository extends Mock implements MyDecksRepository {}
+
+class MockReportRepository extends Mock implements ReportRepository {}
 
 const noQuestions = ContentCount(total: 0, free: 0);
 
@@ -105,6 +116,8 @@ typedef PumpedApp = ({
   MockQuestionRepository questions,
   MockFlashcardRepository flashcards,
   MockLearningRepository learning,
+  MockMyDecksRepository myDecks,
+  MockReportRepository reports,
   AppDatabase db,
   ProviderContainer container,
 });
@@ -121,8 +134,10 @@ Future<PumpedApp> pumpApp(
   void Function(MockQuestionRepository questions)? arrangeQuestions,
   void Function(MockFlashcardRepository flashcards)? arrangeFlashcards,
   void Function(MockLearningRepository learning)? arrangeLearning,
+  void Function(MockMyDecksRepository myDecks)? arrangeMyDecks,
   int Function()? clock,
   RemoteConfig? config,
+  Uint8List? pickedImage,
   bool couponRedemption = true,
 }) async {
   registerFallbacks();
@@ -149,7 +164,7 @@ Future<PumpedApp> pumpApp(
   arrangeQuestions?.call(questions);
 
   final flashcards = MockFlashcardRepository();
-  when(() => flashcards.push(any())).thenAnswer((_) async => 0);
+  when(() => flashcards.push(any(), ready: any(named: 'ready'))).thenAnswer((_) async => 0);
   when(() => flashcards.pull(any())).thenAnswer((_) async {});
   arrangeFlashcards?.call(flashcards);
 
@@ -160,6 +175,12 @@ Future<PumpedApp> pumpApp(
     () => learning.progress(any(), teacherTrackId: any(named: 'teacherTrackId')),
   ).thenAnswer((i) async => emptyProgress(i.positionalArguments.first as String));
   arrangeLearning?.call(learning);
+
+  final myDecks = MockMyDecksRepository();
+  when(() => myDecks.push(any())).thenAnswer((_) async => const MyDecksSyncReport());
+  when(() => myDecks.pull(any())).thenAnswer((_) async {});
+  arrangeMyDecks?.call(myDecks);
+  final reports = MockReportRepository();
 
   final db = AppDatabase(NativeDatabase.memory());
   addTearDown(db.close);
@@ -175,8 +196,12 @@ Future<PumpedApp> pumpApp(
       questionRepositoryProvider.overrideWithValue(questions),
       flashcardRepositoryProvider.overrideWithValue(flashcards),
       learningRepositoryProvider.overrideWithValue(learning),
+      myDecksRepositoryProvider.overrideWithValue(myDecks),
+      reportRepositoryProvider.overrideWithValue(reports),
+      imagePickProvider.overrideWithValue(({required camera, required maxSide}) async => pickedImage),
       cardImageBuilderProvider.overrideWithValue((_, image) => Center(child: Text('img:${image.mediaId}'))),
       cardImagePrefetchProvider.overrideWithValue((_, _) {}),
+      localImageBuilderProvider.overrideWithValue((_, bytes) => Text('local-image:${bytes.length}')),
       if (clock != null) clockProvider.overrideWithValue(clock),
       couponRedemptionProvider.overrideWithValue(couponRedemption),
       remoteConfigProvider.overrideWith((ref) async => config),
@@ -194,6 +219,8 @@ Future<PumpedApp> pumpApp(
     questions: questions,
     flashcards: flashcards,
     learning: learning,
+    myDecks: myDecks,
+    reports: reports,
     db: db,
     container: container,
   );
@@ -203,6 +230,9 @@ void registerFallbacks() {
   registerFallbackValue((levelId: '', universityId: null, facultyId: null, academicYearId: null));
   registerFallbackValue((subjectId: '', teacherTrackId: null, unitId: null, lessonId: null));
   registerFallbackValue(SrsStore(AppDatabase(NativeDatabase.memory())));
+  registerFallbackValue(MyDecksStore(AppDatabase(NativeDatabase.memory())));
+  registerFallbackValue(ReportItemType.question);
+  registerFallbackValue(ReportReason.other);
 }
 
 Finder fieldByKey(String key) => find.byKey(Key(key));

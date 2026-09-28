@@ -2269,6 +2269,1618 @@ class ExamAnswersCompanion extends UpdateCompanion<ExamAnswerRow> {
   }
 }
 
+class $LocalDecksTable extends LocalDecks
+    with TableInfo<$LocalDecksTable, LocalDeckRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $LocalDecksTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _subjectIdMeta = const VerificationMeta(
+    'subjectId',
+  );
+  @override
+  late final GeneratedColumn<String> subjectId = GeneratedColumn<String>(
+    'subject_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _colorMeta = const VerificationMeta('color');
+  @override
+  late final GeneratedColumn<String> color = GeneratedColumn<String>(
+    'color',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _sortOrderMeta = const VerificationMeta(
+    'sortOrder',
+  );
+  @override
+  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
+    'sort_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<int> deletedAt = GeneratedColumn<int>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _dirtyMeta = const VerificationMeta('dirty');
+  @override
+  late final GeneratedColumn<bool> dirty = GeneratedColumn<bool>(
+    'dirty',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("dirty" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    subjectId,
+    color,
+    sortOrder,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    dirty,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'local_decks';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<LocalDeckRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('subject_id')) {
+      context.handle(
+        _subjectIdMeta,
+        subjectId.isAcceptableOrUnknown(data['subject_id']!, _subjectIdMeta),
+      );
+    }
+    if (data.containsKey('color')) {
+      context.handle(
+        _colorMeta,
+        color.isAcceptableOrUnknown(data['color']!, _colorMeta),
+      );
+    }
+    if (data.containsKey('sort_order')) {
+      context.handle(
+        _sortOrderMeta,
+        sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sortOrderMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    if (data.containsKey('dirty')) {
+      context.handle(
+        _dirtyMeta,
+        dirty.isAcceptableOrUnknown(data['dirty']!, _dirtyMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  LocalDeckRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LocalDeckRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      subjectId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}subject_id'],
+      ),
+      color: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}color'],
+      ),
+      sortOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sort_order'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}deleted_at'],
+      ),
+      dirty: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}dirty'],
+      )!,
+    );
+  }
+
+  @override
+  $LocalDecksTable createAlias(String alias) {
+    return $LocalDecksTable(attachedDatabase, alias);
+  }
+}
+
+class LocalDeckRow extends DataClass implements Insertable<LocalDeckRow> {
+  final String id;
+  final String name;
+  final String? subjectId;
+  final String? color;
+  final int sortOrder;
+  final int createdAt;
+  final int updatedAt;
+  final int? deletedAt;
+  final bool dirty;
+  const LocalDeckRow({
+    required this.id,
+    required this.name,
+    this.subjectId,
+    this.color,
+    required this.sortOrder,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+    required this.dirty,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['name'] = Variable<String>(name);
+    if (!nullToAbsent || subjectId != null) {
+      map['subject_id'] = Variable<String>(subjectId);
+    }
+    if (!nullToAbsent || color != null) {
+      map['color'] = Variable<String>(color);
+    }
+    map['sort_order'] = Variable<int>(sortOrder);
+    map['created_at'] = Variable<int>(createdAt);
+    map['updated_at'] = Variable<int>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<int>(deletedAt);
+    }
+    map['dirty'] = Variable<bool>(dirty);
+    return map;
+  }
+
+  LocalDecksCompanion toCompanion(bool nullToAbsent) {
+    return LocalDecksCompanion(
+      id: Value(id),
+      name: Value(name),
+      subjectId: subjectId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(subjectId),
+      color: color == null && nullToAbsent
+          ? const Value.absent()
+          : Value(color),
+      sortOrder: Value(sortOrder),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+      dirty: Value(dirty),
+    );
+  }
+
+  factory LocalDeckRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LocalDeckRow(
+      id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      subjectId: serializer.fromJson<String?>(json['subjectId']),
+      color: serializer.fromJson<String?>(json['color']),
+      sortOrder: serializer.fromJson<int>(json['sortOrder']),
+      createdAt: serializer.fromJson<int>(json['createdAt']),
+      updatedAt: serializer.fromJson<int>(json['updatedAt']),
+      deletedAt: serializer.fromJson<int?>(json['deletedAt']),
+      dirty: serializer.fromJson<bool>(json['dirty']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String>(name),
+      'subjectId': serializer.toJson<String?>(subjectId),
+      'color': serializer.toJson<String?>(color),
+      'sortOrder': serializer.toJson<int>(sortOrder),
+      'createdAt': serializer.toJson<int>(createdAt),
+      'updatedAt': serializer.toJson<int>(updatedAt),
+      'deletedAt': serializer.toJson<int?>(deletedAt),
+      'dirty': serializer.toJson<bool>(dirty),
+    };
+  }
+
+  LocalDeckRow copyWith({
+    String? id,
+    String? name,
+    Value<String?> subjectId = const Value.absent(),
+    Value<String?> color = const Value.absent(),
+    int? sortOrder,
+    int? createdAt,
+    int? updatedAt,
+    Value<int?> deletedAt = const Value.absent(),
+    bool? dirty,
+  }) => LocalDeckRow(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    subjectId: subjectId.present ? subjectId.value : this.subjectId,
+    color: color.present ? color.value : this.color,
+    sortOrder: sortOrder ?? this.sortOrder,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    dirty: dirty ?? this.dirty,
+  );
+  LocalDeckRow copyWithCompanion(LocalDecksCompanion data) {
+    return LocalDeckRow(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      subjectId: data.subjectId.present ? data.subjectId.value : this.subjectId,
+      color: data.color.present ? data.color.value : this.color,
+      sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      dirty: data.dirty.present ? data.dirty.value : this.dirty,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LocalDeckRow(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('subjectId: $subjectId, ')
+          ..write('color: $color, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('dirty: $dirty')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    name,
+    subjectId,
+    color,
+    sortOrder,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    dirty,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LocalDeckRow &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.subjectId == this.subjectId &&
+          other.color == this.color &&
+          other.sortOrder == this.sortOrder &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt &&
+          other.dirty == this.dirty);
+}
+
+class LocalDecksCompanion extends UpdateCompanion<LocalDeckRow> {
+  final Value<String> id;
+  final Value<String> name;
+  final Value<String?> subjectId;
+  final Value<String?> color;
+  final Value<int> sortOrder;
+  final Value<int> createdAt;
+  final Value<int> updatedAt;
+  final Value<int?> deletedAt;
+  final Value<bool> dirty;
+  final Value<int> rowid;
+  const LocalDecksCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.subjectId = const Value.absent(),
+    this.color = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.dirty = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  LocalDecksCompanion.insert({
+    required String id,
+    required String name,
+    this.subjectId = const Value.absent(),
+    this.color = const Value.absent(),
+    required int sortOrder,
+    required int createdAt,
+    required int updatedAt,
+    this.deletedAt = const Value.absent(),
+    this.dirty = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       name = Value(name),
+       sortOrder = Value(sortOrder),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<LocalDeckRow> custom({
+    Expression<String>? id,
+    Expression<String>? name,
+    Expression<String>? subjectId,
+    Expression<String>? color,
+    Expression<int>? sortOrder,
+    Expression<int>? createdAt,
+    Expression<int>? updatedAt,
+    Expression<int>? deletedAt,
+    Expression<bool>? dirty,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (subjectId != null) 'subject_id': subjectId,
+      if (color != null) 'color': color,
+      if (sortOrder != null) 'sort_order': sortOrder,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (dirty != null) 'dirty': dirty,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  LocalDecksCompanion copyWith({
+    Value<String>? id,
+    Value<String>? name,
+    Value<String?>? subjectId,
+    Value<String?>? color,
+    Value<int>? sortOrder,
+    Value<int>? createdAt,
+    Value<int>? updatedAt,
+    Value<int?>? deletedAt,
+    Value<bool>? dirty,
+    Value<int>? rowid,
+  }) {
+    return LocalDecksCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      subjectId: subjectId ?? this.subjectId,
+      color: color ?? this.color,
+      sortOrder: sortOrder ?? this.sortOrder,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      dirty: dirty ?? this.dirty,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (subjectId.present) {
+      map['subject_id'] = Variable<String>(subjectId.value);
+    }
+    if (color.present) {
+      map['color'] = Variable<String>(color.value);
+    }
+    if (sortOrder.present) {
+      map['sort_order'] = Variable<int>(sortOrder.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<int>(deletedAt.value);
+    }
+    if (dirty.present) {
+      map['dirty'] = Variable<bool>(dirty.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LocalDecksCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('subjectId: $subjectId, ')
+          ..write('color: $color, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('dirty: $dirty, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $LocalCardsTable extends LocalCards
+    with TableInfo<$LocalCardsTable, LocalCardRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $LocalCardsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deckIdMeta = const VerificationMeta('deckId');
+  @override
+  late final GeneratedColumn<String> deckId = GeneratedColumn<String>(
+    'deck_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _kindMeta = const VerificationMeta('kind');
+  @override
+  late final GeneratedColumn<String> kind = GeneratedColumn<String>(
+    'kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _officialFlashcardIdMeta =
+      const VerificationMeta('officialFlashcardId');
+  @override
+  late final GeneratedColumn<String> officialFlashcardId =
+      GeneratedColumn<String>(
+        'official_flashcard_id',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _frontTextMeta = const VerificationMeta(
+    'frontText',
+  );
+  @override
+  late final GeneratedColumn<String> frontText = GeneratedColumn<String>(
+    'front_text',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _backTextMeta = const VerificationMeta(
+    'backText',
+  );
+  @override
+  late final GeneratedColumn<String> backText = GeneratedColumn<String>(
+    'back_text',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _frontMediaIdMeta = const VerificationMeta(
+    'frontMediaId',
+  );
+  @override
+  late final GeneratedColumn<String> frontMediaId = GeneratedColumn<String>(
+    'front_media_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _backMediaIdMeta = const VerificationMeta(
+    'backMediaId',
+  );
+  @override
+  late final GeneratedColumn<String> backMediaId = GeneratedColumn<String>(
+    'back_media_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _frontImageJsonMeta = const VerificationMeta(
+    'frontImageJson',
+  );
+  @override
+  late final GeneratedColumn<String> frontImageJson = GeneratedColumn<String>(
+    'front_image_json',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _backImageJsonMeta = const VerificationMeta(
+    'backImageJson',
+  );
+  @override
+  late final GeneratedColumn<String> backImageJson = GeneratedColumn<String>(
+    'back_image_json',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _frontLocalImageMeta = const VerificationMeta(
+    'frontLocalImage',
+  );
+  @override
+  late final GeneratedColumn<Uint8List> frontLocalImage =
+      GeneratedColumn<Uint8List>(
+        'front_local_image',
+        aliasedName,
+        true,
+        type: DriftSqlType.blob,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _backLocalImageMeta = const VerificationMeta(
+    'backLocalImage',
+  );
+  @override
+  late final GeneratedColumn<Uint8List> backLocalImage =
+      GeneratedColumn<Uint8List>(
+        'back_local_image',
+        aliasedName,
+        true,
+        type: DriftSqlType.blob,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _lockedMeta = const VerificationMeta('locked');
+  @override
+  late final GeneratedColumn<bool> locked = GeneratedColumn<bool>(
+    'locked',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("locked" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _sortOrderMeta = const VerificationMeta(
+    'sortOrder',
+  );
+  @override
+  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
+    'sort_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<int> deletedAt = GeneratedColumn<int>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _dirtyMeta = const VerificationMeta('dirty');
+  @override
+  late final GeneratedColumn<bool> dirty = GeneratedColumn<bool>(
+    'dirty',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("dirty" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    deckId,
+    kind,
+    officialFlashcardId,
+    frontText,
+    backText,
+    frontMediaId,
+    backMediaId,
+    frontImageJson,
+    backImageJson,
+    frontLocalImage,
+    backLocalImage,
+    locked,
+    sortOrder,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    dirty,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'local_cards';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<LocalCardRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('deck_id')) {
+      context.handle(
+        _deckIdMeta,
+        deckId.isAcceptableOrUnknown(data['deck_id']!, _deckIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_deckIdMeta);
+    }
+    if (data.containsKey('kind')) {
+      context.handle(
+        _kindMeta,
+        kind.isAcceptableOrUnknown(data['kind']!, _kindMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_kindMeta);
+    }
+    if (data.containsKey('official_flashcard_id')) {
+      context.handle(
+        _officialFlashcardIdMeta,
+        officialFlashcardId.isAcceptableOrUnknown(
+          data['official_flashcard_id']!,
+          _officialFlashcardIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('front_text')) {
+      context.handle(
+        _frontTextMeta,
+        frontText.isAcceptableOrUnknown(data['front_text']!, _frontTextMeta),
+      );
+    }
+    if (data.containsKey('back_text')) {
+      context.handle(
+        _backTextMeta,
+        backText.isAcceptableOrUnknown(data['back_text']!, _backTextMeta),
+      );
+    }
+    if (data.containsKey('front_media_id')) {
+      context.handle(
+        _frontMediaIdMeta,
+        frontMediaId.isAcceptableOrUnknown(
+          data['front_media_id']!,
+          _frontMediaIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('back_media_id')) {
+      context.handle(
+        _backMediaIdMeta,
+        backMediaId.isAcceptableOrUnknown(
+          data['back_media_id']!,
+          _backMediaIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('front_image_json')) {
+      context.handle(
+        _frontImageJsonMeta,
+        frontImageJson.isAcceptableOrUnknown(
+          data['front_image_json']!,
+          _frontImageJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('back_image_json')) {
+      context.handle(
+        _backImageJsonMeta,
+        backImageJson.isAcceptableOrUnknown(
+          data['back_image_json']!,
+          _backImageJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('front_local_image')) {
+      context.handle(
+        _frontLocalImageMeta,
+        frontLocalImage.isAcceptableOrUnknown(
+          data['front_local_image']!,
+          _frontLocalImageMeta,
+        ),
+      );
+    }
+    if (data.containsKey('back_local_image')) {
+      context.handle(
+        _backLocalImageMeta,
+        backLocalImage.isAcceptableOrUnknown(
+          data['back_local_image']!,
+          _backLocalImageMeta,
+        ),
+      );
+    }
+    if (data.containsKey('locked')) {
+      context.handle(
+        _lockedMeta,
+        locked.isAcceptableOrUnknown(data['locked']!, _lockedMeta),
+      );
+    }
+    if (data.containsKey('sort_order')) {
+      context.handle(
+        _sortOrderMeta,
+        sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sortOrderMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    if (data.containsKey('dirty')) {
+      context.handle(
+        _dirtyMeta,
+        dirty.isAcceptableOrUnknown(data['dirty']!, _dirtyMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  LocalCardRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LocalCardRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      deckId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}deck_id'],
+      )!,
+      kind: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}kind'],
+      )!,
+      officialFlashcardId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}official_flashcard_id'],
+      ),
+      frontText: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}front_text'],
+      ),
+      backText: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}back_text'],
+      ),
+      frontMediaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}front_media_id'],
+      ),
+      backMediaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}back_media_id'],
+      ),
+      frontImageJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}front_image_json'],
+      ),
+      backImageJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}back_image_json'],
+      ),
+      frontLocalImage: attachedDatabase.typeMapping.read(
+        DriftSqlType.blob,
+        data['${effectivePrefix}front_local_image'],
+      ),
+      backLocalImage: attachedDatabase.typeMapping.read(
+        DriftSqlType.blob,
+        data['${effectivePrefix}back_local_image'],
+      ),
+      locked: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}locked'],
+      )!,
+      sortOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sort_order'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}deleted_at'],
+      ),
+      dirty: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}dirty'],
+      )!,
+    );
+  }
+
+  @override
+  $LocalCardsTable createAlias(String alias) {
+    return $LocalCardsTable(attachedDatabase, alias);
+  }
+}
+
+class LocalCardRow extends DataClass implements Insertable<LocalCardRow> {
+  final String id;
+  final String deckId;
+  final String kind;
+  final String? officialFlashcardId;
+  final String? frontText;
+  final String? backText;
+  final String? frontMediaId;
+  final String? backMediaId;
+  final String? frontImageJson;
+  final String? backImageJson;
+  final Uint8List? frontLocalImage;
+  final Uint8List? backLocalImage;
+  final bool locked;
+  final int sortOrder;
+  final int createdAt;
+  final int updatedAt;
+  final int? deletedAt;
+  final bool dirty;
+  const LocalCardRow({
+    required this.id,
+    required this.deckId,
+    required this.kind,
+    this.officialFlashcardId,
+    this.frontText,
+    this.backText,
+    this.frontMediaId,
+    this.backMediaId,
+    this.frontImageJson,
+    this.backImageJson,
+    this.frontLocalImage,
+    this.backLocalImage,
+    required this.locked,
+    required this.sortOrder,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+    required this.dirty,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['deck_id'] = Variable<String>(deckId);
+    map['kind'] = Variable<String>(kind);
+    if (!nullToAbsent || officialFlashcardId != null) {
+      map['official_flashcard_id'] = Variable<String>(officialFlashcardId);
+    }
+    if (!nullToAbsent || frontText != null) {
+      map['front_text'] = Variable<String>(frontText);
+    }
+    if (!nullToAbsent || backText != null) {
+      map['back_text'] = Variable<String>(backText);
+    }
+    if (!nullToAbsent || frontMediaId != null) {
+      map['front_media_id'] = Variable<String>(frontMediaId);
+    }
+    if (!nullToAbsent || backMediaId != null) {
+      map['back_media_id'] = Variable<String>(backMediaId);
+    }
+    if (!nullToAbsent || frontImageJson != null) {
+      map['front_image_json'] = Variable<String>(frontImageJson);
+    }
+    if (!nullToAbsent || backImageJson != null) {
+      map['back_image_json'] = Variable<String>(backImageJson);
+    }
+    if (!nullToAbsent || frontLocalImage != null) {
+      map['front_local_image'] = Variable<Uint8List>(frontLocalImage);
+    }
+    if (!nullToAbsent || backLocalImage != null) {
+      map['back_local_image'] = Variable<Uint8List>(backLocalImage);
+    }
+    map['locked'] = Variable<bool>(locked);
+    map['sort_order'] = Variable<int>(sortOrder);
+    map['created_at'] = Variable<int>(createdAt);
+    map['updated_at'] = Variable<int>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<int>(deletedAt);
+    }
+    map['dirty'] = Variable<bool>(dirty);
+    return map;
+  }
+
+  LocalCardsCompanion toCompanion(bool nullToAbsent) {
+    return LocalCardsCompanion(
+      id: Value(id),
+      deckId: Value(deckId),
+      kind: Value(kind),
+      officialFlashcardId: officialFlashcardId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(officialFlashcardId),
+      frontText: frontText == null && nullToAbsent
+          ? const Value.absent()
+          : Value(frontText),
+      backText: backText == null && nullToAbsent
+          ? const Value.absent()
+          : Value(backText),
+      frontMediaId: frontMediaId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(frontMediaId),
+      backMediaId: backMediaId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(backMediaId),
+      frontImageJson: frontImageJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(frontImageJson),
+      backImageJson: backImageJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(backImageJson),
+      frontLocalImage: frontLocalImage == null && nullToAbsent
+          ? const Value.absent()
+          : Value(frontLocalImage),
+      backLocalImage: backLocalImage == null && nullToAbsent
+          ? const Value.absent()
+          : Value(backLocalImage),
+      locked: Value(locked),
+      sortOrder: Value(sortOrder),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+      dirty: Value(dirty),
+    );
+  }
+
+  factory LocalCardRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LocalCardRow(
+      id: serializer.fromJson<String>(json['id']),
+      deckId: serializer.fromJson<String>(json['deckId']),
+      kind: serializer.fromJson<String>(json['kind']),
+      officialFlashcardId: serializer.fromJson<String?>(
+        json['officialFlashcardId'],
+      ),
+      frontText: serializer.fromJson<String?>(json['frontText']),
+      backText: serializer.fromJson<String?>(json['backText']),
+      frontMediaId: serializer.fromJson<String?>(json['frontMediaId']),
+      backMediaId: serializer.fromJson<String?>(json['backMediaId']),
+      frontImageJson: serializer.fromJson<String?>(json['frontImageJson']),
+      backImageJson: serializer.fromJson<String?>(json['backImageJson']),
+      frontLocalImage: serializer.fromJson<Uint8List?>(json['frontLocalImage']),
+      backLocalImage: serializer.fromJson<Uint8List?>(json['backLocalImage']),
+      locked: serializer.fromJson<bool>(json['locked']),
+      sortOrder: serializer.fromJson<int>(json['sortOrder']),
+      createdAt: serializer.fromJson<int>(json['createdAt']),
+      updatedAt: serializer.fromJson<int>(json['updatedAt']),
+      deletedAt: serializer.fromJson<int?>(json['deletedAt']),
+      dirty: serializer.fromJson<bool>(json['dirty']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'deckId': serializer.toJson<String>(deckId),
+      'kind': serializer.toJson<String>(kind),
+      'officialFlashcardId': serializer.toJson<String?>(officialFlashcardId),
+      'frontText': serializer.toJson<String?>(frontText),
+      'backText': serializer.toJson<String?>(backText),
+      'frontMediaId': serializer.toJson<String?>(frontMediaId),
+      'backMediaId': serializer.toJson<String?>(backMediaId),
+      'frontImageJson': serializer.toJson<String?>(frontImageJson),
+      'backImageJson': serializer.toJson<String?>(backImageJson),
+      'frontLocalImage': serializer.toJson<Uint8List?>(frontLocalImage),
+      'backLocalImage': serializer.toJson<Uint8List?>(backLocalImage),
+      'locked': serializer.toJson<bool>(locked),
+      'sortOrder': serializer.toJson<int>(sortOrder),
+      'createdAt': serializer.toJson<int>(createdAt),
+      'updatedAt': serializer.toJson<int>(updatedAt),
+      'deletedAt': serializer.toJson<int?>(deletedAt),
+      'dirty': serializer.toJson<bool>(dirty),
+    };
+  }
+
+  LocalCardRow copyWith({
+    String? id,
+    String? deckId,
+    String? kind,
+    Value<String?> officialFlashcardId = const Value.absent(),
+    Value<String?> frontText = const Value.absent(),
+    Value<String?> backText = const Value.absent(),
+    Value<String?> frontMediaId = const Value.absent(),
+    Value<String?> backMediaId = const Value.absent(),
+    Value<String?> frontImageJson = const Value.absent(),
+    Value<String?> backImageJson = const Value.absent(),
+    Value<Uint8List?> frontLocalImage = const Value.absent(),
+    Value<Uint8List?> backLocalImage = const Value.absent(),
+    bool? locked,
+    int? sortOrder,
+    int? createdAt,
+    int? updatedAt,
+    Value<int?> deletedAt = const Value.absent(),
+    bool? dirty,
+  }) => LocalCardRow(
+    id: id ?? this.id,
+    deckId: deckId ?? this.deckId,
+    kind: kind ?? this.kind,
+    officialFlashcardId: officialFlashcardId.present
+        ? officialFlashcardId.value
+        : this.officialFlashcardId,
+    frontText: frontText.present ? frontText.value : this.frontText,
+    backText: backText.present ? backText.value : this.backText,
+    frontMediaId: frontMediaId.present ? frontMediaId.value : this.frontMediaId,
+    backMediaId: backMediaId.present ? backMediaId.value : this.backMediaId,
+    frontImageJson: frontImageJson.present
+        ? frontImageJson.value
+        : this.frontImageJson,
+    backImageJson: backImageJson.present
+        ? backImageJson.value
+        : this.backImageJson,
+    frontLocalImage: frontLocalImage.present
+        ? frontLocalImage.value
+        : this.frontLocalImage,
+    backLocalImage: backLocalImage.present
+        ? backLocalImage.value
+        : this.backLocalImage,
+    locked: locked ?? this.locked,
+    sortOrder: sortOrder ?? this.sortOrder,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    dirty: dirty ?? this.dirty,
+  );
+  LocalCardRow copyWithCompanion(LocalCardsCompanion data) {
+    return LocalCardRow(
+      id: data.id.present ? data.id.value : this.id,
+      deckId: data.deckId.present ? data.deckId.value : this.deckId,
+      kind: data.kind.present ? data.kind.value : this.kind,
+      officialFlashcardId: data.officialFlashcardId.present
+          ? data.officialFlashcardId.value
+          : this.officialFlashcardId,
+      frontText: data.frontText.present ? data.frontText.value : this.frontText,
+      backText: data.backText.present ? data.backText.value : this.backText,
+      frontMediaId: data.frontMediaId.present
+          ? data.frontMediaId.value
+          : this.frontMediaId,
+      backMediaId: data.backMediaId.present
+          ? data.backMediaId.value
+          : this.backMediaId,
+      frontImageJson: data.frontImageJson.present
+          ? data.frontImageJson.value
+          : this.frontImageJson,
+      backImageJson: data.backImageJson.present
+          ? data.backImageJson.value
+          : this.backImageJson,
+      frontLocalImage: data.frontLocalImage.present
+          ? data.frontLocalImage.value
+          : this.frontLocalImage,
+      backLocalImage: data.backLocalImage.present
+          ? data.backLocalImage.value
+          : this.backLocalImage,
+      locked: data.locked.present ? data.locked.value : this.locked,
+      sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      dirty: data.dirty.present ? data.dirty.value : this.dirty,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LocalCardRow(')
+          ..write('id: $id, ')
+          ..write('deckId: $deckId, ')
+          ..write('kind: $kind, ')
+          ..write('officialFlashcardId: $officialFlashcardId, ')
+          ..write('frontText: $frontText, ')
+          ..write('backText: $backText, ')
+          ..write('frontMediaId: $frontMediaId, ')
+          ..write('backMediaId: $backMediaId, ')
+          ..write('frontImageJson: $frontImageJson, ')
+          ..write('backImageJson: $backImageJson, ')
+          ..write('frontLocalImage: $frontLocalImage, ')
+          ..write('backLocalImage: $backLocalImage, ')
+          ..write('locked: $locked, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('dirty: $dirty')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    deckId,
+    kind,
+    officialFlashcardId,
+    frontText,
+    backText,
+    frontMediaId,
+    backMediaId,
+    frontImageJson,
+    backImageJson,
+    $driftBlobEquality.hash(frontLocalImage),
+    $driftBlobEquality.hash(backLocalImage),
+    locked,
+    sortOrder,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    dirty,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LocalCardRow &&
+          other.id == this.id &&
+          other.deckId == this.deckId &&
+          other.kind == this.kind &&
+          other.officialFlashcardId == this.officialFlashcardId &&
+          other.frontText == this.frontText &&
+          other.backText == this.backText &&
+          other.frontMediaId == this.frontMediaId &&
+          other.backMediaId == this.backMediaId &&
+          other.frontImageJson == this.frontImageJson &&
+          other.backImageJson == this.backImageJson &&
+          $driftBlobEquality.equals(
+            other.frontLocalImage,
+            this.frontLocalImage,
+          ) &&
+          $driftBlobEquality.equals(
+            other.backLocalImage,
+            this.backLocalImage,
+          ) &&
+          other.locked == this.locked &&
+          other.sortOrder == this.sortOrder &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt &&
+          other.dirty == this.dirty);
+}
+
+class LocalCardsCompanion extends UpdateCompanion<LocalCardRow> {
+  final Value<String> id;
+  final Value<String> deckId;
+  final Value<String> kind;
+  final Value<String?> officialFlashcardId;
+  final Value<String?> frontText;
+  final Value<String?> backText;
+  final Value<String?> frontMediaId;
+  final Value<String?> backMediaId;
+  final Value<String?> frontImageJson;
+  final Value<String?> backImageJson;
+  final Value<Uint8List?> frontLocalImage;
+  final Value<Uint8List?> backLocalImage;
+  final Value<bool> locked;
+  final Value<int> sortOrder;
+  final Value<int> createdAt;
+  final Value<int> updatedAt;
+  final Value<int?> deletedAt;
+  final Value<bool> dirty;
+  final Value<int> rowid;
+  const LocalCardsCompanion({
+    this.id = const Value.absent(),
+    this.deckId = const Value.absent(),
+    this.kind = const Value.absent(),
+    this.officialFlashcardId = const Value.absent(),
+    this.frontText = const Value.absent(),
+    this.backText = const Value.absent(),
+    this.frontMediaId = const Value.absent(),
+    this.backMediaId = const Value.absent(),
+    this.frontImageJson = const Value.absent(),
+    this.backImageJson = const Value.absent(),
+    this.frontLocalImage = const Value.absent(),
+    this.backLocalImage = const Value.absent(),
+    this.locked = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.dirty = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  LocalCardsCompanion.insert({
+    required String id,
+    required String deckId,
+    required String kind,
+    this.officialFlashcardId = const Value.absent(),
+    this.frontText = const Value.absent(),
+    this.backText = const Value.absent(),
+    this.frontMediaId = const Value.absent(),
+    this.backMediaId = const Value.absent(),
+    this.frontImageJson = const Value.absent(),
+    this.backImageJson = const Value.absent(),
+    this.frontLocalImage = const Value.absent(),
+    this.backLocalImage = const Value.absent(),
+    this.locked = const Value.absent(),
+    required int sortOrder,
+    required int createdAt,
+    required int updatedAt,
+    this.deletedAt = const Value.absent(),
+    this.dirty = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       deckId = Value(deckId),
+       kind = Value(kind),
+       sortOrder = Value(sortOrder),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<LocalCardRow> custom({
+    Expression<String>? id,
+    Expression<String>? deckId,
+    Expression<String>? kind,
+    Expression<String>? officialFlashcardId,
+    Expression<String>? frontText,
+    Expression<String>? backText,
+    Expression<String>? frontMediaId,
+    Expression<String>? backMediaId,
+    Expression<String>? frontImageJson,
+    Expression<String>? backImageJson,
+    Expression<Uint8List>? frontLocalImage,
+    Expression<Uint8List>? backLocalImage,
+    Expression<bool>? locked,
+    Expression<int>? sortOrder,
+    Expression<int>? createdAt,
+    Expression<int>? updatedAt,
+    Expression<int>? deletedAt,
+    Expression<bool>? dirty,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (deckId != null) 'deck_id': deckId,
+      if (kind != null) 'kind': kind,
+      if (officialFlashcardId != null)
+        'official_flashcard_id': officialFlashcardId,
+      if (frontText != null) 'front_text': frontText,
+      if (backText != null) 'back_text': backText,
+      if (frontMediaId != null) 'front_media_id': frontMediaId,
+      if (backMediaId != null) 'back_media_id': backMediaId,
+      if (frontImageJson != null) 'front_image_json': frontImageJson,
+      if (backImageJson != null) 'back_image_json': backImageJson,
+      if (frontLocalImage != null) 'front_local_image': frontLocalImage,
+      if (backLocalImage != null) 'back_local_image': backLocalImage,
+      if (locked != null) 'locked': locked,
+      if (sortOrder != null) 'sort_order': sortOrder,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (dirty != null) 'dirty': dirty,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  LocalCardsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? deckId,
+    Value<String>? kind,
+    Value<String?>? officialFlashcardId,
+    Value<String?>? frontText,
+    Value<String?>? backText,
+    Value<String?>? frontMediaId,
+    Value<String?>? backMediaId,
+    Value<String?>? frontImageJson,
+    Value<String?>? backImageJson,
+    Value<Uint8List?>? frontLocalImage,
+    Value<Uint8List?>? backLocalImage,
+    Value<bool>? locked,
+    Value<int>? sortOrder,
+    Value<int>? createdAt,
+    Value<int>? updatedAt,
+    Value<int?>? deletedAt,
+    Value<bool>? dirty,
+    Value<int>? rowid,
+  }) {
+    return LocalCardsCompanion(
+      id: id ?? this.id,
+      deckId: deckId ?? this.deckId,
+      kind: kind ?? this.kind,
+      officialFlashcardId: officialFlashcardId ?? this.officialFlashcardId,
+      frontText: frontText ?? this.frontText,
+      backText: backText ?? this.backText,
+      frontMediaId: frontMediaId ?? this.frontMediaId,
+      backMediaId: backMediaId ?? this.backMediaId,
+      frontImageJson: frontImageJson ?? this.frontImageJson,
+      backImageJson: backImageJson ?? this.backImageJson,
+      frontLocalImage: frontLocalImage ?? this.frontLocalImage,
+      backLocalImage: backLocalImage ?? this.backLocalImage,
+      locked: locked ?? this.locked,
+      sortOrder: sortOrder ?? this.sortOrder,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      dirty: dirty ?? this.dirty,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (deckId.present) {
+      map['deck_id'] = Variable<String>(deckId.value);
+    }
+    if (kind.present) {
+      map['kind'] = Variable<String>(kind.value);
+    }
+    if (officialFlashcardId.present) {
+      map['official_flashcard_id'] = Variable<String>(
+        officialFlashcardId.value,
+      );
+    }
+    if (frontText.present) {
+      map['front_text'] = Variable<String>(frontText.value);
+    }
+    if (backText.present) {
+      map['back_text'] = Variable<String>(backText.value);
+    }
+    if (frontMediaId.present) {
+      map['front_media_id'] = Variable<String>(frontMediaId.value);
+    }
+    if (backMediaId.present) {
+      map['back_media_id'] = Variable<String>(backMediaId.value);
+    }
+    if (frontImageJson.present) {
+      map['front_image_json'] = Variable<String>(frontImageJson.value);
+    }
+    if (backImageJson.present) {
+      map['back_image_json'] = Variable<String>(backImageJson.value);
+    }
+    if (frontLocalImage.present) {
+      map['front_local_image'] = Variable<Uint8List>(frontLocalImage.value);
+    }
+    if (backLocalImage.present) {
+      map['back_local_image'] = Variable<Uint8List>(backLocalImage.value);
+    }
+    if (locked.present) {
+      map['locked'] = Variable<bool>(locked.value);
+    }
+    if (sortOrder.present) {
+      map['sort_order'] = Variable<int>(sortOrder.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<int>(deletedAt.value);
+    }
+    if (dirty.present) {
+      map['dirty'] = Variable<bool>(dirty.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LocalCardsCompanion(')
+          ..write('id: $id, ')
+          ..write('deckId: $deckId, ')
+          ..write('kind: $kind, ')
+          ..write('officialFlashcardId: $officialFlashcardId, ')
+          ..write('frontText: $frontText, ')
+          ..write('backText: $backText, ')
+          ..write('frontMediaId: $frontMediaId, ')
+          ..write('backMediaId: $backMediaId, ')
+          ..write('frontImageJson: $frontImageJson, ')
+          ..write('backImageJson: $backImageJson, ')
+          ..write('frontLocalImage: $frontLocalImage, ')
+          ..write('backLocalImage: $backLocalImage, ')
+          ..write('locked: $locked, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('dirty: $dirty, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2277,6 +3889,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $SrsReviewLogsTable srsReviewLogs = $SrsReviewLogsTable(this);
   late final $ExamDraftsTable examDrafts = $ExamDraftsTable(this);
   late final $ExamAnswersTable examAnswers = $ExamAnswersTable(this);
+  late final $LocalDecksTable localDecks = $LocalDecksTable(this);
+  late final $LocalCardsTable localCards = $LocalCardsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2287,6 +3901,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     srsReviewLogs,
     examDrafts,
     examAnswers,
+    localDecks,
+    localCards,
   ];
 }
 
@@ -3505,6 +5121,761 @@ typedef $$ExamAnswersTableProcessedTableManager =
       ExamAnswerRow,
       PrefetchHooks Function()
     >;
+typedef $$LocalDecksTableCreateCompanionBuilder =
+    LocalDecksCompanion Function({
+      required String id,
+      required String name,
+      Value<String?> subjectId,
+      Value<String?> color,
+      required int sortOrder,
+      required int createdAt,
+      required int updatedAt,
+      Value<int?> deletedAt,
+      Value<bool> dirty,
+      Value<int> rowid,
+    });
+typedef $$LocalDecksTableUpdateCompanionBuilder =
+    LocalDecksCompanion Function({
+      Value<String> id,
+      Value<String> name,
+      Value<String?> subjectId,
+      Value<String?> color,
+      Value<int> sortOrder,
+      Value<int> createdAt,
+      Value<int> updatedAt,
+      Value<int?> deletedAt,
+      Value<bool> dirty,
+      Value<int> rowid,
+    });
+
+class $$LocalDecksTableFilterComposer
+    extends Composer<_$AppDatabase, $LocalDecksTable> {
+  $$LocalDecksTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get subjectId => $composableBuilder(
+    column: $table.subjectId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get color => $composableBuilder(
+    column: $table.color,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get dirty => $composableBuilder(
+    column: $table.dirty,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$LocalDecksTableOrderingComposer
+    extends Composer<_$AppDatabase, $LocalDecksTable> {
+  $$LocalDecksTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get subjectId => $composableBuilder(
+    column: $table.subjectId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get color => $composableBuilder(
+    column: $table.color,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get dirty => $composableBuilder(
+    column: $table.dirty,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$LocalDecksTableAnnotationComposer
+    extends Composer<_$AppDatabase, $LocalDecksTable> {
+  $$LocalDecksTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get subjectId =>
+      $composableBuilder(column: $table.subjectId, builder: (column) => column);
+
+  GeneratedColumn<String> get color =>
+      $composableBuilder(column: $table.color, builder: (column) => column);
+
+  GeneratedColumn<int> get sortOrder =>
+      $composableBuilder(column: $table.sortOrder, builder: (column) => column);
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<bool> get dirty =>
+      $composableBuilder(column: $table.dirty, builder: (column) => column);
+}
+
+class $$LocalDecksTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $LocalDecksTable,
+          LocalDeckRow,
+          $$LocalDecksTableFilterComposer,
+          $$LocalDecksTableOrderingComposer,
+          $$LocalDecksTableAnnotationComposer,
+          $$LocalDecksTableCreateCompanionBuilder,
+          $$LocalDecksTableUpdateCompanionBuilder,
+          (
+            LocalDeckRow,
+            BaseReferences<_$AppDatabase, $LocalDecksTable, LocalDeckRow>,
+          ),
+          LocalDeckRow,
+          PrefetchHooks Function()
+        > {
+  $$LocalDecksTableTableManager(_$AppDatabase db, $LocalDecksTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$LocalDecksTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$LocalDecksTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$LocalDecksTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String?> subjectId = const Value.absent(),
+                Value<String?> color = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+                Value<int?> deletedAt = const Value.absent(),
+                Value<bool> dirty = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => LocalDecksCompanion(
+                id: id,
+                name: name,
+                subjectId: subjectId,
+                color: color,
+                sortOrder: sortOrder,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                dirty: dirty,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String name,
+                Value<String?> subjectId = const Value.absent(),
+                Value<String?> color = const Value.absent(),
+                required int sortOrder,
+                required int createdAt,
+                required int updatedAt,
+                Value<int?> deletedAt = const Value.absent(),
+                Value<bool> dirty = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => LocalDecksCompanion.insert(
+                id: id,
+                name: name,
+                subjectId: subjectId,
+                color: color,
+                sortOrder: sortOrder,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                dirty: dirty,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$LocalDecksTable, LocalDeckRow>(table),
+                  BaseReferences<_$AppDatabase, $LocalDecksTable, LocalDeckRow>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$LocalDecksTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $LocalDecksTable,
+      LocalDeckRow,
+      $$LocalDecksTableFilterComposer,
+      $$LocalDecksTableOrderingComposer,
+      $$LocalDecksTableAnnotationComposer,
+      $$LocalDecksTableCreateCompanionBuilder,
+      $$LocalDecksTableUpdateCompanionBuilder,
+      (
+        LocalDeckRow,
+        BaseReferences<_$AppDatabase, $LocalDecksTable, LocalDeckRow>,
+      ),
+      LocalDeckRow,
+      PrefetchHooks Function()
+    >;
+typedef $$LocalCardsTableCreateCompanionBuilder =
+    LocalCardsCompanion Function({
+      required String id,
+      required String deckId,
+      required String kind,
+      Value<String?> officialFlashcardId,
+      Value<String?> frontText,
+      Value<String?> backText,
+      Value<String?> frontMediaId,
+      Value<String?> backMediaId,
+      Value<String?> frontImageJson,
+      Value<String?> backImageJson,
+      Value<Uint8List?> frontLocalImage,
+      Value<Uint8List?> backLocalImage,
+      Value<bool> locked,
+      required int sortOrder,
+      required int createdAt,
+      required int updatedAt,
+      Value<int?> deletedAt,
+      Value<bool> dirty,
+      Value<int> rowid,
+    });
+typedef $$LocalCardsTableUpdateCompanionBuilder =
+    LocalCardsCompanion Function({
+      Value<String> id,
+      Value<String> deckId,
+      Value<String> kind,
+      Value<String?> officialFlashcardId,
+      Value<String?> frontText,
+      Value<String?> backText,
+      Value<String?> frontMediaId,
+      Value<String?> backMediaId,
+      Value<String?> frontImageJson,
+      Value<String?> backImageJson,
+      Value<Uint8List?> frontLocalImage,
+      Value<Uint8List?> backLocalImage,
+      Value<bool> locked,
+      Value<int> sortOrder,
+      Value<int> createdAt,
+      Value<int> updatedAt,
+      Value<int?> deletedAt,
+      Value<bool> dirty,
+      Value<int> rowid,
+    });
+
+class $$LocalCardsTableFilterComposer
+    extends Composer<_$AppDatabase, $LocalCardsTable> {
+  $$LocalCardsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deckId => $composableBuilder(
+    column: $table.deckId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get officialFlashcardId => $composableBuilder(
+    column: $table.officialFlashcardId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get frontText => $composableBuilder(
+    column: $table.frontText,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get backText => $composableBuilder(
+    column: $table.backText,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get frontMediaId => $composableBuilder(
+    column: $table.frontMediaId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get backMediaId => $composableBuilder(
+    column: $table.backMediaId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get frontImageJson => $composableBuilder(
+    column: $table.frontImageJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get backImageJson => $composableBuilder(
+    column: $table.backImageJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<Uint8List> get frontLocalImage => $composableBuilder(
+    column: $table.frontLocalImage,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<Uint8List> get backLocalImage => $composableBuilder(
+    column: $table.backLocalImage,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get locked => $composableBuilder(
+    column: $table.locked,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get dirty => $composableBuilder(
+    column: $table.dirty,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$LocalCardsTableOrderingComposer
+    extends Composer<_$AppDatabase, $LocalCardsTable> {
+  $$LocalCardsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deckId => $composableBuilder(
+    column: $table.deckId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get officialFlashcardId => $composableBuilder(
+    column: $table.officialFlashcardId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get frontText => $composableBuilder(
+    column: $table.frontText,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get backText => $composableBuilder(
+    column: $table.backText,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get frontMediaId => $composableBuilder(
+    column: $table.frontMediaId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get backMediaId => $composableBuilder(
+    column: $table.backMediaId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get frontImageJson => $composableBuilder(
+    column: $table.frontImageJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get backImageJson => $composableBuilder(
+    column: $table.backImageJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<Uint8List> get frontLocalImage => $composableBuilder(
+    column: $table.frontLocalImage,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<Uint8List> get backLocalImage => $composableBuilder(
+    column: $table.backLocalImage,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get locked => $composableBuilder(
+    column: $table.locked,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get dirty => $composableBuilder(
+    column: $table.dirty,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$LocalCardsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $LocalCardsTable> {
+  $$LocalCardsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get deckId =>
+      $composableBuilder(column: $table.deckId, builder: (column) => column);
+
+  GeneratedColumn<String> get kind =>
+      $composableBuilder(column: $table.kind, builder: (column) => column);
+
+  GeneratedColumn<String> get officialFlashcardId => $composableBuilder(
+    column: $table.officialFlashcardId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get frontText =>
+      $composableBuilder(column: $table.frontText, builder: (column) => column);
+
+  GeneratedColumn<String> get backText =>
+      $composableBuilder(column: $table.backText, builder: (column) => column);
+
+  GeneratedColumn<String> get frontMediaId => $composableBuilder(
+    column: $table.frontMediaId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get backMediaId => $composableBuilder(
+    column: $table.backMediaId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get frontImageJson => $composableBuilder(
+    column: $table.frontImageJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get backImageJson => $composableBuilder(
+    column: $table.backImageJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<Uint8List> get frontLocalImage => $composableBuilder(
+    column: $table.frontLocalImage,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<Uint8List> get backLocalImage => $composableBuilder(
+    column: $table.backLocalImage,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get locked =>
+      $composableBuilder(column: $table.locked, builder: (column) => column);
+
+  GeneratedColumn<int> get sortOrder =>
+      $composableBuilder(column: $table.sortOrder, builder: (column) => column);
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<bool> get dirty =>
+      $composableBuilder(column: $table.dirty, builder: (column) => column);
+}
+
+class $$LocalCardsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $LocalCardsTable,
+          LocalCardRow,
+          $$LocalCardsTableFilterComposer,
+          $$LocalCardsTableOrderingComposer,
+          $$LocalCardsTableAnnotationComposer,
+          $$LocalCardsTableCreateCompanionBuilder,
+          $$LocalCardsTableUpdateCompanionBuilder,
+          (
+            LocalCardRow,
+            BaseReferences<_$AppDatabase, $LocalCardsTable, LocalCardRow>,
+          ),
+          LocalCardRow,
+          PrefetchHooks Function()
+        > {
+  $$LocalCardsTableTableManager(_$AppDatabase db, $LocalCardsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$LocalCardsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$LocalCardsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$LocalCardsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> deckId = const Value.absent(),
+                Value<String> kind = const Value.absent(),
+                Value<String?> officialFlashcardId = const Value.absent(),
+                Value<String?> frontText = const Value.absent(),
+                Value<String?> backText = const Value.absent(),
+                Value<String?> frontMediaId = const Value.absent(),
+                Value<String?> backMediaId = const Value.absent(),
+                Value<String?> frontImageJson = const Value.absent(),
+                Value<String?> backImageJson = const Value.absent(),
+                Value<Uint8List?> frontLocalImage = const Value.absent(),
+                Value<Uint8List?> backLocalImage = const Value.absent(),
+                Value<bool> locked = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+                Value<int?> deletedAt = const Value.absent(),
+                Value<bool> dirty = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => LocalCardsCompanion(
+                id: id,
+                deckId: deckId,
+                kind: kind,
+                officialFlashcardId: officialFlashcardId,
+                frontText: frontText,
+                backText: backText,
+                frontMediaId: frontMediaId,
+                backMediaId: backMediaId,
+                frontImageJson: frontImageJson,
+                backImageJson: backImageJson,
+                frontLocalImage: frontLocalImage,
+                backLocalImage: backLocalImage,
+                locked: locked,
+                sortOrder: sortOrder,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                dirty: dirty,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String deckId,
+                required String kind,
+                Value<String?> officialFlashcardId = const Value.absent(),
+                Value<String?> frontText = const Value.absent(),
+                Value<String?> backText = const Value.absent(),
+                Value<String?> frontMediaId = const Value.absent(),
+                Value<String?> backMediaId = const Value.absent(),
+                Value<String?> frontImageJson = const Value.absent(),
+                Value<String?> backImageJson = const Value.absent(),
+                Value<Uint8List?> frontLocalImage = const Value.absent(),
+                Value<Uint8List?> backLocalImage = const Value.absent(),
+                Value<bool> locked = const Value.absent(),
+                required int sortOrder,
+                required int createdAt,
+                required int updatedAt,
+                Value<int?> deletedAt = const Value.absent(),
+                Value<bool> dirty = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => LocalCardsCompanion.insert(
+                id: id,
+                deckId: deckId,
+                kind: kind,
+                officialFlashcardId: officialFlashcardId,
+                frontText: frontText,
+                backText: backText,
+                frontMediaId: frontMediaId,
+                backMediaId: backMediaId,
+                frontImageJson: frontImageJson,
+                backImageJson: backImageJson,
+                frontLocalImage: frontLocalImage,
+                backLocalImage: backLocalImage,
+                locked: locked,
+                sortOrder: sortOrder,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                dirty: dirty,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$LocalCardsTable, LocalCardRow>(table),
+                  BaseReferences<_$AppDatabase, $LocalCardsTable, LocalCardRow>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$LocalCardsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $LocalCardsTable,
+      LocalCardRow,
+      $$LocalCardsTableFilterComposer,
+      $$LocalCardsTableOrderingComposer,
+      $$LocalCardsTableAnnotationComposer,
+      $$LocalCardsTableCreateCompanionBuilder,
+      $$LocalCardsTableUpdateCompanionBuilder,
+      (
+        LocalCardRow,
+        BaseReferences<_$AppDatabase, $LocalCardsTable, LocalCardRow>,
+      ),
+      LocalCardRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -3519,4 +5890,8 @@ class $AppDatabaseManager {
       $$ExamDraftsTableTableManager(_db, _db.examDrafts);
   $$ExamAnswersTableTableManager get examAnswers =>
       $$ExamAnswersTableTableManager(_db, _db.examAnswers);
+  $$LocalDecksTableTableManager get localDecks =>
+      $$LocalDecksTableTableManager(_db, _db.localDecks);
+  $$LocalCardsTableTableManager get localCards =>
+      $$LocalCardsTableTableManager(_db, _db.localCards);
 }

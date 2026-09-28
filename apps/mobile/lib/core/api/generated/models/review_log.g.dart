@@ -8,18 +8,20 @@ part of 'review_log.dart';
 
 ReviewLog _$ReviewLogFromJson(Map<String, dynamic> json) => ReviewLog(
   id: json['id'] as String,
-  flashcardId: json['flashcardId'] as String,
   rating: $enumDecode(_$ReviewLogRatingEnumMap, json['rating']),
   stateBefore: SrsState.fromJson(json['stateBefore'] as Map<String, dynamic>),
   stateAfter: SrsState.fromJson(json['stateAfter'] as Map<String, dynamic>),
   reviewedAt: DateTime.parse(json['reviewedAt'] as String),
+  flashcardId: json['flashcardId'] as String?,
+  userCardId: json['userCardId'] as String?,
   durationMs: (json['durationMs'] as num?)?.toInt(),
   undone: json['undone'] as bool?,
 );
 
 Map<String, dynamic> _$ReviewLogToJson(ReviewLog instance) => <String, dynamic>{
   'id': instance.id,
-  'flashcardId': instance.flashcardId,
+  'flashcardId': ?instance.flashcardId,
+  'userCardId': ?instance.userCardId,
   'rating': instance.rating,
   'stateBefore': instance.stateBefore,
   'stateAfter': instance.stateAfter,

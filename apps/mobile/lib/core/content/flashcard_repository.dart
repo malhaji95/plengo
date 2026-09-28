@@ -2,6 +2,7 @@ import '../api/api_client.dart';
 import '../api/api_exception.dart';
 import '../api/generated/export.dart';
 import '../srs/scheduler.dart';
+import '../srs/srs_key.dart';
 import '../srs/srs_store.dart';
 
 /// Which decks to list: a subject's general content, or one track, optionally one unit/lesson.
@@ -43,9 +44,15 @@ class FlashcardRepository {
     lastReviewedAt: s.lastReviewedAt?.millisecondsSinceEpoch,
   );
 
+  /// Local SRS key of a server state: official id, or `u:<id>` for the student's cards.
+  static String keyOf(SrsCardState s) => s.flashcardId ?? SrsKey.userCard(s.userCardId!);
+
   static Map<String, CardState> _states(Iterable<SrsCardState> items) => {
-    for (final s in items) s.flashcardId: cardStateOf(s),
+    for (final s in items) keyOf(s): cardStateOf(s),
   };
+
+  static ({String? flashcardId, String? userCardId}) _ids(String key) =>
+      SrsKey.isUserCard(key) ? (flashcardId: null, userCardId: SrsKey.idOf(key)) : (flashcardId: key, userCardId: null);
 
   /// Pull states changed on other devices since the stored cursor.
   Future<void> pull(SrsStore store) => guardApi(() async {
@@ -59,8 +66,22 @@ class FlashcardRepository {
   });
 
   /// Push pending logs with the current states of their cards; adopt what the server now holds.
-  Future<int> push(SrsStore store) => guardApi(() async {
-    final logs = await store.pendingLogs();
+  /// [ready] decides whether a card's logs can go now: a student card the server does not know
+  /// yet waits for the decks sync; one that no longer exists anywhere is dropped (returns null).
+  Future<int> push(SrsStore store, {Future<bool?> Function(String key)? ready}) => guardApi(() async {
+    final pending = await store.pendingLogs();
+    final logs = <LocalReviewLog>[];
+    final dropped = <String>[];
+    final verdicts = <String, bool?>{};
+    for (final l in pending) {
+      final ok = ready == null ? true : verdicts[l.flashcardId] ??= await ready(l.flashcardId);
+      if (ok == null) {
+        dropped.add(l.id);
+      } else if (ok) {
+        logs.add(l);
+      }
+    }
+    if (dropped.isNotEmpty) await store.markSynced(dropped);
     if (logs.isEmpty) return 0;
     final ids = {for (final l in logs) l.flashcardId};
     final states = await store.statesFor(ids);
@@ -70,7 +91,8 @@ class FlashcardRepository {
           for (final l in logs)
             ReviewLog(
               id: l.id,
-              flashcardId: l.flashcardId,
+              flashcardId: _ids(l.flashcardId).flashcardId,
+              userCardId: _ids(l.flashcardId).userCardId,
               rating: ReviewLogRating.values.byName(l.rating.name),
               stateBefore: SrsState.fromJson(l.before.toJson()),
               stateAfter: SrsState.fromJson(l.after.toJson()),
@@ -81,7 +103,12 @@ class FlashcardRepository {
         ],
         states: [
           for (final MapEntry(key: id, value: s) in states.entries)
-            if (s.lastReviewedAt != null) SrsSyncState.fromJson({...s.toJson(), 'flashcardId': id}),
+            if (s.lastReviewedAt != null)
+              SrsSyncState.fromJson({
+                ...s.toJson(),
+                if (_ids(id).flashcardId != null) 'flashcardId': _ids(id).flashcardId,
+                if (_ids(id).userCardId != null) 'userCardId': _ids(id).userCardId,
+              }),
         ],
       ),
     )).data;

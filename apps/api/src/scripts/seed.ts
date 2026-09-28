@@ -818,6 +818,50 @@ export async function seedLearning(c: Container) {
   return created;
 }
 
+/** §40: Student 1's private deck with 3 cards, and one open content report for the admin inbox. */
+export async function seedStudentContent(c: Container) {
+  const [s1] = await c.db.select().from(users).where(eq(users.email, 'student1@example.com'));
+  if (!s1) return;
+  // Fixed ids keep the seed idempotent: re-running changes nothing (same updated_at).
+  const at = '2026-01-01T00:00:00.000Z';
+  const deckId = '0190a8e4-0000-7000-8000-000000000001';
+  const card = (n: number, front: string, back: string) => ({
+    id: `0190a8e4-0000-7000-8000-00000000001${n}`,
+    deckId,
+    kind: 'custom' as const,
+    frontText: front,
+    backText: back,
+    sortOrder: n,
+    createdAt: at,
+    updatedAt: at,
+  });
+  const result = await c.userContent.sync(s1.id, {
+    decks: [
+      { id: deckId, name: 'قوانين الفيزياء', color: '#1E88E5', sortOrder: 0, createdAt: at, updatedAt: at },
+    ],
+    cards: [
+      card(1, 'قانون نيوتن الثاني', 'القوة = الكتلة × التسارع'),
+      card(2, 'وحدة الشغل', 'الجول'),
+      card(3, 'سرعة الضوء', '300,000 كم/ث تقريباً'),
+    ],
+  });
+  const [question] = await c.db
+    .select({ id: questions.id })
+    .from(questions)
+    .where(and(eq(questions.status, 'published'), isNull(questions.deletedAt)))
+    .orderBy(asc(questions.createdAt))
+    .limit(1);
+  if (question) {
+    await c.reports.create(s1.id, {
+      itemType: 'question',
+      itemId: question.id,
+      reason: 'unclear',
+      note: 'صياغة السؤال غير واضحة',
+    });
+  }
+  return result;
+}
+
 if (import.meta.url === `file://${process.argv[1]}`) {
   const env = loadEnv();
   const queue = new InlineQueue();
@@ -829,8 +873,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     const createdQuestions = await seedQuestions(c);
     const createdDecks = await seedFlashcards(c);
     const createdQuizzes = await seedLearning(c);
+    await seedStudentContent(c);
     console.log(
-      `structure, teachers, access, questions, flashcards and quizzes seeded (${createdQuestions} new questions, ${createdDecks} new decks, ${createdQuizzes} new quizzes)`,
+      `structure, teachers, access, questions, flashcards, quizzes and student decks seeded (${createdQuestions} new questions, ${createdDecks} new decks, ${createdQuizzes} new quizzes)`,
     );
     console.log(`students: ${access.students.join(', ')} · admins: ${access.admins.join(', ')}`);
     console.log(`password for all seed accounts: ${SEED_PASSWORD} (admins enroll in 2FA at first login)`);

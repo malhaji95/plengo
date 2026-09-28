@@ -13,11 +13,12 @@ part 'review_log.g.dart';
 class ReviewLog {
   const ReviewLog({
     required this.id,
-    required this.flashcardId,
     required this.rating,
     required this.stateBefore,
     required this.stateAfter,
     required this.reviewedAt,
+    this.flashcardId,
+    this.userCardId,
     this.durationMs,
     this.undone,
   });
@@ -25,7 +26,10 @@ class ReviewLog {
   factory ReviewLog.fromJson(Map<String, Object?> json) => _$ReviewLogFromJson(json);
   
   final String id;
-  final String flashcardId;
+  @JsonKey(includeIfNull: false)
+  final String? flashcardId;
+  @JsonKey(includeIfNull: false)
+  final String? userCardId;
   final ReviewLogRating rating;
   final SrsState stateBefore;
   final SrsState stateAfter;

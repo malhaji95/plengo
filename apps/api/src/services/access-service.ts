@@ -1,5 +1,4 @@
-import { and, count, desc, eq, ilike, inArray, or, sql } from 'drizzle-orm';
-import { entitlements, profiles, users, type Db, type Tx } from '@plengo/db';
+import type { Db, Tx } from '@plengo/db';
 import type {
   AccessScope,
   AccessSettings,
@@ -12,13 +11,13 @@ import { decodeCursor, encodeCursor } from '../repositories/question-repository.
 import { AppError } from '../lib/app-error.js';
 import { endOfBusinessDay } from '../lib/business-time.js';
 import {
-  entitlementActiveAt,
   scopeKey,
   toScope,
   type AccessRepository,
   type EntitlementRow,
   type Scope,
   type ScopeColumns,
+  type StudentRow,
 } from '../repositories/access-repository.js';
 import type { AuditService } from './audit-service.js';
 import type { ConfigService } from './config-service.js';
@@ -229,57 +228,19 @@ export function createAccessService(deps: {
   }
 
   async function studentOrNotFound(userId: string) {
-    const [row] = await db
-      .select({ id: users.id })
-      .from(users)
-      .where(and(eq(users.id, userId), eq(users.role, 'student')))
-      .limit(1);
-    if (!row) throw new AppError('NOT_FOUND');
+    if (!(await repo.isStudent(userId))) throw new AppError('NOT_FOUND');
   }
 
   async function assertScope(scope: Scope) {
     if (!(await repo.scopeExists(scope))) throw new AppError('NOT_FOUND', { details: { field: 'scope' } });
   }
 
-  const studentColumns = {
-    id: users.id,
-    email: users.email,
-    name: users.name,
-    fullName: profiles.fullName,
-    educationLevelId: profiles.educationLevelId,
-    emailVerified: users.emailVerified,
-    status: users.status,
-    createdAt: users.createdAt,
-  };
-
-  async function toStudents(
-    rows: {
-      id: string;
-      email: string;
-      name: string;
-      fullName: string | null;
-      educationLevelId: string | null;
-      emailVerified: boolean;
-      status: 'active' | 'disabled';
-      createdAt: Date;
-    }[],
-  ): Promise<AdminStudent[]> {
+  async function toStudents(rows: StudentRow[]): Promise<AdminStudent[]> {
     if (!rows.length) return [];
-    const at = now();
-    const counts = await db
-      .select({ userId: entitlements.userId, n: count() })
-      .from(entitlements)
-      .where(
-        and(
-          inArray(
-            entitlements.userId,
-            rows.map((r) => r.id),
-          ),
-          entitlementActiveAt(at),
-        ),
-      )
-      .groupBy(entitlements.userId);
-    const byUser = new Map(counts.map((c) => [c.userId, c.n]));
+    const byUser = await repo.activeCounts(
+      rows.map((r) => r.id),
+      now(),
+    );
     return rows.map((r) => ({
       id: r.id,
       email: r.email,
@@ -330,22 +291,7 @@ export function createAccessService(deps: {
 
     async searchStudents(q: string | undefined, cursor?: string, limit = 50) {
       const offset = decodeCursor(cursor);
-      const term = q?.trim();
-      const filter = term
-        ? or(
-            ilike(users.email, `%${term}%`),
-            ilike(profiles.fullName, `%${term}%`),
-            sql`${users.id}::text = ${term}`,
-          )
-        : undefined;
-      const rows = await db
-        .select(studentColumns)
-        .from(users)
-        .leftJoin(profiles, eq(profiles.userId, users.id))
-        .where(and(eq(users.role, 'student'), filter))
-        .orderBy(desc(users.createdAt), desc(users.id))
-        .limit(limit + 1)
-        .offset(offset);
+      const rows = await repo.searchStudents(q?.trim() || undefined, limit + 1, offset);
       return {
         items: await toStudents(rows.slice(0, limit)),
         nextCursor: rows.length > limit ? encodeCursor(offset + limit) : null,
@@ -353,12 +299,7 @@ export function createAccessService(deps: {
     },
 
     async studentDetail(userId: string) {
-      const [row] = await db
-        .select(studentColumns)
-        .from(users)
-        .leftJoin(profiles, eq(profiles.userId, users.id))
-        .where(and(eq(users.id, userId), eq(users.role, 'student')))
-        .limit(1);
+      const row = await repo.student(userId);
       if (!row) throw new AppError('NOT_FOUND');
       const [student] = await toStudents([row]);
       return {

@@ -5,9 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/providers.dart';
 import '../../core/api/generated/export.dart';
 import '../../core/content/flashcard_repository.dart';
+import '../../core/content/study_card.dart';
 import '../../core/srs/queue.dart';
 import '../../core/srs/scheduler.dart';
+import '../../core/srs/srs_key.dart';
 import '../../core/srs/srs_store.dart';
+import '../my_decks/my_decks_providers.dart';
 import '../../shared/util/uuid.dart';
 
 final flashcardRepositoryProvider = Provider<FlashcardRepository>(
@@ -57,9 +60,18 @@ class SrsSync {
   Future<void> syncNow() {
     return _running ??= () async {
       try {
+        // Student cards must reach the server before their reviews do.
+        await ref.read(myDecksSyncProvider).syncNow();
         final repo = ref.read(flashcardRepositoryProvider);
         final store = ref.read(srsStoreProvider);
-        while (await repo.push(store) > 0) {}
+        final decks = ref.read(myDecksStoreProvider);
+        Future<bool?> ready(String key) async {
+          if (!SrsKey.isUserCard(key)) return true;
+          final card = await decks.card(SrsKey.idOf(key));
+          return card == null ? null : !card.dirty || card.deletedAt != null;
+        }
+
+        while (await repo.push(store, ready: ready) > 0) {}
         await repo.pull(store);
       } catch (_) {
         // Offline or server error: keep the logs for later.
@@ -81,8 +93,9 @@ final srsSyncProvider = Provider<SrsSync>((ref) {
   return sync;
 });
 
-/// Where a study session takes its cards from: one deck, or every due card (optionally one subject).
-typedef StudySource = ({String? deckId, String? subjectId});
+/// Where a study session takes its cards from: one official deck, one of the student's decks, or
+/// every due card (optionally one subject).
+typedef StudySource = ({String? deckId, String? myDeckId, String? subjectId});
 
 class StudyState {
   const StudyState({
@@ -94,14 +107,14 @@ class StudyState {
     required this.undoCount,
   });
 
-  final Map<String, StudentCard> cards;
+  final Map<String, StudyCard> cards;
   final List<String> order;
   final Map<String, CardState> states;
   final QueueSnapshot queue;
   final bool flipped;
   final int undoCount;
 
-  StudentCard? get current => queue.next == null ? null : cards[queue.next];
+  StudyCard? get current => queue.next == null ? null : cards[queue.next];
 
   StudyState copyWith({Map<String, CardState>? states, QueueSnapshot? queue, bool? flipped, int? undoCount}) =>
       StudyState(
@@ -130,24 +143,43 @@ class StudyController extends AsyncNotifier<StudyState> {
   @override
   Future<StudyState> build() async {
     final repo = ref.read(flashcardRepositoryProvider);
-    await ref.read(srsSyncProvider).syncNow();
-    final List<StudentCard> cards;
+    final List<StudyCard> cards;
     final serverStates = <String, CardState>{};
-    if (source.deckId != null) {
-      cards = (await repo.deckCards(source.deckId!)).cards;
+    if (source.myDeckId != null) {
+      // The student's own deck works fully offline (§13.9); sync in the background.
+      unawaited(ref.read(srsSyncProvider).syncNow());
+      final rows = await ref.read(myDecksStoreProvider).cards(source.myDeckId!);
+      cards = [
+        for (final r in rows)
+          if (!r.locked) StudyCard.own(r),
+      ];
+    } else if (source.deckId != null) {
+      await ref.read(srsSyncProvider).syncNow();
+      cards = [for (final c in (await repo.deckCards(source.deckId!)).cards) StudyCard.official(c)];
     } else {
+      await ref.read(srsSyncProvider).syncNow();
       final due = await repo.due(subjectId: source.subjectId);
-      cards = [for (final d in due.cards) d.card];
+      final own = {
+        for (final r in await ref.read(myDecksStoreProvider).cardsByIds(due.userCards.map((d) => d.card.id))) r.id: r,
+      };
+      cards = [
+        for (final d in due.cards) StudyCard.official(d.card),
+        for (final d in due.userCards)
+          if (own[d.card.id] != null) StudyCard.own(own[d.card.id]!),
+      ];
       for (final d in due.cards) {
         serverStates[d.card.id] = FlashcardRepository.cardStateOf(d.state);
       }
+      for (final d in due.userCards) {
+        serverStates[SrsKey.userCard(d.card.id)] = FlashcardRepository.cardStateOf(d.state);
+      }
     }
     await _store.mergeServer(serverStates);
-    final order = [for (final c in cards) c.id];
+    final order = [for (final c in cards) c.key];
     final states = await _store.statesFor(order);
     _shownAt = _now();
     return StudyState(
-      cards: {for (final c in cards) c.id: c},
+      cards: {for (final c in cards) c.key: c},
       order: order,
       states: states,
       queue: await _queue(order, states),
@@ -165,7 +197,7 @@ class StudyController extends AsyncNotifier<StudyState> {
       states: states,
       now: now,
       // The global due session reviews cards already in progress; new cards come from decks.
-      newLimit: source.deckId == null ? 0 : limits.newPerDay - done.newDone,
+      newLimit: source.deckId == null && source.myDeckId == null ? 0 : limits.newPerDay - done.newDone,
       reviewLimit: limits.maxReviews - done.reviewsDone,
     );
   }
@@ -182,7 +214,7 @@ class StudyController extends AsyncNotifier<StudyState> {
     final card = s?.current;
     if (s == null || card == null) return null;
     final now = _now();
-    return preview(s.states[card.id] ?? CardState.newCard(now), now, card.id);
+    return preview(s.states[card.key] ?? CardState.newCard(now), now, card.key);
   }
 
   Future<void> rate(Rating rating) async {
@@ -190,14 +222,14 @@ class StudyController extends AsyncNotifier<StudyState> {
     final card = s?.current;
     if (s == null || card == null || !s.flipped) return;
     final now = _now();
-    final before = s.states[card.id] ?? CardState.newCard(now);
-    final after = schedule(before, rating, now, card.id);
+    final before = s.states[card.key] ?? CardState.newCard(now);
+    final after = schedule(before, rating, now, card.key);
     final logId = uuidV4();
-    await _store.putState(card.id, after);
+    await _store.putState(card.key, after);
     await _store.addLog(
       LocalReviewLog(
         id: logId,
-        flashcardId: card.id,
+        flashcardId: card.key,
         rating: rating,
         before: before,
         after: after,
@@ -205,9 +237,9 @@ class StudyController extends AsyncNotifier<StudyState> {
         durationMs: now - _shownAt,
       ),
     );
-    _undo.add((cardId: card.id, before: before, logId: logId));
+    _undo.add((cardId: card.key, before: before, logId: logId));
     if (_undo.length > maxUndo) _undo.removeAt(0);
-    final states = {...s.states, card.id: after};
+    final states = {...s.states, card.key: after};
     _shownAt = _now();
     state = AsyncData(
       s.copyWith(states: states, queue: await _queue(s.order, states), flipped: false, undoCount: _undo.length),

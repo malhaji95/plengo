@@ -5,6 +5,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
 import 'due_card.dart';
+import 'due_user_card.dart';
 
 part 'due_cards.g.dart';
 
@@ -12,12 +13,14 @@ part 'due_cards.g.dart';
 class DueCards {
   const DueCards({
     required this.cards,
+    required this.userCards,
     required this.urlsExpireAt,
   });
   
   factory DueCards.fromJson(Map<String, Object?> json) => _$DueCardsFromJson(json);
   
   final List<DueCard> cards;
+  final List<DueUserCard> userCards;
   final String urlsExpireAt;
 
   Map<String, Object?> toJson() => _$DueCardsToJson(this);

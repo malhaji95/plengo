@@ -432,6 +432,7 @@ void main() {
                 question: null,
                 deck: null,
                 card: null,
+                userCard: null,
               ),
             ],
             nextCursor: null,

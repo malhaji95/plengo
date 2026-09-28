@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/api/api_exception.dart';
 import '../../core/api/generated/export.dart';
 import '../../shared/text/bidi.dart';
+import '../reports/report_sheet.dart';
 import '../../shared/widgets/async_view.dart';
 import 'attempt_widgets.dart';
 import 'quiz_providers.dart';
@@ -245,6 +246,8 @@ class _ResultCard extends StatelessWidget {
                   const SizedBox(width: 8),
                   Icon(Icons.flag, size: 16, color: scheme.error, semanticLabel: 'معلّم'),
                 ],
+                const Spacer(),
+                ReportButton(type: ReportItemType.question, id: q.questionId),
               ],
             ),
             const SizedBox(height: 8),

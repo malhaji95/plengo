@@ -34,9 +34,11 @@ class ApiClient {
     );
     dio = Dio(options);
     _refreshDio = Dio(options);
+    uploadDio = Dio(BaseOptions(connectTimeout: const Duration(seconds: 15), sendTimeout: const Duration(minutes: 2)));
     if (adapter != null) {
       dio.httpClientAdapter = adapter;
       _refreshDio.httpClientAdapter = adapter;
+      uploadDio.httpClientAdapter = adapter;
     } else {
       configureHttpAdapter(dio);
       configureHttpAdapter(_refreshDio);
@@ -53,6 +55,9 @@ class ApiClient {
   late final Dio dio;
   late final Dio _refreshDio;
   late final PlengoApi api;
+
+  /// For presigned storage uploads (spec §12.3): no API base URL, headers or credentials.
+  late final Dio uploadDio;
 
   Future<bool>? _refreshing;
 

@@ -8,6 +8,7 @@ import 'bookmark_item_type.dart';
 import 'student_card.dart';
 import 'student_deck.dart';
 import 'student_question.dart';
+import 'user_card.dart';
 
 part 'bookmark.g.dart';
 
@@ -26,6 +27,7 @@ class Bookmark {
     required this.question,
     required this.deck,
     required this.card,
+    required this.userCard,
   });
   
   factory Bookmark.fromJson(Map<String, Object?> json) => _$BookmarkFromJson(json);
@@ -48,6 +50,8 @@ class Bookmark {
   final StudentDeck? deck;
   @JsonKey(includeIfNull: true)
   final StudentCard? card;
+  @JsonKey(includeIfNull: true)
+  final UserCard? userCard;
 
   Map<String, Object?> toJson() => _$BookmarkToJson(this);
 }

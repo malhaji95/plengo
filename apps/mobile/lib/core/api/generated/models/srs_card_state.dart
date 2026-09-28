@@ -20,6 +20,7 @@ class SrsCardState {
     required this.lapses,
     required this.lastReviewedAt,
     required this.flashcardId,
+    required this.userCardId,
     required this.updatedAt,
   });
   
@@ -34,7 +35,10 @@ class SrsCardState {
   final int lapses;
   @JsonKey(includeIfNull: true)
   final DateTime? lastReviewedAt;
-  final String flashcardId;
+  @JsonKey(includeIfNull: true)
+  final String? flashcardId;
+  @JsonKey(includeIfNull: true)
+  final String? userCardId;
   final String updatedAt;
 
   Map<String, Object?> toJson() => _$SrsCardStateToJson(this);
