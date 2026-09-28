@@ -8,11 +8,26 @@ import 'package:json_annotation/json_annotation.dart';
 enum SrsSyncStateState {
   /// The name has been replaced because it contains a keyword. Original name: `new`.
   @JsonValue('new')
-  valueNew,
+  valueNew('new'),
   @JsonValue('learning')
-  learning,
+  learning('learning'),
   @JsonValue('review')
-  review,
+  review('review'),
   @JsonValue('relearning')
-  relearning;
+  relearning('relearning');
+
+  const SrsSyncStateState(this.json);
+
+  final String? json;
+  String toJson() {
+    final value = json;
+    if (value == null) {
+      throw StateError('Cannot convert enum value with null JSON representation to String. '
+          'This usually happens for \$unknown or @JsonValue(null) entries.');
+    }
+    return value as String;
+  }
+
+  @override
+  String toString() => json?.toString() ?? super.toString();
 }

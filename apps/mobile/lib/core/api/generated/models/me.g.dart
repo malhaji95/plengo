@@ -22,7 +22,7 @@ Map<String, dynamic> _$MeToJson(Me instance) => <String, dynamic>{
   'id': instance.id,
   'email': instance.email,
   'emailVerified': instance.emailVerified,
-  'role': _$MeRoleEnumMap[instance.role]!,
+  'role': instance.role,
   'fullName': instance.fullName,
   'educationLevelId': instance.educationLevelId,
   'universityId': instance.universityId,

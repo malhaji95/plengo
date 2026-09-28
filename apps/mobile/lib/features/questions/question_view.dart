@@ -83,7 +83,7 @@ class _QuestionViewState extends ConsumerState<QuestionView> {
         if (result == null)
           SubmitButton(label: 'تحقق', busy: _busy, onPressed: _answered ? _check : null)
         else
-          _Feedback(result: result, written: q.type == StudentQuestionType.written),
+          AnswerFeedback(result: result, written: q.type == StudentQuestionType.written),
       ],
     );
   }
@@ -115,8 +115,9 @@ class _QuestionViewState extends ConsumerState<QuestionView> {
   }
 }
 
-class _Feedback extends StatelessWidget {
-  const _Feedback({required this.result, required this.written});
+/// Correct/incorrect, the correct answer (written questions) and the explanation.
+class AnswerFeedback extends StatelessWidget {
+  const AnswerFeedback({super.key, required this.result, required this.written});
 
   final CheckResult result;
   final bool written;

@@ -30,13 +30,13 @@ StudentQuestion _$StudentQuestionFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$StudentQuestionToJson(StudentQuestion instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'type': _$StudentQuestionTypeEnumMap[instance.type]!,
+      'type': instance.type,
       'subjectId': instance.subjectId,
       'teacherTrackId': instance.teacherTrackId,
       'unitId': instance.unitId,
       'lessonId': instance.lessonId,
       'sortOrder': instance.sortOrder,
-      'difficulty': _$StudentQuestionDifficultyEnumMap[instance.difficulty],
+      'difficulty': instance.difficulty,
       'isFree': instance.isFree,
       'locked': instance.locked,
       'questionText': instance.questionText,

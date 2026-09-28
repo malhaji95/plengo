@@ -7,9 +7,24 @@ import 'package:json_annotation/json_annotation.dart';
 @JsonEnum()
 enum MistakeStatus {
   @JsonValue('active')
-  active,
+  active('active'),
   @JsonValue('mastered')
-  mastered,
+  mastered('mastered'),
   @JsonValue('removed')
-  removed;
+  removed('removed');
+
+  const MistakeStatus(this.json);
+
+  final String? json;
+  String toJson() {
+    final value = json;
+    if (value == null) {
+      throw StateError('Cannot convert enum value with null JSON representation to String. '
+          'This usually happens for \$unknown or @JsonValue(null) entries.');
+    }
+    return value as String;
+  }
+
+  @override
+  String toString() => json?.toString() ?? super.toString();
 }

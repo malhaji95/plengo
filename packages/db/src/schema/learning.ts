@@ -35,8 +35,9 @@ export type AttemptFilters = {
   teacherTrackId?: string | null;
   unitId?: string | null;
   lessonId?: string | null;
-  types?: string[];
+  types?: ('mcq' | 'true_false' | 'written')[];
   count?: number;
+  questionIds?: string[];
 };
 
 export const quizAttempts = pgTable(

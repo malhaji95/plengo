@@ -18,7 +18,7 @@ AccessScope _$AccessScopeFromJson(Map<String, dynamic> json) => AccessScope(
 
 Map<String, dynamic> _$AccessScopeToJson(AccessScope instance) =>
     <String, dynamic>{
-      'scopeType': _$AccessScopeScopeTypeEnumMap[instance.scopeType]!,
+      'scopeType': instance.scopeType,
       'subjectId': instance.subjectId,
       'teacherTrackId': instance.teacherTrackId,
       'subjectNameAr': instance.subjectNameAr,

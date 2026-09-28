@@ -18,7 +18,7 @@ ScopeAccess _$ScopeAccessFromJson(Map<String, dynamic> json) => ScopeAccess(
 Map<String, dynamic> _$ScopeAccessToJson(ScopeAccess instance) =>
     <String, dynamic>{
       'hasAccess': instance.hasAccess,
-      'reason': _$ScopeAccessReasonEnumMap[instance.reason],
+      'reason': instance.reason,
       'isPermanent': instance.isPermanent,
       'entitlementExpiresAt': instance.entitlementExpiresAt,
       'promotionTitleAr': instance.promotionTitleAr,

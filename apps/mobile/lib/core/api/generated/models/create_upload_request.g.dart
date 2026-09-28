@@ -16,7 +16,7 @@ CreateUploadRequest _$CreateUploadRequestFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$CreateUploadRequestToJson(
   CreateUploadRequest instance,
 ) => <String, dynamic>{
-  'kind': _$MediaKindEnumMap[instance.kind]!,
+  'kind': instance.kind,
   'contentType': instance.contentType,
   'size': instance.size,
 };

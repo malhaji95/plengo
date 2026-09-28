@@ -27,7 +27,7 @@ Mistake _$MistakeFromJson(Map<String, dynamic> json) => Mistake(
 
 Map<String, dynamic> _$MistakeToJson(Mistake instance) => <String, dynamic>{
   'questionId': instance.questionId,
-  'type': _$MistakeTypeEnumMap[instance.type]!,
+  'type': instance.type,
   'questionText': instance.questionText,
   'subjectId': instance.subjectId,
   'subjectNameAr': instance.subjectNameAr,
@@ -37,7 +37,7 @@ Map<String, dynamic> _$MistakeToJson(Mistake instance) => <String, dynamic>{
   'unitNameAr': instance.unitNameAr,
   'lessonId': instance.lessonId,
   'lessonNameAr': instance.lessonNameAr,
-  'status': _$MistakeStatusEnumMap[instance.status]!,
+  'status': instance.status,
   'wrongCount': instance.wrongCount,
   'correctStreak': instance.correctStreak,
   'firstWrongAt': instance.firstWrongAt,

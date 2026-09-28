@@ -1,11 +1,26 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-/// Bottom navigation on phones, a side rail on wide (web/tablet) layouts (spec §23.1, §24).
-class HomeShell extends StatelessWidget {
+import '../quizzes/quiz_providers.dart';
+
+/// Bottom navigation on phones, a side rail on wide (web/tablet) layouts (spec §23.1, §24). While
+/// signed in, exams submitted offline are retried every minute (spec §15.2).
+class HomeShell extends ConsumerStatefulWidget {
   const HomeShell({super.key, required this.shell});
 
   final StatefulNavigationShell shell;
+
+  @override
+  ConsumerState<HomeShell> createState() => _HomeShellState();
+}
+
+class _HomeShellState extends ConsumerState<HomeShell> {
+  Timer? _examSync;
+
+  StatefulNavigationShell get shell => widget.shell;
 
   static const _destinations = [
     (icon: Icons.home_outlined, selected: Icons.home, label: 'الرئيسية'),
@@ -14,6 +29,20 @@ class HomeShell extends StatelessWidget {
     (icon: Icons.bookmark_border, selected: Icons.bookmark, label: 'المحفوظات'),
     (icon: Icons.person_outline, selected: Icons.person, label: 'حسابي'),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    final sync = ref.read(examSyncProvider);
+    unawaited(sync.syncNow());
+    _examSync = Timer.periodic(const Duration(minutes: 1), (_) => sync.syncNow());
+  }
+
+  @override
+  void dispose() {
+    _examSync?.cancel();
+    super.dispose();
+  }
 
   void _go(int index) => shell.goBranch(index, initialLocation: index == shell.currentIndex);
 

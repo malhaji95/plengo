@@ -33,7 +33,7 @@ export interface NavItem {
   phase: number;
 }
 
-export const CURRENT_PHASE = 6;
+export const CURRENT_PHASE = 7;
 
 /** Admin navigation, in the order of spec §26.1. */
 export const NAV_ITEMS: NavItem[] = [

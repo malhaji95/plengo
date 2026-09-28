@@ -17,6 +17,7 @@ class AttemptFilters {
     this.lessonId,
     this.types,
     this.count,
+    this.questionIds,
   });
   
   factory AttemptFilters.fromJson(Map<String, Object?> json) => _$AttemptFiltersFromJson(json);
@@ -33,6 +34,8 @@ class AttemptFilters {
   final List<AttemptFiltersTypes>? types;
   @JsonKey(includeIfNull: false)
   final int? count;
+  @JsonKey(includeIfNull: false)
+  final List<String>? questionIds;
 
   Map<String, Object?> toJson() => _$AttemptFiltersToJson(this);
 }

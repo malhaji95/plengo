@@ -20,7 +20,7 @@ ReviewLog _$ReviewLogFromJson(Map<String, dynamic> json) => ReviewLog(
 Map<String, dynamic> _$ReviewLogToJson(ReviewLog instance) => <String, dynamic>{
   'id': instance.id,
   'flashcardId': instance.flashcardId,
-  'rating': _$ReviewLogRatingEnumMap[instance.rating]!,
+  'rating': instance.rating,
   'stateBefore': instance.stateBefore,
   'stateAfter': instance.stateAfter,
   'reviewedAt': instance.reviewedAt.toIso8601String(),

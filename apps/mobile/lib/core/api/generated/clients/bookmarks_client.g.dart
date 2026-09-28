@@ -21,9 +21,11 @@ class _BookmarksClient implements BookmarksClient {
   final ParseErrorLogger? errorLogger;
 
   @override
-  Future<BookmarkListEnvelope> listBookmarks({ItemType? itemType}) async {
+  Future<BookmarkListEnvelope> listBookmarks({
+    BookmarkItemType? itemType,
+  }) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{r'itemType': itemType};
+    final queryParameters = <String, dynamic>{r'itemType': itemType?.toJson()};
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
@@ -105,7 +107,7 @@ class _BookmarksClient implements BookmarksClient {
 
   @override
   Future<DeletedResultEnvelope> removeBookmark({
-    required ItemType itemType,
+    required BookmarkItemType itemType,
     required String itemId,
   }) async {
     final _extra = <String, dynamic>{};
@@ -116,7 +118,7 @@ class _BookmarksClient implements BookmarksClient {
       Options(method: 'DELETE', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/api/v1/bookmarks/${itemType}/${itemId}',
+            '/api/v1/bookmarks/${itemType.toJson()}/${itemId}',
             queryParameters: queryParameters,
             data: _data,
           )

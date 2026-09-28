@@ -22,21 +22,21 @@ class _MistakesClient implements MistakesClient {
 
   @override
   Future<MistakeListEnvelope> listMistakes({
+    MistakeFilterStatus? status,
     String? subjectId,
     String? teacherTrackId,
     String? unitId,
     String? lessonId,
-    Type? type,
-    Status2? status = Status2.active,
+    MistakeFilterType? type,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
+      r'status': status?.toJson(),
       r'subjectId': subjectId,
       r'teacherTrackId': teacherTrackId,
       r'unitId': unitId,
       r'lessonId': lessonId,
-      r'type': type,
-      r'status': status,
+      r'type': type?.toJson(),
     };
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};

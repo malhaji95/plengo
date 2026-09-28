@@ -16,6 +16,9 @@ AttemptFilters _$AttemptFiltersFromJson(Map<String, dynamic> json) =>
           ?.map((e) => $enumDecode(_$AttemptFiltersTypesEnumMap, e))
           .toList(),
       count: (json['count'] as num?)?.toInt(),
+      questionIds: (json['questionIds'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList(),
     );
 
 Map<String, dynamic> _$AttemptFiltersToJson(AttemptFilters instance) =>
@@ -24,10 +27,9 @@ Map<String, dynamic> _$AttemptFiltersToJson(AttemptFilters instance) =>
       'teacherTrackId': ?instance.teacherTrackId,
       'unitId': ?instance.unitId,
       'lessonId': ?instance.lessonId,
-      'types': ?instance.types
-          ?.map((e) => _$AttemptFiltersTypesEnumMap[e]!)
-          .toList(),
+      'types': ?instance.types,
       'count': ?instance.count,
+      'questionIds': ?instance.questionIds,
     };
 
 const _$AttemptFiltersTypesEnumMap = {

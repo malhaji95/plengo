@@ -53,14 +53,14 @@ class _AttemptsClient implements AttemptsClient {
   @override
   Future<AttemptSummaryPageEnvelope> listAttempts({
     int? limit = 20,
-    Status? status,
+    AttemptStatus? status,
     String? quizId,
     String? cursor,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
       r'limit': limit,
-      r'status': status,
+      r'status': status?.toJson(),
       r'quizId': quizId,
       r'cursor': cursor,
     };

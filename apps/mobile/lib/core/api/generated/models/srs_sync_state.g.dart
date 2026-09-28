@@ -22,7 +22,7 @@ SrsSyncState _$SrsSyncStateFromJson(Map<String, dynamic> json) => SrsSyncState(
 
 Map<String, dynamic> _$SrsSyncStateToJson(SrsSyncState instance) =>
     <String, dynamic>{
-      'state': _$SrsSyncStateStateEnumMap[instance.state]!,
+      'state': instance.state,
       'step': instance.step,
       'dueAt': instance.dueAt.toIso8601String(),
       'intervalDays': instance.intervalDays,

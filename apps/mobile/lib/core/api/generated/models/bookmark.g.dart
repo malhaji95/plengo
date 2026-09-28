@@ -29,7 +29,7 @@ Bookmark _$BookmarkFromJson(Map<String, dynamic> json) => Bookmark(
 
 Map<String, dynamic> _$BookmarkToJson(Bookmark instance) => <String, dynamic>{
   'id': instance.id,
-  'itemType': _$BookmarkItemTypeEnumMap[instance.itemType]!,
+  'itemType': instance.itemType,
   'itemId': instance.itemId,
   'createdAt': instance.createdAt,
   'locked': instance.locked,

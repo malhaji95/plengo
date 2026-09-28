@@ -6,13 +6,13 @@ import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 
 import '../models/attempt_envelope.dart';
+import '../models/attempt_status.dart';
 import '../models/attempt_summary_page_envelope.dart';
 import '../models/check_attempt_answer_request.dart';
 import '../models/check_result_envelope.dart';
 import '../models/save_answer_request.dart';
 import '../models/saved_answer_envelope.dart';
 import '../models/start_attempt_request.dart';
-import '../models/status.dart';
 import '../models/submit_attempt_request.dart';
 
 part 'attempts_client.g.dart';
@@ -29,7 +29,7 @@ abstract class AttemptsClient {
   @GET('/api/v1/attempts')
   Future<AttemptSummaryPageEnvelope> listAttempts({
     @Query('limit') int? limit = 20,
-    @Query('status') Status? status,
+    @Query('status') AttemptStatus? status,
     @Query('quizId') String? quizId,
     @Query('cursor') String? cursor,
   });

@@ -35,7 +35,7 @@ Map<String, dynamic> _$ResumeItemToJson(ResumeItem instance) =>
       'unitNameAr': instance.unitNameAr,
       'lessonId': instance.lessonId,
       'lessonNameAr': instance.lessonNameAr,
-      'activityType': _$ResumeItemActivityTypeEnumMap[instance.activityType]!,
+      'activityType': instance.activityType,
       'itemId': instance.itemId,
       'itemTitleAr': instance.itemTitleAr,
       'attemptId': instance.attemptId,

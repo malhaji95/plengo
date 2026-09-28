@@ -8,11 +8,12 @@ import '../../core/api/generated/export.dart';
 import '../../shared/widgets/async_view.dart';
 import '../../shared/widgets/network_avatar.dart';
 import '../access/access_banner.dart';
+import '../learning/scope_learning.dart';
 import '../questions/question_providers.dart';
 import 'catalog_providers.dart';
 
 /// A subject's outline: optional units with their lessons, then lessons directly under the subject.
-/// Questions, decks and quizzes appear here from Phase 5 on.
+/// Questions, decks, quizzes, random practice and progress appear here from Phase 5 on.
 class SubjectScreen extends ConsumerWidget {
   const SubjectScreen({super.key, required this.subjectId});
 
@@ -32,20 +33,23 @@ class SubjectScreen extends ConsumerWidget {
   }
 }
 
-class _OutlineView extends StatelessWidget {
+class _OutlineView extends ConsumerWidget {
   const _OutlineView({required this.outline});
 
   final SubjectOutline outline;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final text = Theme.of(context).textTheme;
+    final progress = ref.watch(progressProvider((subjectId: outline.subject.id, teacherTrackId: null))).value;
+    int? unitPercent(String id) => progress?.units.where((u) => u.unitId == id).firstOrNull?.completionPercent;
     final empty =
         outline.units.isEmpty &&
         outline.lessons.isEmpty &&
         outline.tracks.isEmpty &&
         outline.questionCount.total == 0 &&
-        outline.deckCount.total == 0;
+        outline.deckCount.total == 0 &&
+        outline.quizCount.total == 0;
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 720),
@@ -57,6 +61,12 @@ class _OutlineView extends StatelessWidget {
               const SizedBox(height: 16),
             ],
             ScopeAccessBanner(access: outline.access),
+            ScopeLearning(
+              subjectId: outline.subject.id,
+              quizCount: outline.quizCount,
+              questionCount: outline.questionCount,
+              quizzesPath: '${Routes.subjects}/${outline.subject.id}/quizzes',
+            ),
             if (outline.deckCount.total > 0)
               Card(
                 margin: const EdgeInsets.only(bottom: 8),
@@ -89,7 +99,12 @@ class _OutlineView extends StatelessWidget {
                   initiallyExpanded: i == 0,
                   leading: CircleAvatar(radius: 14, child: Text('${i + 1}', style: text.labelMedium)),
                   title: Text(unit.titleAr, style: const TextStyle(fontWeight: FontWeight.w500)),
-                  subtitle: Text(lessonCountLabel(unit.lessons.length)),
+                  subtitle: Text(
+                    [
+                      lessonCountLabel(unit.lessons.length),
+                      if ((unitPercent(unit.id) ?? 0) > 0) 'أنجزت ${unitPercent(unit.id)}%',
+                    ].join(' · '),
+                  ),
                   children: [
                     if (unit.lessons.isEmpty) const ListTile(title: Text('لا توجد دروس في هذه الوحدة بعد')),
                     for (final lesson in unit.lessons) _LessonTile(lesson: lesson, subjectId: outline.subject.id),

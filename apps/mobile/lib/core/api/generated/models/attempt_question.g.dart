@@ -29,7 +29,7 @@ AttemptQuestion _$AttemptQuestionFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$AttemptQuestionToJson(AttemptQuestion instance) =>
     <String, dynamic>{
       'questionId': instance.questionId,
-      'type': _$AttemptQuestionTypeEnumMap[instance.type]!,
+      'type': instance.type,
       'unitId': instance.unitId,
       'lessonId': instance.lessonId,
       'questionText': instance.questionText,

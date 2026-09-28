@@ -16,7 +16,10 @@ AttemptSummary _$AttemptSummaryFromJson(Map<String, dynamic> json) =>
       titleAr: json['titleAr'] as String,
       subjectId: json['subjectId'] as String?,
       teacherTrackId: json['teacherTrackId'] as String?,
-      status: $enumDecode(_$AttemptSummaryStatusEnumMap, json['status']),
+      filters: json['filters'] == null
+          ? null
+          : AttemptFilters.fromJson(json['filters'] as Map<String, dynamic>),
+      status: $enumDecode(_$AttemptStatusEnumMap, json['status']),
       startedAt: json['startedAt'] as String,
       deadlineAt: json['deadlineAt'] as String?,
       submittedAt: json['submittedAt'] as String?,
@@ -37,12 +40,13 @@ Map<String, dynamic> _$AttemptSummaryToJson(AttemptSummary instance) =>
       'id': instance.id,
       'clientAttemptId': instance.clientAttemptId,
       'quizId': instance.quizId,
-      'source': _$AttemptSummarySourceEnumMap[instance.source]!,
-      'mode': _$AttemptSummaryModeEnumMap[instance.mode]!,
+      'source': instance.source,
+      'mode': instance.mode,
       'titleAr': instance.titleAr,
       'subjectId': instance.subjectId,
       'teacherTrackId': instance.teacherTrackId,
-      'status': _$AttemptSummaryStatusEnumMap[instance.status]!,
+      'filters': instance.filters,
+      'status': instance.status,
       'startedAt': instance.startedAt,
       'deadlineAt': instance.deadlineAt,
       'submittedAt': instance.submittedAt,
@@ -69,8 +73,8 @@ const _$AttemptSummaryModeEnumMap = {
   AttemptSummaryMode.exam: 'exam',
 };
 
-const _$AttemptSummaryStatusEnumMap = {
-  AttemptSummaryStatus.inProgress: 'in_progress',
-  AttemptSummaryStatus.submitted: 'submitted',
-  AttemptSummaryStatus.abandoned: 'abandoned',
+const _$AttemptStatusEnumMap = {
+  AttemptStatus.inProgress: 'in_progress',
+  AttemptStatus.submitted: 'submitted',
+  AttemptStatus.abandoned: 'abandoned',
 };

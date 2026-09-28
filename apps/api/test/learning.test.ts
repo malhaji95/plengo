@@ -422,6 +422,13 @@ describe('practice mode (§15.2)', () => {
       wrongCount: 1,
       scorePercent: 50,
     });
+    // "أعد الأخطاء فقط": a mistakes attempt limited to this attempt's wrong questions.
+    const retry = await start(s, {
+      source: 'mistakes',
+      mode: 'practice',
+      filters: { questionIds: [w.premium.id, w.written.id] },
+    });
+    expect(retry.data.questions.map((x) => x.questionId)).toEqual([w.premium.id]);
 
     const mistakes = await call<{ items: { questionId: string; wrongCount: number }[]; activeCount: number }>(
       s,

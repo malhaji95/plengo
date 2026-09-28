@@ -1743,6 +1743,15 @@
             "type": "integer",
             "minimum": 1,
             "maximum": 100
+          },
+          "questionIds": {
+            "maxItems": 200,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
           }
         },
         "additionalProperties": false
@@ -1865,6 +1874,14 @@
         ],
         "additionalProperties": false
       },
+      "AttemptStatus": {
+        "type": "string",
+        "enum": [
+          "in_progress",
+          "submitted",
+          "abandoned"
+        ]
+      },
       "AttemptSummary": {
         "type": "object",
         "properties": {
@@ -1910,13 +1927,18 @@
               "null"
             ]
           },
-          "status": {
-            "type": "string",
-            "enum": [
-              "in_progress",
-              "submitted",
-              "abandoned"
+          "filters": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AttemptFilters"
+              },
+              {
+                "type": "null"
+              }
             ]
+          },
+          "status": {
+            "$ref": "#/components/schemas/AttemptStatus"
           },
           "startedAt": {
             "type": "string"
@@ -2034,6 +2056,7 @@
           "titleAr",
           "subjectId",
           "teacherTrackId",
+          "filters",
           "status",
           "startedAt",
           "deadlineAt",
@@ -2115,13 +2138,7 @@
             "type": "string"
           },
           "itemType": {
-            "type": "string",
-            "enum": [
-              "question",
-              "flashcard",
-              "user_card",
-              "deck"
-            ]
+            "$ref": "#/components/schemas/BookmarkItemType"
           },
           "itemId": {
             "type": "string"
@@ -2221,17 +2238,20 @@
         ],
         "additionalProperties": false
       },
+      "BookmarkItemType": {
+        "type": "string",
+        "enum": [
+          "question",
+          "flashcard",
+          "user_card",
+          "deck"
+        ]
+      },
       "BookmarkKey": {
         "type": "object",
         "properties": {
           "itemType": {
-            "type": "string",
-            "enum": [
-              "question",
-              "flashcard",
-              "user_card",
-              "deck"
-            ]
+            "$ref": "#/components/schemas/BookmarkItemType"
           },
           "itemId": {
             "type": "string"
@@ -2314,13 +2334,7 @@
         "type": "object",
         "properties": {
           "itemType": {
-            "type": "string",
-            "enum": [
-              "question",
-              "flashcard",
-              "user_card",
-              "deck"
-            ]
+            "$ref": "#/components/schemas/BookmarkItemType"
           },
           "itemId": {
             "type": "string",
@@ -5022,6 +5036,21 @@
           "lastWrongAt"
         ],
         "additionalProperties": false
+      },
+      "MistakeFilterStatus": {
+        "type": "string",
+        "enum": [
+          "active",
+          "mastered"
+        ]
+      },
+      "MistakeFilterType": {
+        "type": "string",
+        "enum": [
+          "mcq",
+          "true_false",
+          "written"
+        ]
       },
       "MistakeList": {
         "type": "object",
@@ -11063,12 +11092,7 @@
         "parameters": [
           {
             "schema": {
-              "type": "string",
-              "enum": [
-                "in_progress",
-                "submitted",
-                "abandoned"
-              ]
+              "$ref": "#/components/schemas/AttemptStatus"
             },
             "in": "query",
             "name": "status",
@@ -11306,12 +11330,7 @@
         "parameters": [
           {
             "schema": {
-              "default": "active",
-              "type": "string",
-              "enum": [
-                "active",
-                "mastered"
-              ]
+              "$ref": "#/components/schemas/MistakeFilterStatus"
             },
             "in": "query",
             "name": "status",
@@ -11359,12 +11378,7 @@
           },
           {
             "schema": {
-              "type": "string",
-              "enum": [
-                "mcq",
-                "true_false",
-                "written"
-              ]
+              "$ref": "#/components/schemas/MistakeFilterType"
             },
             "in": "query",
             "name": "type",
@@ -11531,13 +11545,7 @@
         "parameters": [
           {
             "schema": {
-              "type": "string",
-              "enum": [
-                "question",
-                "flashcard",
-                "user_card",
-                "deck"
-              ]
+              "$ref": "#/components/schemas/BookmarkItemType"
             },
             "in": "query",
             "name": "itemType",
@@ -11615,13 +11623,7 @@
         "parameters": [
           {
             "schema": {
-              "type": "string",
-              "enum": [
-                "question",
-                "flashcard",
-                "user_card",
-                "deck"
-              ]
+              "$ref": "#/components/schemas/BookmarkItemType"
             },
             "in": "path",
             "name": "itemType",

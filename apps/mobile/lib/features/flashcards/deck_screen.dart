@@ -4,7 +4,9 @@ import 'package:go_router/go_router.dart';
 
 import '../../app/router.dart';
 import '../../shared/widgets/async_view.dart';
+import '../../core/api/generated/export.dart';
 import '../access/access_banner.dart';
+import '../bookmarks/bookmark_button.dart';
 import 'decks_screen.dart';
 import 'flashcard_providers.dart';
 
@@ -19,7 +21,10 @@ class DeckScreen extends ConsumerWidget {
     final deck = ref.watch(deckProvider(deckId));
     final text = Theme.of(context).textTheme;
     return Scaffold(
-      appBar: AppBar(title: Text(deck.value?.titleAr ?? '')),
+      appBar: AppBar(
+        title: Text(deck.value?.titleAr ?? ''),
+        actions: [BookmarkButton(type: BookmarkItemType.deck, id: deckId)],
+      ),
       body: AsyncView(
         value: deck,
         onRetry: () => ref.invalidate(deckProvider(deckId)),

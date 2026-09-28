@@ -25,3 +25,11 @@ export function freeLabel(q: Pick<AdminQuestion, 'isFree' | 'freeSource'>) {
   const state = q.isFree ? 'مجاني' : 'مدفوع';
   return q.freeSource === 'manual_override' ? `${state} (يدوي)` : `${state} (حسب القاعدة)`;
 }
+
+export type AdminQuiz = components['schemas']['AdminQuiz'];
+
+export const MODE_LABELS: Record<AdminQuiz['allowedModes'], string> = {
+  both: 'تدريب وامتحان',
+  practice: 'تدريب فقط',
+  exam: 'امتحان فقط',
+};

@@ -6,11 +6,11 @@ import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 
 import '../models/bookmark_envelope.dart';
+import '../models/bookmark_item_type.dart';
 import '../models/bookmark_key_list_envelope.dart';
 import '../models/bookmark_list_envelope.dart';
 import '../models/bookmark_request.dart';
 import '../models/deleted_result_envelope.dart';
-import '../models/item_type.dart';
 
 part 'bookmarks_client.g.dart';
 
@@ -20,7 +20,7 @@ abstract class BookmarksClient {
 
   @GET('/api/v1/bookmarks')
   Future<BookmarkListEnvelope> listBookmarks({
-    @Query('itemType') ItemType? itemType,
+    @Query('itemType') BookmarkItemType? itemType,
   });
 
   @PUT('/api/v1/bookmarks')
@@ -33,7 +33,7 @@ abstract class BookmarksClient {
 
   @DELETE('/api/v1/bookmarks/{itemType}/{itemId}')
   Future<DeletedResultEnvelope> removeBookmark({
-    @Path('itemType') required ItemType itemType,
+    @Path('itemType') required BookmarkItemType itemType,
     @Path('itemId') required String itemId,
   });
 }

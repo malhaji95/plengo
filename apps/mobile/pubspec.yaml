@@ -69,7 +69,7 @@ swagger_parser:
   root_client: true
   root_client_name: PlengoApi
   put_clients_in_folder: true
-  enums_to_json: false
+  enums_to_json: true
   unknown_enum_value: false
   # Omit unset optional fields instead of sending null (the API treats null as "clear").
   include_if_null: true

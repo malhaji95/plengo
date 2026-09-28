@@ -2530,6 +2530,7 @@ export interface components {
             lessonId?: string | null;
             types?: ("mcq" | "true_false" | "written")[];
             count?: number;
+            questionIds?: string[];
         };
         AttemptOption: {
             id: string;
@@ -2551,6 +2552,8 @@ export interface components {
             timeSpentMs: number | null;
             result: components["schemas"]["CheckResult"] | null;
         };
+        /** @enum {string} */
+        AttemptStatus: "in_progress" | "submitted" | "abandoned";
         AttemptSummary: {
             id: string;
             clientAttemptId: string;
@@ -2562,8 +2565,8 @@ export interface components {
             titleAr: string;
             subjectId: string | null;
             teacherTrackId: string | null;
-            /** @enum {string} */
-            status: "in_progress" | "submitted" | "abandoned";
+            filters: components["schemas"]["AttemptFilters"] | null;
+            status: components["schemas"]["AttemptStatus"];
             startedAt: string;
             deadlineAt: string | null;
             submittedAt: string | null;
@@ -2593,8 +2596,7 @@ export interface components {
         };
         Bookmark: {
             id: string;
-            /** @enum {string} */
-            itemType: "question" | "flashcard" | "user_card" | "deck";
+            itemType: components["schemas"]["BookmarkItemType"];
             itemId: string;
             createdAt: string;
             locked: boolean;
@@ -2612,9 +2614,10 @@ export interface components {
             data: components["schemas"]["Bookmark"];
             error: null;
         };
+        /** @enum {string} */
+        BookmarkItemType: "question" | "flashcard" | "user_card" | "deck";
         BookmarkKey: {
-            /** @enum {string} */
-            itemType: "question" | "flashcard" | "user_card" | "deck";
+            itemType: components["schemas"]["BookmarkItemType"];
             itemId: string;
         };
         BookmarkKeyList: components["schemas"]["BookmarkKey"][];
@@ -2635,8 +2638,7 @@ export interface components {
             error: null;
         };
         BookmarkRequest: {
-            /** @enum {string} */
-            itemType: "question" | "flashcard" | "user_card" | "deck";
+            itemType: components["schemas"]["BookmarkItemType"];
             /** Format: uuid */
             itemId: string;
         };
@@ -3185,6 +3187,10 @@ export interface components {
             firstWrongAt: string;
             lastWrongAt: string;
         };
+        /** @enum {string} */
+        MistakeFilterStatus: "active" | "mastered";
+        /** @enum {string} */
+        MistakeFilterType: "mcq" | "true_false" | "written";
         MistakeList: {
             items: components["schemas"]["Mistake"][];
             activeCount: number;
@@ -5183,7 +5189,7 @@ export interface operations {
     listAttempts: {
         parameters: {
             query?: {
-                status?: "in_progress" | "submitted" | "abandoned";
+                status?: components["schemas"]["AttemptStatus"];
                 quizId?: string;
                 cursor?: string;
                 limit?: number;
@@ -5334,12 +5340,12 @@ export interface operations {
     listMistakes: {
         parameters: {
             query?: {
-                status?: "active" | "mastered";
+                status?: components["schemas"]["MistakeFilterStatus"];
                 subjectId?: string;
                 teacherTrackId?: string;
                 unitId?: string;
                 lessonId?: string;
-                type?: "mcq" | "true_false" | "written";
+                type?: components["schemas"]["MistakeFilterType"];
             };
             header?: never;
             path?: never;
@@ -5467,7 +5473,7 @@ export interface operations {
     listBookmarks: {
         parameters: {
             query?: {
-                itemType?: "question" | "flashcard" | "user_card" | "deck";
+                itemType?: components["schemas"]["BookmarkItemType"];
             };
             header?: never;
             path?: never;
@@ -5535,7 +5541,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                itemType: "question" | "flashcard" | "user_card" | "deck";
+                itemType: components["schemas"]["BookmarkItemType"];
                 itemId: string;
             };
             cookie?: never;

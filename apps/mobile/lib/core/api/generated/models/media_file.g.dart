@@ -17,8 +17,8 @@ MediaFile _$MediaFileFromJson(Map<String, dynamic> json) => MediaFile(
 
 Map<String, dynamic> _$MediaFileToJson(MediaFile instance) => <String, dynamic>{
   'id': instance.id,
-  'kind': _$MediaKindEnumMap[instance.kind]!,
-  'status': _$MediaFileStatusEnumMap[instance.status]!,
+  'kind': instance.kind,
+  'status': instance.status,
   'width': instance.width,
   'height': instance.height,
   'version': instance.version,

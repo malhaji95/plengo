@@ -7,9 +7,24 @@ import 'package:json_annotation/json_annotation.dart';
 @JsonEnum()
 enum AttemptFiltersTypes {
   @JsonValue('mcq')
-  mcq,
+  mcq('mcq'),
   @JsonValue('true_false')
-  trueFalse,
+  trueFalse('true_false'),
   @JsonValue('written')
-  written;
+  written('written');
+
+  const AttemptFiltersTypes(this.json);
+
+  final String? json;
+  String toJson() {
+    final value = json;
+    if (value == null) {
+      throw StateError('Cannot convert enum value with null JSON representation to String. '
+          'This usually happens for \$unknown or @JsonValue(null) entries.');
+    }
+    return value as String;
+  }
+
+  @override
+  String toString() => json?.toString() ?? super.toString();
 }

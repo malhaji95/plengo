@@ -7,19 +7,16 @@ part of 'bookmark_key.dart';
 // **************************************************************************
 
 BookmarkKey _$BookmarkKeyFromJson(Map<String, dynamic> json) => BookmarkKey(
-  itemType: $enumDecode(_$BookmarkKeyItemTypeEnumMap, json['itemType']),
+  itemType: $enumDecode(_$BookmarkItemTypeEnumMap, json['itemType']),
   itemId: json['itemId'] as String,
 );
 
 Map<String, dynamic> _$BookmarkKeyToJson(BookmarkKey instance) =>
-    <String, dynamic>{
-      'itemType': _$BookmarkKeyItemTypeEnumMap[instance.itemType]!,
-      'itemId': instance.itemId,
-    };
+    <String, dynamic>{'itemType': instance.itemType, 'itemId': instance.itemId};
 
-const _$BookmarkKeyItemTypeEnumMap = {
-  BookmarkKeyItemType.question: 'question',
-  BookmarkKeyItemType.flashcard: 'flashcard',
-  BookmarkKeyItemType.userCard: 'user_card',
-  BookmarkKeyItemType.deck: 'deck',
+const _$BookmarkItemTypeEnumMap = {
+  BookmarkItemType.question: 'question',
+  BookmarkItemType.flashcard: 'flashcard',
+  BookmarkItemType.userCard: 'user_card',
+  BookmarkItemType.deck: 'deck',
 };

@@ -14,11 +14,13 @@ import 'package:plengo/core/catalog/teacher_repository.dart';
 import 'package:plengo/core/content/flashcard_repository.dart';
 import 'package:plengo/core/content/question_repository.dart';
 import 'package:plengo/core/db/app_database.dart';
+import 'package:plengo/core/learning/learning_repository.dart';
 import 'package:plengo/core/srs/srs_store.dart';
 import 'package:plengo/features/access/access_providers.dart';
 import 'package:plengo/features/flashcards/card_face.dart';
 import 'package:plengo/features/flashcards/flashcard_providers.dart';
 import 'package:plengo/features/questions/question_providers.dart';
+import 'package:plengo/features/quizzes/quiz_providers.dart';
 import 'package:plengo/features/subjects/catalog_providers.dart';
 import 'package:plengo/features/teachers/teacher_providers.dart';
 
@@ -34,7 +36,25 @@ class MockQuestionRepository extends Mock implements QuestionRepository {}
 
 class MockFlashcardRepository extends Mock implements FlashcardRepository {}
 
+class MockLearningRepository extends Mock implements LearningRepository {}
+
 const noQuestions = ContentCount(total: 0, free: 0);
+
+ScopeProgress emptyProgress(String subjectId, {String? teacherTrackId}) => ScopeProgress(
+  questionsAttempted: 0,
+  questionsCorrect: 0,
+  questionsTotal: 0,
+  quizzesCompleted: 0,
+  quizzesTotal: 0,
+  flashcardsStudied: 0,
+  flashcardsTotal: 0,
+  completionPercent: 0,
+  subjectId: subjectId,
+  teacherTrackId: teacherTrackId,
+  lastActivityAt: null,
+  units: const [],
+  lessons: const [],
+);
 
 const noAccess = ScopeAccess(
   hasAccess: false,
@@ -83,6 +103,7 @@ typedef PumpedApp = ({
   MockAccessRepository access,
   MockQuestionRepository questions,
   MockFlashcardRepository flashcards,
+  MockLearningRepository learning,
   AppDatabase db,
   ProviderContainer container,
 });
@@ -98,6 +119,7 @@ Future<PumpedApp> pumpApp(
   void Function(MockAccessRepository access)? arrangeAccess,
   void Function(MockQuestionRepository questions)? arrangeQuestions,
   void Function(MockFlashcardRepository flashcards)? arrangeFlashcards,
+  void Function(MockLearningRepository learning)? arrangeLearning,
   int Function()? clock,
   RemoteConfig? config,
   bool couponRedemption = true,
@@ -130,6 +152,14 @@ Future<PumpedApp> pumpApp(
   when(() => flashcards.pull(any())).thenAnswer((_) async {});
   arrangeFlashcards?.call(flashcards);
 
+  final learning = MockLearningRepository();
+  when(() => learning.resume()).thenAnswer((_) async => const []);
+  when(() => learning.bookmarkKeys()).thenAnswer((_) async => const []);
+  when(
+    () => learning.progress(any(), teacherTrackId: any(named: 'teacherTrackId')),
+  ).thenAnswer((i) async => emptyProgress(i.positionalArguments.first as String));
+  arrangeLearning?.call(learning);
+
   final db = AppDatabase(NativeDatabase.memory());
   addTearDown(db.close);
   final container = ProviderContainer(
@@ -143,6 +173,7 @@ Future<PumpedApp> pumpApp(
       accessRepositoryProvider.overrideWithValue(access),
       questionRepositoryProvider.overrideWithValue(questions),
       flashcardRepositoryProvider.overrideWithValue(flashcards),
+      learningRepositoryProvider.overrideWithValue(learning),
       cardImageBuilderProvider.overrideWithValue((_, image) => Center(child: Text('img:${image.mediaId}'))),
       cardImagePrefetchProvider.overrideWithValue((_, _) {}),
       if (clock != null) clockProvider.overrideWithValue(clock),
@@ -161,6 +192,7 @@ Future<PumpedApp> pumpApp(
     access: access,
     questions: questions,
     flashcards: flashcards,
+    learning: learning,
     db: db,
     container: container,
   );

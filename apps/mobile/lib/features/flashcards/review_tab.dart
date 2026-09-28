@@ -14,7 +14,7 @@ final dueCardsProvider = FutureProvider.autoDispose<DueCards>((ref) async {
 });
 
 /// The Review tab (المراجعة): every due card across accessible decks, optionally one subject
-/// ("كل البطاقات المستحقة", spec §13.2).
+/// ("كل البطاقات المستحقة", spec §13.2), plus the mistake bank and statistics (§16).
 class ReviewTab extends ConsumerStatefulWidget {
   const ReviewTab({super.key});
 
@@ -41,6 +41,8 @@ class _ReviewTabState extends ConsumerState<ReviewTab> {
             child: ListView(
               padding: const EdgeInsets.all(16),
               children: [
+                const _LearningLinks(),
+                const SizedBox(height: 16),
                 if (subjects.length > 1)
                   Wrap(
                     spacing: 8,
@@ -89,4 +91,36 @@ class _ReviewTabState extends ConsumerState<ReviewTab> {
       ),
     );
   }
+}
+
+/// Mistake bank and statistics live under the Review tab.
+class _LearningLinks extends StatelessWidget {
+  const _LearningLinks();
+
+  @override
+  Widget build(BuildContext context) => Row(
+    children: [
+      Expanded(
+        child: Card(
+          margin: EdgeInsets.zero,
+          child: ListTile(
+            leading: const Icon(Icons.replay_circle_filled_outlined),
+            title: const Text('مراجعة الأخطاء'),
+            onTap: () => context.go(Routes.mistakes),
+          ),
+        ),
+      ),
+      const SizedBox(width: 8),
+      Expanded(
+        child: Card(
+          margin: EdgeInsets.zero,
+          child: ListTile(
+            leading: const Icon(Icons.insights_outlined),
+            title: const Text('إحصائياتي'),
+            onTap: () => context.go(Routes.stats),
+          ),
+        ),
+      ),
+    ],
+  );
 }

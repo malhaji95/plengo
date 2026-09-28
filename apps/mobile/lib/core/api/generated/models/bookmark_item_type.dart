@@ -7,11 +7,26 @@ import 'package:json_annotation/json_annotation.dart';
 @JsonEnum()
 enum BookmarkItemType {
   @JsonValue('question')
-  question,
+  question('question'),
   @JsonValue('flashcard')
-  flashcard,
+  flashcard('flashcard'),
   @JsonValue('user_card')
-  userCard,
+  userCard('user_card'),
   @JsonValue('deck')
-  deck;
+  deck('deck');
+
+  const BookmarkItemType(this.json);
+
+  final String? json;
+  String toJson() {
+    final value = json;
+    if (value == null) {
+      throw StateError('Cannot convert enum value with null JSON representation to String. '
+          'This usually happens for \$unknown or @JsonValue(null) entries.');
+    }
+    return value as String;
+  }
+
+  @override
+  String toString() => json?.toString() ?? super.toString();
 }

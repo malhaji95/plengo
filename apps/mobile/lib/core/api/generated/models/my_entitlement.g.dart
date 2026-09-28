@@ -21,11 +21,11 @@ Map<String, dynamic> _$MyEntitlementToJson(MyEntitlement instance) =>
     <String, dynamic>{
       'id': instance.id,
       'scope': instance.scope,
-      'source': _$MyEntitlementSourceEnumMap[instance.source]!,
+      'source': instance.source,
       'startsAt': instance.startsAt,
       'expiresAt': instance.expiresAt,
       'isPermanent': instance.isPermanent,
-      'state': _$MyEntitlementStateEnumMap[instance.state]!,
+      'state': instance.state,
     };
 
 const _$MyEntitlementSourceEnumMap = {

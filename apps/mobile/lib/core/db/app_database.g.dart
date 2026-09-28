@@ -1396,12 +1396,887 @@ class SrsReviewLogsCompanion extends UpdateCompanion<SrsReviewLog> {
   }
 }
 
+class $ExamDraftsTable extends ExamDrafts
+    with TableInfo<$ExamDraftsTable, ExamDraftRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ExamDraftsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _attemptIdMeta = const VerificationMeta(
+    'attemptId',
+  );
+  @override
+  late final GeneratedColumn<String> attemptId = GeneratedColumn<String>(
+    'attempt_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _attemptMeta = const VerificationMeta(
+    'attempt',
+  );
+  @override
+  late final GeneratedColumn<String> attempt = GeneratedColumn<String>(
+    'attempt',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _submitPendingMeta = const VerificationMeta(
+    'submitPending',
+  );
+  @override
+  late final GeneratedColumn<bool> submitPending = GeneratedColumn<bool>(
+    'submit_pending',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("submit_pending" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _timeSpentMsMeta = const VerificationMeta(
+    'timeSpentMs',
+  );
+  @override
+  late final GeneratedColumn<int> timeSpentMs = GeneratedColumn<int>(
+    'time_spent_ms',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    attemptId,
+    attempt,
+    submitPending,
+    timeSpentMs,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'exam_drafts';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ExamDraftRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('attempt_id')) {
+      context.handle(
+        _attemptIdMeta,
+        attemptId.isAcceptableOrUnknown(data['attempt_id']!, _attemptIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_attemptIdMeta);
+    }
+    if (data.containsKey('attempt')) {
+      context.handle(
+        _attemptMeta,
+        attempt.isAcceptableOrUnknown(data['attempt']!, _attemptMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_attemptMeta);
+    }
+    if (data.containsKey('submit_pending')) {
+      context.handle(
+        _submitPendingMeta,
+        submitPending.isAcceptableOrUnknown(
+          data['submit_pending']!,
+          _submitPendingMeta,
+        ),
+      );
+    }
+    if (data.containsKey('time_spent_ms')) {
+      context.handle(
+        _timeSpentMsMeta,
+        timeSpentMs.isAcceptableOrUnknown(
+          data['time_spent_ms']!,
+          _timeSpentMsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {attemptId};
+  @override
+  ExamDraftRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ExamDraftRow(
+      attemptId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}attempt_id'],
+      )!,
+      attempt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}attempt'],
+      )!,
+      submitPending: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}submit_pending'],
+      )!,
+      timeSpentMs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}time_spent_ms'],
+      ),
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $ExamDraftsTable createAlias(String alias) {
+    return $ExamDraftsTable(attachedDatabase, alias);
+  }
+}
+
+class ExamDraftRow extends DataClass implements Insertable<ExamDraftRow> {
+  final String attemptId;
+  final String attempt;
+  final bool submitPending;
+  final int? timeSpentMs;
+  final int updatedAt;
+  const ExamDraftRow({
+    required this.attemptId,
+    required this.attempt,
+    required this.submitPending,
+    this.timeSpentMs,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['attempt_id'] = Variable<String>(attemptId);
+    map['attempt'] = Variable<String>(attempt);
+    map['submit_pending'] = Variable<bool>(submitPending);
+    if (!nullToAbsent || timeSpentMs != null) {
+      map['time_spent_ms'] = Variable<int>(timeSpentMs);
+    }
+    map['updated_at'] = Variable<int>(updatedAt);
+    return map;
+  }
+
+  ExamDraftsCompanion toCompanion(bool nullToAbsent) {
+    return ExamDraftsCompanion(
+      attemptId: Value(attemptId),
+      attempt: Value(attempt),
+      submitPending: Value(submitPending),
+      timeSpentMs: timeSpentMs == null && nullToAbsent
+          ? const Value.absent()
+          : Value(timeSpentMs),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory ExamDraftRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ExamDraftRow(
+      attemptId: serializer.fromJson<String>(json['attemptId']),
+      attempt: serializer.fromJson<String>(json['attempt']),
+      submitPending: serializer.fromJson<bool>(json['submitPending']),
+      timeSpentMs: serializer.fromJson<int?>(json['timeSpentMs']),
+      updatedAt: serializer.fromJson<int>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'attemptId': serializer.toJson<String>(attemptId),
+      'attempt': serializer.toJson<String>(attempt),
+      'submitPending': serializer.toJson<bool>(submitPending),
+      'timeSpentMs': serializer.toJson<int?>(timeSpentMs),
+      'updatedAt': serializer.toJson<int>(updatedAt),
+    };
+  }
+
+  ExamDraftRow copyWith({
+    String? attemptId,
+    String? attempt,
+    bool? submitPending,
+    Value<int?> timeSpentMs = const Value.absent(),
+    int? updatedAt,
+  }) => ExamDraftRow(
+    attemptId: attemptId ?? this.attemptId,
+    attempt: attempt ?? this.attempt,
+    submitPending: submitPending ?? this.submitPending,
+    timeSpentMs: timeSpentMs.present ? timeSpentMs.value : this.timeSpentMs,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  ExamDraftRow copyWithCompanion(ExamDraftsCompanion data) {
+    return ExamDraftRow(
+      attemptId: data.attemptId.present ? data.attemptId.value : this.attemptId,
+      attempt: data.attempt.present ? data.attempt.value : this.attempt,
+      submitPending: data.submitPending.present
+          ? data.submitPending.value
+          : this.submitPending,
+      timeSpentMs: data.timeSpentMs.present
+          ? data.timeSpentMs.value
+          : this.timeSpentMs,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ExamDraftRow(')
+          ..write('attemptId: $attemptId, ')
+          ..write('attempt: $attempt, ')
+          ..write('submitPending: $submitPending, ')
+          ..write('timeSpentMs: $timeSpentMs, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(attemptId, attempt, submitPending, timeSpentMs, updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ExamDraftRow &&
+          other.attemptId == this.attemptId &&
+          other.attempt == this.attempt &&
+          other.submitPending == this.submitPending &&
+          other.timeSpentMs == this.timeSpentMs &&
+          other.updatedAt == this.updatedAt);
+}
+
+class ExamDraftsCompanion extends UpdateCompanion<ExamDraftRow> {
+  final Value<String> attemptId;
+  final Value<String> attempt;
+  final Value<bool> submitPending;
+  final Value<int?> timeSpentMs;
+  final Value<int> updatedAt;
+  final Value<int> rowid;
+  const ExamDraftsCompanion({
+    this.attemptId = const Value.absent(),
+    this.attempt = const Value.absent(),
+    this.submitPending = const Value.absent(),
+    this.timeSpentMs = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ExamDraftsCompanion.insert({
+    required String attemptId,
+    required String attempt,
+    this.submitPending = const Value.absent(),
+    this.timeSpentMs = const Value.absent(),
+    required int updatedAt,
+    this.rowid = const Value.absent(),
+  }) : attemptId = Value(attemptId),
+       attempt = Value(attempt),
+       updatedAt = Value(updatedAt);
+  static Insertable<ExamDraftRow> custom({
+    Expression<String>? attemptId,
+    Expression<String>? attempt,
+    Expression<bool>? submitPending,
+    Expression<int>? timeSpentMs,
+    Expression<int>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (attemptId != null) 'attempt_id': attemptId,
+      if (attempt != null) 'attempt': attempt,
+      if (submitPending != null) 'submit_pending': submitPending,
+      if (timeSpentMs != null) 'time_spent_ms': timeSpentMs,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ExamDraftsCompanion copyWith({
+    Value<String>? attemptId,
+    Value<String>? attempt,
+    Value<bool>? submitPending,
+    Value<int?>? timeSpentMs,
+    Value<int>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return ExamDraftsCompanion(
+      attemptId: attemptId ?? this.attemptId,
+      attempt: attempt ?? this.attempt,
+      submitPending: submitPending ?? this.submitPending,
+      timeSpentMs: timeSpentMs ?? this.timeSpentMs,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (attemptId.present) {
+      map['attempt_id'] = Variable<String>(attemptId.value);
+    }
+    if (attempt.present) {
+      map['attempt'] = Variable<String>(attempt.value);
+    }
+    if (submitPending.present) {
+      map['submit_pending'] = Variable<bool>(submitPending.value);
+    }
+    if (timeSpentMs.present) {
+      map['time_spent_ms'] = Variable<int>(timeSpentMs.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ExamDraftsCompanion(')
+          ..write('attemptId: $attemptId, ')
+          ..write('attempt: $attempt, ')
+          ..write('submitPending: $submitPending, ')
+          ..write('timeSpentMs: $timeSpentMs, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ExamAnswersTable extends ExamAnswers
+    with TableInfo<$ExamAnswersTable, ExamAnswerRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ExamAnswersTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _attemptIdMeta = const VerificationMeta(
+    'attemptId',
+  );
+  @override
+  late final GeneratedColumn<String> attemptId = GeneratedColumn<String>(
+    'attempt_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _questionIdMeta = const VerificationMeta(
+    'questionId',
+  );
+  @override
+  late final GeneratedColumn<String> questionId = GeneratedColumn<String>(
+    'question_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _selectedOptionIdMeta = const VerificationMeta(
+    'selectedOptionId',
+  );
+  @override
+  late final GeneratedColumn<String> selectedOptionId = GeneratedColumn<String>(
+    'selected_option_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _writtenAnswerMeta = const VerificationMeta(
+    'writtenAnswer',
+  );
+  @override
+  late final GeneratedColumn<String> writtenAnswer = GeneratedColumn<String>(
+    'written_answer',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _flaggedMeta = const VerificationMeta(
+    'flagged',
+  );
+  @override
+  late final GeneratedColumn<bool> flagged = GeneratedColumn<bool>(
+    'flagged',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("flagged" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _timeSpentMsMeta = const VerificationMeta(
+    'timeSpentMs',
+  );
+  @override
+  late final GeneratedColumn<int> timeSpentMs = GeneratedColumn<int>(
+    'time_spent_ms',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _dirtyMeta = const VerificationMeta('dirty');
+  @override
+  late final GeneratedColumn<bool> dirty = GeneratedColumn<bool>(
+    'dirty',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("dirty" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    attemptId,
+    questionId,
+    selectedOptionId,
+    writtenAnswer,
+    flagged,
+    timeSpentMs,
+    dirty,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'exam_answers';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ExamAnswerRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('attempt_id')) {
+      context.handle(
+        _attemptIdMeta,
+        attemptId.isAcceptableOrUnknown(data['attempt_id']!, _attemptIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_attemptIdMeta);
+    }
+    if (data.containsKey('question_id')) {
+      context.handle(
+        _questionIdMeta,
+        questionId.isAcceptableOrUnknown(data['question_id']!, _questionIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_questionIdMeta);
+    }
+    if (data.containsKey('selected_option_id')) {
+      context.handle(
+        _selectedOptionIdMeta,
+        selectedOptionId.isAcceptableOrUnknown(
+          data['selected_option_id']!,
+          _selectedOptionIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('written_answer')) {
+      context.handle(
+        _writtenAnswerMeta,
+        writtenAnswer.isAcceptableOrUnknown(
+          data['written_answer']!,
+          _writtenAnswerMeta,
+        ),
+      );
+    }
+    if (data.containsKey('flagged')) {
+      context.handle(
+        _flaggedMeta,
+        flagged.isAcceptableOrUnknown(data['flagged']!, _flaggedMeta),
+      );
+    }
+    if (data.containsKey('time_spent_ms')) {
+      context.handle(
+        _timeSpentMsMeta,
+        timeSpentMs.isAcceptableOrUnknown(
+          data['time_spent_ms']!,
+          _timeSpentMsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('dirty')) {
+      context.handle(
+        _dirtyMeta,
+        dirty.isAcceptableOrUnknown(data['dirty']!, _dirtyMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {attemptId, questionId};
+  @override
+  ExamAnswerRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ExamAnswerRow(
+      attemptId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}attempt_id'],
+      )!,
+      questionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}question_id'],
+      )!,
+      selectedOptionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}selected_option_id'],
+      ),
+      writtenAnswer: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}written_answer'],
+      ),
+      flagged: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}flagged'],
+      )!,
+      timeSpentMs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}time_spent_ms'],
+      ),
+      dirty: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}dirty'],
+      )!,
+    );
+  }
+
+  @override
+  $ExamAnswersTable createAlias(String alias) {
+    return $ExamAnswersTable(attachedDatabase, alias);
+  }
+}
+
+class ExamAnswerRow extends DataClass implements Insertable<ExamAnswerRow> {
+  final String attemptId;
+  final String questionId;
+  final String? selectedOptionId;
+  final String? writtenAnswer;
+  final bool flagged;
+  final int? timeSpentMs;
+  final bool dirty;
+  const ExamAnswerRow({
+    required this.attemptId,
+    required this.questionId,
+    this.selectedOptionId,
+    this.writtenAnswer,
+    required this.flagged,
+    this.timeSpentMs,
+    required this.dirty,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['attempt_id'] = Variable<String>(attemptId);
+    map['question_id'] = Variable<String>(questionId);
+    if (!nullToAbsent || selectedOptionId != null) {
+      map['selected_option_id'] = Variable<String>(selectedOptionId);
+    }
+    if (!nullToAbsent || writtenAnswer != null) {
+      map['written_answer'] = Variable<String>(writtenAnswer);
+    }
+    map['flagged'] = Variable<bool>(flagged);
+    if (!nullToAbsent || timeSpentMs != null) {
+      map['time_spent_ms'] = Variable<int>(timeSpentMs);
+    }
+    map['dirty'] = Variable<bool>(dirty);
+    return map;
+  }
+
+  ExamAnswersCompanion toCompanion(bool nullToAbsent) {
+    return ExamAnswersCompanion(
+      attemptId: Value(attemptId),
+      questionId: Value(questionId),
+      selectedOptionId: selectedOptionId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(selectedOptionId),
+      writtenAnswer: writtenAnswer == null && nullToAbsent
+          ? const Value.absent()
+          : Value(writtenAnswer),
+      flagged: Value(flagged),
+      timeSpentMs: timeSpentMs == null && nullToAbsent
+          ? const Value.absent()
+          : Value(timeSpentMs),
+      dirty: Value(dirty),
+    );
+  }
+
+  factory ExamAnswerRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ExamAnswerRow(
+      attemptId: serializer.fromJson<String>(json['attemptId']),
+      questionId: serializer.fromJson<String>(json['questionId']),
+      selectedOptionId: serializer.fromJson<String?>(json['selectedOptionId']),
+      writtenAnswer: serializer.fromJson<String?>(json['writtenAnswer']),
+      flagged: serializer.fromJson<bool>(json['flagged']),
+      timeSpentMs: serializer.fromJson<int?>(json['timeSpentMs']),
+      dirty: serializer.fromJson<bool>(json['dirty']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'attemptId': serializer.toJson<String>(attemptId),
+      'questionId': serializer.toJson<String>(questionId),
+      'selectedOptionId': serializer.toJson<String?>(selectedOptionId),
+      'writtenAnswer': serializer.toJson<String?>(writtenAnswer),
+      'flagged': serializer.toJson<bool>(flagged),
+      'timeSpentMs': serializer.toJson<int?>(timeSpentMs),
+      'dirty': serializer.toJson<bool>(dirty),
+    };
+  }
+
+  ExamAnswerRow copyWith({
+    String? attemptId,
+    String? questionId,
+    Value<String?> selectedOptionId = const Value.absent(),
+    Value<String?> writtenAnswer = const Value.absent(),
+    bool? flagged,
+    Value<int?> timeSpentMs = const Value.absent(),
+    bool? dirty,
+  }) => ExamAnswerRow(
+    attemptId: attemptId ?? this.attemptId,
+    questionId: questionId ?? this.questionId,
+    selectedOptionId: selectedOptionId.present
+        ? selectedOptionId.value
+        : this.selectedOptionId,
+    writtenAnswer: writtenAnswer.present
+        ? writtenAnswer.value
+        : this.writtenAnswer,
+    flagged: flagged ?? this.flagged,
+    timeSpentMs: timeSpentMs.present ? timeSpentMs.value : this.timeSpentMs,
+    dirty: dirty ?? this.dirty,
+  );
+  ExamAnswerRow copyWithCompanion(ExamAnswersCompanion data) {
+    return ExamAnswerRow(
+      attemptId: data.attemptId.present ? data.attemptId.value : this.attemptId,
+      questionId: data.questionId.present
+          ? data.questionId.value
+          : this.questionId,
+      selectedOptionId: data.selectedOptionId.present
+          ? data.selectedOptionId.value
+          : this.selectedOptionId,
+      writtenAnswer: data.writtenAnswer.present
+          ? data.writtenAnswer.value
+          : this.writtenAnswer,
+      flagged: data.flagged.present ? data.flagged.value : this.flagged,
+      timeSpentMs: data.timeSpentMs.present
+          ? data.timeSpentMs.value
+          : this.timeSpentMs,
+      dirty: data.dirty.present ? data.dirty.value : this.dirty,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ExamAnswerRow(')
+          ..write('attemptId: $attemptId, ')
+          ..write('questionId: $questionId, ')
+          ..write('selectedOptionId: $selectedOptionId, ')
+          ..write('writtenAnswer: $writtenAnswer, ')
+          ..write('flagged: $flagged, ')
+          ..write('timeSpentMs: $timeSpentMs, ')
+          ..write('dirty: $dirty')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    attemptId,
+    questionId,
+    selectedOptionId,
+    writtenAnswer,
+    flagged,
+    timeSpentMs,
+    dirty,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ExamAnswerRow &&
+          other.attemptId == this.attemptId &&
+          other.questionId == this.questionId &&
+          other.selectedOptionId == this.selectedOptionId &&
+          other.writtenAnswer == this.writtenAnswer &&
+          other.flagged == this.flagged &&
+          other.timeSpentMs == this.timeSpentMs &&
+          other.dirty == this.dirty);
+}
+
+class ExamAnswersCompanion extends UpdateCompanion<ExamAnswerRow> {
+  final Value<String> attemptId;
+  final Value<String> questionId;
+  final Value<String?> selectedOptionId;
+  final Value<String?> writtenAnswer;
+  final Value<bool> flagged;
+  final Value<int?> timeSpentMs;
+  final Value<bool> dirty;
+  final Value<int> rowid;
+  const ExamAnswersCompanion({
+    this.attemptId = const Value.absent(),
+    this.questionId = const Value.absent(),
+    this.selectedOptionId = const Value.absent(),
+    this.writtenAnswer = const Value.absent(),
+    this.flagged = const Value.absent(),
+    this.timeSpentMs = const Value.absent(),
+    this.dirty = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ExamAnswersCompanion.insert({
+    required String attemptId,
+    required String questionId,
+    this.selectedOptionId = const Value.absent(),
+    this.writtenAnswer = const Value.absent(),
+    this.flagged = const Value.absent(),
+    this.timeSpentMs = const Value.absent(),
+    this.dirty = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : attemptId = Value(attemptId),
+       questionId = Value(questionId);
+  static Insertable<ExamAnswerRow> custom({
+    Expression<String>? attemptId,
+    Expression<String>? questionId,
+    Expression<String>? selectedOptionId,
+    Expression<String>? writtenAnswer,
+    Expression<bool>? flagged,
+    Expression<int>? timeSpentMs,
+    Expression<bool>? dirty,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (attemptId != null) 'attempt_id': attemptId,
+      if (questionId != null) 'question_id': questionId,
+      if (selectedOptionId != null) 'selected_option_id': selectedOptionId,
+      if (writtenAnswer != null) 'written_answer': writtenAnswer,
+      if (flagged != null) 'flagged': flagged,
+      if (timeSpentMs != null) 'time_spent_ms': timeSpentMs,
+      if (dirty != null) 'dirty': dirty,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ExamAnswersCompanion copyWith({
+    Value<String>? attemptId,
+    Value<String>? questionId,
+    Value<String?>? selectedOptionId,
+    Value<String?>? writtenAnswer,
+    Value<bool>? flagged,
+    Value<int?>? timeSpentMs,
+    Value<bool>? dirty,
+    Value<int>? rowid,
+  }) {
+    return ExamAnswersCompanion(
+      attemptId: attemptId ?? this.attemptId,
+      questionId: questionId ?? this.questionId,
+      selectedOptionId: selectedOptionId ?? this.selectedOptionId,
+      writtenAnswer: writtenAnswer ?? this.writtenAnswer,
+      flagged: flagged ?? this.flagged,
+      timeSpentMs: timeSpentMs ?? this.timeSpentMs,
+      dirty: dirty ?? this.dirty,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (attemptId.present) {
+      map['attempt_id'] = Variable<String>(attemptId.value);
+    }
+    if (questionId.present) {
+      map['question_id'] = Variable<String>(questionId.value);
+    }
+    if (selectedOptionId.present) {
+      map['selected_option_id'] = Variable<String>(selectedOptionId.value);
+    }
+    if (writtenAnswer.present) {
+      map['written_answer'] = Variable<String>(writtenAnswer.value);
+    }
+    if (flagged.present) {
+      map['flagged'] = Variable<bool>(flagged.value);
+    }
+    if (timeSpentMs.present) {
+      map['time_spent_ms'] = Variable<int>(timeSpentMs.value);
+    }
+    if (dirty.present) {
+      map['dirty'] = Variable<bool>(dirty.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ExamAnswersCompanion(')
+          ..write('attemptId: $attemptId, ')
+          ..write('questionId: $questionId, ')
+          ..write('selectedOptionId: $selectedOptionId, ')
+          ..write('writtenAnswer: $writtenAnswer, ')
+          ..write('flagged: $flagged, ')
+          ..write('timeSpentMs: $timeSpentMs, ')
+          ..write('dirty: $dirty, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $KeyValuesTable keyValues = $KeyValuesTable(this);
   late final $SrsCardStatesTable srsCardStates = $SrsCardStatesTable(this);
   late final $SrsReviewLogsTable srsReviewLogs = $SrsReviewLogsTable(this);
+  late final $ExamDraftsTable examDrafts = $ExamDraftsTable(this);
+  late final $ExamAnswersTable examAnswers = $ExamAnswersTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1410,6 +2285,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     keyValues,
     srsCardStates,
     srsReviewLogs,
+    examDrafts,
+    examAnswers,
   ];
 }
 
@@ -2160,6 +3037,474 @@ typedef $$SrsReviewLogsTableProcessedTableManager =
       SrsReviewLog,
       PrefetchHooks Function()
     >;
+typedef $$ExamDraftsTableCreateCompanionBuilder =
+    ExamDraftsCompanion Function({
+      required String attemptId,
+      required String attempt,
+      Value<bool> submitPending,
+      Value<int?> timeSpentMs,
+      required int updatedAt,
+      Value<int> rowid,
+    });
+typedef $$ExamDraftsTableUpdateCompanionBuilder =
+    ExamDraftsCompanion Function({
+      Value<String> attemptId,
+      Value<String> attempt,
+      Value<bool> submitPending,
+      Value<int?> timeSpentMs,
+      Value<int> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$ExamDraftsTableFilterComposer
+    extends Composer<_$AppDatabase, $ExamDraftsTable> {
+  $$ExamDraftsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get attemptId => $composableBuilder(
+    column: $table.attemptId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get attempt => $composableBuilder(
+    column: $table.attempt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get submitPending => $composableBuilder(
+    column: $table.submitPending,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get timeSpentMs => $composableBuilder(
+    column: $table.timeSpentMs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ExamDraftsTableOrderingComposer
+    extends Composer<_$AppDatabase, $ExamDraftsTable> {
+  $$ExamDraftsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get attemptId => $composableBuilder(
+    column: $table.attemptId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get attempt => $composableBuilder(
+    column: $table.attempt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get submitPending => $composableBuilder(
+    column: $table.submitPending,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get timeSpentMs => $composableBuilder(
+    column: $table.timeSpentMs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ExamDraftsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ExamDraftsTable> {
+  $$ExamDraftsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get attemptId =>
+      $composableBuilder(column: $table.attemptId, builder: (column) => column);
+
+  GeneratedColumn<String> get attempt =>
+      $composableBuilder(column: $table.attempt, builder: (column) => column);
+
+  GeneratedColumn<bool> get submitPending => $composableBuilder(
+    column: $table.submitPending,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get timeSpentMs => $composableBuilder(
+    column: $table.timeSpentMs,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$ExamDraftsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ExamDraftsTable,
+          ExamDraftRow,
+          $$ExamDraftsTableFilterComposer,
+          $$ExamDraftsTableOrderingComposer,
+          $$ExamDraftsTableAnnotationComposer,
+          $$ExamDraftsTableCreateCompanionBuilder,
+          $$ExamDraftsTableUpdateCompanionBuilder,
+          (
+            ExamDraftRow,
+            BaseReferences<_$AppDatabase, $ExamDraftsTable, ExamDraftRow>,
+          ),
+          ExamDraftRow,
+          PrefetchHooks Function()
+        > {
+  $$ExamDraftsTableTableManager(_$AppDatabase db, $ExamDraftsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ExamDraftsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ExamDraftsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ExamDraftsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> attemptId = const Value.absent(),
+                Value<String> attempt = const Value.absent(),
+                Value<bool> submitPending = const Value.absent(),
+                Value<int?> timeSpentMs = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ExamDraftsCompanion(
+                attemptId: attemptId,
+                attempt: attempt,
+                submitPending: submitPending,
+                timeSpentMs: timeSpentMs,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String attemptId,
+                required String attempt,
+                Value<bool> submitPending = const Value.absent(),
+                Value<int?> timeSpentMs = const Value.absent(),
+                required int updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => ExamDraftsCompanion.insert(
+                attemptId: attemptId,
+                attempt: attempt,
+                submitPending: submitPending,
+                timeSpentMs: timeSpentMs,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$ExamDraftsTable, ExamDraftRow>(table),
+                  BaseReferences<_$AppDatabase, $ExamDraftsTable, ExamDraftRow>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ExamDraftsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ExamDraftsTable,
+      ExamDraftRow,
+      $$ExamDraftsTableFilterComposer,
+      $$ExamDraftsTableOrderingComposer,
+      $$ExamDraftsTableAnnotationComposer,
+      $$ExamDraftsTableCreateCompanionBuilder,
+      $$ExamDraftsTableUpdateCompanionBuilder,
+      (
+        ExamDraftRow,
+        BaseReferences<_$AppDatabase, $ExamDraftsTable, ExamDraftRow>,
+      ),
+      ExamDraftRow,
+      PrefetchHooks Function()
+    >;
+typedef $$ExamAnswersTableCreateCompanionBuilder =
+    ExamAnswersCompanion Function({
+      required String attemptId,
+      required String questionId,
+      Value<String?> selectedOptionId,
+      Value<String?> writtenAnswer,
+      Value<bool> flagged,
+      Value<int?> timeSpentMs,
+      Value<bool> dirty,
+      Value<int> rowid,
+    });
+typedef $$ExamAnswersTableUpdateCompanionBuilder =
+    ExamAnswersCompanion Function({
+      Value<String> attemptId,
+      Value<String> questionId,
+      Value<String?> selectedOptionId,
+      Value<String?> writtenAnswer,
+      Value<bool> flagged,
+      Value<int?> timeSpentMs,
+      Value<bool> dirty,
+      Value<int> rowid,
+    });
+
+class $$ExamAnswersTableFilterComposer
+    extends Composer<_$AppDatabase, $ExamAnswersTable> {
+  $$ExamAnswersTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get attemptId => $composableBuilder(
+    column: $table.attemptId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get questionId => $composableBuilder(
+    column: $table.questionId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get selectedOptionId => $composableBuilder(
+    column: $table.selectedOptionId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get writtenAnswer => $composableBuilder(
+    column: $table.writtenAnswer,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get flagged => $composableBuilder(
+    column: $table.flagged,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get timeSpentMs => $composableBuilder(
+    column: $table.timeSpentMs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get dirty => $composableBuilder(
+    column: $table.dirty,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ExamAnswersTableOrderingComposer
+    extends Composer<_$AppDatabase, $ExamAnswersTable> {
+  $$ExamAnswersTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get attemptId => $composableBuilder(
+    column: $table.attemptId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get questionId => $composableBuilder(
+    column: $table.questionId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get selectedOptionId => $composableBuilder(
+    column: $table.selectedOptionId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get writtenAnswer => $composableBuilder(
+    column: $table.writtenAnswer,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get flagged => $composableBuilder(
+    column: $table.flagged,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get timeSpentMs => $composableBuilder(
+    column: $table.timeSpentMs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get dirty => $composableBuilder(
+    column: $table.dirty,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ExamAnswersTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ExamAnswersTable> {
+  $$ExamAnswersTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get attemptId =>
+      $composableBuilder(column: $table.attemptId, builder: (column) => column);
+
+  GeneratedColumn<String> get questionId => $composableBuilder(
+    column: $table.questionId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get selectedOptionId => $composableBuilder(
+    column: $table.selectedOptionId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get writtenAnswer => $composableBuilder(
+    column: $table.writtenAnswer,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get flagged =>
+      $composableBuilder(column: $table.flagged, builder: (column) => column);
+
+  GeneratedColumn<int> get timeSpentMs => $composableBuilder(
+    column: $table.timeSpentMs,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get dirty =>
+      $composableBuilder(column: $table.dirty, builder: (column) => column);
+}
+
+class $$ExamAnswersTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ExamAnswersTable,
+          ExamAnswerRow,
+          $$ExamAnswersTableFilterComposer,
+          $$ExamAnswersTableOrderingComposer,
+          $$ExamAnswersTableAnnotationComposer,
+          $$ExamAnswersTableCreateCompanionBuilder,
+          $$ExamAnswersTableUpdateCompanionBuilder,
+          (
+            ExamAnswerRow,
+            BaseReferences<_$AppDatabase, $ExamAnswersTable, ExamAnswerRow>,
+          ),
+          ExamAnswerRow,
+          PrefetchHooks Function()
+        > {
+  $$ExamAnswersTableTableManager(_$AppDatabase db, $ExamAnswersTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ExamAnswersTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ExamAnswersTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ExamAnswersTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> attemptId = const Value.absent(),
+                Value<String> questionId = const Value.absent(),
+                Value<String?> selectedOptionId = const Value.absent(),
+                Value<String?> writtenAnswer = const Value.absent(),
+                Value<bool> flagged = const Value.absent(),
+                Value<int?> timeSpentMs = const Value.absent(),
+                Value<bool> dirty = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ExamAnswersCompanion(
+                attemptId: attemptId,
+                questionId: questionId,
+                selectedOptionId: selectedOptionId,
+                writtenAnswer: writtenAnswer,
+                flagged: flagged,
+                timeSpentMs: timeSpentMs,
+                dirty: dirty,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String attemptId,
+                required String questionId,
+                Value<String?> selectedOptionId = const Value.absent(),
+                Value<String?> writtenAnswer = const Value.absent(),
+                Value<bool> flagged = const Value.absent(),
+                Value<int?> timeSpentMs = const Value.absent(),
+                Value<bool> dirty = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ExamAnswersCompanion.insert(
+                attemptId: attemptId,
+                questionId: questionId,
+                selectedOptionId: selectedOptionId,
+                writtenAnswer: writtenAnswer,
+                flagged: flagged,
+                timeSpentMs: timeSpentMs,
+                dirty: dirty,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$ExamAnswersTable, ExamAnswerRow>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $ExamAnswersTable,
+                    ExamAnswerRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ExamAnswersTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ExamAnswersTable,
+      ExamAnswerRow,
+      $$ExamAnswersTableFilterComposer,
+      $$ExamAnswersTableOrderingComposer,
+      $$ExamAnswersTableAnnotationComposer,
+      $$ExamAnswersTableCreateCompanionBuilder,
+      $$ExamAnswersTableUpdateCompanionBuilder,
+      (
+        ExamAnswerRow,
+        BaseReferences<_$AppDatabase, $ExamAnswersTable, ExamAnswerRow>,
+      ),
+      ExamAnswerRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -2170,4 +3515,8 @@ class $AppDatabaseManager {
       $$SrsCardStatesTableTableManager(_db, _db.srsCardStates);
   $$SrsReviewLogsTableTableManager get srsReviewLogs =>
       $$SrsReviewLogsTableTableManager(_db, _db.srsReviewLogs);
+  $$ExamDraftsTableTableManager get examDrafts =>
+      $$ExamDraftsTableTableManager(_db, _db.examDrafts);
+  $$ExamAnswersTableTableManager get examAnswers =>
+      $$ExamAnswersTableTableManager(_db, _db.examAnswers);
 }

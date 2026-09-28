@@ -63,6 +63,8 @@ export const attemptFiltersSchema = z.object({
   lessonId: z.uuid().nullable().optional(),
   types: z.array(questionTypeSchema).max(3).optional(),
   count: int().min(1).max(100).optional(),
+  /** Mistake reviews only: limit to these questions ("أعد الأخطاء فقط"). */
+  questionIds: z.array(z.uuid()).max(200).optional(),
 });
 
 export const startAttemptBodySchema = z.object({
@@ -109,6 +111,8 @@ export const attemptSummarySchema = z.object({
   titleAr: z.string(),
   subjectId: z.string().nullable(),
   teacherTrackId: z.string().nullable(),
+  /** What a random or mistakes attempt was built from, for "أعد الاختبار". */
+  filters: attemptFiltersSchema.nullable(),
   status: attemptStatusSchema,
   startedAt: z.string(),
   /** Server-authoritative end of a timed exam. */
@@ -273,6 +277,7 @@ export type AdminQuizDetail = z.infer<typeof adminQuizDetailSchema>;
 export type AttemptFiltersInput = z.infer<typeof attemptFiltersSchema>;
 
 const named: [z.ZodType, string][] = [
+  [attemptStatusSchema, 'AttemptStatus'],
   [studentQuizSchema, 'StudentQuiz'],
   [studentQuizListSchema, 'StudentQuizList'],
   [attemptFiltersSchema, 'AttemptFilters'],

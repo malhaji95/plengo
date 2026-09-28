@@ -7,11 +7,26 @@ import 'package:json_annotation/json_annotation.dart';
 @JsonEnum()
 enum SessionPlatform {
   @JsonValue('android')
-  android,
+  android('android'),
   @JsonValue('ios')
-  ios,
+  ios('ios'),
   @JsonValue('web')
-  web,
+  web('web'),
   @JsonValue('admin')
-  admin;
+  admin('admin');
+
+  const SessionPlatform(this.json);
+
+  final String? json;
+  String toJson() {
+    final value = json;
+    if (value == null) {
+      throw StateError('Cannot convert enum value with null JSON representation to String. '
+          'This usually happens for \$unknown or @JsonValue(null) entries.');
+    }
+    return value as String;
+  }
+
+  @override
+  String toString() => json?.toString() ?? super.toString();
 }

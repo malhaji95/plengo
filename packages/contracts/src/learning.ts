@@ -38,13 +38,17 @@ export const mistakeListSchema = z.object({
   masteryStreak: int(),
 });
 
+export const mistakeFilterStatusSchema = z.enum(['active', 'mastered']);
+/** Same values as the question type; named separately so query enums get their own client type. */
+export const mistakeFilterTypeSchema = z.enum(['mcq', 'true_false', 'written']);
+
 export const mistakeQuerySchema = z.object({
-  status: z.enum(['active', 'mastered']).default('active'),
+  status: mistakeFilterStatusSchema.default('active'),
   subjectId: z.uuid().optional(),
   teacherTrackId: z.uuid().optional(),
   unitId: z.uuid().optional(),
   lessonId: z.uuid().optional(),
-  type: questionTypeSchema.optional(),
+  type: mistakeFilterTypeSchema.optional(),
 });
 
 export const learningSettingsSchema = z.object({ mistakeMasteryStreak: int().min(1).max(10) });
@@ -219,6 +223,8 @@ export type ScopeProgress = z.infer<typeof scopeProgressSchema>;
 export type ResumeItem = z.infer<typeof resumeItemSchema>;
 
 const named: [z.ZodType, string][] = [
+  [mistakeFilterStatusSchema, 'MistakeFilterStatus'],
+  [mistakeFilterTypeSchema, 'MistakeFilterType'],
   [mistakeSchema, 'Mistake'],
   [mistakeListSchema, 'MistakeList'],
   [learningSettingsSchema, 'LearningSettings'],
@@ -235,6 +241,7 @@ const named: [z.ZodType, string][] = [
   [statsTrendSchema, 'StatsTrend'],
   [dayCountSchema, 'DayCount'],
   [flashcardStatsSchema, 'FlashcardStats'],
+  [bookmarkItemTypeSchema, 'BookmarkItemType'],
   [bookmarkSchema, 'Bookmark'],
   [bookmarkListSchema, 'BookmarkList'],
   [bookmarkBodySchema, 'BookmarkRequest'],

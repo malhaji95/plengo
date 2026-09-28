@@ -20,7 +20,7 @@ SessionSummary _$SessionSummaryFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$SessionSummaryToJson(SessionSummary instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'platform': _$SessionPlatformEnumMap[instance.platform]!,
+      'platform': instance.platform,
       'appVersion': instance.appVersion,
       'userAgent': instance.userAgent,
       'createdAt': instance.createdAt.toIso8601String(),

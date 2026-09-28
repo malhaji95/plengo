@@ -3,7 +3,7 @@ import 'package:drift/drift.dart';
 part 'app_database.g.dart';
 
 /// Small key/value store for settings and cache metadata. Feature tables (SRS states, review
-/// logs, student decks, exam drafts, offline packs) arrive with their phases (spec §22.12).
+/// logs, exam drafts; student decks and offline packs later) arrive with their phases (§22.12).
 class KeyValues extends Table {
   TextColumn get key => text()();
   TextColumn get value => text()();
@@ -46,12 +46,41 @@ class SrsReviewLogs extends Table {
   Set<Column<Object>> get primaryKey => {id};
 }
 
-@DriftDatabase(tables: [KeyValues, SrsCardStates, SrsReviewLogs])
+/// An exam in progress, cached so it continues through connection drops (spec §15.2). `attempt`
+/// is the server's attempt JSON; `submitPending` marks a submission waiting for the connection.
+@DataClassName('ExamDraftRow')
+class ExamDrafts extends Table {
+  TextColumn get attemptId => text()();
+  TextColumn get attempt => text()();
+  BoolColumn get submitPending => boolean().withDefault(const Constant(false))();
+  IntColumn get timeSpentMs => integer().nullable()();
+  IntColumn get updatedAt => integer()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {attemptId};
+}
+
+/// The latest local answer per exam question. `dirty` answers have not reached the server yet.
+@DataClassName('ExamAnswerRow')
+class ExamAnswers extends Table {
+  TextColumn get attemptId => text()();
+  TextColumn get questionId => text()();
+  TextColumn get selectedOptionId => text().nullable()();
+  TextColumn get writtenAnswer => text().nullable()();
+  BoolColumn get flagged => boolean().withDefault(const Constant(false))();
+  IntColumn get timeSpentMs => integer().nullable()();
+  BoolColumn get dirty => boolean().withDefault(const Constant(true))();
+
+  @override
+  Set<Column<Object>> get primaryKey => {attemptId, questionId};
+}
+
+@DriftDatabase(tables: [KeyValues, SrsCardStates, SrsReviewLogs, ExamDrafts, ExamAnswers])
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -59,6 +88,10 @@ class AppDatabase extends _$AppDatabase {
       if (from < 2) {
         await m.createTable(srsCardStates);
         await m.createTable(srsReviewLogs);
+      }
+      if (from < 3) {
+        await m.createTable(examDrafts);
+        await m.createTable(examAnswers);
       }
     },
   );

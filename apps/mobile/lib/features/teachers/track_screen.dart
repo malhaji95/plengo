@@ -6,6 +6,7 @@ import '../../app/router.dart';
 import '../../shared/widgets/async_view.dart';
 import '../../shared/widgets/network_avatar.dart';
 import '../access/access_banner.dart';
+import '../learning/scope_learning.dart';
 import '../questions/question_providers.dart';
 import 'teacher_providers.dart';
 
@@ -58,6 +59,13 @@ class TrackScreen extends ConsumerWidget {
                     onTap: () => context.go('${Routes.subjects}/${d.subject.id}'),
                   ),
                 ),
+                ScopeLearning(
+                  subjectId: d.subject.id,
+                  teacherTrackId: d.track.id,
+                  quizCount: d.quizCount,
+                  questionCount: d.questionCount,
+                  quizzesPath: '${Routes.tracks}/${d.track.id}/quizzes',
+                ),
                 if (d.deckCount.total > 0)
                   Card(
                     margin: const EdgeInsets.only(bottom: 8),
@@ -82,7 +90,7 @@ class TrackScreen extends ConsumerWidget {
                       onTap: () => context.go('${Routes.tracks}/${d.track.id}/questions'),
                     ),
                   )
-                else if (d.deckCount.total == 0)
+                else if (d.deckCount.total == 0 && d.quizCount.total == 0)
                   const EmptyState('محتوى هذا المسار قيد الإعداد', icon: Icons.hourglass_empty),
               ],
             ),

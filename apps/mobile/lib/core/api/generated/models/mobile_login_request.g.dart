@@ -21,7 +21,7 @@ Map<String, dynamic> _$MobileLoginRequestToJson(MobileLoginRequest instance) =>
     <String, dynamic>{
       'email': instance.email,
       'password': instance.password,
-      'platform': _$MobileLoginRequestPlatformEnumMap[instance.platform]!,
+      'platform': instance.platform,
       'appVersion': ?instance.appVersion,
     };
 

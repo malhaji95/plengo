@@ -44,7 +44,7 @@ Map<String, dynamic> _$StudentQuizToJson(StudentQuiz instance) =>
       'lessonId': instance.lessonId,
       'titleAr': instance.titleAr,
       'description': instance.description,
-      'allowedModes': _$StudentQuizAllowedModesEnumMap[instance.allowedModes]!,
+      'allowedModes': instance.allowedModes,
       'timeLimitSeconds': instance.timeLimitSeconds,
       'passingScorePercent': instance.passingScorePercent,
       'maxAttempts': instance.maxAttempts,

@@ -129,6 +129,7 @@ export function createAttemptService(deps: {
       titleAr: a.titleAr,
       subjectId: a.subjectId,
       teacherTrackId: a.teacherTrackId,
+      filters: a.filters,
       status: a.status,
       startedAt: a.startedAt.toISOString(),
       deadlineAt: a.deadlineAt?.toISOString() ?? null,
@@ -338,9 +339,7 @@ export function createAttemptService(deps: {
           trackId ? eq(questions.teacherTrackId, trackId) : isNull(questions.teacherTrackId),
           f.unitId ? eq(questions.unitId, f.unitId) : undefined,
           f.lessonId ? eq(questions.lessonId, f.lessonId) : undefined,
-          f.types?.length
-            ? inArray(questions.type, f.types as ('mcq' | 'true_false' | 'written')[])
-            : undefined,
+          f.types?.length ? inArray(questions.type, f.types) : undefined,
           scopeOpen ? undefined : eq(questions.isFree, true),
         ),
       )
@@ -382,9 +381,8 @@ export function createAttemptService(deps: {
             : undefined,
           f.unitId ? eq(questions.unitId, f.unitId) : undefined,
           f.lessonId ? eq(questions.lessonId, f.lessonId) : undefined,
-          f.types?.length
-            ? inArray(questions.type, f.types as ('mcq' | 'true_false' | 'written')[])
-            : undefined,
+          f.types?.length ? inArray(questions.type, f.types) : undefined,
+          f.questionIds?.length ? inArray(questions.id, f.questionIds) : undefined,
         ),
       );
     const ctx = await access.context(userId);

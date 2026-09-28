@@ -21,8 +21,8 @@ Map<String, dynamic> _$StartAttemptRequestToJson(
   StartAttemptRequest instance,
 ) => <String, dynamic>{
   'clientAttemptId': instance.clientAttemptId,
-  'source': _$StartAttemptRequestSourceEnumMap[instance.source]!,
-  'mode': _$StartAttemptRequestModeEnumMap[instance.mode]!,
+  'source': instance.source,
+  'mode': instance.mode,
   'quizId': ?instance.quizId,
   'filters': ?instance.filters,
 };

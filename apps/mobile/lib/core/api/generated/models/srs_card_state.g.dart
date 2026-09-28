@@ -23,7 +23,7 @@ SrsCardState _$SrsCardStateFromJson(Map<String, dynamic> json) => SrsCardState(
 
 Map<String, dynamic> _$SrsCardStateToJson(SrsCardState instance) =>
     <String, dynamic>{
-      'state': _$SrsCardStateStateEnumMap[instance.state]!,
+      'state': instance.state,
       'step': instance.step,
       'dueAt': instance.dueAt.toIso8601String(),
       'intervalDays': instance.intervalDays,

@@ -6,9 +6,9 @@ import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 
 import '../models/deleted_result_envelope.dart';
+import '../models/mistake_filter_status.dart';
+import '../models/mistake_filter_type.dart';
 import '../models/mistake_list_envelope.dart';
-import '../models/status2.dart';
-import '../models/type.dart';
 
 part 'mistakes_client.g.dart';
 
@@ -18,12 +18,12 @@ abstract class MistakesClient {
 
   @GET('/api/v1/mistakes')
   Future<MistakeListEnvelope> listMistakes({
+    @Query('status') MistakeFilterStatus? status,
     @Query('subjectId') String? subjectId,
     @Query('teacherTrackId') String? teacherTrackId,
     @Query('unitId') String? unitId,
     @Query('lessonId') String? lessonId,
-    @Query('type') Type? type,
-    @Query('status') Status2? status = Status2.active,
+    @Query('type') MistakeFilterType? type,
   });
 
   @DELETE('/api/v1/mistakes/{questionId}')

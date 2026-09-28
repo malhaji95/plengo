@@ -7,11 +7,26 @@ import 'package:json_annotation/json_annotation.dart';
 @JsonEnum()
 enum MyEntitlementSource {
   @JsonValue('coupon')
-  coupon,
+  coupon('coupon'),
   @JsonValue('admin_grant')
-  adminGrant,
+  adminGrant('admin_grant'),
   @JsonValue('promotion')
-  promotion,
+  promotion('promotion'),
   @JsonValue('future_purchase')
-  futurePurchase;
+  futurePurchase('future_purchase');
+
+  const MyEntitlementSource(this.json);
+
+  final String? json;
+  String toJson() {
+    final value = json;
+    if (value == null) {
+      throw StateError('Cannot convert enum value with null JSON representation to String. '
+          'This usually happens for \$unknown or @JsonValue(null) entries.');
+    }
+    return value as String;
+  }
+
+  @override
+  String toString() => json?.toString() ?? super.toString();
 }

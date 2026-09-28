@@ -18,7 +18,7 @@ Map<String, dynamic> _$TypeAccuracyToJson(TypeAccuracy instance) =>
       'answered': instance.answered,
       'correct': instance.correct,
       'accuracyPercent': instance.accuracyPercent,
-      'type': _$TypeAccuracyTypeEnumMap[instance.type]!,
+      'type': instance.type,
     };
 
 const _$TypeAccuracyTypeEnumMap = {

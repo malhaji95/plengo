@@ -4,9 +4,10 @@
 
 import 'package:json_annotation/json_annotation.dart';
 
+import 'attempt_filters.dart';
+import 'attempt_status.dart';
 import 'attempt_summary_mode.dart';
 import 'attempt_summary_source.dart';
-import 'attempt_summary_status.dart';
 
 part 'attempt_summary.g.dart';
 
@@ -21,6 +22,7 @@ class AttemptSummary {
     required this.titleAr,
     required this.subjectId,
     required this.teacherTrackId,
+    required this.filters,
     required this.status,
     required this.startedAt,
     required this.deadlineAt,
@@ -50,7 +52,9 @@ class AttemptSummary {
   final String? subjectId;
   @JsonKey(includeIfNull: true)
   final String? teacherTrackId;
-  final AttemptSummaryStatus status;
+  @JsonKey(includeIfNull: true)
+  final AttemptFilters? filters;
+  final AttemptStatus status;
   final String startedAt;
   @JsonKey(includeIfNull: true)
   final String? deadlineAt;

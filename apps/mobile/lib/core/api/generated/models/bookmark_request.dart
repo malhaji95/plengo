@@ -4,7 +4,7 @@
 
 import 'package:json_annotation/json_annotation.dart';
 
-import 'bookmark_request_item_type.dart';
+import 'bookmark_item_type.dart';
 
 part 'bookmark_request.g.dart';
 
@@ -17,7 +17,7 @@ class BookmarkRequest {
   
   factory BookmarkRequest.fromJson(Map<String, Object?> json) => _$BookmarkRequestFromJson(json);
   
-  final BookmarkRequestItemType itemType;
+  final BookmarkItemType itemType;
   final String itemId;
 
   Map<String, Object?> toJson() => _$BookmarkRequestToJson(this);

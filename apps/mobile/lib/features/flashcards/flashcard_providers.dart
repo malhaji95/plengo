@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -9,6 +8,7 @@ import '../../core/content/flashcard_repository.dart';
 import '../../core/srs/queue.dart';
 import '../../core/srs/scheduler.dart';
 import '../../core/srs/srs_store.dart';
+import '../../shared/util/uuid.dart';
 
 final flashcardRepositoryProvider = Provider<FlashcardRepository>(
   (ref) => FlashcardRepository(ref.watch(apiClientProvider)),
@@ -114,15 +114,6 @@ class StudyState {
       );
 }
 
-String _uuidV4() {
-  final r = Random.secure();
-  final b = List<int>.generate(16, (_) => r.nextInt(256));
-  b[6] = (b[6] & 0x0f) | 0x40;
-  b[8] = (b[8] & 0x3f) | 0x80;
-  final h = b.map((x) => x.toRadixString(16).padLeft(2, '0')).join();
-  return '${h.substring(0, 8)}-${h.substring(8, 12)}-${h.substring(12, 16)}-${h.substring(16, 20)}-${h.substring(20)}';
-}
-
 /// A study session (spec §13.3–§13.6): the queue is rebuilt after every rating; each rating is
 /// stored locally with its log and synced in the background. Up to 10 ratings can be undone.
 class StudyController extends AsyncNotifier<StudyState> {
@@ -201,7 +192,7 @@ class StudyController extends AsyncNotifier<StudyState> {
     final now = _now();
     final before = s.states[card.id] ?? CardState.newCard(now);
     final after = schedule(before, rating, now, card.id);
-    final logId = _uuidV4();
+    final logId = uuidV4();
     await _store.putState(card.id, after);
     await _store.addLog(
       LocalReviewLog(

@@ -18,9 +18,16 @@ import '../features/flashcards/deck_screen.dart';
 import '../features/flashcards/decks_screen.dart';
 import '../features/flashcards/review_tab.dart';
 import '../features/flashcards/study_screen.dart';
+import '../features/bookmarks/saved_tab.dart';
+import '../features/learning/home_tab.dart';
+import '../features/learning/mistakes_screen.dart';
+import '../features/learning/stats_screen.dart';
+import '../features/quizzes/attempt_route.dart';
+import '../features/quizzes/quizzes_screen.dart';
+import '../features/quizzes/random_practice_screen.dart';
+import '../features/quizzes/results_screen.dart';
 import '../features/questions/questions_screen.dart';
 import '../features/shell/home_shell.dart';
-import '../features/shell/placeholder_tab.dart';
 import '../features/splash/splash_screen.dart';
 import '../features/subjects/subject_screen.dart';
 import '../features/subjects/subjects_screen.dart';
@@ -52,6 +59,11 @@ abstract final class Routes {
   static const redeem = '/redeem';
   static const decks = '/decks';
   static const dueStudy = '/review/study';
+  static const mistakes = '/review/mistakes';
+  static const stats = '/review/stats';
+  static const quizzes = '/quizzes';
+  static const attempts = '/attempts';
+  static const randomPractice = '/practice/random';
 
   static const public = {login, register, verifyEmail, forgotPassword, resetPassword};
 }
@@ -120,12 +132,7 @@ GoRouter buildRouter(Ref ref, {required bool couponRedemption}) {
         builder: (_, _, shell) => HomeShell(shell: shell),
         branches: [
           StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: Routes.home,
-                builder: (_, _) => const PlaceholderTab(title: 'الرئيسية'),
-              ),
-            ],
+            routes: [GoRoute(path: Routes.home, builder: (_, _) => const HomeTab())],
           ),
           StatefulShellBranch(
             routes: [
@@ -140,6 +147,13 @@ GoRouter buildRouter(Ref ref, {required bool couponRedemption}) {
                       GoRoute(
                         path: 'decks',
                         builder: (_, state) => SubjectDecksRoute(subjectId: state.pathParameters['id']!),
+                      ),
+                      GoRoute(
+                        path: 'quizzes',
+                        builder: (_, state) => SubjectQuizzesRoute(
+                          subjectId: state.pathParameters['id']!,
+                          lessonId: state.uri.queryParameters['lessonId'],
+                        ),
                       ),
                       GoRoute(
                         path: 'questions',
@@ -175,7 +189,15 @@ GoRouter buildRouter(Ref ref, {required bool couponRedemption}) {
                     path: 'decks',
                     builder: (_, state) => TrackDecksRoute(trackId: state.pathParameters['id']!),
                   ),
+                  GoRoute(
+                    path: 'quizzes',
+                    builder: (_, state) => TrackQuizzesRoute(trackId: state.pathParameters['id']!),
+                  ),
                 ],
+              ),
+              GoRoute(
+                path: '${Routes.quizzes}/:id',
+                builder: (_, state) => QuizScreen(quizId: state.pathParameters['id']!),
               ),
               GoRoute(
                 path: '${Routes.decks}/:id',
@@ -184,15 +206,28 @@ GoRouter buildRouter(Ref ref, {required bool couponRedemption}) {
             ],
           ),
           StatefulShellBranch(
-            routes: [GoRoute(path: Routes.review, builder: (_, _) => const ReviewTab())],
-          ),
-          StatefulShellBranch(
             routes: [
               GoRoute(
-                path: Routes.saved,
-                builder: (_, _) => const PlaceholderTab(title: 'المحفوظات'),
+                path: Routes.review,
+                builder: (_, _) => const ReviewTab(),
+                routes: [
+                  GoRoute(path: 'mistakes', builder: (_, _) => const MistakesScreen()),
+                  GoRoute(
+                    path: 'stats',
+                    builder: (_, _) => const StatsScreen(),
+                    routes: [
+                      GoRoute(
+                        path: 'subjects/:id',
+                        builder: (_, state) => SubjectStatsScreen(subjectId: state.pathParameters['id']!),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ],
+          ),
+          StatefulShellBranch(
+            routes: [GoRoute(path: Routes.saved, builder: (_, _) => const SavedTab())],
           ),
           StatefulShellBranch(
             routes: [
@@ -225,6 +260,22 @@ GoRouter buildRouter(Ref ref, {required bool couponRedemption}) {
         builder: (_, state) => StudyScreen(
           source: (deckId: null, subjectId: state.uri.queryParameters['subjectId']),
           title: 'كل البطاقات المستحقة',
+        ),
+      ),
+      // Attempts are full-screen: practice, exam or results (spec §15).
+      GoRoute(
+        path: '${Routes.attempts}/:id',
+        builder: (_, state) => AttemptRoute(attemptId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '${Routes.attempts}/:id/results',
+        builder: (_, state) => ResultsScreen(attemptId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: Routes.randomPractice,
+        builder: (_, state) => RandomPracticeScreen(
+          subjectId: state.uri.queryParameters['subjectId'] ?? '',
+          teacherTrackId: state.uri.queryParameters['teacherTrackId'],
         ),
       ),
       if (couponRedemption) GoRoute(path: Routes.redeem, builder: (_, _) => const RedeemScreen()),
