@@ -171,6 +171,8 @@ export const questionStats = pgTable('question_stats', {
   /** Times each option was chosen, by option id. */
   optionDistribution: jsonb('option_distribution').$type<Record<string, number>>().notNull().default({}),
   flaggedForReview: boolean('flagged_for_review').notNull().default(false),
+  /** Attempts counted when an admin last cleared the flag; the rule looks again after 30 more. */
+  flagReviewedAttempts: integer('flag_reviewed_attempts').notNull().default(0),
   lastAttemptAt: timestamp('last_attempt_at', { withTimezone: true }),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });

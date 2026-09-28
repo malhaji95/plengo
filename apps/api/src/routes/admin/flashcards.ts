@@ -3,6 +3,7 @@ import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
 import {
   adminCardListSchema,
+  bulkCardsBodySchema,
   adminCardSchema,
   adminDeckListSchema,
   adminDeckQuerySchema,
@@ -158,6 +159,20 @@ export function adminFlashcardRoutes(c: Container): FastifyPluginAsyncZod {
         },
       },
       async (request) => ok(await f.createCard(actor(request), request.params.id, request.body)),
+    );
+    app.post(
+      '/decks/:id/cards/bulk',
+      {
+        schema: {
+          operationId: 'adminBulkCreateCards',
+          description: 'Flashcard bulk upload (spec §27): image pairs already uploaded and processed.',
+          tags,
+          params: idParams,
+          body: bulkCardsBodySchema,
+          response: { 200: successEnvelope(adminCardListSchema) },
+        },
+      },
+      async (request) => ok(await f.createCards(actor(request), request.params.id, request.body.cards)),
     );
     app.post(
       '/decks/:id/cards/reorder',

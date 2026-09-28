@@ -413,6 +413,29 @@ describe('notifications (§20)', () => {
     await call(b, 'PUT', '/notifications/preferences', { promotions: true });
     await call(b, 'POST', '/push-tokens', { token: 'token-promo-0123456789', platform: 'android' });
     await call(a, 'POST', '/push-tokens', { token: 'token-nopromo-0123456789', platform: 'android' });
+    // The targeting preview applies the same consent rules as delivery (§26.2).
+    const preview = async (type: string) =>
+      (
+        await adminCall('POST', '/notifications/preview', {
+          type,
+          targetType: 'students',
+          target: { userIds: [a.id, b.id] },
+        })
+      ).data;
+    expect(await preview('promotion')).toEqual({ recipients: 1, pushConsented: 1 });
+    expect(await preview('announcement')).toEqual({ recipients: 2, pushConsented: 2 });
+    await call(a, 'PUT', '/notifications/preferences', { learning: false });
+    expect(await preview('new_content')).toEqual({ recipients: 2, pushConsented: 1 });
+    await call(a, 'PUT', '/notifications/preferences', { learning: true });
+    expect(
+      (
+        await adminCall('POST', '/notifications/preview', {
+          type: 'announcement',
+          targetType: 'level',
+          target: {},
+        })
+      ).status,
+    ).toBe(400);
     await adminCall('POST', '/notifications', {
       type: 'promotion',
       titleAr: 'عرض خاص',

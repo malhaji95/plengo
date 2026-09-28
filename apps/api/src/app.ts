@@ -20,6 +20,8 @@ import { adminAccessRoutes } from './routes/admin/access.js';
 import { adminAccountRoutes } from './routes/admin/admins.js';
 import { adminReportRoutes } from './routes/admin/reports.js';
 import { adminHomeRoutes } from './routes/admin/home.js';
+import { adminToolsRoutes } from './routes/admin/tools.js';
+import { adminImportRoutes } from './routes/admin/imports.js';
 import { adminAuthRoutes } from './routes/admin/auth.js';
 import { adminFlashcardRoutes } from './routes/admin/flashcards.js';
 import { adminQuestionRoutes } from './routes/admin/questions.js';
@@ -150,6 +152,8 @@ export async function buildApp(app: App, c: Container): Promise<App> {
   await app.register(adminAccountRoutes(c), { prefix: '/api/v1/admin' });
   await app.register(adminReportRoutes(c), { prefix: '/api/v1/admin' });
   await app.register(adminHomeRoutes(c), { prefix: '/api/v1/admin' });
+  await app.register(adminToolsRoutes(c), { prefix: '/api/v1/admin' });
+  await app.register(adminImportRoutes(c), { prefix: '/api/v1/admin' });
 
   return app;
 }

@@ -142,9 +142,13 @@ export function createReportService(deps: {
 
     mine: async (userId: string) => (await repo.mine(userId, 100)).map(toReport),
 
-    async adminList(filter: Omit<ReportFilter, 'itemIds'>, cursor: string | undefined, limit: number) {
+    async adminList(
+      { itemId, ...filter }: Omit<ReportFilter, 'itemIds'> & { itemId?: string | undefined },
+      cursor: string | undefined,
+      limit: number,
+    ) {
       const offset = decodeCursor(cursor);
-      const rows = await repo.list(filter, limit + 1, offset);
+      const rows = await repo.list({ ...filter, itemIds: itemId ? [itemId] : undefined }, limit + 1, offset);
       return {
         items: await toAdmin(rows.slice(0, limit)),
         nextCursor: rows.length > limit ? encodeCursor(offset + limit) : null,

@@ -11,6 +11,8 @@ export const QUEUES = {
   abandonAttempts: 'attempts.abandon-stale',
   notificationsFanout: 'notifications.fanout',
   dueReminders: 'notifications.due-reminders',
+  importsParse: 'imports.parse',
+  importsCommit: 'imports.commit',
 } as const;
 
 export type QueueName = (typeof QUEUES)[keyof typeof QUEUES];
@@ -29,6 +31,8 @@ export interface JobPayloads {
   'attempts.abandon-stale': Record<string, never>;
   'notifications.fanout': { notificationId: string };
   'notifications.due-reminders': Record<string, never>;
+  'imports.parse': { jobId: string };
+  'imports.commit': { jobId: string; publish: boolean; adminId: string; ip: string | null };
 }
 
 /** What services depend on: enqueueing only. Workers are registered at process start. */

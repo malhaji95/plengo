@@ -198,6 +198,19 @@ export const createNotificationBodySchema = z.object({
   target: notificationTargetSchema.default({}),
 });
 
+export const notificationPreviewBodySchema = createNotificationBodySchema.pick({
+  type: true,
+  targetType: true,
+  target: true,
+});
+/** Who a notification would reach now (§26.2 "targeting preview"). */
+export const notificationPreviewSchema = z.object({
+  /** Students who get the inbox entry (promotions: only those who opted in). */
+  recipients: int(),
+  /** Of those, how many allow a push for this type. */
+  pushConsented: int(),
+});
+
 export const adminNotificationSchema = z.object({
   id: z.string(),
   type: notificationTypeSchema,
@@ -254,6 +267,8 @@ const named: [z.ZodType, string][] = [
   [notificationTargetTypeSchema, 'NotificationTargetType'],
   [notificationTargetSchema, 'NotificationTarget'],
   [createNotificationBodySchema, 'CreateNotificationRequest'],
+  [notificationPreviewBodySchema, 'NotificationPreviewRequest'],
+  [notificationPreviewSchema, 'NotificationPreview'],
   [adminNotificationSchema, 'AdminNotification'],
   [adminNotificationPageSchema, 'AdminNotificationPage'],
 ];

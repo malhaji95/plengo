@@ -2341,6 +2341,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/decks/{id}/cards/bulk": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Flashcard bulk upload (spec §27): image pairs already uploaded and processed. */
+        post: operations["adminBulkCreateCards"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/decks/{id}/cards/reorder": {
         parameters: {
             query?: never;
@@ -2719,6 +2736,185 @@ export interface paths {
         get: operations["adminListNotifications"];
         put?: never;
         post: operations["adminSendNotification"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/notifications/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["adminPreviewNotification"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/audit-logs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminListAuditLogs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminSearch"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/question-analytics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminQuestionAnalytics"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/question-analytics/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminQuestionAnalyticsDetail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/question-analytics/{id}/clear-flag": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["adminClearQuestionFlag"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/imports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminListImports"];
+        put?: never;
+        /** @description Uploads a CSV or XLSX file; a job parses and validates every row. */
+        post: operations["adminCreateImport"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/imports/template": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description The column layout with an example row, as CSV or XLSX. */
+        get: operations["adminImportTemplate"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/imports/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminGetImport"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/imports/{id}/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["adminConfirmImport"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/questions/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Questions of one type and scope in the import layout, as CSV or XLSX. */
+        get: operations["adminExportQuestions"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -3159,6 +3355,24 @@ export interface components {
             data: components["schemas"]["AdminReportPage"];
             error: null;
         };
+        AdminSearchHit: {
+            type: components["schemas"]["AdminSearchHitType"];
+            id: string;
+            title: string;
+            subtitle: string | null;
+            parentId: string | null;
+        };
+        /** @enum {string} */
+        AdminSearchHitType: "admin" | "student" | "teacher" | "track" | "subject" | "question" | "coupon" | "batch";
+        AdminSearchResult: {
+            items: components["schemas"]["AdminSearchHit"][];
+        };
+        AdminSearchResultEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AdminSearchResult"];
+            error: null;
+        };
         AdminStudent: {
             id: string;
             email: string;
@@ -3323,6 +3537,29 @@ export interface components {
             data: components["schemas"]["AttemptSummaryPage"];
             error: null;
         };
+        AuditLogEntry: {
+            id: string;
+            actorAdminId: string | null;
+            actorName: string | null;
+            actorEmail: string | null;
+            action: string;
+            resourceType: string;
+            resourceId: string | null;
+            metadata: {
+                [key: string]: unknown;
+            };
+            createdAt: string;
+        };
+        AuditLogPage: {
+            items: components["schemas"]["AuditLogEntry"][];
+            nextCursor: string | null;
+        };
+        AuditLogPageEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AuditLogPage"];
+            error: null;
+        };
         BackupCodeRequest: {
             code: string;
         };
@@ -3381,6 +3618,14 @@ export interface components {
             /** Format: uuid */
             itemId: string;
         };
+        BulkCardsRequest: {
+            cards: {
+                /** Format: uuid */
+                frontMediaId: string;
+                /** Format: uuid */
+                backMediaId: string;
+            }[];
+        };
         CardImage: {
             mediaId: string;
             cacheKey: string;
@@ -3410,6 +3655,10 @@ export interface components {
             success: true;
             data: components["schemas"]["CheckResult"];
             error: null;
+        };
+        ConfirmImportRequest: {
+            /** @default false */
+            publish: boolean;
         };
         ContentCount: {
             total: number;
@@ -3536,6 +3785,12 @@ export interface components {
             isActive?: boolean;
             /** Format: uuid */
             universityId: string;
+        };
+        CreateImportRequest: {
+            kind: components["schemas"]["ImportKind"];
+            format: components["schemas"]["ImportFormat"];
+            fileName: string;
+            contentBase64: string;
         };
         CreateLessonRequest: {
             /** Format: uuid */
@@ -3912,6 +4167,77 @@ export interface components {
             data: components["schemas"]["Home"];
             error: null;
         };
+        ImportError: {
+            rowNumber: number;
+            field: string | null;
+            message: string;
+        };
+        /** @enum {string} */
+        ImportFormat: "csv" | "xlsx";
+        ImportJob: {
+            id: string;
+            kind: components["schemas"]["ImportKind"];
+            format: components["schemas"]["ImportFormat"];
+            fileName: string;
+            status: components["schemas"]["ImportStatus"];
+            totalRows: number;
+            validRows: number;
+            errorCount: number;
+            failureReason: string | null;
+            errors: components["schemas"]["ImportError"][];
+            preview: components["schemas"]["ImportPreviewRow"][];
+            summary: {
+                created: number;
+                published: boolean;
+                scopes: number;
+            } | null;
+            createdAt: string;
+            completedAt: string | null;
+        };
+        ImportJobEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["ImportJob"];
+            error: null;
+        };
+        ImportJobList: {
+            id: string;
+            kind: components["schemas"]["ImportKind"];
+            format: components["schemas"]["ImportFormat"];
+            fileName: string;
+            status: components["schemas"]["ImportStatus"];
+            totalRows: number;
+            validRows: number;
+            errorCount: number;
+            failureReason: string | null;
+            summary: {
+                created: number;
+                published: boolean;
+                scopes: number;
+            } | null;
+            createdAt: string;
+            completedAt: string | null;
+        }[];
+        ImportJobListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["ImportJobList"];
+            error: null;
+        };
+        /** @enum {string} */
+        ImportKind: "mcq" | "true_false" | "written";
+        ImportPreviewRow: {
+            rowNumber: number;
+            questionText: string;
+            subjectCode: string;
+            unitCode: string | null;
+            lessonCode: string | null;
+            teacherTrackCode: string | null;
+            answers: string[];
+            isFree: boolean | null;
+        };
+        /** @enum {string} */
+        ImportStatus: "parsing" | "ready" | "failed" | "importing" | "completed";
         LearningSettings: {
             mistakeMasteryStreak: number;
         };
@@ -4114,6 +4440,23 @@ export interface components {
             success: true;
             data: components["schemas"]["NotificationPreferences"];
             error: null;
+        };
+        NotificationPreview: {
+            recipients: number;
+            pushConsented: number;
+        };
+        NotificationPreviewEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["NotificationPreview"];
+            error: null;
+        };
+        NotificationPreviewRequest: {
+            /** @enum {string} */
+            type: "new_content" | "teacher_update" | "study_reminder" | "announcement" | "promotion";
+            targetType: components["schemas"]["NotificationTargetType"];
+            /** @default {} */
+            target: components["schemas"]["NotificationTarget"];
         };
         NotificationTarget: {
             /** Format: uuid */
@@ -4355,6 +4698,13 @@ export interface components {
             data: components["schemas"]["OfflineSyncResult"];
             error: null;
         };
+        OptionStat: {
+            optionId: string;
+            text: string;
+            isCorrect: boolean;
+            count: number;
+            percent: number;
+        };
         PasswordConfirmRequest: {
             password: string;
         };
@@ -4388,6 +4738,64 @@ export interface components {
             platform: "android" | "ios" | "web";
             appVersion?: string;
         };
+        QuestionAnalyticsDetail: {
+            questionId: string;
+            /** @enum {string} */
+            type: "mcq" | "true_false" | "written";
+            questionText: string;
+            /** @enum {string} */
+            status: "draft" | "published" | "archived";
+            subjectId: string;
+            subjectNameAr: string;
+            teacherTrackId: string | null;
+            trackTitleAr: string | null;
+            attempts: number;
+            correctPercent: number | null;
+            averageTimeMs: number | null;
+            flagged: boolean;
+            openReports: number;
+            offlineMismatches: number;
+            lastAttemptAt: string | null;
+            options: components["schemas"]["OptionStat"][];
+            flagReasons: ("low_correct" | "wrong_option_preferred")[];
+        };
+        QuestionAnalyticsDetailEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["QuestionAnalyticsDetail"];
+            error: null;
+        };
+        QuestionAnalyticsPage: {
+            items: components["schemas"]["QuestionAnalyticsRow"][];
+            nextCursor: string | null;
+        };
+        QuestionAnalyticsPageEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["QuestionAnalyticsPage"];
+            error: null;
+        };
+        QuestionAnalyticsRow: {
+            questionId: string;
+            /** @enum {string} */
+            type: "mcq" | "true_false" | "written";
+            questionText: string;
+            /** @enum {string} */
+            status: "draft" | "published" | "archived";
+            subjectId: string;
+            subjectNameAr: string;
+            teacherTrackId: string | null;
+            trackTitleAr: string | null;
+            attempts: number;
+            correctPercent: number | null;
+            averageTimeMs: number | null;
+            flagged: boolean;
+            openReports: number;
+            offlineMismatches: number;
+            lastAttemptAt: string | null;
+        };
+        /** @enum {string} */
+        QuestionAnalyticsSort: "attempts" | "correct" | "reports" | "mismatches" | "recent";
         QuestionFreeRequest: {
             /** @enum {string} */
             mode: "rule" | "free" | "paid";
@@ -9783,6 +10191,32 @@ export interface operations {
             };
         };
     };
+    adminBulkCreateCards: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BulkCardsRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminCardListEnvelope"];
+                };
+            };
+        };
+    };
     adminReorderCards: {
         parameters: {
             query?: never;
@@ -10268,6 +10702,7 @@ export interface operations {
                 status?: components["schemas"]["ReportStatus"];
                 itemType?: components["schemas"]["ReportItemType"];
                 reason?: components["schemas"]["ReportReason"];
+                itemId?: string;
                 cursor?: string;
                 limit?: number;
             };
@@ -10588,6 +11023,288 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["AdminNotificationEnvelope"];
                 };
+            };
+        };
+    };
+    adminPreviewNotification: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NotificationPreviewRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationPreviewEnvelope"];
+                };
+            };
+        };
+    };
+    adminListAuditLogs: {
+        parameters: {
+            query?: {
+                actorAdminId?: string;
+                action?: string;
+                resourceType?: string;
+                resourceId?: string;
+                from?: string;
+                to?: string;
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuditLogPageEnvelope"];
+                };
+            };
+        };
+    };
+    adminSearch: {
+        parameters: {
+            query: {
+                q: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminSearchResultEnvelope"];
+                };
+            };
+        };
+    };
+    adminQuestionAnalytics: {
+        parameters: {
+            query?: {
+                subjectId?: string;
+                teacherTrackId?: string;
+                flagged?: "true" | "false";
+                sort?: components["schemas"]["QuestionAnalyticsSort"];
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuestionAnalyticsPageEnvelope"];
+                };
+            };
+        };
+    };
+    adminQuestionAnalyticsDetail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuestionAnalyticsDetailEnvelope"];
+                };
+            };
+        };
+    };
+    adminClearQuestionFlag: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuestionAnalyticsDetailEnvelope"];
+                };
+            };
+        };
+    };
+    adminListImports: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportJobListEnvelope"];
+                };
+            };
+        };
+    };
+    adminCreateImport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateImportRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportJobEnvelope"];
+                };
+            };
+        };
+    };
+    adminImportTemplate: {
+        parameters: {
+            query: {
+                kind: components["schemas"]["ImportKind"];
+                format: components["schemas"]["ImportFormat"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    adminGetImport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportJobEnvelope"];
+                };
+            };
+        };
+    };
+    adminConfirmImport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConfirmImportRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportJobEnvelope"];
+                };
+            };
+        };
+    };
+    adminExportQuestions: {
+        parameters: {
+            query: {
+                kind: components["schemas"]["ImportKind"];
+                format: components["schemas"]["ImportFormat"];
+                subjectId: string;
+                teacherTrackId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

@@ -396,6 +396,37 @@ export function createFlashcardService(deps: {
       return toAdminCard((await repo.getCard(id))!);
     },
 
+    /** Bulk upload (§27): every pair is appended in order in one transaction; one deck version bump. */
+    async createCards(
+      actor: AdminActor,
+      deckId: string,
+      cards: { frontMediaId: string; backMediaId: string }[],
+    ) {
+      const ids = cards.flatMap((c) => [c.frontMediaId, c.backMediaId]);
+      if (new Set(ids).size !== ids.length) invalid('cards', 'duplicate_image');
+      for (const [i, c] of cards.entries()) {
+        await assertCardImage(c.frontMediaId, `cards.${i}.frontMediaId`);
+        await assertCardImage(c.backMediaId, `cards.${i}.backMediaId`);
+      }
+      const created = await db.transaction(async (tx) => {
+        const deck = (await repo.getDeckForUpdate(tx, deckId)) ?? notFound();
+        let sortOrder = await repo.nextCardSortOrder(tx, deckId);
+        const out: string[] = [];
+        for (const c of cards) {
+          const card = await repo.insertCard(tx, { deckId, ...c, sortOrder: sortOrder++ });
+          out.push(card.id);
+        }
+        await bumpDeck(tx, deck, actor);
+        return out;
+      });
+      await record(actor, 'card.bulk_created', 'flashcard_deck', deckId, { count: created.length });
+      return Promise.all(
+        (await repo.listCards(deckId, { publishedOnly: false }))
+          .filter((c) => created.includes(c.id))
+          .map(toAdminCard),
+      );
+    },
+
     async updateCard(
       actor: AdminActor,
       id: string,

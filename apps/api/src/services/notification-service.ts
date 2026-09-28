@@ -159,6 +159,34 @@ export function createNotificationService(deps: {
       return toAdmin(n, 0);
     },
 
+    /** Counts who a notification would reach, with the same audience and consent rules as fan-out. */
+    async preview(input: {
+      type: Exclude<Type, 'due_reminder' | 'report_resolved'>;
+      targetType: AdminNotification['targetType'];
+      target: NotificationTarget;
+    }) {
+      await validateTarget(input.targetType, input.target);
+      let after: string | null = null;
+      let recipients = 0;
+      let pushConsented = 0;
+      for (;;) {
+        const page: Recipient[] = await repo.recipients(
+          { type: input.targetType, value: input.target },
+          after,
+          BATCH,
+          now(),
+        );
+        for (const r of page) {
+          if (!inInbox(input.type, r)) continue;
+          recipients++;
+          if (pushed(input.type, r)) pushConsented++;
+        }
+        if (page.length < BATCH) break;
+        after = page[page.length - 1]!.userId;
+      }
+      return { recipients, pushConsented };
+    },
+
     async list(cursor: string | undefined, limit: number) {
       const offset = decodeCursor(cursor);
       const rows = await repo.listNotifications(limit + 1, offset);

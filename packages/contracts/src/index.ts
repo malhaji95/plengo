@@ -15,3 +15,4 @@ export * from './admins.js';
 export * from './reports.js';
 export * from './offline.js';
 export * from './home.js';
+export * from './admin-tools.js';

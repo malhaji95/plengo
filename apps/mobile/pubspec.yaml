@@ -94,3 +94,7 @@ swagger_parser:
     - admin-reports
     - admin-home
     - admin-notifications
+    - admin-audit
+    - admin-search
+    - admin-analytics
+    - admin-imports

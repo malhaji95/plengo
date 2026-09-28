@@ -114,3 +114,14 @@ export const notificationTargetEnum = pgEnum('notification_target', [
   'students',
 ]);
 export const notificationStatusEnum = pgEnum('notification_status', ['queued', 'sending', 'sent', 'failed']);
+
+/* Bulk import (spec §27). */
+export const importKindEnum = pgEnum('import_kind', ['mcq', 'true_false', 'written']);
+export const importFormatEnum = pgEnum('import_format', ['csv', 'xlsx']);
+export const importStatusEnum = pgEnum('import_status', [
+  'parsing',
+  'ready',
+  'failed',
+  'importing',
+  'completed',
+]);

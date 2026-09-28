@@ -244,6 +244,7 @@ export function createLearningRepository(db: Db) {
     /**
      * Question aggregate for admin analytics. Flagged (and kept flagged until an admin looks) once it
      * has ≥ 30 attempts and either < 20% correct or a wrong option chosen more than the correct one.
+     * After an admin clears the flag, the rule waits for 30 further attempts.
      */
     async addQuestionStats(tx: Tx, g: GradedAnswer) {
       const option = g.selectedOptionId;
@@ -276,7 +277,7 @@ export function createLearningRepository(db: Db) {
         update question_stats set flagged_for_review = true
         where question_id = ${g.question.id}
           and not flagged_for_review
-          and attempt_count >= ${QUESTION_FLAG_MIN_ATTEMPTS}
+          and attempt_count - flag_reviewed_attempts >= ${QUESTION_FLAG_MIN_ATTEMPTS}
           and (
             correct_count * 100 < attempt_count * ${QUESTION_FLAG_MAX_CORRECT_PERCENT}
             or exists (

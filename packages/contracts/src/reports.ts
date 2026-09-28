@@ -53,6 +53,8 @@ export const adminReportQuerySchema = z.object({
   status: reportStatusSchema.optional(),
   itemType: reportItemTypeSchema.optional(),
   reason: reportReasonSchema.optional(),
+  /** All reports on one question or card (from question analytics). */
+  itemId: z.uuid().optional(),
   cursor: z.string().max(200).optional(),
   limit: z.coerce.number().int().min(1).max(200).default(50),
 });

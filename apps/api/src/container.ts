@@ -23,6 +23,8 @@ import { createTeacherRepository } from './repositories/teacher-repository.js';
 import { createUsersRepository, type UsersRepository } from './repositories/users-repository.js';
 import { createOfflineRepository } from './repositories/offline-repository.js';
 import { createHomeRepository } from './repositories/home-repository.js';
+import { createAdminToolsRepository } from './repositories/admin-tools-repository.js';
+import { createImportRepository } from './repositories/import-repository.js';
 import { createReportRepository } from './repositories/report-repository.js';
 import { createUserContentRepository } from './repositories/user-content-repository.js';
 import { createAccessService, type AccessService } from './services/access-service.js';
@@ -56,6 +58,8 @@ import { createTeacherService, type TeacherService } from './services/teacher-se
 import { createUploadService, type UploadService } from './services/upload-service.js';
 import { createOfflineService, type OfflineService } from './services/offline-service.js';
 import { createHomeService, type HomeService } from './services/home-service.js';
+import { createAdminToolsService, type AdminToolsService } from './services/admin-tools-service.js';
+import { createImportService, type ImportService } from './services/import-service.js';
 import { createNotificationService, type NotificationService } from './services/notification-service.js';
 import { FcmPushSender, RecordingPushSender, type PushSender } from './services/push.js';
 import { createReportService, type ReportService } from './services/report-service.js';
@@ -98,6 +102,8 @@ export interface Container {
   admins: AdminService;
   userContent: UserContentService;
   reports: ReportService;
+  adminTools: AdminToolsService;
+  imports: ImportService;
   offline: OfflineService;
   home: HomeService;
   notifications: NotificationService;
@@ -187,6 +193,14 @@ export function createContainer(
   });
   const promotions = createPromotionService({ db, accessRepo, audit, now: overrides.now });
   const questionRepo = createQuestionRepository(db);
+  const imports = createImportService({
+    db,
+    repo: createImportRepository(db),
+    questionRepo,
+    audit,
+    jobs: overrides.jobs,
+    now: overrides.now,
+  });
   const flashcardRepo = createFlashcardRepository(db);
   const quizRepo = createQuizRepository(db);
   const attemptRepo = createAttemptRepository(db);
@@ -417,6 +431,13 @@ export function createContainer(
       notify: (userId, input) => notifications.notifyUser(userId, input),
       now: overrides.now,
     }),
+    adminTools: createAdminToolsService({
+      repo: createAdminToolsRepository(db),
+      coupons,
+      audit,
+      timeZone: env.TZ_BUSINESS,
+    }),
+    imports,
     guards: createGuards({ auth, sessionsRepo, mobileTokens, now: overrides.now }),
     jobHandlers: {
       'media.process': (data) => media.process(data),
@@ -443,6 +464,8 @@ export function createContainer(
       'notifications.due-reminders': async () => {
         await notifications.dueReminders();
       },
+      'imports.parse': (data) => imports.parse(data.jobId),
+      'imports.commit': (data) => imports.commit(data),
     },
   };
 }

@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { and, eq } from 'drizzle-orm';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { entitlements, questionStats, quizAttempts, userMistakes, users } from '@plengo/db';
+import { auditLogs, entitlements, questionStats, quizAttempts, userMistakes, users } from '@plengo/db';
 import { streak } from '../src/services/stats-service.js';
 import {
   body,
@@ -788,6 +788,96 @@ describe('statistics, bookmarks and progress (§16.2–§18)', () => {
     });
     const [row] = await t.c.db.select().from(questionStats).where(eq(questionStats.questionId, w.free.id));
     expect(row).toMatchObject({ attemptCount: 30, flaggedForReview: true });
+  });
+});
+
+describe('question analytics (§26.2)', () => {
+  type Row = {
+    questionId: string;
+    attempts: number;
+    correctPercent: number | null;
+    averageTimeMs: number | null;
+    flagged: boolean;
+    openReports: number;
+    offlineMismatches: number;
+  };
+  type Detail = Row & {
+    options: { optionId: string; isCorrect: boolean; count: number; percent: number }[];
+    flagReasons: string[];
+  };
+
+  it('lists attempts, accuracy, option spread, reports; flags, clears and re-flags after 30 more', async () => {
+    const w = await world();
+    const wrongId = w.wrong(w.free);
+    await t.c.db.insert(questionStats).values({
+      questionId: w.free.id,
+      attemptCount: 29,
+      correctCount: 9,
+      totalTimeMs: 29_000,
+      optionDistribution: { [w.correct(w.free)]: 9, [wrongId]: 20 },
+    });
+    const s = await student();
+    const q = await quiz(w, { questionIds: [w.free.id] });
+    const a = (await start(s, { source: 'curated', mode: 'practice', quizId: q.id })).data;
+    await call(s, 'POST', `/attempts/${a.attempt.id}/answers/${w.free.id}/check`, {
+      selectedOptionId: wrongId,
+    });
+    await call(s, 'POST', '/reports', { itemType: 'question', itemId: w.free.id, reason: 'wrong_answer' });
+
+    const list = (query: string) =>
+      adminCall<{ items: Row[]; nextCursor: string | null }>(
+        'GET',
+        `/question-analytics?subjectId=${w.subjectId}${query}`,
+      );
+    const flagged = (await list('&flagged=true')).data.items;
+    expect(flagged.map((r) => r.questionId)).toEqual([w.free.id]);
+    expect(flagged[0]).toMatchObject({ attempts: 30, correctPercent: 30, flagged: true, openReports: 1 });
+    // Every published question of the subject appears; unanswered ones have no accuracy.
+    const all = (await list('&sort=correct')).data.items;
+    expect(all.length).toBe(5); // general and track questions of the subject
+    expect(all.find((r) => r.questionId === w.premium.id)).toMatchObject({
+      attempts: 0,
+      correctPercent: null,
+    });
+    const paged = await list('&limit=2');
+    expect(paged.data.items).toHaveLength(2);
+    expect(paged.data.nextCursor).not.toBeNull();
+
+    const detail = (await adminCall<Detail>('GET', `/question-analytics/${w.free.id}`)).data;
+    expect(detail.flagReasons).toEqual(['wrong_option_preferred']);
+    expect(detail.options.find((o) => o.optionId === wrongId)).toMatchObject({ count: 21, percent: 70 });
+    expect(detail.options.find((o) => o.isCorrect)).toMatchObject({ count: 9, percent: 30 });
+
+    // Reports can be listed for this one question.
+    const reports = await adminCall<{ items: { itemId: string }[] }>('GET', `/reports?itemId=${w.free.id}`);
+    expect(reports.data.items.map((r) => r.itemId)).toEqual([w.free.id]);
+
+    // Reviewed: cleared, audited, and not flagged again by the very next attempt.
+    const cleared = await adminCall<Detail>('POST', `/question-analytics/${w.free.id}/clear-flag`);
+    expect(cleared.data.flagged).toBe(false);
+    const logs = await t.c.db.select().from(auditLogs).where(eq(auditLogs.resourceId, w.free.id));
+    expect(logs.map((l) => l.action)).toContain('question.flag_cleared');
+    const again = (await start(s, { source: 'curated', mode: 'practice', quizId: q.id })).data;
+    await call(s, 'POST', `/attempts/${again.attempt.id}/answers/${w.free.id}/check`, {
+      selectedOptionId: wrongId,
+    });
+    const [row] = await t.c.db.select().from(questionStats).where(eq(questionStats.questionId, w.free.id));
+    expect(row).toMatchObject({ attemptCount: 31, flaggedForReview: false, flagReviewedAttempts: 30 });
+    // 30 attempts after the review, the rule looks again.
+    await t.c.db
+      .update(questionStats)
+      .set({ attemptCount: 59 })
+      .where(eq(questionStats.questionId, w.free.id));
+    const third = (await start(s, { source: 'curated', mode: 'practice', quizId: q.id })).data;
+    await call(s, 'POST', `/attempts/${third.attempt.id}/answers/${w.free.id}/check`, {
+      selectedOptionId: wrongId,
+    });
+    const [after] = await t.c.db.select().from(questionStats).where(eq(questionStats.questionId, w.free.id));
+    expect(after!.flaggedForReview).toBe(true);
+
+    expect((await adminCall('POST', `/question-analytics/${randomUUID()}/clear-flag`)).status).toBe(404);
+    expect((await adminCall('GET', `/question-analytics/${randomUUID()}`)).status).toBe(404);
+    expect((await call(s, 'GET', '/admin/question-analytics')).status).toBe(403);
   });
 });
 

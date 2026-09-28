@@ -13,6 +13,8 @@ import {
   createCountdownBodySchema,
   createNotificationBodySchema,
   deletedSchema,
+  notificationPreviewBodySchema,
+  notificationPreviewSchema,
   notificationQuerySchema,
   reorderedSchema,
   successEnvelope,
@@ -167,6 +169,18 @@ export function adminHomeRoutes(c: Container): FastifyPluginAsyncZod {
         },
       },
       async (request) => ok(await c.notifications.create(actor(request), request.body)),
+    );
+    app.post(
+      '/notifications/preview',
+      {
+        schema: {
+          operationId: 'adminPreviewNotification',
+          tags: ntags,
+          body: notificationPreviewBodySchema,
+          response: { 200: successEnvelope(notificationPreviewSchema) },
+        },
+      },
+      async (request) => ok(await c.notifications.preview(request.body)),
     );
   };
 }
