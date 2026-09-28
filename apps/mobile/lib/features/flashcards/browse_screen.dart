@@ -20,34 +20,34 @@ class BrowseScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final data = ref.watch(deckCardsProvider(deckId));
+    final data = ref.watch(browseCardsProvider(deckId));
     final decksOn = ref.watch(studentDecksEnabledProvider);
     final reportsOn = ref.watch(contentReportsEnabledProvider);
     return AsyncView(
       value: data,
-      onRetry: () => ref.invalidate(deckCardsProvider(deckId)),
+      onRetry: () => ref.invalidate(browseCardsProvider(deckId)),
       frame: (child) => Scaffold(appBar: AppBar(), body: child),
-      data: (d) {
-        final byKey = {for (final c in d.cards) c.id: c};
-        return CardBrowser(
-          title: d.deck.titleAr,
-          cards: [for (final c in d.cards) StudyCard.official(c)],
-          actions: (card) => [
-            if (decksOn)
-              IconButton(
-                tooltip: 'أضف إلى بطاقاتي',
-                icon: const Icon(Icons.library_add_outlined),
-                onPressed: () => addToMyDeck(context, ref, byKey[card.key]!),
-              ),
-            if (reportsOn)
-              IconButton(
-                tooltip: 'إبلاغ عن مشكلة',
-                icon: const Icon(Icons.flag_outlined),
-                onPressed: () => showReportSheet(context, ref, ReportItemType.flashcard, card.key),
-              ),
-          ],
-        );
-      },
+      data: (d) => CardBrowser(
+        title: d.title,
+        cards: d.cards,
+        actions: (card) => [
+          if (decksOn)
+            IconButton(
+              tooltip: 'أضف إلى بطاقاتي',
+              icon: const Icon(Icons.library_add_outlined),
+              onPressed: () async {
+                final official = await officialCardFor(ref, deckId, card.key);
+                if (official != null && context.mounted) await addToMyDeck(context, ref, official);
+              },
+            ),
+          if (reportsOn)
+            IconButton(
+              tooltip: 'إبلاغ عن مشكلة',
+              icon: const Icon(Icons.flag_outlined),
+              onPressed: () => showReportSheet(context, ref, ReportItemType.flashcard, card.key),
+            ),
+        ],
+      ),
     );
   }
 }

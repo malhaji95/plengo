@@ -3881,6 +3881,2724 @@ class LocalCardsCompanion extends UpdateCompanion<LocalCardRow> {
   }
 }
 
+class $OfflinePacksTable extends OfflinePacks
+    with TableInfo<$OfflinePacksTable, OfflinePackRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $OfflinePacksTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _packKeyMeta = const VerificationMeta(
+    'packKey',
+  );
+  @override
+  late final GeneratedColumn<String> packKey = GeneratedColumn<String>(
+    'pack_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _scopeTypeMeta = const VerificationMeta(
+    'scopeType',
+  );
+  @override
+  late final GeneratedColumn<String> scopeType = GeneratedColumn<String>(
+    'scope_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _subjectIdMeta = const VerificationMeta(
+    'subjectId',
+  );
+  @override
+  late final GeneratedColumn<String> subjectId = GeneratedColumn<String>(
+    'subject_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _teacherTrackIdMeta = const VerificationMeta(
+    'teacherTrackId',
+  );
+  @override
+  late final GeneratedColumn<String> teacherTrackId = GeneratedColumn<String>(
+    'teacher_track_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _scopeTitleMeta = const VerificationMeta(
+    'scopeTitle',
+  );
+  @override
+  late final GeneratedColumn<String> scopeTitle = GeneratedColumn<String>(
+    'scope_title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _kindMeta = const VerificationMeta('kind');
+  @override
+  late final GeneratedColumn<String> kind = GeneratedColumn<String>(
+    'kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _unitIdMeta = const VerificationMeta('unitId');
+  @override
+  late final GeneratedColumn<String> unitId = GeneratedColumn<String>(
+    'unit_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _deckIdMeta = const VerificationMeta('deckId');
+  @override
+  late final GeneratedColumn<String> deckId = GeneratedColumn<String>(
+    'deck_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _titleArMeta = const VerificationMeta(
+    'titleAr',
+  );
+  @override
+  late final GeneratedColumn<String> titleAr = GeneratedColumn<String>(
+    'title_ar',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _versionMeta = const VerificationMeta(
+    'version',
+  );
+  @override
+  late final GeneratedColumn<String> version = GeneratedColumn<String>(
+    'version',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _remoteVersionMeta = const VerificationMeta(
+    'remoteVersion',
+  );
+  @override
+  late final GeneratedColumn<String> remoteVersion = GeneratedColumn<String>(
+    'remote_version',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _premiumMeta = const VerificationMeta(
+    'premium',
+  );
+  @override
+  late final GeneratedColumn<bool> premium = GeneratedColumn<bool>(
+    'premium',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("premium" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _normalizationVersionMeta =
+      const VerificationMeta('normalizationVersion');
+  @override
+  late final GeneratedColumn<int> normalizationVersion = GeneratedColumn<int>(
+    'normalization_version',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _sizeBytesMeta = const VerificationMeta(
+    'sizeBytes',
+  );
+  @override
+  late final GeneratedColumn<int> sizeBytes = GeneratedColumn<int>(
+    'size_bytes',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _downloadedBytesMeta = const VerificationMeta(
+    'downloadedBytes',
+  );
+  @override
+  late final GeneratedColumn<int> downloadedBytes = GeneratedColumn<int>(
+    'downloaded_bytes',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    packKey,
+    scopeType,
+    subjectId,
+    teacherTrackId,
+    scopeTitle,
+    kind,
+    unitId,
+    deckId,
+    titleAr,
+    status,
+    version,
+    remoteVersion,
+    premium,
+    normalizationVersion,
+    sizeBytes,
+    downloadedBytes,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'offline_packs';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<OfflinePackRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('pack_key')) {
+      context.handle(
+        _packKeyMeta,
+        packKey.isAcceptableOrUnknown(data['pack_key']!, _packKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_packKeyMeta);
+    }
+    if (data.containsKey('scope_type')) {
+      context.handle(
+        _scopeTypeMeta,
+        scopeType.isAcceptableOrUnknown(data['scope_type']!, _scopeTypeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_scopeTypeMeta);
+    }
+    if (data.containsKey('subject_id')) {
+      context.handle(
+        _subjectIdMeta,
+        subjectId.isAcceptableOrUnknown(data['subject_id']!, _subjectIdMeta),
+      );
+    }
+    if (data.containsKey('teacher_track_id')) {
+      context.handle(
+        _teacherTrackIdMeta,
+        teacherTrackId.isAcceptableOrUnknown(
+          data['teacher_track_id']!,
+          _teacherTrackIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('scope_title')) {
+      context.handle(
+        _scopeTitleMeta,
+        scopeTitle.isAcceptableOrUnknown(data['scope_title']!, _scopeTitleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_scopeTitleMeta);
+    }
+    if (data.containsKey('kind')) {
+      context.handle(
+        _kindMeta,
+        kind.isAcceptableOrUnknown(data['kind']!, _kindMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_kindMeta);
+    }
+    if (data.containsKey('unit_id')) {
+      context.handle(
+        _unitIdMeta,
+        unitId.isAcceptableOrUnknown(data['unit_id']!, _unitIdMeta),
+      );
+    }
+    if (data.containsKey('deck_id')) {
+      context.handle(
+        _deckIdMeta,
+        deckId.isAcceptableOrUnknown(data['deck_id']!, _deckIdMeta),
+      );
+    }
+    if (data.containsKey('title_ar')) {
+      context.handle(
+        _titleArMeta,
+        titleAr.isAcceptableOrUnknown(data['title_ar']!, _titleArMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleArMeta);
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_statusMeta);
+    }
+    if (data.containsKey('version')) {
+      context.handle(
+        _versionMeta,
+        version.isAcceptableOrUnknown(data['version']!, _versionMeta),
+      );
+    }
+    if (data.containsKey('remote_version')) {
+      context.handle(
+        _remoteVersionMeta,
+        remoteVersion.isAcceptableOrUnknown(
+          data['remote_version']!,
+          _remoteVersionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('premium')) {
+      context.handle(
+        _premiumMeta,
+        premium.isAcceptableOrUnknown(data['premium']!, _premiumMeta),
+      );
+    }
+    if (data.containsKey('normalization_version')) {
+      context.handle(
+        _normalizationVersionMeta,
+        normalizationVersion.isAcceptableOrUnknown(
+          data['normalization_version']!,
+          _normalizationVersionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('size_bytes')) {
+      context.handle(
+        _sizeBytesMeta,
+        sizeBytes.isAcceptableOrUnknown(data['size_bytes']!, _sizeBytesMeta),
+      );
+    }
+    if (data.containsKey('downloaded_bytes')) {
+      context.handle(
+        _downloadedBytesMeta,
+        downloadedBytes.isAcceptableOrUnknown(
+          data['downloaded_bytes']!,
+          _downloadedBytesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {packKey};
+  @override
+  OfflinePackRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return OfflinePackRow(
+      packKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}pack_key'],
+      )!,
+      scopeType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}scope_type'],
+      )!,
+      subjectId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}subject_id'],
+      ),
+      teacherTrackId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}teacher_track_id'],
+      ),
+      scopeTitle: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}scope_title'],
+      )!,
+      kind: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}kind'],
+      )!,
+      unitId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}unit_id'],
+      ),
+      deckId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}deck_id'],
+      ),
+      titleAr: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title_ar'],
+      )!,
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      version: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}version'],
+      ),
+      remoteVersion: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}remote_version'],
+      ),
+      premium: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}premium'],
+      )!,
+      normalizationVersion: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}normalization_version'],
+      ),
+      sizeBytes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}size_bytes'],
+      )!,
+      downloadedBytes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}downloaded_bytes'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $OfflinePacksTable createAlias(String alias) {
+    return $OfflinePacksTable(attachedDatabase, alias);
+  }
+}
+
+class OfflinePackRow extends DataClass implements Insertable<OfflinePackRow> {
+  final String packKey;
+  final String scopeType;
+  final String? subjectId;
+  final String? teacherTrackId;
+  final String scopeTitle;
+  final String kind;
+  final String? unitId;
+  final String? deckId;
+  final String titleAr;
+
+  /// queued | downloading | paused | waiting_wifi | ready | failed
+  final String status;
+  final String? version;
+  final String? remoteVersion;
+  final bool premium;
+  final int? normalizationVersion;
+  final int sizeBytes;
+  final int downloadedBytes;
+  final int updatedAt;
+  const OfflinePackRow({
+    required this.packKey,
+    required this.scopeType,
+    this.subjectId,
+    this.teacherTrackId,
+    required this.scopeTitle,
+    required this.kind,
+    this.unitId,
+    this.deckId,
+    required this.titleAr,
+    required this.status,
+    this.version,
+    this.remoteVersion,
+    required this.premium,
+    this.normalizationVersion,
+    required this.sizeBytes,
+    required this.downloadedBytes,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['pack_key'] = Variable<String>(packKey);
+    map['scope_type'] = Variable<String>(scopeType);
+    if (!nullToAbsent || subjectId != null) {
+      map['subject_id'] = Variable<String>(subjectId);
+    }
+    if (!nullToAbsent || teacherTrackId != null) {
+      map['teacher_track_id'] = Variable<String>(teacherTrackId);
+    }
+    map['scope_title'] = Variable<String>(scopeTitle);
+    map['kind'] = Variable<String>(kind);
+    if (!nullToAbsent || unitId != null) {
+      map['unit_id'] = Variable<String>(unitId);
+    }
+    if (!nullToAbsent || deckId != null) {
+      map['deck_id'] = Variable<String>(deckId);
+    }
+    map['title_ar'] = Variable<String>(titleAr);
+    map['status'] = Variable<String>(status);
+    if (!nullToAbsent || version != null) {
+      map['version'] = Variable<String>(version);
+    }
+    if (!nullToAbsent || remoteVersion != null) {
+      map['remote_version'] = Variable<String>(remoteVersion);
+    }
+    map['premium'] = Variable<bool>(premium);
+    if (!nullToAbsent || normalizationVersion != null) {
+      map['normalization_version'] = Variable<int>(normalizationVersion);
+    }
+    map['size_bytes'] = Variable<int>(sizeBytes);
+    map['downloaded_bytes'] = Variable<int>(downloadedBytes);
+    map['updated_at'] = Variable<int>(updatedAt);
+    return map;
+  }
+
+  OfflinePacksCompanion toCompanion(bool nullToAbsent) {
+    return OfflinePacksCompanion(
+      packKey: Value(packKey),
+      scopeType: Value(scopeType),
+      subjectId: subjectId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(subjectId),
+      teacherTrackId: teacherTrackId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(teacherTrackId),
+      scopeTitle: Value(scopeTitle),
+      kind: Value(kind),
+      unitId: unitId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(unitId),
+      deckId: deckId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deckId),
+      titleAr: Value(titleAr),
+      status: Value(status),
+      version: version == null && nullToAbsent
+          ? const Value.absent()
+          : Value(version),
+      remoteVersion: remoteVersion == null && nullToAbsent
+          ? const Value.absent()
+          : Value(remoteVersion),
+      premium: Value(premium),
+      normalizationVersion: normalizationVersion == null && nullToAbsent
+          ? const Value.absent()
+          : Value(normalizationVersion),
+      sizeBytes: Value(sizeBytes),
+      downloadedBytes: Value(downloadedBytes),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory OfflinePackRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return OfflinePackRow(
+      packKey: serializer.fromJson<String>(json['packKey']),
+      scopeType: serializer.fromJson<String>(json['scopeType']),
+      subjectId: serializer.fromJson<String?>(json['subjectId']),
+      teacherTrackId: serializer.fromJson<String?>(json['teacherTrackId']),
+      scopeTitle: serializer.fromJson<String>(json['scopeTitle']),
+      kind: serializer.fromJson<String>(json['kind']),
+      unitId: serializer.fromJson<String?>(json['unitId']),
+      deckId: serializer.fromJson<String?>(json['deckId']),
+      titleAr: serializer.fromJson<String>(json['titleAr']),
+      status: serializer.fromJson<String>(json['status']),
+      version: serializer.fromJson<String?>(json['version']),
+      remoteVersion: serializer.fromJson<String?>(json['remoteVersion']),
+      premium: serializer.fromJson<bool>(json['premium']),
+      normalizationVersion: serializer.fromJson<int?>(
+        json['normalizationVersion'],
+      ),
+      sizeBytes: serializer.fromJson<int>(json['sizeBytes']),
+      downloadedBytes: serializer.fromJson<int>(json['downloadedBytes']),
+      updatedAt: serializer.fromJson<int>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'packKey': serializer.toJson<String>(packKey),
+      'scopeType': serializer.toJson<String>(scopeType),
+      'subjectId': serializer.toJson<String?>(subjectId),
+      'teacherTrackId': serializer.toJson<String?>(teacherTrackId),
+      'scopeTitle': serializer.toJson<String>(scopeTitle),
+      'kind': serializer.toJson<String>(kind),
+      'unitId': serializer.toJson<String?>(unitId),
+      'deckId': serializer.toJson<String?>(deckId),
+      'titleAr': serializer.toJson<String>(titleAr),
+      'status': serializer.toJson<String>(status),
+      'version': serializer.toJson<String?>(version),
+      'remoteVersion': serializer.toJson<String?>(remoteVersion),
+      'premium': serializer.toJson<bool>(premium),
+      'normalizationVersion': serializer.toJson<int?>(normalizationVersion),
+      'sizeBytes': serializer.toJson<int>(sizeBytes),
+      'downloadedBytes': serializer.toJson<int>(downloadedBytes),
+      'updatedAt': serializer.toJson<int>(updatedAt),
+    };
+  }
+
+  OfflinePackRow copyWith({
+    String? packKey,
+    String? scopeType,
+    Value<String?> subjectId = const Value.absent(),
+    Value<String?> teacherTrackId = const Value.absent(),
+    String? scopeTitle,
+    String? kind,
+    Value<String?> unitId = const Value.absent(),
+    Value<String?> deckId = const Value.absent(),
+    String? titleAr,
+    String? status,
+    Value<String?> version = const Value.absent(),
+    Value<String?> remoteVersion = const Value.absent(),
+    bool? premium,
+    Value<int?> normalizationVersion = const Value.absent(),
+    int? sizeBytes,
+    int? downloadedBytes,
+    int? updatedAt,
+  }) => OfflinePackRow(
+    packKey: packKey ?? this.packKey,
+    scopeType: scopeType ?? this.scopeType,
+    subjectId: subjectId.present ? subjectId.value : this.subjectId,
+    teacherTrackId: teacherTrackId.present
+        ? teacherTrackId.value
+        : this.teacherTrackId,
+    scopeTitle: scopeTitle ?? this.scopeTitle,
+    kind: kind ?? this.kind,
+    unitId: unitId.present ? unitId.value : this.unitId,
+    deckId: deckId.present ? deckId.value : this.deckId,
+    titleAr: titleAr ?? this.titleAr,
+    status: status ?? this.status,
+    version: version.present ? version.value : this.version,
+    remoteVersion: remoteVersion.present
+        ? remoteVersion.value
+        : this.remoteVersion,
+    premium: premium ?? this.premium,
+    normalizationVersion: normalizationVersion.present
+        ? normalizationVersion.value
+        : this.normalizationVersion,
+    sizeBytes: sizeBytes ?? this.sizeBytes,
+    downloadedBytes: downloadedBytes ?? this.downloadedBytes,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  OfflinePackRow copyWithCompanion(OfflinePacksCompanion data) {
+    return OfflinePackRow(
+      packKey: data.packKey.present ? data.packKey.value : this.packKey,
+      scopeType: data.scopeType.present ? data.scopeType.value : this.scopeType,
+      subjectId: data.subjectId.present ? data.subjectId.value : this.subjectId,
+      teacherTrackId: data.teacherTrackId.present
+          ? data.teacherTrackId.value
+          : this.teacherTrackId,
+      scopeTitle: data.scopeTitle.present
+          ? data.scopeTitle.value
+          : this.scopeTitle,
+      kind: data.kind.present ? data.kind.value : this.kind,
+      unitId: data.unitId.present ? data.unitId.value : this.unitId,
+      deckId: data.deckId.present ? data.deckId.value : this.deckId,
+      titleAr: data.titleAr.present ? data.titleAr.value : this.titleAr,
+      status: data.status.present ? data.status.value : this.status,
+      version: data.version.present ? data.version.value : this.version,
+      remoteVersion: data.remoteVersion.present
+          ? data.remoteVersion.value
+          : this.remoteVersion,
+      premium: data.premium.present ? data.premium.value : this.premium,
+      normalizationVersion: data.normalizationVersion.present
+          ? data.normalizationVersion.value
+          : this.normalizationVersion,
+      sizeBytes: data.sizeBytes.present ? data.sizeBytes.value : this.sizeBytes,
+      downloadedBytes: data.downloadedBytes.present
+          ? data.downloadedBytes.value
+          : this.downloadedBytes,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OfflinePackRow(')
+          ..write('packKey: $packKey, ')
+          ..write('scopeType: $scopeType, ')
+          ..write('subjectId: $subjectId, ')
+          ..write('teacherTrackId: $teacherTrackId, ')
+          ..write('scopeTitle: $scopeTitle, ')
+          ..write('kind: $kind, ')
+          ..write('unitId: $unitId, ')
+          ..write('deckId: $deckId, ')
+          ..write('titleAr: $titleAr, ')
+          ..write('status: $status, ')
+          ..write('version: $version, ')
+          ..write('remoteVersion: $remoteVersion, ')
+          ..write('premium: $premium, ')
+          ..write('normalizationVersion: $normalizationVersion, ')
+          ..write('sizeBytes: $sizeBytes, ')
+          ..write('downloadedBytes: $downloadedBytes, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    packKey,
+    scopeType,
+    subjectId,
+    teacherTrackId,
+    scopeTitle,
+    kind,
+    unitId,
+    deckId,
+    titleAr,
+    status,
+    version,
+    remoteVersion,
+    premium,
+    normalizationVersion,
+    sizeBytes,
+    downloadedBytes,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is OfflinePackRow &&
+          other.packKey == this.packKey &&
+          other.scopeType == this.scopeType &&
+          other.subjectId == this.subjectId &&
+          other.teacherTrackId == this.teacherTrackId &&
+          other.scopeTitle == this.scopeTitle &&
+          other.kind == this.kind &&
+          other.unitId == this.unitId &&
+          other.deckId == this.deckId &&
+          other.titleAr == this.titleAr &&
+          other.status == this.status &&
+          other.version == this.version &&
+          other.remoteVersion == this.remoteVersion &&
+          other.premium == this.premium &&
+          other.normalizationVersion == this.normalizationVersion &&
+          other.sizeBytes == this.sizeBytes &&
+          other.downloadedBytes == this.downloadedBytes &&
+          other.updatedAt == this.updatedAt);
+}
+
+class OfflinePacksCompanion extends UpdateCompanion<OfflinePackRow> {
+  final Value<String> packKey;
+  final Value<String> scopeType;
+  final Value<String?> subjectId;
+  final Value<String?> teacherTrackId;
+  final Value<String> scopeTitle;
+  final Value<String> kind;
+  final Value<String?> unitId;
+  final Value<String?> deckId;
+  final Value<String> titleAr;
+  final Value<String> status;
+  final Value<String?> version;
+  final Value<String?> remoteVersion;
+  final Value<bool> premium;
+  final Value<int?> normalizationVersion;
+  final Value<int> sizeBytes;
+  final Value<int> downloadedBytes;
+  final Value<int> updatedAt;
+  final Value<int> rowid;
+  const OfflinePacksCompanion({
+    this.packKey = const Value.absent(),
+    this.scopeType = const Value.absent(),
+    this.subjectId = const Value.absent(),
+    this.teacherTrackId = const Value.absent(),
+    this.scopeTitle = const Value.absent(),
+    this.kind = const Value.absent(),
+    this.unitId = const Value.absent(),
+    this.deckId = const Value.absent(),
+    this.titleAr = const Value.absent(),
+    this.status = const Value.absent(),
+    this.version = const Value.absent(),
+    this.remoteVersion = const Value.absent(),
+    this.premium = const Value.absent(),
+    this.normalizationVersion = const Value.absent(),
+    this.sizeBytes = const Value.absent(),
+    this.downloadedBytes = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  OfflinePacksCompanion.insert({
+    required String packKey,
+    required String scopeType,
+    this.subjectId = const Value.absent(),
+    this.teacherTrackId = const Value.absent(),
+    required String scopeTitle,
+    required String kind,
+    this.unitId = const Value.absent(),
+    this.deckId = const Value.absent(),
+    required String titleAr,
+    required String status,
+    this.version = const Value.absent(),
+    this.remoteVersion = const Value.absent(),
+    this.premium = const Value.absent(),
+    this.normalizationVersion = const Value.absent(),
+    this.sizeBytes = const Value.absent(),
+    this.downloadedBytes = const Value.absent(),
+    required int updatedAt,
+    this.rowid = const Value.absent(),
+  }) : packKey = Value(packKey),
+       scopeType = Value(scopeType),
+       scopeTitle = Value(scopeTitle),
+       kind = Value(kind),
+       titleAr = Value(titleAr),
+       status = Value(status),
+       updatedAt = Value(updatedAt);
+  static Insertable<OfflinePackRow> custom({
+    Expression<String>? packKey,
+    Expression<String>? scopeType,
+    Expression<String>? subjectId,
+    Expression<String>? teacherTrackId,
+    Expression<String>? scopeTitle,
+    Expression<String>? kind,
+    Expression<String>? unitId,
+    Expression<String>? deckId,
+    Expression<String>? titleAr,
+    Expression<String>? status,
+    Expression<String>? version,
+    Expression<String>? remoteVersion,
+    Expression<bool>? premium,
+    Expression<int>? normalizationVersion,
+    Expression<int>? sizeBytes,
+    Expression<int>? downloadedBytes,
+    Expression<int>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (packKey != null) 'pack_key': packKey,
+      if (scopeType != null) 'scope_type': scopeType,
+      if (subjectId != null) 'subject_id': subjectId,
+      if (teacherTrackId != null) 'teacher_track_id': teacherTrackId,
+      if (scopeTitle != null) 'scope_title': scopeTitle,
+      if (kind != null) 'kind': kind,
+      if (unitId != null) 'unit_id': unitId,
+      if (deckId != null) 'deck_id': deckId,
+      if (titleAr != null) 'title_ar': titleAr,
+      if (status != null) 'status': status,
+      if (version != null) 'version': version,
+      if (remoteVersion != null) 'remote_version': remoteVersion,
+      if (premium != null) 'premium': premium,
+      if (normalizationVersion != null)
+        'normalization_version': normalizationVersion,
+      if (sizeBytes != null) 'size_bytes': sizeBytes,
+      if (downloadedBytes != null) 'downloaded_bytes': downloadedBytes,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  OfflinePacksCompanion copyWith({
+    Value<String>? packKey,
+    Value<String>? scopeType,
+    Value<String?>? subjectId,
+    Value<String?>? teacherTrackId,
+    Value<String>? scopeTitle,
+    Value<String>? kind,
+    Value<String?>? unitId,
+    Value<String?>? deckId,
+    Value<String>? titleAr,
+    Value<String>? status,
+    Value<String?>? version,
+    Value<String?>? remoteVersion,
+    Value<bool>? premium,
+    Value<int?>? normalizationVersion,
+    Value<int>? sizeBytes,
+    Value<int>? downloadedBytes,
+    Value<int>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return OfflinePacksCompanion(
+      packKey: packKey ?? this.packKey,
+      scopeType: scopeType ?? this.scopeType,
+      subjectId: subjectId ?? this.subjectId,
+      teacherTrackId: teacherTrackId ?? this.teacherTrackId,
+      scopeTitle: scopeTitle ?? this.scopeTitle,
+      kind: kind ?? this.kind,
+      unitId: unitId ?? this.unitId,
+      deckId: deckId ?? this.deckId,
+      titleAr: titleAr ?? this.titleAr,
+      status: status ?? this.status,
+      version: version ?? this.version,
+      remoteVersion: remoteVersion ?? this.remoteVersion,
+      premium: premium ?? this.premium,
+      normalizationVersion: normalizationVersion ?? this.normalizationVersion,
+      sizeBytes: sizeBytes ?? this.sizeBytes,
+      downloadedBytes: downloadedBytes ?? this.downloadedBytes,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (packKey.present) {
+      map['pack_key'] = Variable<String>(packKey.value);
+    }
+    if (scopeType.present) {
+      map['scope_type'] = Variable<String>(scopeType.value);
+    }
+    if (subjectId.present) {
+      map['subject_id'] = Variable<String>(subjectId.value);
+    }
+    if (teacherTrackId.present) {
+      map['teacher_track_id'] = Variable<String>(teacherTrackId.value);
+    }
+    if (scopeTitle.present) {
+      map['scope_title'] = Variable<String>(scopeTitle.value);
+    }
+    if (kind.present) {
+      map['kind'] = Variable<String>(kind.value);
+    }
+    if (unitId.present) {
+      map['unit_id'] = Variable<String>(unitId.value);
+    }
+    if (deckId.present) {
+      map['deck_id'] = Variable<String>(deckId.value);
+    }
+    if (titleAr.present) {
+      map['title_ar'] = Variable<String>(titleAr.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (version.present) {
+      map['version'] = Variable<String>(version.value);
+    }
+    if (remoteVersion.present) {
+      map['remote_version'] = Variable<String>(remoteVersion.value);
+    }
+    if (premium.present) {
+      map['premium'] = Variable<bool>(premium.value);
+    }
+    if (normalizationVersion.present) {
+      map['normalization_version'] = Variable<int>(normalizationVersion.value);
+    }
+    if (sizeBytes.present) {
+      map['size_bytes'] = Variable<int>(sizeBytes.value);
+    }
+    if (downloadedBytes.present) {
+      map['downloaded_bytes'] = Variable<int>(downloadedBytes.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OfflinePacksCompanion(')
+          ..write('packKey: $packKey, ')
+          ..write('scopeType: $scopeType, ')
+          ..write('subjectId: $subjectId, ')
+          ..write('teacherTrackId: $teacherTrackId, ')
+          ..write('scopeTitle: $scopeTitle, ')
+          ..write('kind: $kind, ')
+          ..write('unitId: $unitId, ')
+          ..write('deckId: $deckId, ')
+          ..write('titleAr: $titleAr, ')
+          ..write('status: $status, ')
+          ..write('version: $version, ')
+          ..write('remoteVersion: $remoteVersion, ')
+          ..write('premium: $premium, ')
+          ..write('normalizationVersion: $normalizationVersion, ')
+          ..write('sizeBytes: $sizeBytes, ')
+          ..write('downloadedBytes: $downloadedBytes, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $OfflineItemsTable extends OfflineItems
+    with TableInfo<$OfflineItemsTable, OfflineItemRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $OfflineItemsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _packKeyMeta = const VerificationMeta(
+    'packKey',
+  );
+  @override
+  late final GeneratedColumn<String> packKey = GeneratedColumn<String>(
+    'pack_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _itemIdMeta = const VerificationMeta('itemId');
+  @override
+  late final GeneratedColumn<String> itemId = GeneratedColumn<String>(
+    'item_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _typeMeta = const VerificationMeta('type');
+  @override
+  late final GeneratedColumn<String> type = GeneratedColumn<String>(
+    'type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _versionMeta = const VerificationMeta(
+    'version',
+  );
+  @override
+  late final GeneratedColumn<int> version = GeneratedColumn<int>(
+    'version',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _isFreeMeta = const VerificationMeta('isFree');
+  @override
+  late final GeneratedColumn<bool> isFree = GeneratedColumn<bool>(
+    'is_free',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_free" IN (0, 1))',
+    ),
+  );
+  static const VerificationMeta _jsonMeta = const VerificationMeta('json');
+  @override
+  late final GeneratedColumn<String> json = GeneratedColumn<String>(
+    'json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    packKey,
+    itemId,
+    type,
+    version,
+    isFree,
+    json,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'offline_items';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<OfflineItemRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('pack_key')) {
+      context.handle(
+        _packKeyMeta,
+        packKey.isAcceptableOrUnknown(data['pack_key']!, _packKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_packKeyMeta);
+    }
+    if (data.containsKey('item_id')) {
+      context.handle(
+        _itemIdMeta,
+        itemId.isAcceptableOrUnknown(data['item_id']!, _itemIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_itemIdMeta);
+    }
+    if (data.containsKey('type')) {
+      context.handle(
+        _typeMeta,
+        type.isAcceptableOrUnknown(data['type']!, _typeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_typeMeta);
+    }
+    if (data.containsKey('version')) {
+      context.handle(
+        _versionMeta,
+        version.isAcceptableOrUnknown(data['version']!, _versionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_versionMeta);
+    }
+    if (data.containsKey('is_free')) {
+      context.handle(
+        _isFreeMeta,
+        isFree.isAcceptableOrUnknown(data['is_free']!, _isFreeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_isFreeMeta);
+    }
+    if (data.containsKey('json')) {
+      context.handle(
+        _jsonMeta,
+        json.isAcceptableOrUnknown(data['json']!, _jsonMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_jsonMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {packKey, itemId};
+  @override
+  OfflineItemRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return OfflineItemRow(
+      packKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}pack_key'],
+      )!,
+      itemId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}item_id'],
+      )!,
+      type: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}type'],
+      )!,
+      version: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}version'],
+      )!,
+      isFree: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_free'],
+      )!,
+      json: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}json'],
+      )!,
+    );
+  }
+
+  @override
+  $OfflineItemsTable createAlias(String alias) {
+    return $OfflineItemsTable(attachedDatabase, alias);
+  }
+}
+
+class OfflineItemRow extends DataClass implements Insertable<OfflineItemRow> {
+  final String packKey;
+  final String itemId;
+  final String type;
+  final int version;
+  final bool isFree;
+  final String json;
+  const OfflineItemRow({
+    required this.packKey,
+    required this.itemId,
+    required this.type,
+    required this.version,
+    required this.isFree,
+    required this.json,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['pack_key'] = Variable<String>(packKey);
+    map['item_id'] = Variable<String>(itemId);
+    map['type'] = Variable<String>(type);
+    map['version'] = Variable<int>(version);
+    map['is_free'] = Variable<bool>(isFree);
+    map['json'] = Variable<String>(json);
+    return map;
+  }
+
+  OfflineItemsCompanion toCompanion(bool nullToAbsent) {
+    return OfflineItemsCompanion(
+      packKey: Value(packKey),
+      itemId: Value(itemId),
+      type: Value(type),
+      version: Value(version),
+      isFree: Value(isFree),
+      json: Value(json),
+    );
+  }
+
+  factory OfflineItemRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return OfflineItemRow(
+      packKey: serializer.fromJson<String>(json['packKey']),
+      itemId: serializer.fromJson<String>(json['itemId']),
+      type: serializer.fromJson<String>(json['type']),
+      version: serializer.fromJson<int>(json['version']),
+      isFree: serializer.fromJson<bool>(json['isFree']),
+      json: serializer.fromJson<String>(json['json']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'packKey': serializer.toJson<String>(packKey),
+      'itemId': serializer.toJson<String>(itemId),
+      'type': serializer.toJson<String>(type),
+      'version': serializer.toJson<int>(version),
+      'isFree': serializer.toJson<bool>(isFree),
+      'json': serializer.toJson<String>(json),
+    };
+  }
+
+  OfflineItemRow copyWith({
+    String? packKey,
+    String? itemId,
+    String? type,
+    int? version,
+    bool? isFree,
+    String? json,
+  }) => OfflineItemRow(
+    packKey: packKey ?? this.packKey,
+    itemId: itemId ?? this.itemId,
+    type: type ?? this.type,
+    version: version ?? this.version,
+    isFree: isFree ?? this.isFree,
+    json: json ?? this.json,
+  );
+  OfflineItemRow copyWithCompanion(OfflineItemsCompanion data) {
+    return OfflineItemRow(
+      packKey: data.packKey.present ? data.packKey.value : this.packKey,
+      itemId: data.itemId.present ? data.itemId.value : this.itemId,
+      type: data.type.present ? data.type.value : this.type,
+      version: data.version.present ? data.version.value : this.version,
+      isFree: data.isFree.present ? data.isFree.value : this.isFree,
+      json: data.json.present ? data.json.value : this.json,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OfflineItemRow(')
+          ..write('packKey: $packKey, ')
+          ..write('itemId: $itemId, ')
+          ..write('type: $type, ')
+          ..write('version: $version, ')
+          ..write('isFree: $isFree, ')
+          ..write('json: $json')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(packKey, itemId, type, version, isFree, json);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is OfflineItemRow &&
+          other.packKey == this.packKey &&
+          other.itemId == this.itemId &&
+          other.type == this.type &&
+          other.version == this.version &&
+          other.isFree == this.isFree &&
+          other.json == this.json);
+}
+
+class OfflineItemsCompanion extends UpdateCompanion<OfflineItemRow> {
+  final Value<String> packKey;
+  final Value<String> itemId;
+  final Value<String> type;
+  final Value<int> version;
+  final Value<bool> isFree;
+  final Value<String> json;
+  final Value<int> rowid;
+  const OfflineItemsCompanion({
+    this.packKey = const Value.absent(),
+    this.itemId = const Value.absent(),
+    this.type = const Value.absent(),
+    this.version = const Value.absent(),
+    this.isFree = const Value.absent(),
+    this.json = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  OfflineItemsCompanion.insert({
+    required String packKey,
+    required String itemId,
+    required String type,
+    required int version,
+    required bool isFree,
+    required String json,
+    this.rowid = const Value.absent(),
+  }) : packKey = Value(packKey),
+       itemId = Value(itemId),
+       type = Value(type),
+       version = Value(version),
+       isFree = Value(isFree),
+       json = Value(json);
+  static Insertable<OfflineItemRow> custom({
+    Expression<String>? packKey,
+    Expression<String>? itemId,
+    Expression<String>? type,
+    Expression<int>? version,
+    Expression<bool>? isFree,
+    Expression<String>? json,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (packKey != null) 'pack_key': packKey,
+      if (itemId != null) 'item_id': itemId,
+      if (type != null) 'type': type,
+      if (version != null) 'version': version,
+      if (isFree != null) 'is_free': isFree,
+      if (json != null) 'json': json,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  OfflineItemsCompanion copyWith({
+    Value<String>? packKey,
+    Value<String>? itemId,
+    Value<String>? type,
+    Value<int>? version,
+    Value<bool>? isFree,
+    Value<String>? json,
+    Value<int>? rowid,
+  }) {
+    return OfflineItemsCompanion(
+      packKey: packKey ?? this.packKey,
+      itemId: itemId ?? this.itemId,
+      type: type ?? this.type,
+      version: version ?? this.version,
+      isFree: isFree ?? this.isFree,
+      json: json ?? this.json,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (packKey.present) {
+      map['pack_key'] = Variable<String>(packKey.value);
+    }
+    if (itemId.present) {
+      map['item_id'] = Variable<String>(itemId.value);
+    }
+    if (type.present) {
+      map['type'] = Variable<String>(type.value);
+    }
+    if (version.present) {
+      map['version'] = Variable<int>(version.value);
+    }
+    if (isFree.present) {
+      map['is_free'] = Variable<bool>(isFree.value);
+    }
+    if (json.present) {
+      map['json'] = Variable<String>(json.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OfflineItemsCompanion(')
+          ..write('packKey: $packKey, ')
+          ..write('itemId: $itemId, ')
+          ..write('type: $type, ')
+          ..write('version: $version, ')
+          ..write('isFree: $isFree, ')
+          ..write('json: $json, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $OfflineFilesTable extends OfflineFiles
+    with TableInfo<$OfflineFilesTable, OfflineFileRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $OfflineFilesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _packKeyMeta = const VerificationMeta(
+    'packKey',
+  );
+  @override
+  late final GeneratedColumn<String> packKey = GeneratedColumn<String>(
+    'pack_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _mediaIdMeta = const VerificationMeta(
+    'mediaId',
+  );
+  @override
+  late final GeneratedColumn<String> mediaId = GeneratedColumn<String>(
+    'media_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _versionMeta = const VerificationMeta(
+    'version',
+  );
+  @override
+  late final GeneratedColumn<int> version = GeneratedColumn<int>(
+    'version',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _pathMeta = const VerificationMeta('path');
+  @override
+  late final GeneratedColumn<String> path = GeneratedColumn<String>(
+    'path',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sizeBytesMeta = const VerificationMeta(
+    'sizeBytes',
+  );
+  @override
+  late final GeneratedColumn<int> sizeBytes = GeneratedColumn<int>(
+    'size_bytes',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    packKey,
+    mediaId,
+    version,
+    path,
+    sizeBytes,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'offline_files';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<OfflineFileRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('pack_key')) {
+      context.handle(
+        _packKeyMeta,
+        packKey.isAcceptableOrUnknown(data['pack_key']!, _packKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_packKeyMeta);
+    }
+    if (data.containsKey('media_id')) {
+      context.handle(
+        _mediaIdMeta,
+        mediaId.isAcceptableOrUnknown(data['media_id']!, _mediaIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_mediaIdMeta);
+    }
+    if (data.containsKey('version')) {
+      context.handle(
+        _versionMeta,
+        version.isAcceptableOrUnknown(data['version']!, _versionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_versionMeta);
+    }
+    if (data.containsKey('path')) {
+      context.handle(
+        _pathMeta,
+        path.isAcceptableOrUnknown(data['path']!, _pathMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_pathMeta);
+    }
+    if (data.containsKey('size_bytes')) {
+      context.handle(
+        _sizeBytesMeta,
+        sizeBytes.isAcceptableOrUnknown(data['size_bytes']!, _sizeBytesMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sizeBytesMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {packKey, mediaId};
+  @override
+  OfflineFileRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return OfflineFileRow(
+      packKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}pack_key'],
+      )!,
+      mediaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}media_id'],
+      )!,
+      version: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}version'],
+      )!,
+      path: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}path'],
+      )!,
+      sizeBytes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}size_bytes'],
+      )!,
+    );
+  }
+
+  @override
+  $OfflineFilesTable createAlias(String alias) {
+    return $OfflineFilesTable(attachedDatabase, alias);
+  }
+}
+
+class OfflineFileRow extends DataClass implements Insertable<OfflineFileRow> {
+  final String packKey;
+  final String mediaId;
+  final int version;
+  final String path;
+  final int sizeBytes;
+  const OfflineFileRow({
+    required this.packKey,
+    required this.mediaId,
+    required this.version,
+    required this.path,
+    required this.sizeBytes,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['pack_key'] = Variable<String>(packKey);
+    map['media_id'] = Variable<String>(mediaId);
+    map['version'] = Variable<int>(version);
+    map['path'] = Variable<String>(path);
+    map['size_bytes'] = Variable<int>(sizeBytes);
+    return map;
+  }
+
+  OfflineFilesCompanion toCompanion(bool nullToAbsent) {
+    return OfflineFilesCompanion(
+      packKey: Value(packKey),
+      mediaId: Value(mediaId),
+      version: Value(version),
+      path: Value(path),
+      sizeBytes: Value(sizeBytes),
+    );
+  }
+
+  factory OfflineFileRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return OfflineFileRow(
+      packKey: serializer.fromJson<String>(json['packKey']),
+      mediaId: serializer.fromJson<String>(json['mediaId']),
+      version: serializer.fromJson<int>(json['version']),
+      path: serializer.fromJson<String>(json['path']),
+      sizeBytes: serializer.fromJson<int>(json['sizeBytes']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'packKey': serializer.toJson<String>(packKey),
+      'mediaId': serializer.toJson<String>(mediaId),
+      'version': serializer.toJson<int>(version),
+      'path': serializer.toJson<String>(path),
+      'sizeBytes': serializer.toJson<int>(sizeBytes),
+    };
+  }
+
+  OfflineFileRow copyWith({
+    String? packKey,
+    String? mediaId,
+    int? version,
+    String? path,
+    int? sizeBytes,
+  }) => OfflineFileRow(
+    packKey: packKey ?? this.packKey,
+    mediaId: mediaId ?? this.mediaId,
+    version: version ?? this.version,
+    path: path ?? this.path,
+    sizeBytes: sizeBytes ?? this.sizeBytes,
+  );
+  OfflineFileRow copyWithCompanion(OfflineFilesCompanion data) {
+    return OfflineFileRow(
+      packKey: data.packKey.present ? data.packKey.value : this.packKey,
+      mediaId: data.mediaId.present ? data.mediaId.value : this.mediaId,
+      version: data.version.present ? data.version.value : this.version,
+      path: data.path.present ? data.path.value : this.path,
+      sizeBytes: data.sizeBytes.present ? data.sizeBytes.value : this.sizeBytes,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OfflineFileRow(')
+          ..write('packKey: $packKey, ')
+          ..write('mediaId: $mediaId, ')
+          ..write('version: $version, ')
+          ..write('path: $path, ')
+          ..write('sizeBytes: $sizeBytes')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(packKey, mediaId, version, path, sizeBytes);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is OfflineFileRow &&
+          other.packKey == this.packKey &&
+          other.mediaId == this.mediaId &&
+          other.version == this.version &&
+          other.path == this.path &&
+          other.sizeBytes == this.sizeBytes);
+}
+
+class OfflineFilesCompanion extends UpdateCompanion<OfflineFileRow> {
+  final Value<String> packKey;
+  final Value<String> mediaId;
+  final Value<int> version;
+  final Value<String> path;
+  final Value<int> sizeBytes;
+  final Value<int> rowid;
+  const OfflineFilesCompanion({
+    this.packKey = const Value.absent(),
+    this.mediaId = const Value.absent(),
+    this.version = const Value.absent(),
+    this.path = const Value.absent(),
+    this.sizeBytes = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  OfflineFilesCompanion.insert({
+    required String packKey,
+    required String mediaId,
+    required int version,
+    required String path,
+    required int sizeBytes,
+    this.rowid = const Value.absent(),
+  }) : packKey = Value(packKey),
+       mediaId = Value(mediaId),
+       version = Value(version),
+       path = Value(path),
+       sizeBytes = Value(sizeBytes);
+  static Insertable<OfflineFileRow> custom({
+    Expression<String>? packKey,
+    Expression<String>? mediaId,
+    Expression<int>? version,
+    Expression<String>? path,
+    Expression<int>? sizeBytes,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (packKey != null) 'pack_key': packKey,
+      if (mediaId != null) 'media_id': mediaId,
+      if (version != null) 'version': version,
+      if (path != null) 'path': path,
+      if (sizeBytes != null) 'size_bytes': sizeBytes,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  OfflineFilesCompanion copyWith({
+    Value<String>? packKey,
+    Value<String>? mediaId,
+    Value<int>? version,
+    Value<String>? path,
+    Value<int>? sizeBytes,
+    Value<int>? rowid,
+  }) {
+    return OfflineFilesCompanion(
+      packKey: packKey ?? this.packKey,
+      mediaId: mediaId ?? this.mediaId,
+      version: version ?? this.version,
+      path: path ?? this.path,
+      sizeBytes: sizeBytes ?? this.sizeBytes,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (packKey.present) {
+      map['pack_key'] = Variable<String>(packKey.value);
+    }
+    if (mediaId.present) {
+      map['media_id'] = Variable<String>(mediaId.value);
+    }
+    if (version.present) {
+      map['version'] = Variable<int>(version.value);
+    }
+    if (path.present) {
+      map['path'] = Variable<String>(path.value);
+    }
+    if (sizeBytes.present) {
+      map['size_bytes'] = Variable<int>(sizeBytes.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OfflineFilesCompanion(')
+          ..write('packKey: $packKey, ')
+          ..write('mediaId: $mediaId, ')
+          ..write('version: $version, ')
+          ..write('path: $path, ')
+          ..write('sizeBytes: $sizeBytes, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $OfflineLeaseRowsTable extends OfflineLeaseRows
+    with TableInfo<$OfflineLeaseRowsTable, OfflineLeaseRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $OfflineLeaseRowsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _scopeKeyMeta = const VerificationMeta(
+    'scopeKey',
+  );
+  @override
+  late final GeneratedColumn<String> scopeKey = GeneratedColumn<String>(
+    'scope_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _expiresAtMeta = const VerificationMeta(
+    'expiresAt',
+  );
+  @override
+  late final GeneratedColumn<int> expiresAt = GeneratedColumn<int>(
+    'expires_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _refreshedAtMeta = const VerificationMeta(
+    'refreshedAt',
+  );
+  @override
+  late final GeneratedColumn<int> refreshedAt = GeneratedColumn<int>(
+    'refreshed_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [scopeKey, expiresAt, refreshedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'offline_lease_rows';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<OfflineLeaseRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('scope_key')) {
+      context.handle(
+        _scopeKeyMeta,
+        scopeKey.isAcceptableOrUnknown(data['scope_key']!, _scopeKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_scopeKeyMeta);
+    }
+    if (data.containsKey('expires_at')) {
+      context.handle(
+        _expiresAtMeta,
+        expiresAt.isAcceptableOrUnknown(data['expires_at']!, _expiresAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_expiresAtMeta);
+    }
+    if (data.containsKey('refreshed_at')) {
+      context.handle(
+        _refreshedAtMeta,
+        refreshedAt.isAcceptableOrUnknown(
+          data['refreshed_at']!,
+          _refreshedAtMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_refreshedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {scopeKey};
+  @override
+  OfflineLeaseRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return OfflineLeaseRow(
+      scopeKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}scope_key'],
+      )!,
+      expiresAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}expires_at'],
+      )!,
+      refreshedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}refreshed_at'],
+      )!,
+    );
+  }
+
+  @override
+  $OfflineLeaseRowsTable createAlias(String alias) {
+    return $OfflineLeaseRowsTable(attachedDatabase, alias);
+  }
+}
+
+class OfflineLeaseRow extends DataClass implements Insertable<OfflineLeaseRow> {
+  final String scopeKey;
+  final int expiresAt;
+  final int refreshedAt;
+  const OfflineLeaseRow({
+    required this.scopeKey,
+    required this.expiresAt,
+    required this.refreshedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['scope_key'] = Variable<String>(scopeKey);
+    map['expires_at'] = Variable<int>(expiresAt);
+    map['refreshed_at'] = Variable<int>(refreshedAt);
+    return map;
+  }
+
+  OfflineLeaseRowsCompanion toCompanion(bool nullToAbsent) {
+    return OfflineLeaseRowsCompanion(
+      scopeKey: Value(scopeKey),
+      expiresAt: Value(expiresAt),
+      refreshedAt: Value(refreshedAt),
+    );
+  }
+
+  factory OfflineLeaseRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return OfflineLeaseRow(
+      scopeKey: serializer.fromJson<String>(json['scopeKey']),
+      expiresAt: serializer.fromJson<int>(json['expiresAt']),
+      refreshedAt: serializer.fromJson<int>(json['refreshedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'scopeKey': serializer.toJson<String>(scopeKey),
+      'expiresAt': serializer.toJson<int>(expiresAt),
+      'refreshedAt': serializer.toJson<int>(refreshedAt),
+    };
+  }
+
+  OfflineLeaseRow copyWith({
+    String? scopeKey,
+    int? expiresAt,
+    int? refreshedAt,
+  }) => OfflineLeaseRow(
+    scopeKey: scopeKey ?? this.scopeKey,
+    expiresAt: expiresAt ?? this.expiresAt,
+    refreshedAt: refreshedAt ?? this.refreshedAt,
+  );
+  OfflineLeaseRow copyWithCompanion(OfflineLeaseRowsCompanion data) {
+    return OfflineLeaseRow(
+      scopeKey: data.scopeKey.present ? data.scopeKey.value : this.scopeKey,
+      expiresAt: data.expiresAt.present ? data.expiresAt.value : this.expiresAt,
+      refreshedAt: data.refreshedAt.present
+          ? data.refreshedAt.value
+          : this.refreshedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OfflineLeaseRow(')
+          ..write('scopeKey: $scopeKey, ')
+          ..write('expiresAt: $expiresAt, ')
+          ..write('refreshedAt: $refreshedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(scopeKey, expiresAt, refreshedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is OfflineLeaseRow &&
+          other.scopeKey == this.scopeKey &&
+          other.expiresAt == this.expiresAt &&
+          other.refreshedAt == this.refreshedAt);
+}
+
+class OfflineLeaseRowsCompanion extends UpdateCompanion<OfflineLeaseRow> {
+  final Value<String> scopeKey;
+  final Value<int> expiresAt;
+  final Value<int> refreshedAt;
+  final Value<int> rowid;
+  const OfflineLeaseRowsCompanion({
+    this.scopeKey = const Value.absent(),
+    this.expiresAt = const Value.absent(),
+    this.refreshedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  OfflineLeaseRowsCompanion.insert({
+    required String scopeKey,
+    required int expiresAt,
+    required int refreshedAt,
+    this.rowid = const Value.absent(),
+  }) : scopeKey = Value(scopeKey),
+       expiresAt = Value(expiresAt),
+       refreshedAt = Value(refreshedAt);
+  static Insertable<OfflineLeaseRow> custom({
+    Expression<String>? scopeKey,
+    Expression<int>? expiresAt,
+    Expression<int>? refreshedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (scopeKey != null) 'scope_key': scopeKey,
+      if (expiresAt != null) 'expires_at': expiresAt,
+      if (refreshedAt != null) 'refreshed_at': refreshedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  OfflineLeaseRowsCompanion copyWith({
+    Value<String>? scopeKey,
+    Value<int>? expiresAt,
+    Value<int>? refreshedAt,
+    Value<int>? rowid,
+  }) {
+    return OfflineLeaseRowsCompanion(
+      scopeKey: scopeKey ?? this.scopeKey,
+      expiresAt: expiresAt ?? this.expiresAt,
+      refreshedAt: refreshedAt ?? this.refreshedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (scopeKey.present) {
+      map['scope_key'] = Variable<String>(scopeKey.value);
+    }
+    if (expiresAt.present) {
+      map['expires_at'] = Variable<int>(expiresAt.value);
+    }
+    if (refreshedAt.present) {
+      map['refreshed_at'] = Variable<int>(refreshedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OfflineLeaseRowsCompanion(')
+          ..write('scopeKey: $scopeKey, ')
+          ..write('expiresAt: $expiresAt, ')
+          ..write('refreshedAt: $refreshedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $LocalAttemptsTable extends LocalAttempts
+    with TableInfo<$LocalAttemptsTable, LocalAttemptRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $LocalAttemptsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _attemptMeta = const VerificationMeta(
+    'attempt',
+  );
+  @override
+  late final GeneratedColumn<String> attempt = GeneratedColumn<String>(
+    'attempt',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _payloadMeta = const VerificationMeta(
+    'payload',
+  );
+  @override
+  late final GeneratedColumn<String> payload = GeneratedColumn<String>(
+    'payload',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _submittedMeta = const VerificationMeta(
+    'submitted',
+  );
+  @override
+  late final GeneratedColumn<bool> submitted = GeneratedColumn<bool>(
+    'submitted',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("submitted" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _syncedMeta = const VerificationMeta('synced');
+  @override
+  late final GeneratedColumn<bool> synced = GeneratedColumn<bool>(
+    'synced',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("synced" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _serverAttemptIdMeta = const VerificationMeta(
+    'serverAttemptId',
+  );
+  @override
+  late final GeneratedColumn<String> serverAttemptId = GeneratedColumn<String>(
+    'server_attempt_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    attempt,
+    payload,
+    submitted,
+    synced,
+    serverAttemptId,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'local_attempts';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<LocalAttemptRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('attempt')) {
+      context.handle(
+        _attemptMeta,
+        attempt.isAcceptableOrUnknown(data['attempt']!, _attemptMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_attemptMeta);
+    }
+    if (data.containsKey('payload')) {
+      context.handle(
+        _payloadMeta,
+        payload.isAcceptableOrUnknown(data['payload']!, _payloadMeta),
+      );
+    }
+    if (data.containsKey('submitted')) {
+      context.handle(
+        _submittedMeta,
+        submitted.isAcceptableOrUnknown(data['submitted']!, _submittedMeta),
+      );
+    }
+    if (data.containsKey('synced')) {
+      context.handle(
+        _syncedMeta,
+        synced.isAcceptableOrUnknown(data['synced']!, _syncedMeta),
+      );
+    }
+    if (data.containsKey('server_attempt_id')) {
+      context.handle(
+        _serverAttemptIdMeta,
+        serverAttemptId.isAcceptableOrUnknown(
+          data['server_attempt_id']!,
+          _serverAttemptIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  LocalAttemptRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LocalAttemptRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      attempt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}attempt'],
+      )!,
+      payload: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payload'],
+      ),
+      submitted: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}submitted'],
+      )!,
+      synced: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}synced'],
+      )!,
+      serverAttemptId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}server_attempt_id'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $LocalAttemptsTable createAlias(String alias) {
+    return $LocalAttemptsTable(attachedDatabase, alias);
+  }
+}
+
+class LocalAttemptRow extends DataClass implements Insertable<LocalAttemptRow> {
+  final String id;
+  final String attempt;
+  final String? payload;
+  final bool submitted;
+  final bool synced;
+  final String? serverAttemptId;
+  final int createdAt;
+  const LocalAttemptRow({
+    required this.id,
+    required this.attempt,
+    this.payload,
+    required this.submitted,
+    required this.synced,
+    this.serverAttemptId,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['attempt'] = Variable<String>(attempt);
+    if (!nullToAbsent || payload != null) {
+      map['payload'] = Variable<String>(payload);
+    }
+    map['submitted'] = Variable<bool>(submitted);
+    map['synced'] = Variable<bool>(synced);
+    if (!nullToAbsent || serverAttemptId != null) {
+      map['server_attempt_id'] = Variable<String>(serverAttemptId);
+    }
+    map['created_at'] = Variable<int>(createdAt);
+    return map;
+  }
+
+  LocalAttemptsCompanion toCompanion(bool nullToAbsent) {
+    return LocalAttemptsCompanion(
+      id: Value(id),
+      attempt: Value(attempt),
+      payload: payload == null && nullToAbsent
+          ? const Value.absent()
+          : Value(payload),
+      submitted: Value(submitted),
+      synced: Value(synced),
+      serverAttemptId: serverAttemptId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(serverAttemptId),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory LocalAttemptRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LocalAttemptRow(
+      id: serializer.fromJson<String>(json['id']),
+      attempt: serializer.fromJson<String>(json['attempt']),
+      payload: serializer.fromJson<String?>(json['payload']),
+      submitted: serializer.fromJson<bool>(json['submitted']),
+      synced: serializer.fromJson<bool>(json['synced']),
+      serverAttemptId: serializer.fromJson<String?>(json['serverAttemptId']),
+      createdAt: serializer.fromJson<int>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'attempt': serializer.toJson<String>(attempt),
+      'payload': serializer.toJson<String?>(payload),
+      'submitted': serializer.toJson<bool>(submitted),
+      'synced': serializer.toJson<bool>(synced),
+      'serverAttemptId': serializer.toJson<String?>(serverAttemptId),
+      'createdAt': serializer.toJson<int>(createdAt),
+    };
+  }
+
+  LocalAttemptRow copyWith({
+    String? id,
+    String? attempt,
+    Value<String?> payload = const Value.absent(),
+    bool? submitted,
+    bool? synced,
+    Value<String?> serverAttemptId = const Value.absent(),
+    int? createdAt,
+  }) => LocalAttemptRow(
+    id: id ?? this.id,
+    attempt: attempt ?? this.attempt,
+    payload: payload.present ? payload.value : this.payload,
+    submitted: submitted ?? this.submitted,
+    synced: synced ?? this.synced,
+    serverAttemptId: serverAttemptId.present
+        ? serverAttemptId.value
+        : this.serverAttemptId,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  LocalAttemptRow copyWithCompanion(LocalAttemptsCompanion data) {
+    return LocalAttemptRow(
+      id: data.id.present ? data.id.value : this.id,
+      attempt: data.attempt.present ? data.attempt.value : this.attempt,
+      payload: data.payload.present ? data.payload.value : this.payload,
+      submitted: data.submitted.present ? data.submitted.value : this.submitted,
+      synced: data.synced.present ? data.synced.value : this.synced,
+      serverAttemptId: data.serverAttemptId.present
+          ? data.serverAttemptId.value
+          : this.serverAttemptId,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LocalAttemptRow(')
+          ..write('id: $id, ')
+          ..write('attempt: $attempt, ')
+          ..write('payload: $payload, ')
+          ..write('submitted: $submitted, ')
+          ..write('synced: $synced, ')
+          ..write('serverAttemptId: $serverAttemptId, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    attempt,
+    payload,
+    submitted,
+    synced,
+    serverAttemptId,
+    createdAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LocalAttemptRow &&
+          other.id == this.id &&
+          other.attempt == this.attempt &&
+          other.payload == this.payload &&
+          other.submitted == this.submitted &&
+          other.synced == this.synced &&
+          other.serverAttemptId == this.serverAttemptId &&
+          other.createdAt == this.createdAt);
+}
+
+class LocalAttemptsCompanion extends UpdateCompanion<LocalAttemptRow> {
+  final Value<String> id;
+  final Value<String> attempt;
+  final Value<String?> payload;
+  final Value<bool> submitted;
+  final Value<bool> synced;
+  final Value<String?> serverAttemptId;
+  final Value<int> createdAt;
+  final Value<int> rowid;
+  const LocalAttemptsCompanion({
+    this.id = const Value.absent(),
+    this.attempt = const Value.absent(),
+    this.payload = const Value.absent(),
+    this.submitted = const Value.absent(),
+    this.synced = const Value.absent(),
+    this.serverAttemptId = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  LocalAttemptsCompanion.insert({
+    required String id,
+    required String attempt,
+    this.payload = const Value.absent(),
+    this.submitted = const Value.absent(),
+    this.synced = const Value.absent(),
+    this.serverAttemptId = const Value.absent(),
+    required int createdAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       attempt = Value(attempt),
+       createdAt = Value(createdAt);
+  static Insertable<LocalAttemptRow> custom({
+    Expression<String>? id,
+    Expression<String>? attempt,
+    Expression<String>? payload,
+    Expression<bool>? submitted,
+    Expression<bool>? synced,
+    Expression<String>? serverAttemptId,
+    Expression<int>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (attempt != null) 'attempt': attempt,
+      if (payload != null) 'payload': payload,
+      if (submitted != null) 'submitted': submitted,
+      if (synced != null) 'synced': synced,
+      if (serverAttemptId != null) 'server_attempt_id': serverAttemptId,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  LocalAttemptsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? attempt,
+    Value<String?>? payload,
+    Value<bool>? submitted,
+    Value<bool>? synced,
+    Value<String?>? serverAttemptId,
+    Value<int>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return LocalAttemptsCompanion(
+      id: id ?? this.id,
+      attempt: attempt ?? this.attempt,
+      payload: payload ?? this.payload,
+      submitted: submitted ?? this.submitted,
+      synced: synced ?? this.synced,
+      serverAttemptId: serverAttemptId ?? this.serverAttemptId,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (attempt.present) {
+      map['attempt'] = Variable<String>(attempt.value);
+    }
+    if (payload.present) {
+      map['payload'] = Variable<String>(payload.value);
+    }
+    if (submitted.present) {
+      map['submitted'] = Variable<bool>(submitted.value);
+    }
+    if (synced.present) {
+      map['synced'] = Variable<bool>(synced.value);
+    }
+    if (serverAttemptId.present) {
+      map['server_attempt_id'] = Variable<String>(serverAttemptId.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LocalAttemptsCompanion(')
+          ..write('id: $id, ')
+          ..write('attempt: $attempt, ')
+          ..write('payload: $payload, ')
+          ..write('submitted: $submitted, ')
+          ..write('synced: $synced, ')
+          ..write('serverAttemptId: $serverAttemptId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $LocalMistakesTable extends LocalMistakes
+    with TableInfo<$LocalMistakesTable, LocalMistakeRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $LocalMistakesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _questionIdMeta = const VerificationMeta(
+    'questionId',
+  );
+  @override
+  late final GeneratedColumn<String> questionId = GeneratedColumn<String>(
+    'question_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _wrongAtMeta = const VerificationMeta(
+    'wrongAt',
+  );
+  @override
+  late final GeneratedColumn<int> wrongAt = GeneratedColumn<int>(
+    'wrong_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [questionId, wrongAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'local_mistakes';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<LocalMistakeRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('question_id')) {
+      context.handle(
+        _questionIdMeta,
+        questionId.isAcceptableOrUnknown(data['question_id']!, _questionIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_questionIdMeta);
+    }
+    if (data.containsKey('wrong_at')) {
+      context.handle(
+        _wrongAtMeta,
+        wrongAt.isAcceptableOrUnknown(data['wrong_at']!, _wrongAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_wrongAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {questionId};
+  @override
+  LocalMistakeRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LocalMistakeRow(
+      questionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}question_id'],
+      )!,
+      wrongAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}wrong_at'],
+      )!,
+    );
+  }
+
+  @override
+  $LocalMistakesTable createAlias(String alias) {
+    return $LocalMistakesTable(attachedDatabase, alias);
+  }
+}
+
+class LocalMistakeRow extends DataClass implements Insertable<LocalMistakeRow> {
+  final String questionId;
+  final int wrongAt;
+  const LocalMistakeRow({required this.questionId, required this.wrongAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['question_id'] = Variable<String>(questionId);
+    map['wrong_at'] = Variable<int>(wrongAt);
+    return map;
+  }
+
+  LocalMistakesCompanion toCompanion(bool nullToAbsent) {
+    return LocalMistakesCompanion(
+      questionId: Value(questionId),
+      wrongAt: Value(wrongAt),
+    );
+  }
+
+  factory LocalMistakeRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LocalMistakeRow(
+      questionId: serializer.fromJson<String>(json['questionId']),
+      wrongAt: serializer.fromJson<int>(json['wrongAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'questionId': serializer.toJson<String>(questionId),
+      'wrongAt': serializer.toJson<int>(wrongAt),
+    };
+  }
+
+  LocalMistakeRow copyWith({String? questionId, int? wrongAt}) =>
+      LocalMistakeRow(
+        questionId: questionId ?? this.questionId,
+        wrongAt: wrongAt ?? this.wrongAt,
+      );
+  LocalMistakeRow copyWithCompanion(LocalMistakesCompanion data) {
+    return LocalMistakeRow(
+      questionId: data.questionId.present
+          ? data.questionId.value
+          : this.questionId,
+      wrongAt: data.wrongAt.present ? data.wrongAt.value : this.wrongAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LocalMistakeRow(')
+          ..write('questionId: $questionId, ')
+          ..write('wrongAt: $wrongAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(questionId, wrongAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LocalMistakeRow &&
+          other.questionId == this.questionId &&
+          other.wrongAt == this.wrongAt);
+}
+
+class LocalMistakesCompanion extends UpdateCompanion<LocalMistakeRow> {
+  final Value<String> questionId;
+  final Value<int> wrongAt;
+  final Value<int> rowid;
+  const LocalMistakesCompanion({
+    this.questionId = const Value.absent(),
+    this.wrongAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  LocalMistakesCompanion.insert({
+    required String questionId,
+    required int wrongAt,
+    this.rowid = const Value.absent(),
+  }) : questionId = Value(questionId),
+       wrongAt = Value(wrongAt);
+  static Insertable<LocalMistakeRow> custom({
+    Expression<String>? questionId,
+    Expression<int>? wrongAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (questionId != null) 'question_id': questionId,
+      if (wrongAt != null) 'wrong_at': wrongAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  LocalMistakesCompanion copyWith({
+    Value<String>? questionId,
+    Value<int>? wrongAt,
+    Value<int>? rowid,
+  }) {
+    return LocalMistakesCompanion(
+      questionId: questionId ?? this.questionId,
+      wrongAt: wrongAt ?? this.wrongAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (questionId.present) {
+      map['question_id'] = Variable<String>(questionId.value);
+    }
+    if (wrongAt.present) {
+      map['wrong_at'] = Variable<int>(wrongAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LocalMistakesCompanion(')
+          ..write('questionId: $questionId, ')
+          ..write('wrongAt: $wrongAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3891,6 +6609,14 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $ExamAnswersTable examAnswers = $ExamAnswersTable(this);
   late final $LocalDecksTable localDecks = $LocalDecksTable(this);
   late final $LocalCardsTable localCards = $LocalCardsTable(this);
+  late final $OfflinePacksTable offlinePacks = $OfflinePacksTable(this);
+  late final $OfflineItemsTable offlineItems = $OfflineItemsTable(this);
+  late final $OfflineFilesTable offlineFiles = $OfflineFilesTable(this);
+  late final $OfflineLeaseRowsTable offlineLeaseRows = $OfflineLeaseRowsTable(
+    this,
+  );
+  late final $LocalAttemptsTable localAttempts = $LocalAttemptsTable(this);
+  late final $LocalMistakesTable localMistakes = $LocalMistakesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3903,6 +6629,12 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     examAnswers,
     localDecks,
     localCards,
+    offlinePacks,
+    offlineItems,
+    offlineFiles,
+    offlineLeaseRows,
+    localAttempts,
+    localMistakes,
   ];
 }
 
@@ -5876,6 +8608,1472 @@ typedef $$LocalCardsTableProcessedTableManager =
       LocalCardRow,
       PrefetchHooks Function()
     >;
+typedef $$OfflinePacksTableCreateCompanionBuilder =
+    OfflinePacksCompanion Function({
+      required String packKey,
+      required String scopeType,
+      Value<String?> subjectId,
+      Value<String?> teacherTrackId,
+      required String scopeTitle,
+      required String kind,
+      Value<String?> unitId,
+      Value<String?> deckId,
+      required String titleAr,
+      required String status,
+      Value<String?> version,
+      Value<String?> remoteVersion,
+      Value<bool> premium,
+      Value<int?> normalizationVersion,
+      Value<int> sizeBytes,
+      Value<int> downloadedBytes,
+      required int updatedAt,
+      Value<int> rowid,
+    });
+typedef $$OfflinePacksTableUpdateCompanionBuilder =
+    OfflinePacksCompanion Function({
+      Value<String> packKey,
+      Value<String> scopeType,
+      Value<String?> subjectId,
+      Value<String?> teacherTrackId,
+      Value<String> scopeTitle,
+      Value<String> kind,
+      Value<String?> unitId,
+      Value<String?> deckId,
+      Value<String> titleAr,
+      Value<String> status,
+      Value<String?> version,
+      Value<String?> remoteVersion,
+      Value<bool> premium,
+      Value<int?> normalizationVersion,
+      Value<int> sizeBytes,
+      Value<int> downloadedBytes,
+      Value<int> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$OfflinePacksTableFilterComposer
+    extends Composer<_$AppDatabase, $OfflinePacksTable> {
+  $$OfflinePacksTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get packKey => $composableBuilder(
+    column: $table.packKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get scopeType => $composableBuilder(
+    column: $table.scopeType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get subjectId => $composableBuilder(
+    column: $table.subjectId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get teacherTrackId => $composableBuilder(
+    column: $table.teacherTrackId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get scopeTitle => $composableBuilder(
+    column: $table.scopeTitle,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get unitId => $composableBuilder(
+    column: $table.unitId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deckId => $composableBuilder(
+    column: $table.deckId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get titleAr => $composableBuilder(
+    column: $table.titleAr,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get remoteVersion => $composableBuilder(
+    column: $table.remoteVersion,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get premium => $composableBuilder(
+    column: $table.premium,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get normalizationVersion => $composableBuilder(
+    column: $table.normalizationVersion,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sizeBytes => $composableBuilder(
+    column: $table.sizeBytes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get downloadedBytes => $composableBuilder(
+    column: $table.downloadedBytes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$OfflinePacksTableOrderingComposer
+    extends Composer<_$AppDatabase, $OfflinePacksTable> {
+  $$OfflinePacksTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get packKey => $composableBuilder(
+    column: $table.packKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get scopeType => $composableBuilder(
+    column: $table.scopeType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get subjectId => $composableBuilder(
+    column: $table.subjectId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get teacherTrackId => $composableBuilder(
+    column: $table.teacherTrackId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get scopeTitle => $composableBuilder(
+    column: $table.scopeTitle,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get unitId => $composableBuilder(
+    column: $table.unitId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deckId => $composableBuilder(
+    column: $table.deckId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get titleAr => $composableBuilder(
+    column: $table.titleAr,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get remoteVersion => $composableBuilder(
+    column: $table.remoteVersion,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get premium => $composableBuilder(
+    column: $table.premium,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get normalizationVersion => $composableBuilder(
+    column: $table.normalizationVersion,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sizeBytes => $composableBuilder(
+    column: $table.sizeBytes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get downloadedBytes => $composableBuilder(
+    column: $table.downloadedBytes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$OfflinePacksTableAnnotationComposer
+    extends Composer<_$AppDatabase, $OfflinePacksTable> {
+  $$OfflinePacksTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get packKey =>
+      $composableBuilder(column: $table.packKey, builder: (column) => column);
+
+  GeneratedColumn<String> get scopeType =>
+      $composableBuilder(column: $table.scopeType, builder: (column) => column);
+
+  GeneratedColumn<String> get subjectId =>
+      $composableBuilder(column: $table.subjectId, builder: (column) => column);
+
+  GeneratedColumn<String> get teacherTrackId => $composableBuilder(
+    column: $table.teacherTrackId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get scopeTitle => $composableBuilder(
+    column: $table.scopeTitle,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get kind =>
+      $composableBuilder(column: $table.kind, builder: (column) => column);
+
+  GeneratedColumn<String> get unitId =>
+      $composableBuilder(column: $table.unitId, builder: (column) => column);
+
+  GeneratedColumn<String> get deckId =>
+      $composableBuilder(column: $table.deckId, builder: (column) => column);
+
+  GeneratedColumn<String> get titleAr =>
+      $composableBuilder(column: $table.titleAr, builder: (column) => column);
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<String> get version =>
+      $composableBuilder(column: $table.version, builder: (column) => column);
+
+  GeneratedColumn<String> get remoteVersion => $composableBuilder(
+    column: $table.remoteVersion,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get premium =>
+      $composableBuilder(column: $table.premium, builder: (column) => column);
+
+  GeneratedColumn<int> get normalizationVersion => $composableBuilder(
+    column: $table.normalizationVersion,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get sizeBytes =>
+      $composableBuilder(column: $table.sizeBytes, builder: (column) => column);
+
+  GeneratedColumn<int> get downloadedBytes => $composableBuilder(
+    column: $table.downloadedBytes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$OfflinePacksTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $OfflinePacksTable,
+          OfflinePackRow,
+          $$OfflinePacksTableFilterComposer,
+          $$OfflinePacksTableOrderingComposer,
+          $$OfflinePacksTableAnnotationComposer,
+          $$OfflinePacksTableCreateCompanionBuilder,
+          $$OfflinePacksTableUpdateCompanionBuilder,
+          (
+            OfflinePackRow,
+            BaseReferences<_$AppDatabase, $OfflinePacksTable, OfflinePackRow>,
+          ),
+          OfflinePackRow,
+          PrefetchHooks Function()
+        > {
+  $$OfflinePacksTableTableManager(_$AppDatabase db, $OfflinePacksTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$OfflinePacksTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$OfflinePacksTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$OfflinePacksTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> packKey = const Value.absent(),
+                Value<String> scopeType = const Value.absent(),
+                Value<String?> subjectId = const Value.absent(),
+                Value<String?> teacherTrackId = const Value.absent(),
+                Value<String> scopeTitle = const Value.absent(),
+                Value<String> kind = const Value.absent(),
+                Value<String?> unitId = const Value.absent(),
+                Value<String?> deckId = const Value.absent(),
+                Value<String> titleAr = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<String?> version = const Value.absent(),
+                Value<String?> remoteVersion = const Value.absent(),
+                Value<bool> premium = const Value.absent(),
+                Value<int?> normalizationVersion = const Value.absent(),
+                Value<int> sizeBytes = const Value.absent(),
+                Value<int> downloadedBytes = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => OfflinePacksCompanion(
+                packKey: packKey,
+                scopeType: scopeType,
+                subjectId: subjectId,
+                teacherTrackId: teacherTrackId,
+                scopeTitle: scopeTitle,
+                kind: kind,
+                unitId: unitId,
+                deckId: deckId,
+                titleAr: titleAr,
+                status: status,
+                version: version,
+                remoteVersion: remoteVersion,
+                premium: premium,
+                normalizationVersion: normalizationVersion,
+                sizeBytes: sizeBytes,
+                downloadedBytes: downloadedBytes,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String packKey,
+                required String scopeType,
+                Value<String?> subjectId = const Value.absent(),
+                Value<String?> teacherTrackId = const Value.absent(),
+                required String scopeTitle,
+                required String kind,
+                Value<String?> unitId = const Value.absent(),
+                Value<String?> deckId = const Value.absent(),
+                required String titleAr,
+                required String status,
+                Value<String?> version = const Value.absent(),
+                Value<String?> remoteVersion = const Value.absent(),
+                Value<bool> premium = const Value.absent(),
+                Value<int?> normalizationVersion = const Value.absent(),
+                Value<int> sizeBytes = const Value.absent(),
+                Value<int> downloadedBytes = const Value.absent(),
+                required int updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => OfflinePacksCompanion.insert(
+                packKey: packKey,
+                scopeType: scopeType,
+                subjectId: subjectId,
+                teacherTrackId: teacherTrackId,
+                scopeTitle: scopeTitle,
+                kind: kind,
+                unitId: unitId,
+                deckId: deckId,
+                titleAr: titleAr,
+                status: status,
+                version: version,
+                remoteVersion: remoteVersion,
+                premium: premium,
+                normalizationVersion: normalizationVersion,
+                sizeBytes: sizeBytes,
+                downloadedBytes: downloadedBytes,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$OfflinePacksTable, OfflinePackRow>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $OfflinePacksTable,
+                    OfflinePackRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$OfflinePacksTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $OfflinePacksTable,
+      OfflinePackRow,
+      $$OfflinePacksTableFilterComposer,
+      $$OfflinePacksTableOrderingComposer,
+      $$OfflinePacksTableAnnotationComposer,
+      $$OfflinePacksTableCreateCompanionBuilder,
+      $$OfflinePacksTableUpdateCompanionBuilder,
+      (
+        OfflinePackRow,
+        BaseReferences<_$AppDatabase, $OfflinePacksTable, OfflinePackRow>,
+      ),
+      OfflinePackRow,
+      PrefetchHooks Function()
+    >;
+typedef $$OfflineItemsTableCreateCompanionBuilder =
+    OfflineItemsCompanion Function({
+      required String packKey,
+      required String itemId,
+      required String type,
+      required int version,
+      required bool isFree,
+      required String json,
+      Value<int> rowid,
+    });
+typedef $$OfflineItemsTableUpdateCompanionBuilder =
+    OfflineItemsCompanion Function({
+      Value<String> packKey,
+      Value<String> itemId,
+      Value<String> type,
+      Value<int> version,
+      Value<bool> isFree,
+      Value<String> json,
+      Value<int> rowid,
+    });
+
+class $$OfflineItemsTableFilterComposer
+    extends Composer<_$AppDatabase, $OfflineItemsTable> {
+  $$OfflineItemsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get packKey => $composableBuilder(
+    column: $table.packKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get itemId => $composableBuilder(
+    column: $table.itemId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get type => $composableBuilder(
+    column: $table.type,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isFree => $composableBuilder(
+    column: $table.isFree,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get json => $composableBuilder(
+    column: $table.json,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$OfflineItemsTableOrderingComposer
+    extends Composer<_$AppDatabase, $OfflineItemsTable> {
+  $$OfflineItemsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get packKey => $composableBuilder(
+    column: $table.packKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get itemId => $composableBuilder(
+    column: $table.itemId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get type => $composableBuilder(
+    column: $table.type,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isFree => $composableBuilder(
+    column: $table.isFree,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get json => $composableBuilder(
+    column: $table.json,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$OfflineItemsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $OfflineItemsTable> {
+  $$OfflineItemsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get packKey =>
+      $composableBuilder(column: $table.packKey, builder: (column) => column);
+
+  GeneratedColumn<String> get itemId =>
+      $composableBuilder(column: $table.itemId, builder: (column) => column);
+
+  GeneratedColumn<String> get type =>
+      $composableBuilder(column: $table.type, builder: (column) => column);
+
+  GeneratedColumn<int> get version =>
+      $composableBuilder(column: $table.version, builder: (column) => column);
+
+  GeneratedColumn<bool> get isFree =>
+      $composableBuilder(column: $table.isFree, builder: (column) => column);
+
+  GeneratedColumn<String> get json =>
+      $composableBuilder(column: $table.json, builder: (column) => column);
+}
+
+class $$OfflineItemsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $OfflineItemsTable,
+          OfflineItemRow,
+          $$OfflineItemsTableFilterComposer,
+          $$OfflineItemsTableOrderingComposer,
+          $$OfflineItemsTableAnnotationComposer,
+          $$OfflineItemsTableCreateCompanionBuilder,
+          $$OfflineItemsTableUpdateCompanionBuilder,
+          (
+            OfflineItemRow,
+            BaseReferences<_$AppDatabase, $OfflineItemsTable, OfflineItemRow>,
+          ),
+          OfflineItemRow,
+          PrefetchHooks Function()
+        > {
+  $$OfflineItemsTableTableManager(_$AppDatabase db, $OfflineItemsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$OfflineItemsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$OfflineItemsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$OfflineItemsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> packKey = const Value.absent(),
+                Value<String> itemId = const Value.absent(),
+                Value<String> type = const Value.absent(),
+                Value<int> version = const Value.absent(),
+                Value<bool> isFree = const Value.absent(),
+                Value<String> json = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => OfflineItemsCompanion(
+                packKey: packKey,
+                itemId: itemId,
+                type: type,
+                version: version,
+                isFree: isFree,
+                json: json,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String packKey,
+                required String itemId,
+                required String type,
+                required int version,
+                required bool isFree,
+                required String json,
+                Value<int> rowid = const Value.absent(),
+              }) => OfflineItemsCompanion.insert(
+                packKey: packKey,
+                itemId: itemId,
+                type: type,
+                version: version,
+                isFree: isFree,
+                json: json,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$OfflineItemsTable, OfflineItemRow>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $OfflineItemsTable,
+                    OfflineItemRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$OfflineItemsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $OfflineItemsTable,
+      OfflineItemRow,
+      $$OfflineItemsTableFilterComposer,
+      $$OfflineItemsTableOrderingComposer,
+      $$OfflineItemsTableAnnotationComposer,
+      $$OfflineItemsTableCreateCompanionBuilder,
+      $$OfflineItemsTableUpdateCompanionBuilder,
+      (
+        OfflineItemRow,
+        BaseReferences<_$AppDatabase, $OfflineItemsTable, OfflineItemRow>,
+      ),
+      OfflineItemRow,
+      PrefetchHooks Function()
+    >;
+typedef $$OfflineFilesTableCreateCompanionBuilder =
+    OfflineFilesCompanion Function({
+      required String packKey,
+      required String mediaId,
+      required int version,
+      required String path,
+      required int sizeBytes,
+      Value<int> rowid,
+    });
+typedef $$OfflineFilesTableUpdateCompanionBuilder =
+    OfflineFilesCompanion Function({
+      Value<String> packKey,
+      Value<String> mediaId,
+      Value<int> version,
+      Value<String> path,
+      Value<int> sizeBytes,
+      Value<int> rowid,
+    });
+
+class $$OfflineFilesTableFilterComposer
+    extends Composer<_$AppDatabase, $OfflineFilesTable> {
+  $$OfflineFilesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get packKey => $composableBuilder(
+    column: $table.packKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get mediaId => $composableBuilder(
+    column: $table.mediaId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get path => $composableBuilder(
+    column: $table.path,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sizeBytes => $composableBuilder(
+    column: $table.sizeBytes,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$OfflineFilesTableOrderingComposer
+    extends Composer<_$AppDatabase, $OfflineFilesTable> {
+  $$OfflineFilesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get packKey => $composableBuilder(
+    column: $table.packKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get mediaId => $composableBuilder(
+    column: $table.mediaId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get path => $composableBuilder(
+    column: $table.path,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sizeBytes => $composableBuilder(
+    column: $table.sizeBytes,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$OfflineFilesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $OfflineFilesTable> {
+  $$OfflineFilesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get packKey =>
+      $composableBuilder(column: $table.packKey, builder: (column) => column);
+
+  GeneratedColumn<String> get mediaId =>
+      $composableBuilder(column: $table.mediaId, builder: (column) => column);
+
+  GeneratedColumn<int> get version =>
+      $composableBuilder(column: $table.version, builder: (column) => column);
+
+  GeneratedColumn<String> get path =>
+      $composableBuilder(column: $table.path, builder: (column) => column);
+
+  GeneratedColumn<int> get sizeBytes =>
+      $composableBuilder(column: $table.sizeBytes, builder: (column) => column);
+}
+
+class $$OfflineFilesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $OfflineFilesTable,
+          OfflineFileRow,
+          $$OfflineFilesTableFilterComposer,
+          $$OfflineFilesTableOrderingComposer,
+          $$OfflineFilesTableAnnotationComposer,
+          $$OfflineFilesTableCreateCompanionBuilder,
+          $$OfflineFilesTableUpdateCompanionBuilder,
+          (
+            OfflineFileRow,
+            BaseReferences<_$AppDatabase, $OfflineFilesTable, OfflineFileRow>,
+          ),
+          OfflineFileRow,
+          PrefetchHooks Function()
+        > {
+  $$OfflineFilesTableTableManager(_$AppDatabase db, $OfflineFilesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$OfflineFilesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$OfflineFilesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$OfflineFilesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> packKey = const Value.absent(),
+                Value<String> mediaId = const Value.absent(),
+                Value<int> version = const Value.absent(),
+                Value<String> path = const Value.absent(),
+                Value<int> sizeBytes = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => OfflineFilesCompanion(
+                packKey: packKey,
+                mediaId: mediaId,
+                version: version,
+                path: path,
+                sizeBytes: sizeBytes,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String packKey,
+                required String mediaId,
+                required int version,
+                required String path,
+                required int sizeBytes,
+                Value<int> rowid = const Value.absent(),
+              }) => OfflineFilesCompanion.insert(
+                packKey: packKey,
+                mediaId: mediaId,
+                version: version,
+                path: path,
+                sizeBytes: sizeBytes,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$OfflineFilesTable, OfflineFileRow>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $OfflineFilesTable,
+                    OfflineFileRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$OfflineFilesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $OfflineFilesTable,
+      OfflineFileRow,
+      $$OfflineFilesTableFilterComposer,
+      $$OfflineFilesTableOrderingComposer,
+      $$OfflineFilesTableAnnotationComposer,
+      $$OfflineFilesTableCreateCompanionBuilder,
+      $$OfflineFilesTableUpdateCompanionBuilder,
+      (
+        OfflineFileRow,
+        BaseReferences<_$AppDatabase, $OfflineFilesTable, OfflineFileRow>,
+      ),
+      OfflineFileRow,
+      PrefetchHooks Function()
+    >;
+typedef $$OfflineLeaseRowsTableCreateCompanionBuilder =
+    OfflineLeaseRowsCompanion Function({
+      required String scopeKey,
+      required int expiresAt,
+      required int refreshedAt,
+      Value<int> rowid,
+    });
+typedef $$OfflineLeaseRowsTableUpdateCompanionBuilder =
+    OfflineLeaseRowsCompanion Function({
+      Value<String> scopeKey,
+      Value<int> expiresAt,
+      Value<int> refreshedAt,
+      Value<int> rowid,
+    });
+
+class $$OfflineLeaseRowsTableFilterComposer
+    extends Composer<_$AppDatabase, $OfflineLeaseRowsTable> {
+  $$OfflineLeaseRowsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get scopeKey => $composableBuilder(
+    column: $table.scopeKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get expiresAt => $composableBuilder(
+    column: $table.expiresAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get refreshedAt => $composableBuilder(
+    column: $table.refreshedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$OfflineLeaseRowsTableOrderingComposer
+    extends Composer<_$AppDatabase, $OfflineLeaseRowsTable> {
+  $$OfflineLeaseRowsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get scopeKey => $composableBuilder(
+    column: $table.scopeKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get expiresAt => $composableBuilder(
+    column: $table.expiresAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get refreshedAt => $composableBuilder(
+    column: $table.refreshedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$OfflineLeaseRowsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $OfflineLeaseRowsTable> {
+  $$OfflineLeaseRowsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get scopeKey =>
+      $composableBuilder(column: $table.scopeKey, builder: (column) => column);
+
+  GeneratedColumn<int> get expiresAt =>
+      $composableBuilder(column: $table.expiresAt, builder: (column) => column);
+
+  GeneratedColumn<int> get refreshedAt => $composableBuilder(
+    column: $table.refreshedAt,
+    builder: (column) => column,
+  );
+}
+
+class $$OfflineLeaseRowsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $OfflineLeaseRowsTable,
+          OfflineLeaseRow,
+          $$OfflineLeaseRowsTableFilterComposer,
+          $$OfflineLeaseRowsTableOrderingComposer,
+          $$OfflineLeaseRowsTableAnnotationComposer,
+          $$OfflineLeaseRowsTableCreateCompanionBuilder,
+          $$OfflineLeaseRowsTableUpdateCompanionBuilder,
+          (
+            OfflineLeaseRow,
+            BaseReferences<
+              _$AppDatabase,
+              $OfflineLeaseRowsTable,
+              OfflineLeaseRow
+            >,
+          ),
+          OfflineLeaseRow,
+          PrefetchHooks Function()
+        > {
+  $$OfflineLeaseRowsTableTableManager(
+    _$AppDatabase db,
+    $OfflineLeaseRowsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$OfflineLeaseRowsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$OfflineLeaseRowsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$OfflineLeaseRowsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> scopeKey = const Value.absent(),
+                Value<int> expiresAt = const Value.absent(),
+                Value<int> refreshedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => OfflineLeaseRowsCompanion(
+                scopeKey: scopeKey,
+                expiresAt: expiresAt,
+                refreshedAt: refreshedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String scopeKey,
+                required int expiresAt,
+                required int refreshedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => OfflineLeaseRowsCompanion.insert(
+                scopeKey: scopeKey,
+                expiresAt: expiresAt,
+                refreshedAt: refreshedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$OfflineLeaseRowsTable, OfflineLeaseRow>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $OfflineLeaseRowsTable,
+                    OfflineLeaseRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$OfflineLeaseRowsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $OfflineLeaseRowsTable,
+      OfflineLeaseRow,
+      $$OfflineLeaseRowsTableFilterComposer,
+      $$OfflineLeaseRowsTableOrderingComposer,
+      $$OfflineLeaseRowsTableAnnotationComposer,
+      $$OfflineLeaseRowsTableCreateCompanionBuilder,
+      $$OfflineLeaseRowsTableUpdateCompanionBuilder,
+      (
+        OfflineLeaseRow,
+        BaseReferences<_$AppDatabase, $OfflineLeaseRowsTable, OfflineLeaseRow>,
+      ),
+      OfflineLeaseRow,
+      PrefetchHooks Function()
+    >;
+typedef $$LocalAttemptsTableCreateCompanionBuilder =
+    LocalAttemptsCompanion Function({
+      required String id,
+      required String attempt,
+      Value<String?> payload,
+      Value<bool> submitted,
+      Value<bool> synced,
+      Value<String?> serverAttemptId,
+      required int createdAt,
+      Value<int> rowid,
+    });
+typedef $$LocalAttemptsTableUpdateCompanionBuilder =
+    LocalAttemptsCompanion Function({
+      Value<String> id,
+      Value<String> attempt,
+      Value<String?> payload,
+      Value<bool> submitted,
+      Value<bool> synced,
+      Value<String?> serverAttemptId,
+      Value<int> createdAt,
+      Value<int> rowid,
+    });
+
+class $$LocalAttemptsTableFilterComposer
+    extends Composer<_$AppDatabase, $LocalAttemptsTable> {
+  $$LocalAttemptsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get attempt => $composableBuilder(
+    column: $table.attempt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get submitted => $composableBuilder(
+    column: $table.submitted,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get serverAttemptId => $composableBuilder(
+    column: $table.serverAttemptId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$LocalAttemptsTableOrderingComposer
+    extends Composer<_$AppDatabase, $LocalAttemptsTable> {
+  $$LocalAttemptsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get attempt => $composableBuilder(
+    column: $table.attempt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get submitted => $composableBuilder(
+    column: $table.submitted,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get synced => $composableBuilder(
+    column: $table.synced,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get serverAttemptId => $composableBuilder(
+    column: $table.serverAttemptId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$LocalAttemptsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $LocalAttemptsTable> {
+  $$LocalAttemptsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get attempt =>
+      $composableBuilder(column: $table.attempt, builder: (column) => column);
+
+  GeneratedColumn<String> get payload =>
+      $composableBuilder(column: $table.payload, builder: (column) => column);
+
+  GeneratedColumn<bool> get submitted =>
+      $composableBuilder(column: $table.submitted, builder: (column) => column);
+
+  GeneratedColumn<bool> get synced =>
+      $composableBuilder(column: $table.synced, builder: (column) => column);
+
+  GeneratedColumn<String> get serverAttemptId => $composableBuilder(
+    column: $table.serverAttemptId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$LocalAttemptsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $LocalAttemptsTable,
+          LocalAttemptRow,
+          $$LocalAttemptsTableFilterComposer,
+          $$LocalAttemptsTableOrderingComposer,
+          $$LocalAttemptsTableAnnotationComposer,
+          $$LocalAttemptsTableCreateCompanionBuilder,
+          $$LocalAttemptsTableUpdateCompanionBuilder,
+          (
+            LocalAttemptRow,
+            BaseReferences<_$AppDatabase, $LocalAttemptsTable, LocalAttemptRow>,
+          ),
+          LocalAttemptRow,
+          PrefetchHooks Function()
+        > {
+  $$LocalAttemptsTableTableManager(_$AppDatabase db, $LocalAttemptsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$LocalAttemptsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$LocalAttemptsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$LocalAttemptsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> attempt = const Value.absent(),
+                Value<String?> payload = const Value.absent(),
+                Value<bool> submitted = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
+                Value<String?> serverAttemptId = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => LocalAttemptsCompanion(
+                id: id,
+                attempt: attempt,
+                payload: payload,
+                submitted: submitted,
+                synced: synced,
+                serverAttemptId: serverAttemptId,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String attempt,
+                Value<String?> payload = const Value.absent(),
+                Value<bool> submitted = const Value.absent(),
+                Value<bool> synced = const Value.absent(),
+                Value<String?> serverAttemptId = const Value.absent(),
+                required int createdAt,
+                Value<int> rowid = const Value.absent(),
+              }) => LocalAttemptsCompanion.insert(
+                id: id,
+                attempt: attempt,
+                payload: payload,
+                submitted: submitted,
+                synced: synced,
+                serverAttemptId: serverAttemptId,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$LocalAttemptsTable, LocalAttemptRow>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $LocalAttemptsTable,
+                    LocalAttemptRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$LocalAttemptsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $LocalAttemptsTable,
+      LocalAttemptRow,
+      $$LocalAttemptsTableFilterComposer,
+      $$LocalAttemptsTableOrderingComposer,
+      $$LocalAttemptsTableAnnotationComposer,
+      $$LocalAttemptsTableCreateCompanionBuilder,
+      $$LocalAttemptsTableUpdateCompanionBuilder,
+      (
+        LocalAttemptRow,
+        BaseReferences<_$AppDatabase, $LocalAttemptsTable, LocalAttemptRow>,
+      ),
+      LocalAttemptRow,
+      PrefetchHooks Function()
+    >;
+typedef $$LocalMistakesTableCreateCompanionBuilder =
+    LocalMistakesCompanion Function({
+      required String questionId,
+      required int wrongAt,
+      Value<int> rowid,
+    });
+typedef $$LocalMistakesTableUpdateCompanionBuilder =
+    LocalMistakesCompanion Function({
+      Value<String> questionId,
+      Value<int> wrongAt,
+      Value<int> rowid,
+    });
+
+class $$LocalMistakesTableFilterComposer
+    extends Composer<_$AppDatabase, $LocalMistakesTable> {
+  $$LocalMistakesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get questionId => $composableBuilder(
+    column: $table.questionId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get wrongAt => $composableBuilder(
+    column: $table.wrongAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$LocalMistakesTableOrderingComposer
+    extends Composer<_$AppDatabase, $LocalMistakesTable> {
+  $$LocalMistakesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get questionId => $composableBuilder(
+    column: $table.questionId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get wrongAt => $composableBuilder(
+    column: $table.wrongAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$LocalMistakesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $LocalMistakesTable> {
+  $$LocalMistakesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get questionId => $composableBuilder(
+    column: $table.questionId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get wrongAt =>
+      $composableBuilder(column: $table.wrongAt, builder: (column) => column);
+}
+
+class $$LocalMistakesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $LocalMistakesTable,
+          LocalMistakeRow,
+          $$LocalMistakesTableFilterComposer,
+          $$LocalMistakesTableOrderingComposer,
+          $$LocalMistakesTableAnnotationComposer,
+          $$LocalMistakesTableCreateCompanionBuilder,
+          $$LocalMistakesTableUpdateCompanionBuilder,
+          (
+            LocalMistakeRow,
+            BaseReferences<_$AppDatabase, $LocalMistakesTable, LocalMistakeRow>,
+          ),
+          LocalMistakeRow,
+          PrefetchHooks Function()
+        > {
+  $$LocalMistakesTableTableManager(_$AppDatabase db, $LocalMistakesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$LocalMistakesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$LocalMistakesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$LocalMistakesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> questionId = const Value.absent(),
+                Value<int> wrongAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => LocalMistakesCompanion(
+                questionId: questionId,
+                wrongAt: wrongAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String questionId,
+                required int wrongAt,
+                Value<int> rowid = const Value.absent(),
+              }) => LocalMistakesCompanion.insert(
+                questionId: questionId,
+                wrongAt: wrongAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$LocalMistakesTable, LocalMistakeRow>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $LocalMistakesTable,
+                    LocalMistakeRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$LocalMistakesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $LocalMistakesTable,
+      LocalMistakeRow,
+      $$LocalMistakesTableFilterComposer,
+      $$LocalMistakesTableOrderingComposer,
+      $$LocalMistakesTableAnnotationComposer,
+      $$LocalMistakesTableCreateCompanionBuilder,
+      $$LocalMistakesTableUpdateCompanionBuilder,
+      (
+        LocalMistakeRow,
+        BaseReferences<_$AppDatabase, $LocalMistakesTable, LocalMistakeRow>,
+      ),
+      LocalMistakeRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -5894,4 +10092,16 @@ class $AppDatabaseManager {
       $$LocalDecksTableTableManager(_db, _db.localDecks);
   $$LocalCardsTableTableManager get localCards =>
       $$LocalCardsTableTableManager(_db, _db.localCards);
+  $$OfflinePacksTableTableManager get offlinePacks =>
+      $$OfflinePacksTableTableManager(_db, _db.offlinePacks);
+  $$OfflineItemsTableTableManager get offlineItems =>
+      $$OfflineItemsTableTableManager(_db, _db.offlineItems);
+  $$OfflineFilesTableTableManager get offlineFiles =>
+      $$OfflineFilesTableTableManager(_db, _db.offlineFiles);
+  $$OfflineLeaseRowsTableTableManager get offlineLeaseRows =>
+      $$OfflineLeaseRowsTableTableManager(_db, _db.offlineLeaseRows);
+  $$LocalAttemptsTableTableManager get localAttempts =>
+      $$LocalAttemptsTableTableManager(_db, _db.localAttempts);
+  $$LocalMistakesTableTableManager get localMistakes =>
+      $$LocalMistakesTableTableManager(_db, _db.localMistakes);
 }

@@ -143,4 +143,12 @@ class SrsStore {
 
   Future<String?> cursor() => db.getValue(cursorKey);
   Future<void> setCursor(String cursor) => db.setValue(cursorKey, cursor);
+
+  /// Reviewed cards due before [before] (the offline "all due cards" session, §13.2).
+  Future<Map<String, CardState>> dueStates(int before) async {
+    final rows = await (db.select(
+      db.srsCardStates,
+    )..where((t) => t.state.equals('new').not() & t.dueAt.isSmallerThanValue(before))).get();
+    return {for (final r in rows) r.flashcardId: _toState(r)};
+  }
 }

@@ -3,9 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/providers.dart';
 import '../../core/api/generated/export.dart';
 import '../../core/content/question_repository.dart';
+import '../../core/offline/offline_repositories.dart';
+import '../offline/offline_providers.dart';
 
+/// Questions held in downloaded packs are graded on the device (spec §22.6).
 final questionRepositoryProvider = Provider<QuestionRepository>(
-  (ref) => QuestionRepository(ref.watch(apiClientProvider)),
+  (ref) => OfflineQuestionRepository(ref.watch(apiClientProvider), ref.watch(offlineContentProvider)),
 );
 
 /// Loaded pages of a question list.

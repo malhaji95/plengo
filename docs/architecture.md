@@ -505,3 +505,41 @@ from Phase 1; Phase 2 adds the college hierarchy and admin CRUD.
   available so data syncs if a flag is turned back on.
 - **Avatars**: the account screen picks an image (≤ 800 px), uploads it as `avatar`, waits for
   processing and then sets `avatarMediaId`.
+
+### ADR-019 — Offline packs (Phase 9)
+
+- **What is downloadable.** Per subject or track: free items for everyone, premium items only with
+  an active entitlement (a promotion opens content online but gives no offline copy); quizzes only
+  with `allow_offline`, and their question list is limited to what the student may download.
+- **Pack keys** follow §22.10: `{scope_type}:{scope_id}:{unit_id|none}:{questions|decks|quizzes}`,
+  plus `{scope_type}:{scope_id}:-:deck.{deck_id}` for "تحميل البطاقات". "تحميل الكل" is every unit
+  pack of the scope. A pack's version is a hash of its item ids and versions, so any edit, addition
+  or removal shows "تحديث متاح".
+- **Delta downloads.** The device compares the manifest with what it holds and requests only new or
+  changed items (`items?ids=`, 50 per request); removed items and their images are deleted. Items are
+  stored per chunk, so an interrupted, paused or failed download resumes where it stopped. Accepted
+  answers always carry the normalizer's current output and version.
+- **Leases** (`offline_leases`) are per device session: `min(now + 30 days, entitlement end)`,
+  renewed at most once a day, revoked when access ends. The device stores them with the last server
+  time and treats a clock more than 5 minutes behind it as expired. A `none` answer deletes that
+  scope's premium items and images; free items stay.
+- **Encryption at rest.** The database is SQLCipher (Phase 1). Pack images are AES-256-GCM files in
+  the app's private support directory, keyed by HKDF-SHA256 from the device's database key (never
+  stored). Logout wipes the tables and every pack file. Web has no packs (conditional import keeps
+  `dart:io` out of the web build).
+- **Local grading.** A Dart port of the normalizer passes the shared fixtures. Quizzes held in packs
+  run entirely on the device (`local-<uuid>` attempts through the same screens), questions held in
+  packs are checked on the device even online, and random practice / "اختبر أخطائي" are built from
+  pack questions when the server cannot be reached. Written questions from a pack with another
+  normalizer version go to the server.
+- **Sync.** Finished offline attempts are uploaded to `POST /offline/sync`, idempotent by client id.
+  The server re-grades every answer (its grade drives stats, mistakes and progress), logs
+  local/server differences in `offline_grade_mismatches`, and counts questions the student may use
+  now or covers with a live lease. A local mirror of wrong answers feeds offline mistake practice
+  until the server has them. The stats screen shows an approximation from local attempts when
+  offline. Content reports written offline are queued and sent when the connection returns.
+- **Limits.** Downloads run in the app's own background (they continue across screens, pause,
+  resume and wait for Wi-Fi), not as OS background tasks, so they stop when the system kills the app
+  and resume at the next start. The "free space below size + 500 MB" warning and OS background
+  transfers need platform plugins and device testing; both are Phase 13 work. The admin view of
+  grading mismatches comes with question analytics (Phase 11).

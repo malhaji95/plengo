@@ -9,6 +9,7 @@ import '../access/access_banner.dart';
 import '../bookmarks/bookmark_button.dart';
 import 'decks_screen.dart';
 import 'flashcard_providers.dart';
+import '../offline/download_widgets.dart';
 
 /// Deck details with its two modes: تصفح (Browse) and مراجعة (Study) (spec §13.2).
 class DeckScreen extends ConsumerWidget {
@@ -52,6 +53,12 @@ class DeckScreen extends ConsumerWidget {
                     onPressed: () => context.push('${Routes.decks}/$deckId/browse'),
                     icon: const Icon(Icons.flip_outlined),
                     label: const Text('تصفح'),
+                  ),
+                  const SizedBox(height: 16),
+                  OfflineDownloadTile(
+                    scope: (subjectId: d.subjectId, teacherTrackId: d.teacherTrackId),
+                    deckId: deckId,
+                    label: 'تحميل البطاقات',
                   ),
                 ],
               ],

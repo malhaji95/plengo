@@ -7,11 +7,20 @@ import '../../core/api/api_exception.dart';
 import '../../core/api/generated/export.dart';
 import '../../core/learning/exam_store.dart';
 import '../../core/learning/learning_repository.dart';
+import '../../core/offline/local_learning.dart';
+import '../offline/offline_providers.dart';
 import '../../shared/util/uuid.dart';
 import '../flashcards/flashcard_providers.dart';
 
+/// Attempts from downloaded packs run on the device (spec §22.6); the rest go to the server.
 final learningRepositoryProvider = Provider<LearningRepository>(
-  (ref) => LearningRepository(ref.watch(apiClientProvider)),
+  (ref) => OfflineLearningRepository(
+    ref.watch(apiClientProvider),
+    content: ref.watch(offlineContentProvider),
+    local: ref.watch(localAttemptStoreProvider),
+    clock: ref.watch(clockProvider),
+    onSubmitted: () => unawaited(ref.read(offlineControllerProvider.notifier).syncOnline()),
+  ),
 );
 
 final examStoreProvider = Provider<ExamStore>((ref) => ExamStore(ref.watch(databaseProvider)));

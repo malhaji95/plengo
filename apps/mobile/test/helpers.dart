@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:plengo/app/app.dart';
@@ -24,6 +25,7 @@ import 'package:plengo/features/access/access_providers.dart';
 import 'package:plengo/features/flashcards/card_face.dart';
 import 'package:plengo/features/flashcards/flashcard_providers.dart';
 import 'package:plengo/features/my_decks/card_editor_screen.dart';
+import 'package:plengo/features/offline/offline_providers.dart';
 import 'package:plengo/features/my_decks/my_decks_providers.dart';
 import 'package:plengo/features/reports/report_sheet.dart';
 import 'package:plengo/features/questions/question_providers.dart';
@@ -139,6 +141,8 @@ Future<PumpedApp> pumpApp(
   RemoteConfig? config,
   Uint8List? pickedImage,
   bool couponRedemption = true,
+  bool offlinePacks = false,
+  List<Override> extraOverrides = const [],
 }) async {
   registerFallbacks();
   final repo = MockAuthRepository();
@@ -185,6 +189,8 @@ Future<PumpedApp> pumpApp(
   final db = AppDatabase(NativeDatabase.memory());
   addTearDown(db.close);
   final container = ProviderContainer(
+    // Failed providers are not retried in tests (a retry timer would outlive the test).
+    retry: (_, _) => null,
     overrides: [
       appEnvironmentProvider.overrideWithValue(const AppEnvironment(platform: 'android', appVersion: '1.0.0')),
       tokenStoreProvider.overrideWithValue(MemoryTokenStore()),
@@ -199,6 +205,11 @@ Future<PumpedApp> pumpApp(
       myDecksRepositoryProvider.overrideWithValue(myDecks),
       reportRepositoryProvider.overrideWithValue(reports),
       imagePickProvider.overrideWithValue(({required camera, required maxSide}) async => pickedImage),
+      // Offline packs are off unless a test turns them on (they need a scripted server).
+      offlinePacksAvailableProvider.overrideWithValue(offlinePacks),
+      connectivityChangesProvider.overrideWithValue(const Stream.empty()),
+      onWifiProvider.overrideWithValue(() async => true),
+      ...extraOverrides,
       cardImageBuilderProvider.overrideWithValue((_, image) => Center(child: Text('img:${image.mediaId}'))),
       cardImagePrefetchProvider.overrideWithValue((_, _) {}),
       localImageBuilderProvider.overrideWithValue((_, bytes) => Text('local-image:${bytes.length}')),

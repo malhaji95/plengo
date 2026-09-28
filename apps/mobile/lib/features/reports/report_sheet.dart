@@ -1,29 +1,64 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/providers.dart';
 import '../../core/api/api_exception.dart';
 import '../../core/api/generated/export.dart';
+import '../../core/db/app_database.dart';
 
 /// Whether content reports are on (remote flag, §10.2); on when the config is unknown.
 final contentReportsEnabledProvider = Provider<bool>(
   (ref) => ref.watch(remoteConfigProvider).value?.features.contentReports ?? true,
 );
 
+/// Reports go to the server; without a connection they wait on the device and are sent later
+/// (spec §22.7). Returns null when queued.
 class ReportRepository {
-  ReportRepository(this.api);
+  ReportRepository(this.api, [this.db]);
 
   final PlengoApi api;
+  final AppDatabase? db;
+  static const queueKey = 'reports.queue';
 
-  Future<Report> create(ReportItemType type, String itemId, ReportReason reason, String? note) => guardApi(
-    () async => (await api.reports.createReport(
-      body: CreateReportRequest(itemType: type, itemId: itemId, reason: reason, note: note),
-    )).data,
-  );
+  Future<Report?> create(ReportItemType type, String itemId, ReportReason reason, String? note) async {
+    final body = CreateReportRequest(itemType: type, itemId: itemId, reason: reason, note: note);
+    try {
+      return await guardApi(() async => (await api.reports.createReport(body: body)).data);
+    } on ApiException catch (e) {
+      if (e.code != 'NETWORK_ERROR' || db == null) rethrow;
+      await db!.setValue(queueKey, jsonEncode([...await _queued(), body]));
+      return null;
+    }
+  }
+
+  Future<List<Object?>> _queued() async => (jsonDecode(await db?.getValue(queueKey) ?? '[]') as List).cast<Object?>();
+
+  /// Sends queued reports; keeps them while still offline. Refused ones (e.g. removed content) are dropped.
+  Future<int> flush() async {
+    final queued = await _queued();
+    var sent = 0;
+    for (final (i, item) in queued.indexed) {
+      try {
+        await guardApi(
+          () => api.reports.createReport(body: CreateReportRequest.fromJson(item! as Map<String, Object?>)),
+        );
+        sent++;
+      } on ApiException catch (e) {
+        if (e.code == 'NETWORK_ERROR') {
+          await db!.setValue(queueKey, jsonEncode(queued.sublist(i)));
+          return sent;
+        }
+      }
+    }
+    if (queued.isNotEmpty) await db?.setValue(queueKey, '[]');
+    return sent;
+  }
 }
 
 final reportRepositoryProvider = Provider<ReportRepository>(
-  (ref) => ReportRepository(ref.watch(apiClientProvider).api),
+  (ref) => ReportRepository(ref.watch(apiClientProvider).api, ref.watch(databaseProvider)),
 );
 
 const reportReasons = {
@@ -41,8 +76,10 @@ Future<void> showReportSheet(BuildContext context, WidgetRef ref, ReportItemType
     isScrollControlled: true,
     builder: (_) => _ReportSheet(type: type, itemId: itemId),
   );
-  if (sent == true && context.mounted) {
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('شكراً، وصلنا بلاغك وسنراجعه')));
+  if (sent != null && context.mounted) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(sent ? 'شكراً، وصلنا بلاغك وسنراجعه' : 'أنت غير متصل، سيُرسل بلاغك عند الاتصال')),
+    );
   }
 }
 
@@ -72,8 +109,10 @@ class _ReportSheetState extends ConsumerState<_ReportSheet> {
     setState(() => (_sending = true, _error = null));
     try {
       final note = _note.text.trim();
-      await ref.read(reportRepositoryProvider).create(widget.type, widget.itemId, _reason!, note.isEmpty ? null : note);
-      if (mounted) Navigator.pop(context, true);
+      final report = await ref
+          .read(reportRepositoryProvider)
+          .create(widget.type, widget.itemId, _reason!, note.isEmpty ? null : note);
+      if (mounted) Navigator.pop(context, report != null);
     } on ApiException catch (e) {
       setState(() => (_sending = false, _error = e.message));
     }

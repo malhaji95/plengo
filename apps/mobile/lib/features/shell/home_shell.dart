@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../quizzes/quiz_providers.dart';
+import '../offline/offline_providers.dart';
 
 /// Bottom navigation on phones, a side rail on wide (web/tablet) layouts (spec §23.1, §24). While
 /// signed in, exams submitted offline are retried every minute (spec §15.2).
@@ -19,6 +20,7 @@ class HomeShell extends ConsumerStatefulWidget {
 
 class _HomeShellState extends ConsumerState<HomeShell> {
   Timer? _examSync;
+  StreamSubscription<Object?>? _connectivity;
 
   StatefulNavigationShell get shell => widget.shell;
 
@@ -36,11 +38,18 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     final sync = ref.read(examSyncProvider);
     unawaited(sync.syncNow());
     _examSync = Timer.periodic(const Duration(minutes: 1), (_) => sync.syncNow());
+    // Offline packs: leases, offline attempts and updates when online; again when the connection returns.
+    final offline = ref.read(offlineControllerProvider.notifier);
+    unawaited(offline.syncOnline());
+    if (ref.read(offlinePacksAvailableProvider)) {
+      _connectivity = ref.read(connectivityChangesProvider).listen((_) => offline.syncOnline());
+    }
   }
 
   @override
   void dispose() {
     _examSync?.cancel();
+    _connectivity?.cancel();
     super.dispose();
   }
 

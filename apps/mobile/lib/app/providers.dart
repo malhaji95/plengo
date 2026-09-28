@@ -9,6 +9,7 @@ import '../core/auth/auth_repository.dart';
 import '../core/auth/token_store.dart';
 import '../core/config/version.dart';
 import '../core/db/app_database.dart';
+import '../core/offline/pack_files.dart';
 import 'flags.dart';
 
 /// Values fixed for the lifetime of the process, provided by `main`.
@@ -25,6 +26,9 @@ class AppEnvironment {
 final appEnvironmentProvider = Provider<AppEnvironment>((ref) => throw UnimplementedError('override in main'));
 final tokenStoreProvider = Provider<TokenStore>((ref) => throw UnimplementedError('override in main'));
 final databaseProvider = Provider<AppDatabase>((ref) => throw UnimplementedError('override in main'));
+
+/// Encrypted pack image files (spec §22.5); `main` provides the real store on Android and iOS.
+final packFilesProvider = Provider<PackFileStore>((ref) => MemoryPackFiles());
 
 final apiClientProvider = Provider<ApiClient>((ref) {
   final env = ref.watch(appEnvironmentProvider);
@@ -92,6 +96,8 @@ class AuthController extends AsyncNotifier<Me?> {
   Future<void> logout() async {
     await ref.read(authRepositoryProvider).logout();
     await ref.read(databaseProvider).wipe();
+    // Pack files go too (§22.5): their key is derived from this device's database key.
+    await ref.read(packFilesProvider).deleteAll();
     state = const AsyncData(null);
   }
 

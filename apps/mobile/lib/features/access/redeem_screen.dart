@@ -9,6 +9,7 @@ import '../../core/api/generated/export.dart';
 import '../../shared/widgets/form_widgets.dart';
 import 'access_format.dart';
 import 'access_providers.dart';
+import '../offline/download_widgets.dart';
 
 /// Coupon code input: uppercase, Arabic/Persian digits to ASCII, only the code alphabet, dashes
 /// inserted as `XXXX-XXXX-XX` (spec §9.2, §9.3). The server normalizes again; this is for typing.
@@ -78,6 +79,14 @@ class _RedeemScreenState extends ConsumerState<RedeemScreen> {
     try {
       final result = await redeemCoupon(ref, _code.text);
       if (mounted) setState(() => _result = result);
+      // Offer the activated content for offline use (§22.2).
+      final scope = result.entitlement.scope;
+      if (mounted) {
+        await offerDownloadAfterRedemption(context, ref, (
+          subjectId: scope.subjectId,
+          teacherTrackId: scope.scopeType == AccessScopeScopeType.teacherTrack ? scope.teacherTrackId : null,
+        ));
+      }
     } on ApiException catch (e) {
       if (mounted) setState(() => _error = e.message);
     } finally {

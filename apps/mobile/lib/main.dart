@@ -8,7 +8,9 @@ import 'app/app.dart';
 import 'app/flags.dart';
 import 'app/providers.dart';
 import 'core/auth/token_store.dart';
+import 'core/db/database_key.dart';
 import 'core/db/open_database.dart';
+import 'core/offline/native_pack_files.dart';
 import 'core/platform/app_platform.dart';
 
 Future<void> main() async {
@@ -18,12 +20,15 @@ Future<void> main() async {
   final info = await PackageInfo.fromPlatform();
   final env = AppEnvironment(platform: appPlatformName(), appVersion: info.version);
   final db = await openAppDatabase();
+  // Pack images: AES-GCM with a key derived from the device's database key (spec §22.5).
+  final packFiles = env.isWeb ? null : await openNativePackFiles(await loadOrCreateDatabaseKey());
 
   Widget app = ProviderScope(
     overrides: [
       appEnvironmentProvider.overrideWithValue(env),
       tokenStoreProvider.overrideWithValue(env.isWeb ? MemoryTokenStore() : SecureTokenStore()),
       databaseProvider.overrideWithValue(db),
+      if (packFiles != null) packFilesProvider.overrideWithValue(packFiles),
     ],
     child: const PlengoApp(),
   );

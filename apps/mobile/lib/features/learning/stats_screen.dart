@@ -7,14 +7,29 @@ import '../../core/api/generated/export.dart';
 import '../../shared/text/bidi.dart';
 import '../../shared/widgets/async_view.dart';
 import '../quizzes/attempt_widgets.dart';
+import '../offline/offline_providers.dart';
 import '../quizzes/quiz_providers.dart';
 
 typedef _AllStats = ({StatsOverview overview, StatsTrend trend, FlashcardStats flashcards});
 
 final statsProvider = FutureProvider.autoDispose<_AllStats>((ref) async {
   final repo = ref.watch(learningRepositoryProvider);
-  final (overview, trend, flashcards) = await (repo.overview(), repo.trend(), repo.flashcardStats()).wait;
-  return (overview: overview, trend: trend, flashcards: flashcards);
+  // eagerError: the first failure itself surfaces (e.g. NETWORK_ERROR for the offline view).
+  final r = await Future.wait<Object>([repo.overview(), repo.trend(), repo.flashcardStats()], eagerError: true);
+  return (overview: r[0] as StatsOverview, trend: r[1] as StatsTrend, flashcards: r[2] as FlashcardStats);
+});
+
+/// Without a connection: an approximation from attempts taken on this device (spec §22.6), replaced
+/// by the server's figures once they sync.
+final offlineStatsProvider = FutureProvider.autoDispose<({int attempts, int answered, int correct})>((ref) async {
+  final attempts = await ref.watch(localAttemptStoreProvider).submitted();
+  var answered = 0;
+  var correct = 0;
+  for (final a in attempts) {
+    answered += a.attempt.answeredCount;
+    correct += a.attempt.correctCount ?? 0;
+  }
+  return (attempts: attempts.length, answered: answered, correct: correct);
 });
 
 final subjectStatsProvider = FutureProvider.autoDispose.family<SubjectStats, String>(
@@ -36,6 +51,12 @@ class StatsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final stats = ref.watch(statsProvider);
+    if (stats.hasError && isOffline(stats.error!)) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('إحصائياتي')),
+        body: _OfflineStats(onRetry: () => ref.invalidate(statsProvider)),
+      );
+    }
     return Scaffold(
       appBar: AppBar(title: const Text('إحصائياتي')),
       body: AsyncView(
@@ -306,6 +327,41 @@ class SubjectStatsScreen extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _OfflineStats extends ConsumerWidget {
+  const _OfflineStats({required this.onRetry});
+
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final local = ref.watch(offlineStatsProvider).value;
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        const Text(
+          'أنت غير متصل. هذه أرقام تقريبية من الاختبارات التي أجريتها على هذا الجهاز، وتُستبدل بإحصائياتك الكاملة عند الاتصال.',
+        ),
+        const SizedBox(height: 16),
+        if (local != null)
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              _Tile(label: 'اختبارات على الجهاز', value: '${local.attempts}'),
+              _Tile(label: 'أسئلة مُجابة', value: '${local.answered}'),
+              _Tile(
+                label: 'نسبة الصواب',
+                value: _pct(local.answered == 0 ? null : (local.correct * 100 / local.answered).round()),
+              ),
+            ],
+          ),
+        const SizedBox(height: 16),
+        OutlinedButton(onPressed: onRetry, child: const Text('إعادة المحاولة')),
+      ],
     );
   }
 }

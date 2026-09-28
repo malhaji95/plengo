@@ -4,8 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/providers.dart';
 import '../../core/api/generated/export.dart';
+import '../../core/api/api_exception.dart';
 import '../../core/content/flashcard_repository.dart';
 import '../../core/content/study_card.dart';
+import '../../core/offline/offline_repositories.dart';
+import '../offline/offline_providers.dart';
 import '../../core/srs/queue.dart';
 import '../../core/srs/scheduler.dart';
 import '../../core/srs/srs_key.dart';
@@ -13,8 +16,9 @@ import '../../core/srs/srs_store.dart';
 import '../my_decks/my_decks_providers.dart';
 import '../../shared/util/uuid.dart';
 
+/// Downloaded decks are read from the device (spec §22.11).
 final flashcardRepositoryProvider = Provider<FlashcardRepository>(
-  (ref) => FlashcardRepository(ref.watch(apiClientProvider)),
+  (ref) => OfflineFlashcardRepository(ref.watch(apiClientProvider), ref.watch(offlineContentProvider)),
 );
 
 final srsStoreProvider = Provider<SrsStore>((ref) => SrsStore(ref.watch(databaseProvider)));
@@ -42,6 +46,27 @@ final decksProvider = FutureProvider.autoDispose.family<List<StudentDeck>, DeckQ
 final deckProvider = FutureProvider.autoDispose.family<StudentDeck, String>(
   (ref, id) => ref.watch(flashcardRepositoryProvider).deck(id),
 );
+
+/// A deck's cards for Browse: from the device when the deck is downloaded (§22.11), otherwise from
+/// the server with signed image URLs.
+final browseCardsProvider = FutureProvider.autoDispose.family<({String title, List<StudyCard> cards}), String>((
+  ref,
+  deckId,
+) async {
+  final repo = ref.watch(flashcardRepositoryProvider);
+  final local = repo is OfflineFlashcardRepository ? await repo.localStudyCards(deckId) : null;
+  if (local != null) return (title: (await repo.deck(deckId)).titleAr, cards: local);
+  final d = await repo.deckCards(deckId);
+  return (title: d.deck.titleAr, cards: [for (final c in d.cards) StudyCard.official(c)]);
+});
+
+/// The official card behind a Browse card (for "أضف إلى بطاقاتي").
+Future<StudentCard?> officialCardFor(WidgetRef ref, String deckId, String cardId) async {
+  final local = await ref.read(offlineContentProvider).card(cardId);
+  if (local != null) return OfflineFlashcardRepository.officialCard(local);
+  final d = await ref.read(flashcardRepositoryProvider).deckCards(deckId);
+  return d.cards.where((c) => c.id == cardId).firstOrNull;
+}
 
 /// Cards with signed image URLs (valid one hour).
 final deckCardsProvider = FutureProvider.autoDispose.family<DeckCards, String>(
@@ -155,10 +180,31 @@ class StudyController extends AsyncNotifier<StudyState> {
       ];
     } else if (source.deckId != null) {
       await ref.read(srsSyncProvider).syncNow();
-      cards = [for (final c in (await repo.deckCards(source.deckId!)).cards) StudyCard.official(c)];
+      // A downloaded deck is studied from the device (§22.11).
+      final local = repo is OfflineFlashcardRepository ? await repo.localStudyCards(source.deckId!) : null;
+      cards = local ?? [for (final c in (await repo.deckCards(source.deckId!)).cards) StudyCard.official(c)];
     } else {
       await ref.read(srsSyncProvider).syncNow();
-      final due = await repo.due(subjectId: source.subjectId);
+      final DueCards due;
+      try {
+        due = await repo.due(subjectId: source.subjectId);
+      } on ApiException catch (e) {
+        if (e.code != 'NETWORK_ERROR') rethrow;
+        final offline = await _offlineDue();
+        if (offline.isEmpty) rethrow;
+        cards = offline;
+        final order = [for (final c in cards) c.key];
+        final states = await _store.statesFor(order);
+        _shownAt = _now();
+        return StudyState(
+          cards: {for (final c in cards) c.key: c},
+          order: order,
+          states: states,
+          queue: await _queue(order, states),
+          flipped: false,
+          undoCount: 0,
+        );
+      }
       final own = {
         for (final r in await ref.read(myDecksStoreProvider).cardsByIds(due.userCards.map((d) => d.card.id))) r.id: r,
       };
@@ -186,6 +232,34 @@ class StudyController extends AsyncNotifier<StudyState> {
       flipped: false,
       undoCount: 0,
     );
+  }
+
+  /// Without a connection, the due session uses cards on the device: downloaded official decks the
+  /// student may still use and their own decks (§22.6).
+  Future<List<StudyCard>> _offlineDue() async {
+    final now = _now();
+    final due = await _store.dueStates(startOfBusinessDay(businessDay(now) + 1));
+    final content = ref.read(offlineContentProvider);
+    final repo = ref.read(flashcardRepositoryProvider);
+    final own = {
+      for (final r
+          in await ref.read(myDecksStoreProvider).cardsByIds(due.keys.where(SrsKey.isUserCard).map(SrsKey.idOf)))
+        r.id: r,
+    };
+    final out = <StudyCard>[];
+    for (final key in due.keys) {
+      if (SrsKey.isUserCard(key)) {
+        final r = own[SrsKey.idOf(key)];
+        if (r != null && !r.locked) out.add(StudyCard.own(r));
+        continue;
+      }
+      final c = await content.card(key);
+      if (c == null || repo is! OfflineFlashcardRepository) continue;
+      final local = await repo.localStudyCards(c.deckId);
+      final match = local?.where((s) => s.key == key).firstOrNull;
+      if (match != null) out.add(match);
+    }
+    return out;
   }
 
   Future<QueueSnapshot> _queue(List<String> order, Map<String, CardState> states) async {

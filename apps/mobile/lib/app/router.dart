@@ -39,6 +39,7 @@ import '../features/teachers/teachers_screen.dart';
 import '../features/teachers/track_screen.dart';
 import '../features/update/force_update_screen.dart';
 import 'providers.dart';
+import '../features/offline/offline_storage_screen.dart';
 
 abstract final class Routes {
   static const splash = '/splash';
@@ -57,6 +58,7 @@ abstract final class Routes {
   static const placement = '/account/placement';
   static const following = '/account/following';
   static const myAccess = '/account/access';
+  static const offlineStorage = '/account/offline';
   static const teachers = '/teachers';
   static const tracks = '/tracks';
   static const redeem = '/redeem';
@@ -269,6 +271,7 @@ GoRouter buildRouter(Ref ref, {required bool couponRedemption}) {
                   GoRoute(path: 'placement', builder: (_, _) => const PlacementScreen()),
                   GoRoute(path: 'following', builder: (_, _) => const FollowedTeachersScreen()),
                   GoRoute(path: 'access', builder: (_, _) => const MyAccessScreen()),
+                  GoRoute(path: 'offline', builder: (_, _) => const OfflineStorageScreen()),
                 ],
               ),
             ],

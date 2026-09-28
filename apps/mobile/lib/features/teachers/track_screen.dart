@@ -9,6 +9,7 @@ import '../access/access_banner.dart';
 import '../learning/scope_learning.dart';
 import '../questions/question_providers.dart';
 import 'teacher_providers.dart';
+import '../offline/download_widgets.dart';
 
 /// A teacher track page (spec §7.2, §23.2 #12). Its questions, decks and quizzes arrive with
 /// Phases 5–7. A track is its own access scope: a subject entitlement does not open it (§8.1).
@@ -66,6 +67,7 @@ class TrackScreen extends ConsumerWidget {
                   questionCount: d.questionCount,
                   quizzesPath: '${Routes.tracks}/${d.track.id}/quizzes',
                 ),
+                OfflineDownloadTile(scope: (subjectId: d.subject.id, teacherTrackId: d.track.id), label: 'تحميل الكل'),
                 if (d.deckCount.total > 0)
                   Card(
                     margin: const EdgeInsets.only(bottom: 8),

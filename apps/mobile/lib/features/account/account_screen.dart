@@ -12,6 +12,7 @@ import '../access/access_providers.dart';
 import '../my_decks/card_editor_screen.dart';
 import '../subjects/catalog_providers.dart';
 import '../teachers/teacher_providers.dart';
+import '../offline/offline_providers.dart';
 
 class AccountScreen extends ConsumerWidget {
   const AccountScreen({super.key});
@@ -73,6 +74,14 @@ class AccountScreen extends ConsumerWidget {
               title: const Text('إدخال كود التفعيل'),
               trailing: const Icon(Icons.chevron_left),
               onTap: () => context.push(Routes.redeem),
+            ),
+          if (ref.watch(offlinePacksAvailableProvider))
+            ListTile(
+              leading: const Icon(Icons.download_for_offline_outlined),
+              title: const Text('المحتوى المحمّل'),
+              subtitle: const Text('التحميل دون اتصال والمساحة المستخدمة'),
+              trailing: const Icon(Icons.chevron_left),
+              onTap: () => context.go(Routes.offlineStorage),
             ),
           ListTile(
             leading: const Icon(Icons.school_outlined),

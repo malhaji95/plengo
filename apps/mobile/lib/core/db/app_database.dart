@@ -3,7 +3,7 @@ import 'package:drift/drift.dart';
 part 'app_database.g.dart';
 
 /// Small key/value store for settings and cache metadata. Feature tables (SRS states, review
-/// logs, exam drafts, student decks; offline packs later) arrive with their phases (§22.12).
+/// logs, exam drafts, student decks, offline packs) arrive with their phases (§22.12).
 class KeyValues extends Table {
   TextColumn get key => text()();
   TextColumn get value => text()();
@@ -122,12 +122,121 @@ class LocalCards extends Table {
   Set<Column<Object>> get primaryKey => {id};
 }
 
-@DriftDatabase(tables: [KeyValues, SrsCardStates, SrsReviewLogs, ExamDrafts, ExamAnswers, LocalDecks, LocalCards])
+/// A downloaded (or downloading) offline pack (spec §22). `version` is what the device holds;
+/// `remoteVersion` the latest the server reported, so a difference means "تحديث متاح".
+@DataClassName('OfflinePackRow')
+class OfflinePacks extends Table {
+  TextColumn get packKey => text()();
+  TextColumn get scopeType => text()();
+  TextColumn get subjectId => text().nullable()();
+  TextColumn get teacherTrackId => text().nullable()();
+  TextColumn get scopeTitle => text()();
+  TextColumn get kind => text()();
+  TextColumn get unitId => text().nullable()();
+  TextColumn get deckId => text().nullable()();
+  TextColumn get titleAr => text()();
+
+  /// queued | downloading | paused | waiting_wifi | ready | failed
+  TextColumn get status => text()();
+  TextColumn get version => text().nullable()();
+  TextColumn get remoteVersion => text().nullable()();
+  BoolColumn get premium => boolean().withDefault(const Constant(false))();
+  IntColumn get normalizationVersion => integer().nullable()();
+  IntColumn get sizeBytes => integer().withDefault(const Constant(0))();
+  IntColumn get downloadedBytes => integer().withDefault(const Constant(0))();
+  IntColumn get updatedAt => integer()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {packKey};
+}
+
+/// One item of a pack: a question, deck, card or quiz as the server sent it (JSON), with its version.
+@DataClassName('OfflineItemRow')
+class OfflineItems extends Table {
+  TextColumn get packKey => text()();
+  TextColumn get itemId => text()();
+  TextColumn get type => text()();
+  IntColumn get version => integer()();
+  BoolColumn get isFree => boolean()();
+  TextColumn get json => text()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {packKey, itemId};
+}
+
+/// An encrypted image file of a pack card (AES-GCM, §22.5).
+@DataClassName('OfflineFileRow')
+class OfflineFiles extends Table {
+  TextColumn get packKey => text()();
+  TextColumn get mediaId => text()();
+  IntColumn get version => integer()();
+  TextColumn get path => text()();
+  IntColumn get sizeBytes => integer()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {packKey, mediaId};
+}
+
+/// The device's lease for a scope's premium pack content (§22.4). Scope key: `subject:<id>` or
+/// `teacher_track:<id>`.
+@DataClassName('OfflineLeaseRow')
+class OfflineLeaseRows extends Table {
+  TextColumn get scopeKey => text()();
+  IntColumn get expiresAt => integer()();
+  IntColumn get refreshedAt => integer()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {scopeKey};
+}
+
+/// An attempt taken from downloaded packs (§22.6). `attempt` is the `Attempt` JSON the screens use;
+/// `payload` the upload body once submitted. Kept until the server has it.
+@DataClassName('LocalAttemptRow')
+class LocalAttempts extends Table {
+  TextColumn get id => text()();
+  TextColumn get attempt => text()();
+  TextColumn get payload => text().nullable()();
+  BoolColumn get submitted => boolean().withDefault(const Constant(false))();
+  BoolColumn get synced => boolean().withDefault(const Constant(false))();
+  TextColumn get serverAttemptId => text().nullable()();
+  IntColumn get createdAt => integer()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+/// Questions answered wrong offline, a local mirror of the mistake bank until the server has them.
+@DataClassName('LocalMistakeRow')
+class LocalMistakes extends Table {
+  TextColumn get questionId => text()();
+  IntColumn get wrongAt => integer()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {questionId};
+}
+
+@DriftDatabase(
+  tables: [
+    KeyValues,
+    SrsCardStates,
+    SrsReviewLogs,
+    ExamDrafts,
+    ExamAnswers,
+    LocalDecks,
+    LocalCards,
+    OfflinePacks,
+    OfflineItems,
+    OfflineFiles,
+    OfflineLeaseRows,
+    LocalAttempts,
+    LocalMistakes,
+  ],
+)
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -143,6 +252,18 @@ class AppDatabase extends _$AppDatabase {
       if (from < 4) {
         await m.createTable(localDecks);
         await m.createTable(localCards);
+      }
+      if (from < 5) {
+        for (final TableInfo<Table, Object?> table in [
+          offlinePacks,
+          offlineItems,
+          offlineFiles,
+          offlineLeaseRows,
+          localAttempts,
+          localMistakes,
+        ]) {
+          await m.createTable(table);
+        }
       }
     },
   );

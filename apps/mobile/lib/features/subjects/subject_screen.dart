@@ -12,6 +12,7 @@ import '../access/access_banner.dart';
 import '../learning/scope_learning.dart';
 import '../questions/question_providers.dart';
 import 'catalog_providers.dart';
+import '../offline/download_widgets.dart';
 
 /// A subject's outline: optional units with their lessons, then lessons directly under the subject.
 /// Questions, decks, quizzes, random practice and progress appear here from Phase 5 on.
@@ -68,6 +69,7 @@ class _OutlineView extends ConsumerWidget {
               questionCount: outline.questionCount,
               quizzesPath: '${Routes.subjects}/${outline.subject.id}/quizzes',
             ),
+            OfflineDownloadTile(scope: (subjectId: outline.subject.id, teacherTrackId: null), label: 'تحميل الكل'),
             if (outline.deckCount.total > 0)
               Card(
                 margin: const EdgeInsets.only(bottom: 8),
@@ -107,6 +109,14 @@ class _OutlineView extends ConsumerWidget {
                     ].join(' · '),
                   ),
                   children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: OfflineDownloadTile(
+                        scope: (subjectId: outline.subject.id, teacherTrackId: null),
+                        unitId: unit.id,
+                        label: 'تحميل الوحدة',
+                      ),
+                    ),
                     if (unit.lessons.isEmpty) const ListTile(title: Text('لا توجد دروس في هذه الوحدة بعد')),
                     for (final lesson in unit.lessons) _LessonTile(lesson: lesson, subjectId: outline.subject.id),
                   ],
