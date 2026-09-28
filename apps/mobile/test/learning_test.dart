@@ -568,4 +568,101 @@ void main() {
     expect(req.filters?.types, [AttemptFiltersTypes.written]);
     expect(req.filters?.count, 20);
   });
+
+  testWidgets('an exam started offline-capable resumes from the device after a restart (§15.2)', (tester) async {
+    final app = await open(
+      tester,
+      '/home',
+      arrange: (l) => when(() => l.attempt('a1')).thenAnswer((_) async => throw offline),
+    );
+    // What the previous app session stored before it was closed.
+    final store = ExamStore(app.db);
+    await store.saveAttempt(attempt());
+    await store.putAnswer('a1', const LocalAnswer(questionId: 'q1', selectedOptionId: 'q1-b', flagged: true));
+    app.container.read(routerProvider).go('/attempts/a1');
+    await tester.pumpAndSettle();
+    expect(find.text('لا يوجد اتصال. تُحفظ إجاباتك على الجهاز وتُرسل لاحقاً.'), findsOneWidget);
+    // Resumes at the first unanswered question, keeping the stored answer and flag.
+    expect(find.text('السؤال 2 من 2 · أجبت عن 1'), findsOneWidget);
+    await tester.tap(find.byTooltip('شبكة الأسئلة'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('1'));
+    await tester.pumpAndSettle();
+    expect(find.text('سؤال الأول'), findsOneWidget);
+    final flag = tester.widget<FilterChip>(find.byKey(const Key('flag')));
+    expect(flag.selected, isTrue);
+  });
+
+  testWidgets('mistake bank filters by type and links to the related unit (§16.1)', (tester) async {
+    Mistake mistake(String id, MistakeType type, String unitId, String unit) => Mistake(
+      questionId: id,
+      type: type,
+      questionText: 'خطأ $unit',
+      subjectId: 'p',
+      subjectNameAr: 'الفيزياء',
+      teacherTrackId: null,
+      trackTitleAr: null,
+      unitId: unitId,
+      unitNameAr: unit,
+      lessonId: null,
+      lessonNameAr: null,
+      status: MistakeStatus.active,
+      wrongCount: 1,
+      correctStreak: 0,
+      firstWrongAt: '2026-09-20T00:00:00Z',
+      lastWrongAt: '2026-09-21T00:00:00Z',
+    );
+    final app = await open(
+      tester,
+      '/review/mistakes',
+      arrange: (l) {
+        when(() => l.mistakes(status: any(named: 'status'))).thenAnswer(
+          (_) async => MistakeList(
+            items: [
+              mistake('m1', MistakeType.mcq, 'u1', 'الميكانيك'),
+              mistake('m2', MistakeType.written, 'u2', 'الكهرباء'),
+            ],
+            activeCount: 2,
+            masteredCount: 0,
+            masteryStreak: 2,
+            nextCursor: null,
+          ),
+        );
+        when(() => l.start(any())).thenAnswer((_) async => attempt(mode: AttemptSummaryMode.practice));
+        when(() => l.attempt('a1')).thenAnswer((_) async => attempt(mode: AttemptSummaryMode.practice));
+      },
+      arrangeCatalog: (c) => when(() => c.outline('p')).thenAnswer(
+        (_) async => SubjectOutline(
+          subject: subject('p', 'الفيزياء'),
+          units: const [],
+          lessons: const [],
+          tracks: const [],
+          access: noAccess,
+          questionCount: noQuestions,
+          deckCount: noQuestions,
+          quizCount: noQuestions,
+        ),
+      ),
+    );
+    expect(find.text('خطأ الميكانيك'), findsOneWidget);
+    expect(find.text('خطأ الكهرباء'), findsOneWidget);
+    await tester.tap(find.text('إجابة مكتوبة'));
+    await tester.pumpAndSettle();
+    expect(find.text('خطأ الميكانيك'), findsNothing);
+    expect(find.text('خطأ الكهرباء'), findsOneWidget);
+    // Units of the (only) subject filter too.
+    await tester.tap(find.text('إجابة مكتوبة'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('الميكانيك').first);
+    await tester.pumpAndSettle();
+    expect(find.text('خطأ الكهرباء'), findsNothing);
+    // "اختبر أخطائي" sends the chosen unit.
+    await tester.tap(find.text('اختبر أخطائي'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('ابدأ'));
+    await tester.pumpAndSettle();
+    final req = verify(() => app.learning.start(captureAny())).captured.single as StartAttemptRequest;
+    expect(req.source, StartAttemptRequestSource.mistakes);
+    expect(req.filters?.unitId, 'u1');
+  });
 }

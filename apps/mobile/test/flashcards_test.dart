@@ -170,4 +170,39 @@ void main() {
     expect(find.text('هذا المحتوى يحتاج إلى تفعيل'), findsOneWidget);
     expect(find.text('مراجعة'), findsNothing);
   });
+
+  testWidgets('review tab: every due card across subjects, filterable by subject (§13.2)', (tester) async {
+    SrsCardState state(String id) => SrsCardState(
+      state: SrsCardStateState.review,
+      step: 0,
+      dueAt: DateTime.fromMillisecondsSinceEpoch(t0 - 1000, isUtc: true),
+      intervalDays: 3,
+      ease: 2.5,
+      reps: 2,
+      lapses: 0,
+      lastReviewedAt: DateTime.fromMillisecondsSinceEpoch(t0 - 3 * 86400000, isUtc: true),
+      flashcardId: id,
+      updatedAt: '2026-09-24T09:00:00Z',
+    );
+    DueCard due(int i, String subjectId, String name) =>
+        DueCard(card: card(i), deckTitleAr: 'مجموعة', subjectId: subjectId, subjectNameAr: name, state: state('c$i'));
+    final app = await pumpApp(
+      tester,
+      signedInAs: testMe,
+      arrangeFlashcards: (f) => when(() => f.due(subjectId: any(named: 'subjectId'))).thenAnswer(
+        (_) async => DueCards(
+          cards: [due(0, 'p', 'الفيزياء'), due(1, 'p', 'الفيزياء'), due(2, 'm', 'الرياضيات')],
+          urlsExpireAt: '',
+        ),
+      ),
+    );
+    app.container.read(routerProvider).go(Routes.review);
+    await tester.pumpAndSettle();
+    expect(find.text('مراجعة الأخطاء'), findsOneWidget);
+    expect(find.text('إحصائياتي'), findsOneWidget);
+    expect(find.text('كل البطاقات المستحقة: 3 بطاقات'), findsOneWidget);
+    await tester.tap(find.text('الرياضيات'));
+    await tester.pumpAndSettle();
+    expect(find.text('كل البطاقات المستحقة: بطاقة واحدة'), findsOneWidget);
+  });
 }

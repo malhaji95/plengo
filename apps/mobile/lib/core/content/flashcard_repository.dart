@@ -30,8 +30,21 @@ class FlashcardRepository {
   Future<DueCards> due({String? subjectId}) =>
       guardApi(() async => (await client.api.srs.listDueCards(subjectId: subjectId)).data);
 
+  /// The scheduler's state from the API model, field by field (generated enums are objects, not
+  /// strings, in the model's `toJson`).
+  static CardState cardStateOf(SrsCardState s) => CardState(
+    state: cardStateNameFromJson(s.state.toJson()),
+    step: s.step,
+    dueAt: s.dueAt.millisecondsSinceEpoch,
+    intervalDays: s.intervalDays,
+    ease: s.ease.toDouble(),
+    reps: s.reps,
+    lapses: s.lapses,
+    lastReviewedAt: s.lastReviewedAt?.millisecondsSinceEpoch,
+  );
+
   static Map<String, CardState> _states(Iterable<SrsCardState> items) => {
-    for (final s in items) s.flashcardId: CardState.fromJson(s.toJson()),
+    for (final s in items) s.flashcardId: cardStateOf(s),
   };
 
   /// Pull states changed on other devices since the stored cursor.

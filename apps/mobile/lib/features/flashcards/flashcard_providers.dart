@@ -139,7 +139,7 @@ class StudyController extends AsyncNotifier<StudyState> {
       final due = await repo.due(subjectId: source.subjectId);
       cards = [for (final d in due.cards) d.card];
       for (final d in due.cards) {
-        serverStates[d.card.id] = CardState.fromJson(d.state.toJson());
+        serverStates[d.card.id] = FlashcardRepository.cardStateOf(d.state);
       }
     }
     await _store.mergeServer(serverStates);
