@@ -1,0 +1,49 @@
+# Student web to Cloudflare Pages (spec §4, §24). Manual: pick the environment; the API and media
+# origins come from that environment's variables, the Cloudflare credentials from its secrets.
+name: Deploy student web
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        type: choice
+        options: [staging, production]
+        default: staging
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    defaults:
+      run:
+        working-directory: apps/mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.47.5
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Build
+        run: >
+          flutter build web --release --no-web-resources-cdn
+          --dart-define=API_BASE_URL=${{ vars.API_BASE_URL }}
+          --dart-define=COUPON_REDEMPTION=true
+          --dart-define=SENTRY_DSN_PUBLIC=${{ vars.SENTRY_DSN_PUBLIC }}
+      - name: Security and cache headers
+        run: node tool/web_headers.mjs build/web
+        env:
+          API_BASE_URL: ${{ vars.API_BASE_URL }}
+          MEDIA_ORIGINS: ${{ vars.MEDIA_ORIGINS }}
+          SENTRY_ORIGIN: ${{ vars.SENTRY_ORIGIN }}
+      - name: First-load budget
+        run: node tool/web_size.mjs build/web --budget-kb 4096
+      - name: Publish to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: apps/mobile
+          command: pages deploy build/web --project-name=${{ vars.CLOUDFLARE_PAGES_PROJECT }} --branch=${{ inputs.environment == 'production' && 'main' || 'staging' }}

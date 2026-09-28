@@ -65,6 +65,38 @@ class _HomeShellState extends ConsumerState<HomeShell> {
   @override
   Widget build(BuildContext context) {
     final wide = MediaQuery.sizeOf(context).width >= 600;
+    // Online-only notice when the browser gives no persistent storage (spec §24).
+    final content = ValueListenableBuilder<bool>(
+      valueListenable: ref.watch(ephemeralStorageProvider),
+      builder: (context, ephemeral, child) => ephemeral
+          ? Column(
+              children: [
+                Material(
+                  color: Theme.of(context).colorScheme.tertiaryContainer,
+                  child: const SafeArea(
+                    bottom: false,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: Row(
+                        children: [
+                          Icon(Icons.storage_outlined, size: 20),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'متصفحك لا يسمح بالتخزين المحلي، لذلك يعمل التطبيق متصلاً فقط ولن تُحفظ المراجعة دون اتصال.',
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(child: child!),
+              ],
+            )
+          : child!,
+      child: shell,
+    );
     if (wide) {
       return Scaffold(
         body: Row(
@@ -79,13 +111,13 @@ class _HomeShellState extends ConsumerState<HomeShell> {
               ],
             ),
             const VerticalDivider(width: 1),
-            Expanded(child: shell),
+            Expanded(child: content),
           ],
         ),
       );
     }
     return Scaffold(
-      body: shell,
+      body: content,
       bottomNavigationBar: NavigationBar(
         selectedIndex: shell.currentIndex,
         onDestinationSelected: _go,

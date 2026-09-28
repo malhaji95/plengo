@@ -603,3 +603,22 @@ from Phase 1; Phase 2 adds the college hierarchy and admin CRUD.
   matches ids) and reuses coupon lookup by full code (hash) or last four.
 - **Notification preview** (§26.2, missed in Phase 10) counts recipients and push consent with the
   same audience and consent rules as the fan-out; the admin sees the numbers before confirming.
+
+### ADR-022 — Student web (Phase 12)
+
+- **One codebase.** The web build is the Flutter app with web adaptations only where the platform
+  differs: cookie auth, WASM SQLite, no offline packs, no secure storage. Browsers without
+  persistent storage get drift's in-memory database and an "online only" notice rather than a
+  failure.
+- **Layout.** `ResponsiveList` (1–3 columns from 600 px) for lists; `ContentWidth` (720 px) for
+  reading, study and quiz screens; the navigation rail from 600 px. Rows of a grid take the height of
+  their tallest card.
+- **Hosting.** Cloudflare Pages via a manual workflow per environment. Headers are generated at
+  deploy time from the environment's API and media origins, so the CSP names exact origins. Every
+  file is `no-cache` with ETag revalidation because Flutter's engine files are not content-hashed.
+- **Service worker.** Network-first for same-origin files, cache as the offline fallback; it never
+  serves stale files while online, avoiding a mismatched engine and app. Flutter's deprecated worker
+  (which unregisters itself) is not used; the bootstrap is a custom template.
+- **Measurement.** Budget in CI (brotli first-load set ≤ 4 MB) and a reproducible throttled
+  measurement in headless Chromium over the DevTools protocol, with no npm dependencies. The skwasm
+  build was evaluated and rejected: same bytes, and the wasm module loads after its JS loader.

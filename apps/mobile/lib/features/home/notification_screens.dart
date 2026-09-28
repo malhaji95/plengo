@@ -7,6 +7,7 @@ import '../../core/api/generated/export.dart';
 import '../../shared/widgets/async_view.dart';
 import '../access/access_format.dart';
 import 'home_providers.dart';
+import '../../shared/widgets/responsive.dart';
 
 typedef InboxState = ({List<StudentNotification> items, String? nextCursor, int unread, bool loadingMore});
 
@@ -108,57 +109,59 @@ class NotificationsScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: AsyncView(
-        value: inbox,
-        onRetry: () => ref.invalidate(inboxProvider),
-        data: (s) => s.items.isEmpty
-            ? const EmptyState('لا توجد إشعارات', icon: Icons.notifications_none)
-            : RefreshIndicator(
-                onRefresh: () => ref.refresh(inboxProvider.future),
-                child: NotificationListener<ScrollNotification>(
-                  onNotification: (n) {
-                    if (n.metrics.extentAfter < 300) ref.read(inboxProvider.notifier).loadMore();
-                    return false;
-                  },
-                  child: ListView.separated(
-                    itemCount: s.items.length + (s.nextCursor != null ? 1 : 0),
-                    separatorBuilder: (_, _) => const Divider(height: 1),
-                    itemBuilder: (context, i) {
-                      if (i == s.items.length) {
-                        return Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Center(
-                            child: s.loadingMore
-                                ? const CircularProgressIndicator()
-                                : OutlinedButton(
-                                    onPressed: () => ref.read(inboxProvider.notifier).loadMore(),
-                                    child: const Text('عرض المزيد'),
-                                  ),
-                          ),
-                        );
-                      }
-                      final n = s.items[i];
-                      final isUnread = n.readAt == null;
-                      return ListTile(
-                        leading: Icon(_typeIcons[n.type] ?? Icons.notifications_outlined),
-                        title: Text(
-                          n.titleAr,
-                          style: TextStyle(fontWeight: isUnread ? FontWeight.bold : FontWeight.normal),
-                        ),
-                        subtitle: Text('${n.bodyAr}\n${damascusDate(n.createdAt)}'),
-                        isThreeLine: true,
-                        trailing: isUnread
-                            ? Icon(Icons.circle, size: 10, color: Theme.of(context).colorScheme.primary)
-                            : null,
-                        onTap: () async {
-                          await _guard(context, () => ref.read(inboxProvider.notifier).markRead(n));
-                          if (context.mounted) await openAction(context, ref, n.action, n.actionTarget);
-                        },
-                      );
+      body: ContentWidth(
+        child: AsyncView(
+          value: inbox,
+          onRetry: () => ref.invalidate(inboxProvider),
+          data: (s) => s.items.isEmpty
+              ? const EmptyState('لا توجد إشعارات', icon: Icons.notifications_none)
+              : RefreshIndicator(
+                  onRefresh: () => ref.refresh(inboxProvider.future),
+                  child: NotificationListener<ScrollNotification>(
+                    onNotification: (n) {
+                      if (n.metrics.extentAfter < 300) ref.read(inboxProvider.notifier).loadMore();
+                      return false;
                     },
+                    child: ListView.separated(
+                      itemCount: s.items.length + (s.nextCursor != null ? 1 : 0),
+                      separatorBuilder: (_, _) => const Divider(height: 1),
+                      itemBuilder: (context, i) {
+                        if (i == s.items.length) {
+                          return Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Center(
+                              child: s.loadingMore
+                                  ? const CircularProgressIndicator()
+                                  : OutlinedButton(
+                                      onPressed: () => ref.read(inboxProvider.notifier).loadMore(),
+                                      child: const Text('عرض المزيد'),
+                                    ),
+                            ),
+                          );
+                        }
+                        final n = s.items[i];
+                        final isUnread = n.readAt == null;
+                        return ListTile(
+                          leading: Icon(_typeIcons[n.type] ?? Icons.notifications_outlined),
+                          title: Text(
+                            n.titleAr,
+                            style: TextStyle(fontWeight: isUnread ? FontWeight.bold : FontWeight.normal),
+                          ),
+                          subtitle: Text('${n.bodyAr}\n${damascusDate(n.createdAt)}'),
+                          isThreeLine: true,
+                          trailing: isUnread
+                              ? Icon(Icons.circle, size: 10, color: Theme.of(context).colorScheme.primary)
+                              : null,
+                          onTap: () async {
+                            await _guard(context, () => ref.read(inboxProvider.notifier).markRead(n));
+                            if (context.mounted) await openAction(context, ref, n.action, n.actionTarget);
+                          },
+                        );
+                      },
+                    ),
                   ),
                 ),
-              ),
+        ),
       ),
     );
   }
@@ -191,51 +194,53 @@ class NotificationSettingsScreen extends ConsumerWidget {
     });
     return Scaffold(
       appBar: AppBar(title: const Text('إعدادات الإشعارات')),
-      body: AsyncView(
-        value: prefs,
-        onRetry: () => ref.invalidate(notificationPreferencesProvider),
-        data: (p) => ListView(
-          children: [
-            SwitchListTile(
-              title: const Text('التعلّم'),
-              subtitle: const Text('محتوى جديد، تحديثات المدرسين، وتذكير المراجعة'),
-              value: p.learning,
-              onChanged: (v) => save(learning: v),
-            ),
-            SwitchListTile(
-              title: const Text('العروض'),
-              subtitle: const Text('عروض وخصومات. لن تصلك إلا إذا فعّلتها'),
-              value: p.promotions,
-              onChanged: (v) => save(promotions: v),
-            ),
-            ListTile(
-              enabled: p.learning,
-              title: const Text('وقت تذكير المراجعة'),
-              subtitle: const Text('بتوقيت دمشق، عندما تكون لديك بطاقات مستحقة'),
-              trailing: DropdownButton<String>(
-                value: reminderTimes.contains(p.reminderTime) ? p.reminderTime : null,
-                hint: Directionality(textDirection: TextDirection.ltr, child: Text(p.reminderTime)),
-                onChanged: p.learning ? (v) => v == null ? null : save(reminderTime: v) : null,
-                items: [
-                  for (final t in reminderTimes)
-                    DropdownMenuItem(
-                      value: t,
-                      child: Directionality(textDirection: TextDirection.ltr, child: Text(t)),
-                    ),
-                ],
+      body: ContentWidth(
+        child: AsyncView(
+          value: prefs,
+          onRetry: () => ref.invalidate(notificationPreferencesProvider),
+          data: (p) => ListView(
+            children: [
+              SwitchListTile(
+                title: const Text('التعلّم'),
+                subtitle: const Text('محتوى جديد، تحديثات المدرسين، وتذكير المراجعة'),
+                value: p.learning,
+                onChanged: (v) => save(learning: v),
               ),
-            ),
-            const Divider(),
-            ListTile(
-              title: const Text('الهدف اليومي'),
-              subtitle: Text(switch (goal) {
-                AsyncData(value: final g) => '$g عنصراً يومياً (بطاقات وإجابات)',
-                _ => '…',
-              }),
-              trailing: const Icon(Icons.edit_outlined),
-              onTap: goal.hasValue ? () => editDailyGoal(context, ref, goal.value!) : null,
-            ),
-          ],
+              SwitchListTile(
+                title: const Text('العروض'),
+                subtitle: const Text('عروض وخصومات. لن تصلك إلا إذا فعّلتها'),
+                value: p.promotions,
+                onChanged: (v) => save(promotions: v),
+              ),
+              ListTile(
+                enabled: p.learning,
+                title: const Text('وقت تذكير المراجعة'),
+                subtitle: const Text('بتوقيت دمشق، عندما تكون لديك بطاقات مستحقة'),
+                trailing: DropdownButton<String>(
+                  value: reminderTimes.contains(p.reminderTime) ? p.reminderTime : null,
+                  hint: Directionality(textDirection: TextDirection.ltr, child: Text(p.reminderTime)),
+                  onChanged: p.learning ? (v) => v == null ? null : save(reminderTime: v) : null,
+                  items: [
+                    for (final t in reminderTimes)
+                      DropdownMenuItem(
+                        value: t,
+                        child: Directionality(textDirection: TextDirection.ltr, child: Text(t)),
+                      ),
+                  ],
+                ),
+              ),
+              const Divider(),
+              ListTile(
+                title: const Text('الهدف اليومي'),
+                subtitle: Text(switch (goal) {
+                  AsyncData(value: final g) => '$g عنصراً يومياً (بطاقات وإجابات)',
+                  _ => '…',
+                }),
+                trailing: const Icon(Icons.edit_outlined),
+                onTap: goal.hasValue ? () => editDailyGoal(context, ref, goal.value!) : null,
+              ),
+            ],
+          ),
         ),
       ),
     );

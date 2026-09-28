@@ -9,6 +9,7 @@ import '../../shared/widgets/async_view.dart';
 import '../quizzes/attempt_widgets.dart';
 import '../offline/offline_providers.dart';
 import '../quizzes/quiz_providers.dart';
+import '../../shared/widgets/responsive.dart';
 
 typedef _AllStats = ({StatsOverview overview, StatsTrend trend, FlashcardStats flashcards});
 
@@ -54,104 +55,106 @@ class StatsScreen extends ConsumerWidget {
     if (stats.hasError && isOffline(stats.error!)) {
       return Scaffold(
         appBar: AppBar(title: const Text('إحصائياتي')),
-        body: _OfflineStats(onRetry: () => ref.invalidate(statsProvider)),
+        body: ContentWidth(child: _OfflineStats(onRetry: () => ref.invalidate(statsProvider))),
       );
     }
     return Scaffold(
       appBar: AppBar(title: const Text('إحصائياتي')),
-      body: AsyncView(
-        value: stats,
-        onRetry: () => ref.invalidate(statsProvider),
-        data: (s) {
-          final o = s.overview;
-          final text = Theme.of(context).textTheme;
-          return RefreshIndicator(
-            onRefresh: () => ref.refresh(statsProvider.future),
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 820),
-                child: ListView(
-                  padding: const EdgeInsets.all(16),
-                  children: [
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        _Tile(label: 'أسئلة مُجابة', value: '${o.totals.answered}'),
-                        _Tile(label: 'نسبة الصواب', value: _pct(o.totals.accuracyPercent)),
-                        _Tile(label: 'اختبارات مكتملة', value: '${o.quizzesCompleted}'),
-                        _Tile(label: 'أيام الدراسة', value: '${o.studyDays}'),
-                        _Tile(label: 'السلسلة الحالية', value: '${o.currentStreak} يوم'),
-                        if (o.averageTimeMs != null)
-                          _Tile(label: 'متوسط الوقت للسؤال', value: humanDuration(o.averageTimeMs!)),
-                        _Tile(label: 'أخطاء نشطة / متقنة', value: '${o.mistakes.active} / ${o.mistakes.mastered}'),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    Text('الدقة أسبوعياً (آخر 12 أسبوعاً)', style: text.titleSmall),
-                    const SizedBox(height: 8),
-                    BarChart(
-                      values: [for (final w in s.trend.weeks) (w.accuracyPercent ?? 0).toDouble()],
-                      max: 100,
-                      labels: [for (final w in s.trend.weeks) w.weekStart.substring(5)],
-                      semantics: 'الدقة الأسبوعية',
-                    ),
-                    if (o.subjects.isNotEmpty) ...[
+      body: ContentWidth(
+        child: AsyncView(
+          value: stats,
+          onRetry: () => ref.invalidate(statsProvider),
+          data: (s) {
+            final o = s.overview;
+            final text = Theme.of(context).textTheme;
+            return RefreshIndicator(
+              onRefresh: () => ref.refresh(statsProvider.future),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 820),
+                  child: ListView(
+                    padding: const EdgeInsets.all(16),
+                    children: [
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          _Tile(label: 'أسئلة مُجابة', value: '${o.totals.answered}'),
+                          _Tile(label: 'نسبة الصواب', value: _pct(o.totals.accuracyPercent)),
+                          _Tile(label: 'اختبارات مكتملة', value: '${o.quizzesCompleted}'),
+                          _Tile(label: 'أيام الدراسة', value: '${o.studyDays}'),
+                          _Tile(label: 'السلسلة الحالية', value: '${o.currentStreak} يوم'),
+                          if (o.averageTimeMs != null)
+                            _Tile(label: 'متوسط الوقت للسؤال', value: humanDuration(o.averageTimeMs!)),
+                          _Tile(label: 'أخطاء نشطة / متقنة', value: '${o.mistakes.active} / ${o.mistakes.mastered}'),
+                        ],
+                      ),
                       const SizedBox(height: 20),
-                      Text('حسب المادة', style: text.titleSmall),
-                      for (final sub in o.subjects)
-                        ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          title: Text(sub.subjectNameAr),
-                          subtitle: Text(
-                            [if (sub.trackTitleAr != null) sub.trackTitleAr!, '${sub.answered} سؤال'].join(' · '),
+                      Text('الدقة أسبوعياً (آخر 12 أسبوعاً)', style: text.titleSmall),
+                      const SizedBox(height: 8),
+                      BarChart(
+                        values: [for (final w in s.trend.weeks) (w.accuracyPercent ?? 0).toDouble()],
+                        max: 100,
+                        labels: [for (final w in s.trend.weeks) w.weekStart.substring(5)],
+                        semantics: 'الدقة الأسبوعية',
+                      ),
+                      if (o.subjects.isNotEmpty) ...[
+                        const SizedBox(height: 20),
+                        Text('حسب المادة', style: text.titleSmall),
+                        for (final sub in o.subjects)
+                          ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            title: Text(sub.subjectNameAr),
+                            subtitle: Text(
+                              [if (sub.trackTitleAr != null) sub.trackTitleAr!, '${sub.answered} سؤال'].join(' · '),
+                            ),
+                            trailing: Text(_pct(sub.accuracyPercent)),
+                            onTap: () => context.go('${Routes.stats}/subjects/${sub.subjectId}'),
                           ),
-                          trailing: Text(_pct(sub.accuracyPercent)),
-                          onTap: () => context.go('${Routes.stats}/subjects/${sub.subjectId}'),
-                        ),
+                      ],
+                      if (o.byType.isNotEmpty) ...[
+                        const SizedBox(height: 12),
+                        Text('حسب نوع السؤال', style: text.titleSmall),
+                        for (final t in o.byType)
+                          ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            title: Text(_typeNames[t.type] ?? ''),
+                            trailing: Text(_pct(t.accuracyPercent)),
+                          ),
+                      ],
+                      if (o.weakestUnits.isNotEmpty) ...[
+                        const SizedBox(height: 12),
+                        Text('الوحدات الأضعف', style: text.titleSmall),
+                        for (final u in o.weakestUnits)
+                          ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            title: Text(u.unitNameAr),
+                            subtitle: Text(u.subjectNameAr),
+                            trailing: Text(_pct(u.accuracyPercent)),
+                          ),
+                      ],
+                      if (o.mostMissed.isNotEmpty) ...[
+                        const SizedBox(height: 12),
+                        Text('الأسئلة الأكثر خطأ', style: text.titleSmall),
+                        for (final m in o.mostMissed)
+                          ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            title: Text(isolateLtr(m.questionText), maxLines: 2, overflow: TextOverflow.ellipsis),
+                            subtitle: Text(m.subjectNameAr),
+                            trailing: Text('×${m.wrongCount}'),
+                          ),
+                      ],
+                      const SizedBox(height: 20),
+                      Text('البطاقات التعليمية', style: text.titleSmall),
+                      const SizedBox(height: 8),
+                      _FlashcardSection(stats: s.flashcards),
                     ],
-                    if (o.byType.isNotEmpty) ...[
-                      const SizedBox(height: 12),
-                      Text('حسب نوع السؤال', style: text.titleSmall),
-                      for (final t in o.byType)
-                        ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          title: Text(_typeNames[t.type] ?? ''),
-                          trailing: Text(_pct(t.accuracyPercent)),
-                        ),
-                    ],
-                    if (o.weakestUnits.isNotEmpty) ...[
-                      const SizedBox(height: 12),
-                      Text('الوحدات الأضعف', style: text.titleSmall),
-                      for (final u in o.weakestUnits)
-                        ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          title: Text(u.unitNameAr),
-                          subtitle: Text(u.subjectNameAr),
-                          trailing: Text(_pct(u.accuracyPercent)),
-                        ),
-                    ],
-                    if (o.mostMissed.isNotEmpty) ...[
-                      const SizedBox(height: 12),
-                      Text('الأسئلة الأكثر خطأ', style: text.titleSmall),
-                      for (final m in o.mostMissed)
-                        ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          title: Text(isolateLtr(m.questionText), maxLines: 2, overflow: TextOverflow.ellipsis),
-                          subtitle: Text(m.subjectNameAr),
-                          trailing: Text('×${m.wrongCount}'),
-                        ),
-                    ],
-                    const SizedBox(height: 20),
-                    Text('البطاقات التعليمية', style: text.titleSmall),
-                    const SizedBox(height: 8),
-                    _FlashcardSection(stats: s.flashcards),
-                  ],
+                  ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

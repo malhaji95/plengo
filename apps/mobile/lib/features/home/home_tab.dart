@@ -12,6 +12,7 @@ import '../access/access_format.dart';
 import '../offline/offline_providers.dart';
 import 'home_providers.dart';
 import 'notification_screens.dart';
+import '../../shared/widgets/responsive.dart';
 
 /// Home (spec §19.1): greeting and bell, exam countdown, banners, today's work with goal and streak,
 /// continue learning, my subjects and tracks, free content, followed teachers, mistakes shortcut.
@@ -38,18 +39,20 @@ class HomeTab extends ConsumerWidget {
           ),
         ],
       ),
-      body: RefreshIndicator(
-        onRefresh: () => ref.refresh(homeProvider.future),
-        child: switch (home) {
-          AsyncData(value: final h) => _HomeBody(home: h),
-          AsyncError(error: final ApiException e) when e.code == 'NETWORK_ERROR' => const _OfflineHome(),
-          AsyncError() => ListView(
-            children: [
-              AsyncView(value: home, onRetry: () => ref.invalidate(homeProvider), data: (_) => const SizedBox()),
-            ],
-          ),
-          _ => const Center(child: CircularProgressIndicator()),
-        },
+      body: ContentWidth(
+        child: RefreshIndicator(
+          onRefresh: () => ref.refresh(homeProvider.future),
+          child: switch (home) {
+            AsyncData(value: final h) => _HomeBody(home: h),
+            AsyncError(error: final ApiException e) when e.code == 'NETWORK_ERROR' => const _OfflineHome(),
+            AsyncError() => ListView(
+              children: [
+                AsyncView(value: home, onRetry: () => ref.invalidate(homeProvider), data: (_) => const SizedBox()),
+              ],
+            ),
+            _ => const Center(child: CircularProgressIndicator()),
+          },
+        ),
       ),
     );
   }

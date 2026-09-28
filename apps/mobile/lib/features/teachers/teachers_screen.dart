@@ -7,6 +7,7 @@ import '../../core/api/generated/export.dart';
 import '../../shared/widgets/async_view.dart';
 import '../../shared/widgets/network_avatar.dart';
 import 'teacher_providers.dart';
+import '../../shared/widgets/responsive.dart';
 
 /// All teachers (spec §23.2 #12).
 class TeachersScreen extends ConsumerWidget {
@@ -56,10 +57,8 @@ class TeacherList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (teachers.isEmpty) return ListView(children: [EmptyState(empty, icon: Icons.person_search_outlined)]);
-    return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+    return ResponsiveList(
       itemCount: teachers.length,
-      separatorBuilder: (_, _) => const SizedBox(height: 8),
       itemBuilder: (context, i) {
         final t = teachers[i];
         return Card(

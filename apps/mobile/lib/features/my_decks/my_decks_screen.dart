@@ -9,6 +9,7 @@ import '../../shared/util/uuid.dart';
 import '../../shared/widgets/async_view.dart';
 import '../flashcards/decks_screen.dart';
 import 'my_decks_providers.dart';
+import '../../shared/widgets/responsive.dart';
 
 /// Deck colours the student can pick (stored as #RRGGBB).
 const deckColors = ['#1E88E5', '#43A047', '#F4511E', '#8E24AA', '#FDD835', '#546E7A'];
@@ -46,20 +47,22 @@ class _MyDecksScreenState extends ConsumerState<MyDecksScreen> {
         onRetry: () => ref.invalidate(myDecksProvider),
         data: (list) => RefreshIndicator(
           onRefresh: () => ref.read(myDecksSyncProvider).syncNow(),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 720),
-              child: ListView(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
-                children: [
-                  if (list.isEmpty)
-                    const EmptyState(
+          child: list.isEmpty
+              ? ListView(
+                  children: const [
+                    EmptyState(
                       'أنشئ مجموعتك الأولى وأضف إليها بطاقاتك الخاصة',
                       icon: Icons.collections_bookmark_outlined,
                     ),
-                  for (final d in list)
-                    Card(
-                      margin: const EdgeInsets.only(bottom: 8),
+                  ],
+                )
+              : ResponsiveList(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
+                  itemCount: list.length,
+                  itemBuilder: (context, i) {
+                    final d = list[i];
+                    return Card(
+                      margin: EdgeInsets.zero,
                       child: ListTile(
                         leading: CircleAvatar(
                           backgroundColor: deckColor(d.deck.color) ?? Theme.of(context).colorScheme.primaryContainer,
@@ -70,11 +73,9 @@ class _MyDecksScreenState extends ConsumerState<MyDecksScreen> {
                         trailing: const Icon(Icons.chevron_left),
                         onTap: () => context.go('${Routes.myDecks}/${d.deck.id}'),
                       ),
-                    ),
-                ],
-              ),
-            ),
-          ),
+                    );
+                  },
+                ),
         ),
       ),
     );

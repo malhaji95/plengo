@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -9,6 +10,7 @@ import '../core/auth/auth_repository.dart';
 import '../core/auth/token_store.dart';
 import '../core/config/version.dart';
 import '../core/db/app_database.dart';
+import '../core/db/open_database.dart';
 import '../core/home/home_repository.dart';
 import '../core/home/push_messaging.dart';
 import '../core/offline/pack_files.dart';
@@ -28,6 +30,9 @@ class AppEnvironment {
 final appEnvironmentProvider = Provider<AppEnvironment>((ref) => throw UnimplementedError('override in main'));
 final tokenStoreProvider = Provider<TokenStore>((ref) => throw UnimplementedError('override in main'));
 final databaseProvider = Provider<AppDatabase>((ref) => throw UnimplementedError('override in main'));
+
+/// Whether local storage is only in memory this session (a browser without persistent storage).
+final ephemeralStorageProvider = Provider<ValueListenable<bool>>((ref) => ephemeralDatabase);
 
 /// Encrypted pack image files (spec §22.5); `main` provides the real store on Android and iOS.
 final packFilesProvider = Provider<PackFileStore>((ref) => MemoryPackFiles());

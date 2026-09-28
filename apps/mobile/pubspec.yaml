@@ -14,7 +14,6 @@ dependencies:
   flutter_web_plugins:
     sdk: flutter
   cached_network_image: ^4.0.2
-  cupertino_icons: ^1.0.9
   dio: ^5.11.1
   drift: ^2.35.0
   drift_flutter: ^0.3.1

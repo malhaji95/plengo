@@ -8,6 +8,7 @@ import '../../core/api/generated/export.dart';
 import '../../shared/text/bidi.dart';
 import '../../shared/widgets/async_view.dart';
 import '../quizzes/quiz_providers.dart';
+import '../../shared/widgets/responsive.dart';
 
 final mistakesProvider = FutureProvider.autoDispose.family<MistakeList, MistakeFilterStatus>(
   (ref, status) => ref.watch(learningRepositoryProvider).mistakes(status: status),
@@ -100,129 +101,131 @@ class _MistakesScreenState extends ConsumerState<MistakesScreen> {
     final mistakes = ref.watch(mistakesProvider(_status));
     return Scaffold(
       appBar: AppBar(title: const Text('مراجعة الأخطاء')),
-      body: AsyncView(
-        value: mistakes,
-        onRetry: () => ref.invalidate(mistakesProvider(_status)),
-        data: (list) {
-          final subjects = <String, String>{for (final m in list.items) m.subjectId: m.subjectNameAr};
-          final inSubject = list.items.where((m) => _subjectId == null || m.subjectId == _subjectId).toList();
-          final units = <String, String>{
-            for (final m in inSubject)
-              if (m.unitId != null) m.unitId!: m.unitNameAr ?? '',
-          };
-          final types = {for (final m in inSubject) m.type};
-          final shown = inSubject
-              .where((m) => (_unitId == null || m.unitId == _unitId) && (_type == null || m.type == _type))
-              .toList();
-          // Group by subject, then unit (or the lesson directly under the subject).
-          final groups = <String, List<Mistake>>{};
-          for (final m in shown) {
-            final key = [
-              if (_subjectId == null) m.subjectNameAr,
-              if (m.trackTitleAr != null) m.trackTitleAr!,
-              m.unitNameAr ?? m.lessonNameAr ?? 'أسئلة عامة',
-            ].join(' · ');
-            (groups[key] ??= []).add(m);
-          }
-          return ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              SegmentedButton<MistakeFilterStatus>(
-                segments: [
-                  ButtonSegment(value: MistakeFilterStatus.active, label: Text('نشطة (${list.activeCount})')),
-                  ButtonSegment(value: MistakeFilterStatus.mastered, label: Text('متقنة (${list.masteredCount})')),
-                ],
-                selected: {_status},
-                onSelectionChanged: (s) => setState(() => _status = s.first),
-              ),
-              const SizedBox(height: 12),
-              if (subjects.length > 1)
-                Wrap(
-                  spacing: 8,
-                  children: [
-                    ChoiceChip(
-                      label: const Text('كل المواد'),
-                      selected: _subjectId == null,
-                      onSelected: (_) => setState(() {
-                        _subjectId = null;
-                        _unitId = null;
-                      }),
-                    ),
-                    for (final MapEntry(key: id, value: name) in subjects.entries)
+      body: ContentWidth(
+        child: AsyncView(
+          value: mistakes,
+          onRetry: () => ref.invalidate(mistakesProvider(_status)),
+          data: (list) {
+            final subjects = <String, String>{for (final m in list.items) m.subjectId: m.subjectNameAr};
+            final inSubject = list.items.where((m) => _subjectId == null || m.subjectId == _subjectId).toList();
+            final units = <String, String>{
+              for (final m in inSubject)
+                if (m.unitId != null) m.unitId!: m.unitNameAr ?? '',
+            };
+            final types = {for (final m in inSubject) m.type};
+            final shown = inSubject
+                .where((m) => (_unitId == null || m.unitId == _unitId) && (_type == null || m.type == _type))
+                .toList();
+            // Group by subject, then unit (or the lesson directly under the subject).
+            final groups = <String, List<Mistake>>{};
+            for (final m in shown) {
+              final key = [
+                if (_subjectId == null) m.subjectNameAr,
+                if (m.trackTitleAr != null) m.trackTitleAr!,
+                m.unitNameAr ?? m.lessonNameAr ?? 'أسئلة عامة',
+              ].join(' · ');
+              (groups[key] ??= []).add(m);
+            }
+            return ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                SegmentedButton<MistakeFilterStatus>(
+                  segments: [
+                    ButtonSegment(value: MistakeFilterStatus.active, label: Text('نشطة (${list.activeCount})')),
+                    ButtonSegment(value: MistakeFilterStatus.mastered, label: Text('متقنة (${list.masteredCount})')),
+                  ],
+                  selected: {_status},
+                  onSelectionChanged: (s) => setState(() => _status = s.first),
+                ),
+                const SizedBox(height: 12),
+                if (subjects.length > 1)
+                  Wrap(
+                    spacing: 8,
+                    children: [
                       ChoiceChip(
-                        label: Text(name),
-                        selected: _subjectId == id,
+                        label: const Text('كل المواد'),
+                        selected: _subjectId == null,
                         onSelected: (_) => setState(() {
-                          _subjectId = id;
+                          _subjectId = null;
                           _unitId = null;
                         }),
                       ),
-                  ],
-                ),
-              // Units once a subject is chosen (or when there is only one subject).
-              if ((_subjectId != null || subjects.length == 1) && units.length > 1) ...[
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  children: [
-                    ChoiceChip(
-                      label: const Text('كل الوحدات'),
-                      selected: _unitId == null,
-                      onSelected: (_) => setState(() => _unitId = null),
-                    ),
-                    for (final MapEntry(key: id, value: name) in units.entries)
+                      for (final MapEntry(key: id, value: name) in subjects.entries)
+                        ChoiceChip(
+                          label: Text(name),
+                          selected: _subjectId == id,
+                          onSelected: (_) => setState(() {
+                            _subjectId = id;
+                            _unitId = null;
+                          }),
+                        ),
+                    ],
+                  ),
+                // Units once a subject is chosen (or when there is only one subject).
+                if ((_subjectId != null || subjects.length == 1) && units.length > 1) ...[
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    children: [
                       ChoiceChip(
-                        label: Text(name),
-                        selected: _unitId == id,
-                        onSelected: (_) => setState(() => _unitId = id),
+                        label: const Text('كل الوحدات'),
+                        selected: _unitId == null,
+                        onSelected: (_) => setState(() => _unitId = null),
                       ),
-                  ],
-                ),
-              ],
-              if (types.length > 1) ...[
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  children: [
-                    for (final t in MistakeType.values.where(types.contains))
-                      FilterChip(
-                        label: Text(_typeLabels[t]!),
-                        selected: _type == t,
-                        onSelected: (on) => setState(() => _type = on ? t : null),
-                      ),
-                  ],
-                ),
-              ],
-              if (_status == MistakeFilterStatus.active && shown.isNotEmpty) ...[
+                      for (final MapEntry(key: id, value: name) in units.entries)
+                        ChoiceChip(
+                          label: Text(name),
+                          selected: _unitId == id,
+                          onSelected: (_) => setState(() => _unitId = id),
+                        ),
+                    ],
+                  ),
+                ],
+                if (types.length > 1) ...[
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    children: [
+                      for (final t in MistakeType.values.where(types.contains))
+                        FilterChip(
+                          label: Text(_typeLabels[t]!),
+                          selected: _type == t,
+                          onSelected: (on) => setState(() => _type = on ? t : null),
+                        ),
+                    ],
+                  ),
+                ],
+                if (_status == MistakeFilterStatus.active && shown.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  FilledButton.icon(
+                    onPressed: () => _test(list),
+                    icon: const Icon(Icons.play_arrow),
+                    label: const Text('اختبر أخطائي'),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'يُتقن السؤال بعد ${list.masteryStreak} إجابات صحيحة متتالية',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ],
                 const SizedBox(height: 12),
-                FilledButton.icon(
-                  onPressed: () => _test(list),
-                  icon: const Icon(Icons.play_arrow),
-                  label: const Text('اختبر أخطائي'),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'يُتقن السؤال بعد ${list.masteryStreak} إجابات صحيحة متتالية',
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
+                if (shown.isEmpty)
+                  EmptyState(
+                    _status == MistakeFilterStatus.active ? 'لا أخطاء لمراجعتها 🎉' : 'لا أسئلة متقنة بعد',
+                    icon: Icons.task_alt,
+                  ),
+                for (final MapEntry(key: title, value: items) in groups.entries) ...[
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8, bottom: 4),
+                    child: Text(title, style: Theme.of(context).textTheme.titleSmall),
+                  ),
+                  for (final m in items) _MistakeTile(mistake: m),
+                ],
               ],
-              const SizedBox(height: 12),
-              if (shown.isEmpty)
-                EmptyState(
-                  _status == MistakeFilterStatus.active ? 'لا أخطاء لمراجعتها 🎉' : 'لا أسئلة متقنة بعد',
-                  icon: Icons.task_alt,
-                ),
-              for (final MapEntry(key: title, value: items) in groups.entries) ...[
-                Padding(
-                  padding: const EdgeInsets.only(top: 8, bottom: 4),
-                  child: Text(title, style: Theme.of(context).textTheme.titleSmall),
-                ),
-                for (final m in items) _MistakeTile(mistake: m),
-              ],
-            ],
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

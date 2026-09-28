@@ -13,6 +13,7 @@ import '../my_decks/card_editor_screen.dart';
 import '../subjects/catalog_providers.dart';
 import '../teachers/teacher_providers.dart';
 import '../offline/offline_providers.dart';
+import '../../shared/widgets/responsive.dart';
 
 class AccountScreen extends ConsumerWidget {
   const AccountScreen({super.key});
@@ -25,95 +26,97 @@ class AccountScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('حسابي')),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        children: [
-          if (me != null)
+      body: ContentWidth(
+        child: ListView(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          children: [
+            if (me != null)
+              ListTile(
+                leading: _AvatarButton(me: me),
+                title: Text(me.fullName),
+                subtitle: Text(me.email, textDirection: TextDirection.ltr, textAlign: TextAlign.right),
+              ),
+            const Divider(),
+            const _SectionTitle('المظهر'),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: SegmentedButton<ThemeMode>(
+                segments: const [
+                  ButtonSegment(value: ThemeMode.system, label: Text('تلقائي')),
+                  ButtonSegment(value: ThemeMode.light, label: Text('فاتح')),
+                  ButtonSegment(value: ThemeMode.dark, label: Text('داكن')),
+                ],
+                selected: {appearance.themeMode},
+                onSelectionChanged: (s) => appearanceCtl.setThemeMode(s.first),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: SegmentedButton<int>(
+                segments: const [
+                  ButtonSegment(value: 0, label: Text('خط صغير')),
+                  ButtonSegment(value: 1, label: Text('عادي')),
+                  ButtonSegment(value: 2, label: Text('كبير')),
+                ],
+                selected: {appearance.fontStep},
+                onSelectionChanged: (s) => appearanceCtl.setFontStep(s.first),
+              ),
+            ),
+            const Divider(height: 32),
             ListTile(
-              leading: _AvatarButton(me: me),
-              title: Text(me.fullName),
-              subtitle: Text(me.email, textDirection: TextDirection.ltr, textAlign: TextAlign.right),
-            ),
-          const Divider(),
-          const _SectionTitle('المظهر'),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: SegmentedButton<ThemeMode>(
-              segments: const [
-                ButtonSegment(value: ThemeMode.system, label: Text('تلقائي')),
-                ButtonSegment(value: ThemeMode.light, label: Text('فاتح')),
-                ButtonSegment(value: ThemeMode.dark, label: Text('داكن')),
-              ],
-              selected: {appearance.themeMode},
-              onSelectionChanged: (s) => appearanceCtl.setThemeMode(s.first),
-            ),
-          ),
-          const SizedBox(height: 12),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: SegmentedButton<int>(
-              segments: const [
-                ButtonSegment(value: 0, label: Text('خط صغير')),
-                ButtonSegment(value: 1, label: Text('عادي')),
-                ButtonSegment(value: 2, label: Text('كبير')),
-              ],
-              selected: {appearance.fontStep},
-              onSelectionChanged: (s) => appearanceCtl.setFontStep(s.first),
-            ),
-          ),
-          const Divider(height: 32),
-          ListTile(
-            leading: const Icon(Icons.key_outlined),
-            title: const Text('صلاحيات الوصول'),
-            trailing: const Icon(Icons.chevron_left),
-            onTap: () => context.go(Routes.myAccess),
-          ),
-          if (ref.watch(couponRedemptionProvider))
-            ListTile(
-              leading: const Icon(Icons.vpn_key_outlined),
-              title: const Text('إدخال كود التفعيل'),
+              leading: const Icon(Icons.key_outlined),
+              title: const Text('صلاحيات الوصول'),
               trailing: const Icon(Icons.chevron_left),
-              onTap: () => context.push(Routes.redeem),
+              onTap: () => context.go(Routes.myAccess),
             ),
-          if (ref.watch(offlinePacksAvailableProvider))
+            if (ref.watch(couponRedemptionProvider))
+              ListTile(
+                leading: const Icon(Icons.vpn_key_outlined),
+                title: const Text('إدخال كود التفعيل'),
+                trailing: const Icon(Icons.chevron_left),
+                onTap: () => context.push(Routes.redeem),
+              ),
+            if (ref.watch(offlinePacksAvailableProvider))
+              ListTile(
+                leading: const Icon(Icons.download_for_offline_outlined),
+                title: const Text('المحتوى المحمّل'),
+                subtitle: const Text('التحميل دون اتصال والمساحة المستخدمة'),
+                trailing: const Icon(Icons.chevron_left),
+                onTap: () => context.go(Routes.offlineStorage),
+              ),
             ListTile(
-              leading: const Icon(Icons.download_for_offline_outlined),
-              title: const Text('المحتوى المحمّل'),
-              subtitle: const Text('التحميل دون اتصال والمساحة المستخدمة'),
+              leading: const Icon(Icons.notifications_outlined),
+              title: const Text('الإشعارات والهدف اليومي'),
               trailing: const Icon(Icons.chevron_left),
-              onTap: () => context.go(Routes.offlineStorage),
+              onTap: () => context.go(Routes.notificationSettings),
             ),
-          ListTile(
-            leading: const Icon(Icons.notifications_outlined),
-            title: const Text('الإشعارات والهدف اليومي'),
-            trailing: const Icon(Icons.chevron_left),
-            onTap: () => context.go(Routes.notificationSettings),
-          ),
-          ListTile(
-            leading: const Icon(Icons.school_outlined),
-            title: const Text('المرحلة التعليمية'),
-            trailing: const Icon(Icons.chevron_left),
-            onTap: () => context.go(Routes.placement),
-          ),
-          if (ref.watch(teacherFollowingEnabledProvider))
             ListTile(
-              leading: const Icon(Icons.groups_outlined),
-              title: const Text('المدرسون الذين أتابعهم'),
+              leading: const Icon(Icons.school_outlined),
+              title: const Text('المرحلة التعليمية'),
               trailing: const Icon(Icons.chevron_left),
-              onTap: () => context.go(Routes.following),
+              onTap: () => context.go(Routes.placement),
             ),
-          ListTile(
-            leading: const Icon(Icons.devices_outlined),
-            title: const Text('الأجهزة المتصلة'),
-            trailing: const Icon(Icons.chevron_left),
-            onTap: () => context.go(Routes.sessions),
-          ),
-          ListTile(
-            leading: Icon(Icons.logout, color: Theme.of(context).colorScheme.error),
-            title: Text('تسجيل الخروج', style: TextStyle(color: Theme.of(context).colorScheme.error)),
-            onTap: () => ref.read(authControllerProvider.notifier).logout(),
-          ),
-        ],
+            if (ref.watch(teacherFollowingEnabledProvider))
+              ListTile(
+                leading: const Icon(Icons.groups_outlined),
+                title: const Text('المدرسون الذين أتابعهم'),
+                trailing: const Icon(Icons.chevron_left),
+                onTap: () => context.go(Routes.following),
+              ),
+            ListTile(
+              leading: const Icon(Icons.devices_outlined),
+              title: const Text('الأجهزة المتصلة'),
+              trailing: const Icon(Icons.chevron_left),
+              onTap: () => context.go(Routes.sessions),
+            ),
+            ListTile(
+              leading: Icon(Icons.logout, color: Theme.of(context).colorScheme.error),
+              title: Text('تسجيل الخروج', style: TextStyle(color: Theme.of(context).colorScheme.error)),
+              onTap: () => ref.read(authControllerProvider.notifier).logout(),
+            ),
+          ],
+        ),
       ),
     );
   }

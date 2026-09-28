@@ -8,6 +8,7 @@ import '../../shared/widgets/async_view.dart';
 import '../my_decks/my_decks_providers.dart';
 import 'decks_screen.dart';
 import 'flashcard_providers.dart';
+import '../../shared/widgets/responsive.dart';
 
 final dueCardsProvider = FutureProvider.autoDispose<DueCards>((ref) async {
   await ref.read(srsSyncProvider).syncNow();
@@ -32,71 +33,73 @@ class _ReviewTabState extends ConsumerState<ReviewTab> {
     // The links work offline (student decks, §13.9); only the due list needs the server.
     return Scaffold(
       appBar: AppBar(title: const Text('المراجعة')),
-      body: RefreshIndicator(
-        onRefresh: () => ref.refresh(dueCardsProvider.future),
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            const _LearningLinks(),
-            const SizedBox(height: 16),
-            AsyncView(
-              value: due,
-              onRetry: () => ref.invalidate(dueCardsProvider),
-              data: (d) {
-                final subjects = <String, String>{for (final c in d.cards) c.subjectId: c.subjectNameAr};
-                // The student's own cards count in "كل المواد" (their decks have no required subject).
-                final count =
-                    d.cards.where((c) => _subjectId == null || c.subjectId == _subjectId).length +
-                    (_subjectId == null ? d.userCards.length : 0);
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    if (subjects.length > 1)
-                      Wrap(
-                        spacing: 8,
-                        children: [
-                          ChoiceChip(
-                            label: const Text('كل المواد'),
-                            selected: _subjectId == null,
-                            onSelected: (_) => setState(() => _subjectId = null),
-                          ),
-                          for (final MapEntry(key: id, value: name) in subjects.entries)
+      body: ContentWidth(
+        child: RefreshIndicator(
+          onRefresh: () => ref.refresh(dueCardsProvider.future),
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              const _LearningLinks(),
+              const SizedBox(height: 16),
+              AsyncView(
+                value: due,
+                onRetry: () => ref.invalidate(dueCardsProvider),
+                data: (d) {
+                  final subjects = <String, String>{for (final c in d.cards) c.subjectId: c.subjectNameAr};
+                  // The student's own cards count in "كل المواد" (their decks have no required subject).
+                  final count =
+                      d.cards.where((c) => _subjectId == null || c.subjectId == _subjectId).length +
+                      (_subjectId == null ? d.userCards.length : 0);
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (subjects.length > 1)
+                        Wrap(
+                          spacing: 8,
+                          children: [
                             ChoiceChip(
-                              label: Text(name),
-                              selected: _subjectId == id,
-                              onSelected: (_) => setState(() => _subjectId = id),
+                              label: const Text('كل المواد'),
+                              selected: _subjectId == null,
+                              onSelected: (_) => setState(() => _subjectId = null),
                             ),
-                        ],
-                      ),
-                    const SizedBox(height: 24),
-                    if (count == 0)
-                      const EmptyState('لا توجد بطاقات مستحقة الآن 🎉', icon: Icons.check_circle_outline)
-                    else ...[
-                      Text(
-                        'كل البطاقات المستحقة: ${cardCountLabel(count)}',
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      const SizedBox(height: 16),
-                      FilledButton.icon(
-                        onPressed: () async {
-                          await context.push(
-                            Uri(
-                              path: Routes.dueStudy,
-                              queryParameters: _subjectId == null ? null : {'subjectId': _subjectId},
-                            ).toString(),
-                          );
-                          ref.invalidate(dueCardsProvider);
-                        },
-                        icon: const Icon(Icons.psychology_outlined),
-                        label: const Text('ابدأ المراجعة'),
-                      ),
+                            for (final MapEntry(key: id, value: name) in subjects.entries)
+                              ChoiceChip(
+                                label: Text(name),
+                                selected: _subjectId == id,
+                                onSelected: (_) => setState(() => _subjectId = id),
+                              ),
+                          ],
+                        ),
+                      const SizedBox(height: 24),
+                      if (count == 0)
+                        const EmptyState('لا توجد بطاقات مستحقة الآن 🎉', icon: Icons.check_circle_outline)
+                      else ...[
+                        Text(
+                          'كل البطاقات المستحقة: ${cardCountLabel(count)}',
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        const SizedBox(height: 16),
+                        FilledButton.icon(
+                          onPressed: () async {
+                            await context.push(
+                              Uri(
+                                path: Routes.dueStudy,
+                                queryParameters: _subjectId == null ? null : {'subjectId': _subjectId},
+                              ).toString(),
+                            );
+                            ref.invalidate(dueCardsProvider);
+                          },
+                          icon: const Icon(Icons.psychology_outlined),
+                          label: const Text('ابدأ المراجعة'),
+                        ),
+                      ],
                     ],
-                  ],
-                );
-              },
-            ),
-          ],
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

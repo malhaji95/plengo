@@ -88,6 +88,8 @@ jobs:
       - run: flutter test
       - name: Web build (no CDN resources)
         run: flutter build web --release --no-web-resources-cdn --dart-define=API_BASE_URL=https://api.example.com
+      - name: Web first-load budget (spec §34.3)
+        run: node tool/web_size.mjs build/web --budget-kb 4096
 
   docker:
     name: API image

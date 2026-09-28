@@ -8,6 +8,7 @@ import '../../core/api/generated/export.dart';
 import '../../shared/widgets/async_view.dart';
 import 'catalog_providers.dart';
 import 'placement_picker.dart';
+import '../../shared/widgets/responsive.dart';
 
 /// "المواد": every level is browsable; the student's own level and college placement are only the
 /// starting point (spec §8.9).
@@ -178,10 +179,9 @@ class _SubjectList extends ConsumerWidget {
         onRetry: () => ref.invalidate(subjectsProvider(query)),
         data: (items) => items.isEmpty
             ? ListView(children: const [EmptyState('لا توجد مواد هنا بعد', icon: Icons.menu_book_outlined)])
-            : ListView.separated(
+            : ResponsiveList(
                 padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
                 itemCount: items.length,
-                separatorBuilder: (_, _) => const SizedBox(height: 8),
                 itemBuilder: (context, i) => _SubjectCard(subject: items[i]),
               ),
       ),
