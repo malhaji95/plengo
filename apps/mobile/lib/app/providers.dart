@@ -9,6 +9,8 @@ import '../core/auth/auth_repository.dart';
 import '../core/auth/token_store.dart';
 import '../core/config/version.dart';
 import '../core/db/app_database.dart';
+import '../core/home/home_repository.dart';
+import '../core/home/push_messaging.dart';
 import '../core/offline/pack_files.dart';
 import 'flags.dart';
 
@@ -45,6 +47,21 @@ final apiClientProvider = Provider<ApiClient>((ref) {
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
   return AuthRepository(client: ref.watch(apiClientProvider), platform: ref.watch(appEnvironmentProvider).platform);
+});
+
+final homeRepositoryProvider = Provider<HomeRepository>((ref) => HomeRepository(ref.watch(apiClientProvider)));
+
+/// Where push tokens come from; `main` swaps in FCM when the build carries Firebase config.
+final pushMessagingProvider = Provider<PushMessaging>((ref) => const NoPushMessaging());
+
+final pushRegistrationProvider = Provider<PushRegistration>((ref) {
+  final env = ref.watch(appEnvironmentProvider);
+  return PushRegistration(
+    ref.watch(pushMessagingProvider),
+    ref.watch(homeRepositoryProvider),
+    platform: env.platform,
+    appVersion: env.appVersion,
+  );
 });
 
 /// Set when the API answers APP_UPDATE_REQUIRED or the config says this build is too old.
@@ -94,6 +111,8 @@ class AuthController extends AsyncNotifier<Me?> {
   }
 
   Future<void> logout() async {
+    // Revoke this device's push token while the session can still authenticate the call.
+    await ref.read(pushRegistrationProvider).stop();
     await ref.read(authRepositoryProvider).logout();
     await ref.read(databaseProvider).wipe();
     // Pack files go too (§22.5): their key is derived from this device's database key.

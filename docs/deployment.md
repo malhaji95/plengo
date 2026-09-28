@@ -46,6 +46,12 @@ cannot spoof its IP for rate limits. HSTS is sent by the API when `APP_ENV` is `
 `production`, and by the admin in production builds. Admin error reporting uses
 `NEXT_PUBLIC_SENTRY_DSN` (optional).
 
+Push notifications (spec §20.3) use FCM's HTTP v1 API with a Firebase service account:
+`FCM_PROJECT_ID`, `FCM_CLIENT_EMAIL` and `FCM_PRIVATE_KEY` (the PEM from the service-account JSON;
+`\n` escapes are accepted). Without them the API logs pushes instead of sending them; inbox entries
+are written either way. Due-card reminders run hourly (`notifications.due-reminders`) and send at
+most one reminder per student per business day.
+
 ### R2 CORS (spec §12.7)
 
 `media-private` (uploads are presigned `PUT`s straight from the browser):

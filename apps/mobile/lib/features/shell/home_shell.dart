@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../app/providers.dart';
+import '../home/home_providers.dart';
 import '../quizzes/quiz_providers.dart';
 import '../offline/offline_providers.dart';
 
@@ -39,6 +41,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     unawaited(sync.syncNow());
     _examSync = Timer.periodic(const Duration(minutes: 1), (_) => sync.syncNow());
     // Offline packs: leases, offline attempts and updates when online; again when the connection returns.
+    unawaited(ref.read(pushRegistrationProvider).start());
     final offline = ref.read(offlineControllerProvider.notifier);
     unawaited(offline.syncOnline());
     if (ref.read(offlinePacksAvailableProvider)) {
@@ -53,7 +56,11 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     super.dispose();
   }
 
-  void _go(int index) => shell.goBranch(index, initialLocation: index == shell.currentIndex);
+  void _go(int index) {
+    // Returning to Home shows fresh counts (due cards, goal, unread), keeping the old ones meanwhile.
+    if (index == 0) ref.invalidate(homeProvider);
+    shell.goBranch(index, initialLocation: index == shell.currentIndex);
+  }
 
   @override
   Widget build(BuildContext context) {

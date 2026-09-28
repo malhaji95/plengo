@@ -4,6 +4,7 @@ import { entitlements, users } from '@plengo/db';
 import {
   seedAccess,
   seedFlashcards,
+  seedHome,
   seedLearning,
   seedQuestions,
   seedStructure,
@@ -32,6 +33,7 @@ describe('development seed (§40)', () => {
         decks: await seedFlashcards(t.c),
         quizzes: await seedLearning(t.c),
         studentContent: await seedStudentContent(t.c),
+        home: await seedHome(t.c, t.queue),
       };
     };
     const first = await run();
@@ -42,6 +44,8 @@ describe('development seed (§40)', () => {
     expect(first.decks).toBe(2);
     expect(second.decks).toBe(0);
     expect(first.quizzes).toBe(3);
+    expect(first.home).toEqual({ banners: 1, countdowns: 1, notifications: 1 });
+    expect(second.home).toEqual({ banners: 0, countdowns: 0, notifications: 0 });
     expect(second.quizzes).toBe(0);
     expect(second.codes.map((c) => c.code)).toEqual(first.codes.map((c) => c.code));
     for (const { code } of first.codes) expect(code).toMatch(/^[2-9A-Z]{4}-[2-9A-Z]{4}-[2-9A-Z]{2}$/);

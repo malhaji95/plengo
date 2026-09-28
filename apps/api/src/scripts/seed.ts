@@ -8,13 +8,16 @@ import { and, asc, eq, isNull } from 'drizzle-orm';
 import sharp from 'sharp';
 import {
   academicYears,
+  banners,
   couponBatches,
   coupons,
   educationLevels,
+  examCountdowns,
   faculties,
   flashcardDecks,
   lessons,
   mediaFiles,
+  notifications,
   promotions,
   questions,
   quizAttempts,
@@ -595,7 +598,12 @@ export async function seedQuestions(c: Container) {
 }
 
 /** A card image rendered from text and processed like an upload (dev seed only). */
-async function seedImage(c: Container, kind: 'flashcard' | 'cover', lines: string[], background: string) {
+async function seedImage(
+  c: Container,
+  kind: 'flashcard' | 'cover' | 'banner',
+  lines: string[],
+  background: string,
+) {
   const id = randomUUID();
   const texts = lines
     .map(
@@ -609,7 +617,7 @@ async function seedImage(c: Container, kind: 'flashcard' | 'cover', lines: strin
   await c.storage.put('private', storageKey, png, 'image/png');
   await c.db.insert(mediaFiles).values({
     id,
-    bucket: kind === 'cover' ? 'public' : 'private',
+    bucket: kind === 'flashcard' ? 'private' : 'public',
     storageKey,
     kind,
     mimeType: 'image/png',
@@ -862,6 +870,59 @@ export async function seedStudentContent(c: Container) {
   return result;
 }
 
+/**
+ * §40 Home: a banner opening Grade 12 Physics, the Grade 12 exam countdown, and a welcome
+ * announcement delivered to every student's inbox. Returns what was created.
+ */
+export async function seedHome(c: Container, queue: InlineQueue) {
+  const [admin] = await c.db.select().from(users).where(eq(users.email, 'seed-admin1@example.com'));
+  if (!admin) return { banners: 0, countdowns: 0, notifications: 0 };
+  const actor = { adminId: admin.id, ip: null };
+  const created = { banners: 0, countdowns: 0, notifications: 0 };
+  const [g12] = await c.db.select().from(educationLevels).where(eq(educationLevels.code, 'grade-12'));
+  const [physics] = await c.db.select().from(subjects).where(eq(subjects.code, 'g12-physics'));
+
+  const title = 'ابدأ مراجعة الفيزياء';
+  if (physics && !(await c.db.select().from(banners).where(eq(banners.titleAr, title))).length) {
+    const image = await seedImage(c, 'banner', ['فيزياء البكالوريا', 'ابدأ المراجعة الآن'], '#1e3a8a');
+    await c.home.createBanner(actor, {
+      titleAr: title,
+      imageMediaId: image,
+      action: 'subject',
+      actionTarget: physics.id,
+    });
+    created.banners++;
+  }
+  if (
+    g12 &&
+    !(await c.db.select().from(examCountdowns).where(eq(examCountdowns.educationLevelId, g12.id))).length
+  ) {
+    const year =
+      new Date().getUTCMonth() >= 6 ? new Date().getUTCFullYear() + 1 : new Date().getUTCFullYear();
+    await c.home.createCountdown(actor, {
+      educationLevelId: g12.id,
+      titleAr: 'امتحان الشهادة الثانوية',
+      examDate: `${year}-06-01`,
+    });
+    created.countdowns++;
+  }
+  const welcome = 'أهلاً بك في منصة بلينغو';
+  if (!(await c.db.select().from(notifications).where(eq(notifications.titleAr, welcome))).length) {
+    await c.notifications.create(actor, {
+      type: 'announcement',
+      titleAr: welcome,
+      bodyAr: 'ابدأ بمادة من موادك، وحدّد هدفك اليومي من الإعدادات.',
+      action: 'internal_route',
+      actionTarget: '/subjects',
+      targetType: 'all',
+      target: {},
+    });
+    await queue.drain(c.jobHandlers);
+    created.notifications++;
+  }
+  return created;
+}
+
 if (import.meta.url === `file://${process.argv[1]}`) {
   const env = loadEnv();
   const queue = new InlineQueue();
@@ -874,8 +935,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     const createdDecks = await seedFlashcards(c);
     const createdQuizzes = await seedLearning(c);
     await seedStudentContent(c);
+    await seedHome(c, queue);
     console.log(
-      `structure, teachers, access, questions, flashcards, quizzes and student decks seeded (${createdQuestions} new questions, ${createdDecks} new decks, ${createdQuizzes} new quizzes)`,
+      `structure, teachers, access, questions, flashcards, quizzes, student decks and home seeded (${createdQuestions} new questions, ${createdDecks} new decks, ${createdQuizzes} new quizzes)`,
     );
     console.log(`students: ${access.students.join(', ')} · admins: ${access.admins.join(', ')}`);
     console.log(`password for all seed accounts: ${SEED_PASSWORD} (admins enroll in 2FA at first login)`);

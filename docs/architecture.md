@@ -543,3 +543,32 @@ from Phase 1; Phase 2 adds the college hierarchy and admin CRUD.
   and resume at the next start. The "free space below size + 500 MB" warning and OS background
   transfers need platform plugins and device testing; both are Phase 13 work. The admin view of
   grading mismatches comes with question analytics (Phase 11).
+
+### ADR-020 — Home, daily goal, notifications and push (Phase 10)
+
+- **One Home call.** `GET /home` returns everything the Home tab shows (§19.1): greeting, unread
+  count, the nearest active exam countdown of the student's level, live banners, today's work,
+  resume items, active entitlements, subjects with free content, followed teachers and the active
+  mistake count. Offline, the tab falls back to links that work without a connection (review,
+  downloads).
+- **Banners** are admin-uploaded `banner` media in the public bucket. A banner is live when active
+  and inside its optional schedule; an optional education level narrows the audience. Tap actions
+  are validated on save (entity id, `https://` URL or an in-app path) and the app ignores any target
+  it cannot route, so a bad banner never strands a student. In-app actions use `go`, switching tabs.
+- **Daily goal and streak.** `user_daily_activity` counts graded answers (attempts and question
+  checks) and SRS ratings per business day (04:00 Asia/Damascus, like SRS). Each day keeps the goal
+  in force that day, so changing the goal never rewrites history. The streak counts consecutive days
+  with the goal met, ending today, or yesterday while today is still open.
+- **Notifications.** Admin notifications are stored once and fanned out by a pg-boss job into
+  `user_notifications` (the inbox) in batches; the job is idempotent. Consent (§20.2): announcements
+  and report outcomes always reach the inbox and push; learning notifications always reach the inbox
+  but push only with "التعلّم" on; promotions reach neither inbox nor push unless the student opted
+  in. Due-card reminders run hourly and send once per business day at the student's chosen hour.
+- **Push.** The API talks to FCM HTTP v1 directly with a service-account JWT (no SDK); unregistered
+  tokens are revoked. Without credentials a recording sender logs instead. The app registers its
+  token after sign-in and revokes it before sign-out. The device side is the `PushMessaging`
+  interface: builds without Firebase configuration use `NoPushMessaging` (inbox only). Wiring the
+  FCM plugin needs the release Firebase files and device testing, so it is Phase 13 work.
+- **Partial updates never default.** A `.default()` in an update schema filled omitted fields and
+  wiped a banner's action when toggling it; update schemas now carry no defaults, and a contracts
+  test enforces it.

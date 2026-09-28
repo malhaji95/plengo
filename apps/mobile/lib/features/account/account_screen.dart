@@ -84,6 +84,12 @@ class AccountScreen extends ConsumerWidget {
               onTap: () => context.go(Routes.offlineStorage),
             ),
           ListTile(
+            leading: const Icon(Icons.notifications_outlined),
+            title: const Text('الإشعارات والهدف اليومي'),
+            trailing: const Icon(Icons.chevron_left),
+            onTap: () => context.go(Routes.notificationSettings),
+          ),
+          ListTile(
             leading: const Icon(Icons.school_outlined),
             title: const Text('المرحلة التعليمية'),
             trailing: const Icon(Icons.chevron_left),

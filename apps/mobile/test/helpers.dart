@@ -19,11 +19,13 @@ import 'package:plengo/core/content/my_decks_repository.dart';
 import 'package:plengo/core/content/my_decks_store.dart';
 import 'package:plengo/core/content/question_repository.dart';
 import 'package:plengo/core/db/app_database.dart';
+import 'package:plengo/core/home/home_repository.dart';
 import 'package:plengo/core/learning/learning_repository.dart';
 import 'package:plengo/core/srs/srs_store.dart';
 import 'package:plengo/features/access/access_providers.dart';
 import 'package:plengo/features/flashcards/card_face.dart';
 import 'package:plengo/features/flashcards/flashcard_providers.dart';
+import 'package:plengo/features/home/home_providers.dart';
 import 'package:plengo/features/my_decks/card_editor_screen.dart';
 import 'package:plengo/features/offline/offline_providers.dart';
 import 'package:plengo/features/my_decks/my_decks_providers.dart';
@@ -50,6 +52,33 @@ class MockLearningRepository extends Mock implements LearningRepository {}
 class MockMyDecksRepository extends Mock implements MyDecksRepository {}
 
 class MockReportRepository extends Mock implements ReportRepository {}
+
+class MockHomeRepository extends Mock implements HomeRepository {}
+
+const noToday = Today(dueCards: 0, goal: 20, done: 0, goalMet: false, streak: 0);
+
+Home testHome({
+  List<ResumeItem> resume = const [],
+  Today today = noToday,
+  int unread = 0,
+  ExamCountdown? countdown,
+  List<HomeBanner> banners = const [],
+  List<MyEntitlement> myAccess = const [],
+  List<FreeSubject> freeSubjects = const [],
+  List<Teacher> followedTeachers = const [],
+  int activeMistakes = 0,
+}) => Home(
+  greetingName: 'سارة أحمد',
+  unreadNotifications: unread,
+  countdown: countdown,
+  banners: banners,
+  today: today,
+  resume: resume,
+  myAccess: myAccess,
+  freeSubjects: freeSubjects,
+  followedTeachers: followedTeachers,
+  activeMistakes: activeMistakes,
+);
 
 const noQuestions = ContentCount(total: 0, free: 0);
 
@@ -120,6 +149,8 @@ typedef PumpedApp = ({
   MockLearningRepository learning,
   MockMyDecksRepository myDecks,
   MockReportRepository reports,
+  MockHomeRepository home,
+  List<Uri> launched,
   AppDatabase db,
   ProviderContainer container,
 });
@@ -137,6 +168,7 @@ Future<PumpedApp> pumpApp(
   void Function(MockFlashcardRepository flashcards)? arrangeFlashcards,
   void Function(MockLearningRepository learning)? arrangeLearning,
   void Function(MockMyDecksRepository myDecks)? arrangeMyDecks,
+  void Function(MockHomeRepository home)? arrangeHome,
   int Function()? clock,
   RemoteConfig? config,
   Uint8List? pickedImage,
@@ -186,6 +218,12 @@ Future<PumpedApp> pumpApp(
   arrangeMyDecks?.call(myDecks);
   final reports = MockReportRepository();
 
+  // Home defaults to the learning mock's resume list so older tests keep driving "متابعة التعلم".
+  final home = MockHomeRepository();
+  when(() => home.home()).thenAnswer((_) async => testHome(resume: await learning.resume()));
+  arrangeHome?.call(home);
+  final launched = <Uri>[];
+
   final db = AppDatabase(NativeDatabase.memory());
   addTearDown(db.close);
   final container = ProviderContainer(
@@ -204,6 +242,9 @@ Future<PumpedApp> pumpApp(
       learningRepositoryProvider.overrideWithValue(learning),
       myDecksRepositoryProvider.overrideWithValue(myDecks),
       reportRepositoryProvider.overrideWithValue(reports),
+      homeRepositoryProvider.overrideWithValue(home),
+      bannerImageBuilderProvider.overrideWithValue((_, b) => Center(child: Text('banner:${b.titleAr}'))),
+      externalUrlLauncherProvider.overrideWithValue((uri) async => launched.add(uri)),
       imagePickProvider.overrideWithValue(({required camera, required maxSide}) async => pickedImage),
       // Offline packs are off unless a test turns them on (they need a scripted server).
       offlinePacksAvailableProvider.overrideWithValue(offlinePacks),
@@ -232,6 +273,8 @@ Future<PumpedApp> pumpApp(
     learning: learning,
     myDecks: myDecks,
     reports: reports,
+    home: home,
+    launched: launched,
     db: db,
     container: container,
   );

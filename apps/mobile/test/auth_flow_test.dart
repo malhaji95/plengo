@@ -103,6 +103,8 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('سارة أحمد'), findsOneWidget);
     await tester.scrollUntilVisible(find.text('تسجيل الخروج'), 100);
+    await tester.drag(find.byType(Scrollable).last, const Offset(0, -200));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('تسجيل الخروج'));
     await tester.pumpAndSettle();
     expect(find.byType(LoginScreen), findsOneWidget);

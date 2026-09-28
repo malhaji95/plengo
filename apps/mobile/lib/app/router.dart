@@ -19,7 +19,8 @@ import '../features/flashcards/decks_screen.dart';
 import '../features/flashcards/review_tab.dart';
 import '../features/flashcards/study_screen.dart';
 import '../features/bookmarks/saved_tab.dart';
-import '../features/learning/home_tab.dart';
+import '../features/home/home_tab.dart';
+import '../features/home/notification_screens.dart';
 import '../features/learning/mistakes_screen.dart';
 import '../features/learning/stats_screen.dart';
 import '../features/my_decks/card_editor_screen.dart';
@@ -50,6 +51,8 @@ abstract final class Routes {
   static const forgotPassword = '/forgot-password';
   static const resetPassword = '/reset-password';
   static const home = '/home';
+  static const notifications = '/notifications';
+  static const notificationSettings = '/account/notifications';
   static const subjects = '/subjects';
   static const review = '/review';
   static const saved = '/saved';
@@ -272,12 +275,14 @@ GoRouter buildRouter(Ref ref, {required bool couponRedemption}) {
                   GoRoute(path: 'following', builder: (_, _) => const FollowedTeachersScreen()),
                   GoRoute(path: 'access', builder: (_, _) => const MyAccessScreen()),
                   GoRoute(path: 'offline', builder: (_, _) => const OfflineStorageScreen()),
+                  GoRoute(path: 'notifications', builder: (_, _) => const NotificationSettingsScreen()),
                 ],
               ),
             ],
           ),
         ],
       ),
+      GoRoute(path: Routes.notifications, builder: (_, _) => const NotificationsScreen()),
       // Full-screen study modes (outside the tab shell).
       GoRoute(
         path: '${Routes.decks}/:id/browse',
