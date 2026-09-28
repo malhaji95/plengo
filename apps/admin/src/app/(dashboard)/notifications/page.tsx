@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { selectClass } from '@/components/access/scope-picker';
 import { FormError } from '@/components/form-error';
 import { ActionFields, actionBody } from '@/components/home/action-fields';
@@ -60,6 +60,9 @@ export default function NotificationsPage() {
   const [userIds, setUserIds] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [preview, setPreview] = useState<{ recipients: number; pushConsented: number } | null>(null);
+
+  useEffect(() => setPreview(null), [type, targetType, targetId, userIds]);
 
   const parsedUserIds = [...new Set(userIds.match(UUID) ?? [])].map((s) => s.toLowerCase());
   const targetReady =
@@ -89,11 +92,42 @@ export default function NotificationsPage() {
     }
   };
 
+  const previewCall = () =>
+    unwrap(
+      api.POST('/api/v1/admin/notifications/preview', { body: { type, targetType, target: targetBody() } }),
+    );
+
+  async function showPreview() {
+    setError(null);
+    try {
+      setPreview(await previewCall());
+    } catch (err) {
+      setError(errorMessage(err));
+    }
+  }
+
   async function send(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setNotice(null);
-    if (!window.confirm(`إرسال الإشعار إلى: ${TARGET_LABELS[targetType]}؟`)) return;
+    try {
+      // Always show who it will reach before sending (§26.2 targeting preview).
+      const counts = await previewCall();
+      setPreview(counts);
+      if (counts.recipients === 0) {
+        setError('لا يوجد مستلمون لهذا الاستهداف');
+        return;
+      }
+      if (
+        !window.confirm(
+          `سيصل الإشعار إلى ${counts.recipients} طالباً (${counts.pushConsented} منهم يقبلون الإشعارات الفورية). إرسال؟`,
+        )
+      )
+        return;
+    } catch (err) {
+      setError(errorMessage(err));
+      return;
+    }
     try {
       await unwrap(
         api.POST('/api/v1/admin/notifications', {
@@ -245,9 +279,24 @@ export default function NotificationsPage() {
               </div>
             ) : null}
           </div>
-          <Button type="submit" disabled={!title || !body || !targetReady}>
-            إرسال
-          </Button>
+          <div className="flex flex-wrap items-center gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={!targetReady}
+              onClick={() => void showPreview()}
+            >
+              معاينة المستلمين
+            </Button>
+            <Button type="submit" disabled={!title || !body || !targetReady}>
+              إرسال
+            </Button>
+            {preview ? (
+              <span className="text-sm text-muted">
+                {preview.recipients} مستلم · {preview.pushConsented} إشعار فوري
+              </span>
+            ) : null}
+          </div>
           {notice ? <p className="text-sm text-success">{notice}</p> : null}
         </form>
       </Card>

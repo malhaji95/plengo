@@ -6,6 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { selectClass } from '@/components/access/scope-picker';
 import { FormError } from '@/components/form-error';
+import { BulkUpload } from '@/components/flashcards/bulk-upload';
 import { ImageUpload, uploadImage } from '@/components/image-upload';
 import { PlacementPicker, type Placement } from '@/components/questions/placement-picker';
 import { Button } from '@/components/ui/button';
@@ -147,6 +148,7 @@ export default function DeckPage() {
       <Card className="space-y-3">
         <h2 className="font-semibold">البطاقات ({list.length})</h2>
         <NewCard deckId={id} onCreated={() => void run(async () => {})} />
+        <BulkUpload deckId={id} onDone={() => void run(async () => {})} />
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {list.map((c, i) => (
             <CardTile

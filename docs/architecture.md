@@ -572,3 +572,34 @@ from Phase 1; Phase 2 adds the college hierarchy and admin CRUD.
 - **Partial updates never default.** A `.default()` in an update schema filled omitted fields and
   wiped a banner's action when toggling it; update schemas now carry no defaults, and a contracts
   test enforces it.
+
+### ADR-021 — Admin productivity (Phase 11)
+
+- **Bulk import** (§27) is a two-step job. The upload (≤ 5 MB, base64 in JSON, ≤ 2000 rows) is
+  stored on `import_jobs`; the `imports.parse` job reads CSV or XLSX, resolves every code (level,
+  subject, unit, lesson, track slug) and validates each row, writing Arabic per-row errors to
+  `import_errors` and the resolved rows to the job. The preview shows both. **A file with any error
+  cannot be imported**: the admin fixes the file and uploads it again, so a partial import never
+  happens. Confirm queues `imports.commit`, which re-resolves the codes (the structure may have
+  changed), then inserts every question, the job's completion and the audit entry in one
+  transaction. Imported questions are drafts or published; blank `is_free_override` follows the free
+  rule (recomputed for each touched scope), a value becomes a manual override. Export writes the
+  same layout, so an export re-imports unchanged (formula-looking cells are neutralised on export and
+  restored on import).
+- **No spreadsheet dependency.** CSV and XLSX are read by small in-house readers (RFC 4180, a ZIP
+  central-directory reader with shared/inline strings) next to the existing writers. Entry and total
+  sizes are capped before and during inflation (zip bombs).
+- **Flashcard bulk upload** pairs files by prefix in the browser (`001-front.png`/`001-back.png`,
+  `_a`/`_b`, أمامي/خلفي; single-letter markers need a separator), reads ZIPs with the platform's
+  `DecompressionStream`, lets the admin correct the grid, uploads each image through the normal
+  presigned flow (processing is the media job), then appends all pairs in one request and one deck
+  version bump. Free status stays a deck setting.
+- **Question analytics** read `question_stats` (maintained by graded attempts), open reports and
+  offline grading mismatches. The auto-flag rule is unchanged (≥ 30 attempts; < 20% correct or a wrong
+  option chosen more than the right one); clearing a flag is audited and stores the attempt count,
+  so the rule looks again only after 30 further attempts.
+- **Audit log** is listed newest first with actor, exact action or `prefix.` filter, resource and
+  Damascus-day range. **Global search** queries each entity type with escaped ILIKE (a UUID also
+  matches ids) and reuses coupon lookup by full code (hash) or last four.
+- **Notification preview** (§26.2, missed in Phase 10) counts recipients and push consent with the
+  same audience and consent rules as the fan-out; the admin sees the numbers before confirming.

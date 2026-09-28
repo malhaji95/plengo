@@ -4,6 +4,7 @@ import { LogOut, Menu } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { createContext, useContext, useEffect, useState } from 'react';
+import { GlobalSearch } from '@/components/global-search';
 import { Button } from '@/components/ui/button';
 import { api, ApiError, unwrap } from '@/lib/api';
 import { CURRENT_PHASE, NAV_ITEMS } from '@/lib/nav';
@@ -77,7 +78,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </aside>
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="flex h-14 items-center justify-between border-b border-border bg-surface px-4">
+          <header className="flex h-14 items-center justify-between gap-3 border-b border-border bg-surface px-4">
             <Button
               variant="ghost"
               size="sm"
@@ -87,8 +88,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             >
               <Menu className="size-5" />
             </Button>
+            <GlobalSearch />
             <div className="ms-auto flex items-center gap-3 text-sm">
-              <span className="text-muted">{admin.fullName}</span>
+              <span className="hidden text-muted sm:inline">{admin.fullName}</span>
               <Button variant="outline" size="sm" onClick={logout}>
                 <LogOut className="size-4" aria-hidden />
                 خروج

@@ -320,12 +320,17 @@ describe('notifications (§20.2)', () => {
     fireEvent.change(screen.getByLabelText('النص'), { target: { value: 'عرض لطلاب البكالوريا' } });
     fireEvent.change(screen.getByLabelText('المستلمون'), { target: { value: 'level' } });
     replies.set('POST /api/v1/admin/notifications', ok({ id: 'n2' }));
+    replies.set('POST /api/v1/admin/notifications/preview', ok({ recipients: 40, pushConsented: 25 }));
     const send = screen.getByRole('button', { name: 'إرسال' }) as HTMLButtonElement;
     expect(send.disabled).toBe(true);
     fireEvent.change(screen.getByLabelText('مرحلة تعليمية'), { target: { value: 'l12' } });
     fireEvent.click(send);
-    await waitFor(() => expect(calls.some((c) => c.method === 'POST')).toBe(true));
-    expect(calls.find((c) => c.method === 'POST')?.init?.body).toEqual({
+    await waitFor(() =>
+      expect(calls.some((c) => c.path === '/api/v1/admin/notifications' && c.method === 'POST')).toBe(true),
+    );
+    expect(
+      calls.find((c) => c.path === '/api/v1/admin/notifications' && c.method === 'POST')?.init?.body,
+    ).toEqual({
       type: 'promotion',
       titleAr: 'خصم',
       bodyAr: 'عرض لطلاب البكالوريا',
@@ -335,6 +340,32 @@ describe('notifications (§20.2)', () => {
       target: { educationLevelId: 'l12' },
     });
     expect(await screen.findByText('تمت جدولة الإرسال')).toBeTruthy();
+    // The recipient count is shown and confirmed before sending (§26.2).
+    expect(calls.find((c) => c.path === '/api/v1/admin/notifications/preview')?.init?.body).toEqual({
+      type: 'promotion',
+      targetType: 'level',
+      target: { educationLevelId: 'l12' },
+    });
+    expect(vi.mocked(window.confirm).mock.calls.at(-1)?.[0]).toContain('40 طالباً (25');
+    expect(screen.getByText('40 مستلم · 25 إشعار فوري')).toBeTruthy();
+  });
+
+  it('does not send when the target reaches nobody', async () => {
+    for (const path of ['levels', 'subjects', 'teacher-tracks', 'teachers']) {
+      replies.set(`GET /api/v1/admin/${path}`, ok([{ id: 'x1', code: 'x', nameAr: 'س', titleAr: 'س' }]));
+    }
+    replies.set('GET /api/v1/admin/notifications', ok({ items: [], nextCursor: null }));
+    replies.set('POST /api/v1/admin/notifications/preview', ok({ recipients: 0, pushConsented: 0 }));
+    const { default: NotificationsPage } = await import('@/app/(dashboard)/notifications/page');
+    render(<NotificationsPage />);
+    await screen.findByText('لم تُرسل إشعارات بعد');
+    fireEvent.change(screen.getByLabelText('العنوان'), { target: { value: 'تنبيه' } });
+    fireEvent.change(screen.getByLabelText('النص'), { target: { value: 'نص' } });
+    fireEvent.click(screen.getByRole('button', { name: 'معاينة المستلمين' }));
+    expect(await screen.findByText('0 مستلم · 0 إشعار فوري')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'إرسال' }));
+    expect(await screen.findByText('لا يوجد مستلمون لهذا الاستهداف')).toBeTruthy();
+    expect(calls.some((c) => c.method === 'POST' && c.path === '/api/v1/admin/notifications')).toBe(false);
   });
 
   it('parses pasted student ids and reports API validation errors', async () => {
@@ -343,6 +374,7 @@ describe('notifications (§20.2)', () => {
     }
     replies.set('GET /api/v1/admin/notifications', ok({ items: [], nextCursor: null }));
     replies.set('POST /api/v1/admin/notifications', fail('VALIDATION_ERROR', 'البيانات المدخلة غير صحيحة'));
+    replies.set('POST /api/v1/admin/notifications/preview', ok({ recipients: 2, pushConsented: 2 }));
     const { default: NotificationsPage } = await import('@/app/(dashboard)/notifications/page');
     render(<NotificationsPage />);
     await screen.findByText('لم تُرسل إشعارات بعد');
@@ -357,7 +389,9 @@ describe('notifications (§20.2)', () => {
     fireEvent.change(screen.getByLabelText('الوجهة'), { target: { value: '/home/review' } });
     fireEvent.click(screen.getByRole('button', { name: 'إرسال' }));
     expect(await screen.findByText('البيانات المدخلة غير صحيحة')).toBeTruthy();
-    expect(calls.find((c) => c.method === 'POST')?.init?.body).toMatchObject({
+    expect(
+      calls.find((c) => c.path === '/api/v1/admin/notifications' && c.method === 'POST')?.init?.body,
+    ).toMatchObject({
       action: 'internal_route',
       actionTarget: '/home/review',
       targetType: 'students',
