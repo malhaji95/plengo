@@ -10,10 +10,14 @@ part 'me_envelope.g.dart';
 
 @JsonSerializable()
 class MeEnvelope {
-  const MeEnvelope({required this.success, required this.data, required this.error});
-
+  const MeEnvelope({
+    required this.success,
+    required this.data,
+    required this.error,
+  });
+  
   factory MeEnvelope.fromJson(Map<String, Object?> json) => _$MeEnvelopeFromJson(json);
-
+  
   final bool success;
   final Me data;
   final dynamic error;

@@ -20,9 +20,9 @@ class TeacherTrack {
     required this.description,
     required this.coverUrl,
   });
-
+  
   factory TeacherTrack.fromJson(Map<String, Object?> json) => _$TeacherTrackFromJson(json);
-
+  
   final String id;
   final String teacherId;
   final String teacherNameAr;

@@ -15,9 +15,9 @@ class SubmitAnswer {
     this.timeSpentMs,
     this.flagged,
   });
-
+  
   factory SubmitAnswer.fromJson(Map<String, Object?> json) => _$SubmitAnswerFromJson(json);
-
+  
   final String questionId;
   @JsonKey(includeIfNull: false)
   final String? selectedOptionId;

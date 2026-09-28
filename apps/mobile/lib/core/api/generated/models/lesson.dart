@@ -16,9 +16,9 @@ class Lesson {
     required this.titleAr,
     required this.sortOrder,
   });
-
+  
   factory Lesson.fromJson(Map<String, Object?> json) => _$LessonFromJson(json);
-
+  
   final String id;
   final String subjectId;
   @JsonKey(includeIfNull: true)

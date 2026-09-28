@@ -18,14 +18,15 @@ UnitProgress _$UnitProgressFromJson(Map<String, dynamic> json) => UnitProgress(
   unitId: json['unitId'] as String,
 );
 
-Map<String, dynamic> _$UnitProgressToJson(UnitProgress instance) => <String, dynamic>{
-  'questionsAttempted': instance.questionsAttempted,
-  'questionsCorrect': instance.questionsCorrect,
-  'questionsTotal': instance.questionsTotal,
-  'quizzesCompleted': instance.quizzesCompleted,
-  'quizzesTotal': instance.quizzesTotal,
-  'flashcardsStudied': instance.flashcardsStudied,
-  'flashcardsTotal': instance.flashcardsTotal,
-  'completionPercent': instance.completionPercent,
-  'unitId': instance.unitId,
-};
+Map<String, dynamic> _$UnitProgressToJson(UnitProgress instance) =>
+    <String, dynamic>{
+      'questionsAttempted': instance.questionsAttempted,
+      'questionsCorrect': instance.questionsCorrect,
+      'questionsTotal': instance.questionsTotal,
+      'quizzesCompleted': instance.quizzesCompleted,
+      'quizzesTotal': instance.quizzesTotal,
+      'flashcardsStudied': instance.flashcardsStudied,
+      'flashcardsTotal': instance.flashcardsTotal,
+      'completionPercent': instance.completionPercent,
+      'unitId': instance.unitId,
+    };

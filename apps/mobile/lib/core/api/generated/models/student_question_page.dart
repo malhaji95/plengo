@@ -16,9 +16,9 @@ class StudentQuestionPage {
     required this.totalCount,
     required this.accessibleCount,
   });
-
+  
   factory StudentQuestionPage.fromJson(Map<String, Object?> json) => _$StudentQuestionPageFromJson(json);
-
+  
   final List<StudentQuestion> items;
   @JsonKey(includeIfNull: true)
   final String? nextCursor;

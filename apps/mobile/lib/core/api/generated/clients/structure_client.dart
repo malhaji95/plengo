@@ -27,10 +27,14 @@ abstract class StructureClient {
   Future<UniversityListEnvelope> listUniversities();
 
   @GET('/api/v1/faculties')
-  Future<FacultyListEnvelope> listFaculties({@Query('universityId') required String universityId});
+  Future<FacultyListEnvelope> listFaculties({
+    @Query('universityId') required String universityId,
+  });
 
   @GET('/api/v1/academic-years')
-  Future<AcademicYearListEnvelope> listAcademicYears({@Query('facultyId') required String facultyId});
+  Future<AcademicYearListEnvelope> listAcademicYears({
+    @Query('facultyId') required String facultyId,
+  });
 
   @GET('/api/v1/subjects')
   Future<SubjectListEnvelope> listSubjects({
@@ -41,11 +45,17 @@ abstract class StructureClient {
   });
 
   @GET('/api/v1/subjects/{id}')
-  Future<SubjectOutlineEnvelope> getSubjectOutline({@Path('id') required String id});
+  Future<SubjectOutlineEnvelope> getSubjectOutline({
+    @Path('id') required String id,
+  });
 
   @GET('/api/v1/units/{id}')
-  Future<UnitWithLessonsEnvelope> getUnit({@Path('id') required String id});
+  Future<UnitWithLessonsEnvelope> getUnit({
+    @Path('id') required String id,
+  });
 
   @GET('/api/v1/lessons/{id}')
-  Future<LessonEnvelope> getLesson({@Path('id') required String id});
+  Future<LessonEnvelope> getLesson({
+    @Path('id') required String id,
+  });
 }

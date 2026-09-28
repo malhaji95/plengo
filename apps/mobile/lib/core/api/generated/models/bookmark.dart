@@ -27,9 +27,9 @@ class Bookmark {
     required this.deck,
     required this.card,
   });
-
+  
   factory Bookmark.fromJson(Map<String, Object?> json) => _$BookmarkFromJson(json);
-
+  
   final String id;
   final BookmarkItemType itemType;
   final String itemId;

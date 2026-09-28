@@ -18,9 +18,9 @@ class TeacherDetail {
     required this.isFollowing,
     required this.bio,
   });
-
+  
   factory TeacherDetail.fromJson(Map<String, Object?> json) => _$TeacherDetailFromJson(json);
-
+  
   final String id;
   final String nameAr;
   final String slug;

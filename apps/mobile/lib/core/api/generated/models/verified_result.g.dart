@@ -9,6 +9,5 @@ part of 'verified_result.dart';
 VerifiedResult _$VerifiedResultFromJson(Map<String, dynamic> json) =>
     VerifiedResult(verified: json['verified'] as bool);
 
-Map<String, dynamic> _$VerifiedResultToJson(VerifiedResult instance) => <String, dynamic>{
-  'verified': instance.verified,
-};
+Map<String, dynamic> _$VerifiedResultToJson(VerifiedResult instance) =>
+    <String, dynamic>{'verified': instance.verified};

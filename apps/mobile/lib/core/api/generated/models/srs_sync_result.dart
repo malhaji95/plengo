@@ -10,10 +10,14 @@ part 'srs_sync_result.g.dart';
 
 @JsonSerializable()
 class SrsSyncResult {
-  const SrsSyncResult({required this.acceptedLogs, required this.appliedStates, required this.states});
-
+  const SrsSyncResult({
+    required this.acceptedLogs,
+    required this.appliedStates,
+    required this.states,
+  });
+  
   factory SrsSyncResult.fromJson(Map<String, Object?> json) => _$SrsSyncResultFromJson(json);
-
+  
   final int acceptedLogs;
   final int appliedStates;
   final List<SrsCardState> states;

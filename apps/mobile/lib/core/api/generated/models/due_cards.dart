@@ -10,10 +10,13 @@ part 'due_cards.g.dart';
 
 @JsonSerializable()
 class DueCards {
-  const DueCards({required this.cards, required this.urlsExpireAt});
-
+  const DueCards({
+    required this.cards,
+    required this.urlsExpireAt,
+  });
+  
   factory DueCards.fromJson(Map<String, Object?> json) => _$DueCardsFromJson(json);
-
+  
   final List<DueCard> cards;
   final String urlsExpireAt;
 

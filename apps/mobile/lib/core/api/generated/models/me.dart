@@ -22,9 +22,9 @@ class Me {
     required this.academicYearId,
     required this.avatarUrl,
   });
-
+  
   factory Me.fromJson(Map<String, Object?> json) => _$MeFromJson(json);
-
+  
   final String id;
   final String email;
   final bool emailVerified;

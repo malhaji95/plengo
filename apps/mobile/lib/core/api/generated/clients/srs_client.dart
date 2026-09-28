@@ -17,11 +17,18 @@ abstract class SrsClient {
   factory SrsClient(Dio dio, {String? baseUrl}) = _SrsClient;
 
   @GET('/api/v1/srs/states')
-  Future<SrsStatesPageEnvelope> listSrsStates({@Query('limit') int? limit = 500, @Query('since') String? since});
+  Future<SrsStatesPageEnvelope> listSrsStates({
+    @Query('limit') int? limit = 500,
+    @Query('since') String? since,
+  });
 
   @POST('/api/v1/srs/sync')
-  Future<SrsSyncResultEnvelope> syncSrs({@Body() required SrsSyncRequest body});
+  Future<SrsSyncResultEnvelope> syncSrs({
+    @Body() required SrsSyncRequest body,
+  });
 
   @GET('/api/v1/srs/due')
-  Future<DueCardsEnvelope> listDueCards({@Query('subjectId') String? subjectId});
+  Future<DueCardsEnvelope> listDueCards({
+    @Query('subjectId') String? subjectId,
+  });
 }

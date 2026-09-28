@@ -8,10 +8,15 @@ part 'save_answer_request.g.dart';
 
 @JsonSerializable()
 class SaveAnswerRequest {
-  const SaveAnswerRequest({this.selectedOptionId, this.writtenAnswer, this.timeSpentMs, this.flagged});
-
+  const SaveAnswerRequest({
+    this.selectedOptionId,
+    this.writtenAnswer,
+    this.timeSpentMs,
+    this.flagged,
+  });
+  
   factory SaveAnswerRequest.fromJson(Map<String, Object?> json) => _$SaveAnswerRequestFromJson(json);
-
+  
   @JsonKey(includeIfNull: false)
   final String? selectedOptionId;
   @JsonKey(includeIfNull: false)

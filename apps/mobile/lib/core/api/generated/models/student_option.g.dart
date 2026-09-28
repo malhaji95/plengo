@@ -9,7 +9,5 @@ part of 'student_option.dart';
 StudentOption _$StudentOptionFromJson(Map<String, dynamic> json) =>
     StudentOption(id: json['id'] as String, text: json['text'] as String);
 
-Map<String, dynamic> _$StudentOptionToJson(StudentOption instance) => <String, dynamic>{
-  'id': instance.id,
-  'text': instance.text,
-};
+Map<String, dynamic> _$StudentOptionToJson(StudentOption instance) =>
+    <String, dynamic>{'id': instance.id, 'text': instance.text};

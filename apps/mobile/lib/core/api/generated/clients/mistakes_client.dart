@@ -29,5 +29,7 @@ abstract class MistakesClient {
   });
 
   @DELETE('/api/v1/mistakes/{questionId}')
-  Future<DeletedResultEnvelope> removeMistake({@Path('questionId') required String questionId});
+  Future<DeletedResultEnvelope> removeMistake({
+    @Path('questionId') required String questionId,
+  });
 }

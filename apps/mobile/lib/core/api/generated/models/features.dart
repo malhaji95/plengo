@@ -15,9 +15,9 @@ class Features {
     required this.streaks,
     required this.contentReports,
   });
-
+  
   factory Features.fromJson(Map<String, Object?> json) => _$FeaturesFromJson(json);
-
+  
   final bool teacherFollowing;
   final bool randomPractice;
   final bool studentDecks;

@@ -10,10 +10,13 @@ part 'bookmark_key.g.dart';
 
 @JsonSerializable()
 class BookmarkKey {
-  const BookmarkKey({required this.itemType, required this.itemId});
-
+  const BookmarkKey({
+    required this.itemType,
+    required this.itemId,
+  });
+  
   factory BookmarkKey.fromJson(Map<String, Object?> json) => _$BookmarkKeyFromJson(json);
-
+  
   final BookmarkItemType itemType;
   final String itemId;
 

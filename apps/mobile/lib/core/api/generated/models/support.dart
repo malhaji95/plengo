@@ -8,10 +8,13 @@ part 'support.g.dart';
 
 @JsonSerializable()
 class Support {
-  const Support({required this.email, required this.whatsapp});
-
+  const Support({
+    required this.email,
+    required this.whatsapp,
+  });
+  
   factory Support.fromJson(Map<String, Object?> json) => _$SupportFromJson(json);
-
+  
   final String email;
   final String whatsapp;
 

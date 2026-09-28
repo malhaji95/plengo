@@ -18,5 +18,7 @@ abstract class MeClient {
   Future<MeEnvelope> getMe();
 
   @PATCH('/api/v1/me')
-  Future<MeEnvelope> updateMe({@Body() required UpdateProfileRequest body});
+  Future<MeEnvelope> updateMe({
+    @Body() required UpdateProfileRequest body,
+  });
 }

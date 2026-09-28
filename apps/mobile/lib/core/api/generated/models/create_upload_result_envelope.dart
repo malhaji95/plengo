@@ -10,10 +10,14 @@ part 'create_upload_result_envelope.g.dart';
 
 @JsonSerializable()
 class CreateUploadResultEnvelope {
-  const CreateUploadResultEnvelope({required this.success, required this.data, required this.error});
-
+  const CreateUploadResultEnvelope({
+    required this.success,
+    required this.data,
+    required this.error,
+  });
+  
   factory CreateUploadResultEnvelope.fromJson(Map<String, Object?> json) => _$CreateUploadResultEnvelopeFromJson(json);
-
+  
   final bool success;
   final CreateUploadResult data;
   final dynamic error;

@@ -6,25 +6,27 @@ part of 'my_entitlement.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-MyEntitlement _$MyEntitlementFromJson(Map<String, dynamic> json) => MyEntitlement(
-  id: json['id'] as String,
-  scope: AccessScope.fromJson(json['scope'] as Map<String, dynamic>),
-  source: $enumDecode(_$MyEntitlementSourceEnumMap, json['source']),
-  startsAt: json['startsAt'] as String,
-  expiresAt: json['expiresAt'] as String?,
-  isPermanent: json['isPermanent'] as bool,
-  state: $enumDecode(_$MyEntitlementStateEnumMap, json['state']),
-);
+MyEntitlement _$MyEntitlementFromJson(Map<String, dynamic> json) =>
+    MyEntitlement(
+      id: json['id'] as String,
+      scope: AccessScope.fromJson(json['scope'] as Map<String, dynamic>),
+      source: $enumDecode(_$MyEntitlementSourceEnumMap, json['source']),
+      startsAt: json['startsAt'] as String,
+      expiresAt: json['expiresAt'] as String?,
+      isPermanent: json['isPermanent'] as bool,
+      state: $enumDecode(_$MyEntitlementStateEnumMap, json['state']),
+    );
 
-Map<String, dynamic> _$MyEntitlementToJson(MyEntitlement instance) => <String, dynamic>{
-  'id': instance.id,
-  'scope': instance.scope,
-  'source': instance.source,
-  'startsAt': instance.startsAt,
-  'expiresAt': instance.expiresAt,
-  'isPermanent': instance.isPermanent,
-  'state': instance.state,
-};
+Map<String, dynamic> _$MyEntitlementToJson(MyEntitlement instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'scope': instance.scope,
+      'source': instance.source,
+      'startsAt': instance.startsAt,
+      'expiresAt': instance.expiresAt,
+      'isPermanent': instance.isPermanent,
+      'state': instance.state,
+    };
 
 const _$MyEntitlementSourceEnumMap = {
   MyEntitlementSource.coupon: 'coupon',

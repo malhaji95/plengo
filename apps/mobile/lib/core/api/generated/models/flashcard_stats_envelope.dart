@@ -10,10 +10,14 @@ part 'flashcard_stats_envelope.g.dart';
 
 @JsonSerializable()
 class FlashcardStatsEnvelope {
-  const FlashcardStatsEnvelope({required this.success, required this.data, required this.error});
-
+  const FlashcardStatsEnvelope({
+    required this.success,
+    required this.data,
+    required this.error,
+  });
+  
   factory FlashcardStatsEnvelope.fromJson(Map<String, Object?> json) => _$FlashcardStatsEnvelopeFromJson(json);
-
+  
   final bool success;
   final FlashcardStats data;
   final dynamic error;

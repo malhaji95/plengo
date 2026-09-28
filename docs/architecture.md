@@ -438,3 +438,34 @@ from Phase 1; Phase 2 adds the college hierarchy and admin CRUD.
   sync) is idempotent and the server returns the same result. Phase 12 revisits web persistence.
 - **Generated enums** in the Dart client use `enums_to_json`, so enum path and query parameters
   are sent as their JSON values (`user_card`, not `userCard`).
+  Because of this, a generated model's `toJson()` holds enum objects rather than strings; code that
+  converts generated models into local ones (for example `FlashcardRepository.cardStateOf`) maps
+  field by field instead of round-tripping through JSON.
+
+### ADR-017 — Requirements audit of phases 1–7
+
+- **Admin accounts** (§26.1) are managed in the admin UI: create, deactivate, reactivate and reset
+  2FA. The last active admin cannot be deactivated. An admin cannot reset their own 2FA. Every
+  change revokes the target's sessions and is audited. Student sessions can be revoked and recent
+  attempts viewed from the student page.
+- **Remote config** (`minSupportedVersion`, `latestVersion`, store URLs) and the mastery streak are
+  edited under Settings. The app's force-update screen links to the store, or reloads the page on web.
+- **Client IP**: only `TRUST_PROXY_HOPS` proxies are trusted. Sessions keep an IP hash and a
+  200-character user-agent summary, never the raw IP (Better Auth IP tracking is off).
+- **OTP emails** are limited to 5 per hour per address across register, resend and reset (one shared
+  in-process `WindowLimiter`, ADR-006). Coupon redemptions are serialized per student in-process, so
+  a burst cannot get past the failed-attempt limit.
+- **Lists that can grow** (mistakes, bookmarks, student search, batch coupons) use the offset
+  cursors from the question bank. A student's session list is bounded by the session lifetime, so
+  it is not paginated.
+- **Integrity**: time totals are `bigint` and each answer adds at most 30 minutes. Starting an
+  attempt locks the (student, quiz) pair so `max_attempts` holds under concurrency. The stateless
+  question check is refused while the question is in an open exam. Publishing, unpublishing or
+  deleting a question bumps every quiz containing it. SRS sync only moves the resume pointer for
+  decks the student can open.
+- **Images** meet the §12 size budgets. The full variant lowers its quality until it fits (never
+  below 45). Avatars are a media kind (400 px / 120 px); the API accepts and signs them now, and the
+  app's avatar picker comes with Phase 8.
+- **Services** reach the database only through repositories (`access-service` is the remaining
+  exception and moves with Phase 8).
+- **Admin tests** run in CI with Vitest + Testing Library (jsdom).

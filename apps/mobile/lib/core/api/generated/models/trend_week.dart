@@ -14,9 +14,9 @@ class TrendWeek {
     required this.accuracyPercent,
     required this.weekStart,
   });
-
+  
   factory TrendWeek.fromJson(Map<String, Object?> json) => _$TrendWeekFromJson(json);
-
+  
   final int answered;
   final int correct;
   @JsonKey(includeIfNull: true)

@@ -16,9 +16,15 @@ Bookmark _$BookmarkFromJson(Map<String, dynamic> json) => Bookmark(
   titleAr: json['titleAr'] as String?,
   subjectId: json['subjectId'] as String?,
   subjectNameAr: json['subjectNameAr'] as String?,
-  question: json['question'] == null ? null : StudentQuestion.fromJson(json['question'] as Map<String, dynamic>),
-  deck: json['deck'] == null ? null : StudentDeck.fromJson(json['deck'] as Map<String, dynamic>),
-  card: json['card'] == null ? null : StudentCard.fromJson(json['card'] as Map<String, dynamic>),
+  question: json['question'] == null
+      ? null
+      : StudentQuestion.fromJson(json['question'] as Map<String, dynamic>),
+  deck: json['deck'] == null
+      ? null
+      : StudentDeck.fromJson(json['deck'] as Map<String, dynamic>),
+  card: json['card'] == null
+      ? null
+      : StudentCard.fromJson(json['card'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$BookmarkToJson(Bookmark instance) => <String, dynamic>{

@@ -26,9 +26,9 @@ class ScopeProgress {
     required this.units,
     required this.lessons,
   });
-
+  
   factory ScopeProgress.fromJson(Map<String, Object?> json) => _$ScopeProgressFromJson(json);
-
+  
   final int questionsAttempted;
   final int questionsCorrect;
   final int questionsTotal;

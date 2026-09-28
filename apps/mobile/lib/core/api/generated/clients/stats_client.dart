@@ -20,10 +20,14 @@ abstract class StatsClient {
   Future<StatsOverviewEnvelope> getStatsOverview();
 
   @GET('/api/v1/stats/subjects/{id}')
-  Future<SubjectStatsEnvelope> getSubjectStats({@Path('id') required String id});
+  Future<SubjectStatsEnvelope> getSubjectStats({
+    @Path('id') required String id,
+  });
 
   @GET('/api/v1/stats/trend')
-  Future<StatsTrendEnvelope> getStatsTrend({@Query('weeks') int? weeks = 12});
+  Future<StatsTrendEnvelope> getStatsTrend({
+    @Query('weeks') int? weeks = 12,
+  });
 
   @GET('/api/v1/stats/flashcards')
   Future<FlashcardStatsEnvelope> getFlashcardStats();

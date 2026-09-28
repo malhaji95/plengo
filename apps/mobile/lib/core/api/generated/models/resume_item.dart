@@ -25,9 +25,9 @@ class ResumeItem {
     required this.attemptId,
     required this.lastActivityAt,
   });
-
+  
   factory ResumeItem.fromJson(Map<String, Object?> json) => _$ResumeItemFromJson(json);
-
+  
   final String subjectId;
   final String subjectNameAr;
   @JsonKey(includeIfNull: true)

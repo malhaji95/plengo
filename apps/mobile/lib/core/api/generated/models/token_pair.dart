@@ -14,9 +14,9 @@ class TokenPair {
     required this.refreshToken,
     required this.refreshTokenExpiresAt,
   });
-
+  
   factory TokenPair.fromJson(Map<String, Object?> json) => _$TokenPairFromJson(json);
-
+  
   final String accessToken;
   final DateTime accessTokenExpiresAt;
   final String refreshToken;

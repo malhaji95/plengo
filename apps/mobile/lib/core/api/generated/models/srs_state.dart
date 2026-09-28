@@ -20,9 +20,9 @@ class SrsState {
     required this.lapses,
     required this.lastReviewedAt,
   });
-
+  
   factory SrsState.fromJson(Map<String, Object?> json) => _$SrsStateFromJson(json);
-
+  
   final SrsStateState state;
   final int step;
   final DateTime dueAt;

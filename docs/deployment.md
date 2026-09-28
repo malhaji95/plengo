@@ -40,4 +40,32 @@ refuses to start otherwise. Secrets: `BETTER_AUTH_SECRET`, `MOBILE_ACCESS_JWT_SE
 `COUPON_ENCRYPTION_KEY` (32 random bytes, base64: `openssl rand -base64 32`), R2 keys, email API key.
 Never rotate the coupon secrets on a live system: existing codes stop matching and exports fail.
 
+`TRUST_PROXY_HOPS` (default 1) is the number of proxies in front of the API that append to
+`X-Forwarded-For` (Caddy alone: 1; Cloudflare → Caddy: 2). Only those hops are trusted, so a client
+cannot spoof its IP for rate limits. HSTS is sent by the API when `APP_ENV` is `staging` or
+`production`, and by the admin in production builds. Admin error reporting uses
+`NEXT_PUBLIC_SENTRY_DSN` (optional).
+
+### R2 CORS (spec §12.7)
+
+`media-private` (uploads are presigned `PUT`s straight from the browser):
+
+```json
+[
+  {
+    "AllowedOrigins": ["https://admin.<domain>", "https://app.<domain>"],
+    "AllowedMethods": ["PUT"],
+    "AllowedHeaders": ["content-type"],
+    "MaxAgeSeconds": 3600
+  },
+  {
+    "AllowedOrigins": ["https://app.<domain>"],
+    "AllowedMethods": ["GET"],
+    "MaxAgeSeconds": 3600
+  }
+]
+```
+
+`media-public`: `GET` from any origin (`"AllowedOrigins": ["*"], "AllowedMethods": ["GET"]`).
+
 Backups and the restore drill are Phase 13 (spec §35).

@@ -10,10 +10,14 @@ part 'media_file_envelope.g.dart';
 
 @JsonSerializable()
 class MediaFileEnvelope {
-  const MediaFileEnvelope({required this.success, required this.data, required this.error});
-
+  const MediaFileEnvelope({
+    required this.success,
+    required this.data,
+    required this.error,
+  });
+  
   factory MediaFileEnvelope.fromJson(Map<String, Object?> json) => _$MediaFileEnvelopeFromJson(json);
-
+  
   final bool success;
   final MediaFile data;
   final dynamic error;

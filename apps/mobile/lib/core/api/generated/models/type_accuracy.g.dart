@@ -13,12 +13,13 @@ TypeAccuracy _$TypeAccuracyFromJson(Map<String, dynamic> json) => TypeAccuracy(
   type: $enumDecode(_$TypeAccuracyTypeEnumMap, json['type']),
 );
 
-Map<String, dynamic> _$TypeAccuracyToJson(TypeAccuracy instance) => <String, dynamic>{
-  'answered': instance.answered,
-  'correct': instance.correct,
-  'accuracyPercent': instance.accuracyPercent,
-  'type': instance.type,
-};
+Map<String, dynamic> _$TypeAccuracyToJson(TypeAccuracy instance) =>
+    <String, dynamic>{
+      'answered': instance.answered,
+      'correct': instance.correct,
+      'accuracyPercent': instance.accuracyPercent,
+      'type': instance.type,
+    };
 
 const _$TypeAccuracyTypeEnumMap = {
   TypeAccuracyType.mcq: 'mcq',

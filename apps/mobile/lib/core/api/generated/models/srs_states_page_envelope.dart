@@ -10,10 +10,14 @@ part 'srs_states_page_envelope.g.dart';
 
 @JsonSerializable()
 class SrsStatesPageEnvelope {
-  const SrsStatesPageEnvelope({required this.success, required this.data, required this.error});
-
+  const SrsStatesPageEnvelope({
+    required this.success,
+    required this.data,
+    required this.error,
+  });
+  
   factory SrsStatesPageEnvelope.fromJson(Map<String, Object?> json) => _$SrsStatesPageEnvelopeFromJson(json);
-
+  
   final bool success;
   final SrsStatesPage data;
   final dynamic error;

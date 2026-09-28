@@ -10,10 +10,14 @@ part 'token_pair_envelope.g.dart';
 
 @JsonSerializable()
 class TokenPairEnvelope {
-  const TokenPairEnvelope({required this.success, required this.data, required this.error});
-
+  const TokenPairEnvelope({
+    required this.success,
+    required this.data,
+    required this.error,
+  });
+  
   factory TokenPairEnvelope.fromJson(Map<String, Object?> json) => _$TokenPairEnvelopeFromJson(json);
-
+  
   final bool success;
   final TokenPair data;
   final dynamic error;

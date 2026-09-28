@@ -14,9 +14,9 @@ class MissedQuestion {
     required this.subjectNameAr,
     required this.wrongCount,
   });
-
+  
   factory MissedQuestion.fromJson(Map<String, Object?> json) => _$MissedQuestionFromJson(json);
-
+  
   final String questionId;
   final String questionText;
   final String subjectNameAr;

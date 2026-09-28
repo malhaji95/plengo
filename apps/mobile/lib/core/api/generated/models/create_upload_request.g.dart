@@ -6,13 +6,16 @@ part of 'create_upload_request.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-CreateUploadRequest _$CreateUploadRequestFromJson(Map<String, dynamic> json) => CreateUploadRequest(
-  kind: $enumDecode(_$MediaKindEnumMap, json['kind']),
-  contentType: json['contentType'] as String,
-  size: (json['size'] as num).toInt(),
-);
+CreateUploadRequest _$CreateUploadRequestFromJson(Map<String, dynamic> json) =>
+    CreateUploadRequest(
+      kind: $enumDecode(_$MediaKindEnumMap, json['kind']),
+      contentType: json['contentType'] as String,
+      size: (json['size'] as num).toInt(),
+    );
 
-Map<String, dynamic> _$CreateUploadRequestToJson(CreateUploadRequest instance) => <String, dynamic>{
+Map<String, dynamic> _$CreateUploadRequestToJson(
+  CreateUploadRequest instance,
+) => <String, dynamic>{
   'kind': instance.kind,
   'contentType': instance.contentType,
   'size': instance.size,

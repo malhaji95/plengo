@@ -17,9 +17,9 @@ class UnitAccuracy {
     required this.subjectId,
     required this.subjectNameAr,
   });
-
+  
   factory UnitAccuracy.fromJson(Map<String, Object?> json) => _$UnitAccuracyFromJson(json);
-
+  
   final int answered;
   final int correct;
   @JsonKey(includeIfNull: true)

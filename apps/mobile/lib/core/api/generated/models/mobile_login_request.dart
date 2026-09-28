@@ -10,10 +10,15 @@ part 'mobile_login_request.g.dart';
 
 @JsonSerializable()
 class MobileLoginRequest {
-  const MobileLoginRequest({required this.email, required this.password, required this.platform, this.appVersion});
-
+  const MobileLoginRequest({
+    required this.email,
+    required this.password,
+    required this.platform,
+    this.appVersion,
+  });
+  
   factory MobileLoginRequest.fromJson(Map<String, Object?> json) => _$MobileLoginRequestFromJson(json);
-
+  
   final String email;
   final String password;
   final MobileLoginRequestPlatform platform;

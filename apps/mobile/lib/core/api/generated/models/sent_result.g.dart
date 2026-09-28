@@ -6,6 +6,8 @@ part of 'sent_result.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-SentResult _$SentResultFromJson(Map<String, dynamic> json) => SentResult(sent: json['sent'] as bool);
+SentResult _$SentResultFromJson(Map<String, dynamic> json) =>
+    SentResult(sent: json['sent'] as bool);
 
-Map<String, dynamic> _$SentResultToJson(SentResult instance) => <String, dynamic>{'sent': instance.sent};
+Map<String, dynamic> _$SentResultToJson(SentResult instance) =>
+    <String, dynamic>{'sent': instance.sent};

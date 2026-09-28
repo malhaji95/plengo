@@ -16,9 +16,9 @@ class AcademicYear {
     required this.isActive,
     required this.facultyId,
   });
-
+  
   factory AcademicYear.fromJson(Map<String, Object?> json) => _$AcademicYearFromJson(json);
-
+  
   final String id;
   final String code;
   final String nameAr;

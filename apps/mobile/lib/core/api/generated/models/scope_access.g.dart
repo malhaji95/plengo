@@ -15,14 +15,15 @@ ScopeAccess _$ScopeAccessFromJson(Map<String, dynamic> json) => ScopeAccess(
   promotionEndsAt: json['promotionEndsAt'] as String?,
 );
 
-Map<String, dynamic> _$ScopeAccessToJson(ScopeAccess instance) => <String, dynamic>{
-  'hasAccess': instance.hasAccess,
-  'reason': instance.reason,
-  'isPermanent': instance.isPermanent,
-  'entitlementExpiresAt': instance.entitlementExpiresAt,
-  'promotionTitleAr': instance.promotionTitleAr,
-  'promotionEndsAt': instance.promotionEndsAt,
-};
+Map<String, dynamic> _$ScopeAccessToJson(ScopeAccess instance) =>
+    <String, dynamic>{
+      'hasAccess': instance.hasAccess,
+      'reason': instance.reason,
+      'isPermanent': instance.isPermanent,
+      'entitlementExpiresAt': instance.entitlementExpiresAt,
+      'promotionTitleAr': instance.promotionTitleAr,
+      'promotionEndsAt': instance.promotionEndsAt,
+    };
 
 const _$ScopeAccessReasonEnumMap = {
   ScopeAccessReason.entitlement: 'entitlement',

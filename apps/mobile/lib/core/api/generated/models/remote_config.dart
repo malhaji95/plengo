@@ -25,9 +25,9 @@ class RemoteConfig {
     required this.privacyPolicyUrl,
     required this.termsUrl,
   });
-
+  
   factory RemoteConfig.fromJson(Map<String, Object?> json) => _$RemoteConfigFromJson(json);
-
+  
   final MinSupportedVersion minSupportedVersion;
   final LatestVersion latestVersion;
   final Features features;

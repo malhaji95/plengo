@@ -14,10 +14,11 @@ SubmitAnswer _$SubmitAnswerFromJson(Map<String, dynamic> json) => SubmitAnswer(
   flagged: json['flagged'] as bool?,
 );
 
-Map<String, dynamic> _$SubmitAnswerToJson(SubmitAnswer instance) => <String, dynamic>{
-  'questionId': instance.questionId,
-  'selectedOptionId': ?instance.selectedOptionId,
-  'writtenAnswer': ?instance.writtenAnswer,
-  'timeSpentMs': ?instance.timeSpentMs,
-  'flagged': ?instance.flagged,
-};
+Map<String, dynamic> _$SubmitAnswerToJson(SubmitAnswer instance) =>
+    <String, dynamic>{
+      'questionId': instance.questionId,
+      'selectedOptionId': ?instance.selectedOptionId,
+      'writtenAnswer': ?instance.writtenAnswer,
+      'timeSpentMs': ?instance.timeSpentMs,
+      'flagged': ?instance.flagged,
+    };

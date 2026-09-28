@@ -6,7 +6,9 @@ part of 'update_profile_request.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-UpdateProfileRequest _$UpdateProfileRequestFromJson(Map<String, dynamic> json) => UpdateProfileRequest(
+UpdateProfileRequest _$UpdateProfileRequestFromJson(
+  Map<String, dynamic> json,
+) => UpdateProfileRequest(
   fullName: json['fullName'] as String?,
   educationLevelId: json['educationLevelId'] as String?,
   universityId: json['universityId'] as String?,
@@ -15,7 +17,9 @@ UpdateProfileRequest _$UpdateProfileRequestFromJson(Map<String, dynamic> json) =
   avatarMediaId: json['avatarMediaId'] as String?,
 );
 
-Map<String, dynamic> _$UpdateProfileRequestToJson(UpdateProfileRequest instance) => <String, dynamic>{
+Map<String, dynamic> _$UpdateProfileRequestToJson(
+  UpdateProfileRequest instance,
+) => <String, dynamic>{
   'fullName': ?instance.fullName,
   'educationLevelId': ?instance.educationLevelId,
   'universityId': ?instance.universityId,

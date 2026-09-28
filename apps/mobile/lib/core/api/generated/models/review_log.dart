@@ -21,9 +21,9 @@ class ReviewLog {
     this.durationMs,
     this.undone,
   });
-
+  
   factory ReviewLog.fromJson(Map<String, Object?> json) => _$ReviewLogFromJson(json);
-
+  
   final String id;
   final String flashcardId;
   final ReviewLogRating rating;

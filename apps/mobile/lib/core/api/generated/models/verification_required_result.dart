@@ -8,10 +8,12 @@ part 'verification_required_result.g.dart';
 
 @JsonSerializable()
 class VerificationRequiredResult {
-  const VerificationRequiredResult({required this.verificationRequired});
-
+  const VerificationRequiredResult({
+    required this.verificationRequired,
+  });
+  
   factory VerificationRequiredResult.fromJson(Map<String, Object?> json) => _$VerificationRequiredResultFromJson(json);
-
+  
   final bool verificationRequired;
 
   Map<String, Object?> toJson() => _$VerificationRequiredResultToJson(this);

@@ -8,10 +8,12 @@ part 'resend_otp_request.g.dart';
 
 @JsonSerializable()
 class ResendOtpRequest {
-  const ResendOtpRequest({required this.email});
-
+  const ResendOtpRequest({
+    required this.email,
+  });
+  
   factory ResendOtpRequest.fromJson(Map<String, Object?> json) => _$ResendOtpRequestFromJson(json);
-
+  
   final String email;
 
   Map<String, Object?> toJson() => _$ResendOtpRequestToJson(this);

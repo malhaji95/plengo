@@ -8,10 +8,12 @@ part 'deleted_result.g.dart';
 
 @JsonSerializable()
 class DeletedResult {
-  const DeletedResult({required this.deleted});
-
+  const DeletedResult({
+    required this.deleted,
+  });
+  
   factory DeletedResult.fromJson(Map<String, Object?> json) => _$DeletedResultFromJson(json);
-
+  
   final bool deleted;
 
   Map<String, Object?> toJson() => _$DeletedResultToJson(this);

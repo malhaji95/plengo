@@ -17,9 +17,9 @@ class SubjectAccuracy {
     required this.teacherTrackId,
     required this.trackTitleAr,
   });
-
+  
   factory SubjectAccuracy.fromJson(Map<String, Object?> json) => _$SubjectAccuracyFromJson(json);
-
+  
   final int answered;
   final int correct;
   @JsonKey(includeIfNull: true)

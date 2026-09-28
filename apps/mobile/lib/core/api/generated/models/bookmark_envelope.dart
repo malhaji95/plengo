@@ -10,10 +10,14 @@ part 'bookmark_envelope.g.dart';
 
 @JsonSerializable()
 class BookmarkEnvelope {
-  const BookmarkEnvelope({required this.success, required this.data, required this.error});
-
+  const BookmarkEnvelope({
+    required this.success,
+    required this.data,
+    required this.error,
+  });
+  
   factory BookmarkEnvelope.fromJson(Map<String, Object?> json) => _$BookmarkEnvelopeFromJson(json);
-
+  
   final bool success;
   final Bookmark data;
   final dynamic error;
