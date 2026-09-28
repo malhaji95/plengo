@@ -2064,7 +2064,8 @@
             "type": "string",
             "enum": [
               "active",
-              "disabled"
+              "disabled",
+              "deleted"
             ]
           },
           "createdAt": {
@@ -14650,6 +14651,37 @@
         }
       }
     },
+    "/api/v1/me/delete": {
+      "post": {
+        "operationId": "deleteMyAccount",
+        "tags": [
+          "me"
+        ],
+        "description": "Deletes the account after the password is confirmed (spec §33): personal data, sessions, access and student decks go; learning history stays anonymous.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordConfirmRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeletedResultEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/sessions": {
       "get": {
         "operationId": "listSessions",
@@ -18885,6 +18917,39 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AdminStudentDetailEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/students/{id}/delete": {
+      "post": {
+        "operationId": "adminDeleteStudent",
+        "tags": [
+          "admin-students"
+        ],
+        "description": "Deletes a student account on request (spec §33). Irreversible; audited.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeletedResultEnvelope"
                 }
               }
             }

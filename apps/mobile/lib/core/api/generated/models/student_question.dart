@@ -26,9 +26,9 @@ class StudentQuestion {
     required this.questionText,
     required this.options,
   });
-  
+
   factory StudentQuestion.fromJson(Map<String, Object?> json) => _$StudentQuestionFromJson(json);
-  
+
   final String id;
   final StudentQuestionType type;
   final String subjectId;

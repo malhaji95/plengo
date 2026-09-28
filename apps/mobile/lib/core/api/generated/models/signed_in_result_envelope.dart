@@ -10,14 +10,10 @@ part 'signed_in_result_envelope.g.dart';
 
 @JsonSerializable()
 class SignedInResultEnvelope {
-  const SignedInResultEnvelope({
-    required this.success,
-    required this.data,
-    required this.error,
-  });
-  
+  const SignedInResultEnvelope({required this.success, required this.data, required this.error});
+
   factory SignedInResultEnvelope.fromJson(Map<String, Object?> json) => _$SignedInResultEnvelopeFromJson(json);
-  
+
   final bool success;
   final SignedInResult data;
   final dynamic error;

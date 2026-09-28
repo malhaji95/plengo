@@ -26,9 +26,9 @@ class OfflineQuiz {
     required this.isFree,
     required this.questionIds,
   });
-  
+
   factory OfflineQuiz.fromJson(Map<String, Object?> json) => _$OfflineQuizFromJson(json);
-  
+
   final String id;
   final String subjectId;
   @JsonKey(includeIfNull: true)

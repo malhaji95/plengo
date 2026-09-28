@@ -24,9 +24,9 @@ class UserCard {
     required this.updatedAt,
     required this.deletedAt,
   });
-  
+
   factory UserCard.fromJson(Map<String, Object?> json) => _$UserCardFromJson(json);
-  
+
   final String id;
   final String deckId;
   final UserCardKind kind;

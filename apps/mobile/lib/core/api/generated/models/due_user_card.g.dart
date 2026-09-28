@@ -12,9 +12,8 @@ DueUserCard _$DueUserCardFromJson(Map<String, dynamic> json) => DueUserCard(
   state: SrsCardState.fromJson(json['state'] as Map<String, dynamic>),
 );
 
-Map<String, dynamic> _$DueUserCardToJson(DueUserCard instance) =>
-    <String, dynamic>{
-      'card': instance.card,
-      'deckName': instance.deckName,
-      'state': instance.state,
-    };
+Map<String, dynamic> _$DueUserCardToJson(DueUserCard instance) => <String, dynamic>{
+  'card': instance.card,
+  'deckName': instance.deckName,
+  'state': instance.state,
+};

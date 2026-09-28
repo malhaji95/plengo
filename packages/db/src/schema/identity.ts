@@ -23,6 +23,8 @@ export const users = pgTable('users', {
   role: userRoleEnum('role').notNull().default('student'),
   status: userStatusEnum('status').notNull().default('active'),
   ...timestamps,
+  /** Set when the account was deleted; personal data is gone from this row (§33). */
+  deletedAt: timestamp('deleted_at', { withTimezone: true }),
 });
 
 export const sessions = pgTable(

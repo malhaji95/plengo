@@ -10,14 +10,10 @@ part 'bookmark_list.g.dart';
 
 @JsonSerializable()
 class BookmarkList {
-  const BookmarkList({
-    required this.items,
-    required this.nextCursor,
-    required this.urlsExpireAt,
-  });
-  
+  const BookmarkList({required this.items, required this.nextCursor, required this.urlsExpireAt});
+
   factory BookmarkList.fromJson(Map<String, Object?> json) => _$BookmarkListFromJson(json);
-  
+
   final List<Bookmark> items;
   @JsonKey(includeIfNull: true)
   final String? nextCursor;

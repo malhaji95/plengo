@@ -68,6 +68,13 @@ class AuthRepository {
     }
   }
 
+  /// Deletes the account (spec §33) after the server re-checks the password. Throws
+  /// `AUTH_INVALID_CREDENTIALS` for a wrong password; on success the local tokens are cleared.
+  Future<void> deleteAccount(String password) async {
+    await guardApi(() => client.api.me.deleteMyAccount(body: PasswordConfirmRequest(password: password)));
+    await client.tokens.clear();
+  }
+
   /// Only the deepest chosen college layer is sent; the API derives the ones above it.
   Future<void> register({
     required String fullName,

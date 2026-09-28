@@ -24,9 +24,9 @@ class UserCardWrite {
     this.officialFlashcardId,
     this.deletedAt,
   });
-  
+
   factory UserCardWrite.fromJson(Map<String, Object?> json) => _$UserCardWriteFromJson(json);
-  
+
   final String id;
   final String deckId;
   final UserCardKind kind;

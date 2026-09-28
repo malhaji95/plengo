@@ -30,9 +30,7 @@ abstract class OfflineClient {
   });
 
   @GET('/api/v1/offline/packs/{packKey}/manifest')
-  Future<OfflineManifestEnvelope> offlineManifest({
-    @Path('packKey') required String packKey,
-  });
+  Future<OfflineManifestEnvelope> offlineManifest({@Path('packKey') required String packKey});
 
   @GET('/api/v1/offline/packs/{packKey}/items')
   Future<OfflineItemsPageEnvelope> offlineItems({
@@ -42,12 +40,8 @@ abstract class OfflineClient {
   });
 
   @POST('/api/v1/offline/licenses/refresh')
-  Future<OfflineLeasesEnvelope> refreshOfflineLicenses({
-    @Body() required RefreshLeasesRequest body,
-  });
+  Future<OfflineLeasesEnvelope> refreshOfflineLicenses({@Body() required RefreshLeasesRequest body});
 
   @POST('/api/v1/offline/sync')
-  Future<OfflineSyncResultEnvelope> syncOffline({
-    @Body() required OfflineSyncRequest body,
-  });
+  Future<OfflineSyncResultEnvelope> syncOffline({@Body() required OfflineSyncRequest body});
 }

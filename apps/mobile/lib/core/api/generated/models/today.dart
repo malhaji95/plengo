@@ -15,9 +15,9 @@ class Today {
     required this.goalMet,
     required this.streak,
   });
-  
+
   factory Today.fromJson(Map<String, Object?> json) => _$TodayFromJson(json);
-  
+
   final int dueCards;
   final int goal;
   final int done;

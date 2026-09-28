@@ -8,14 +8,10 @@ part 'check_attempt_answer_request.g.dart';
 
 @JsonSerializable()
 class CheckAttemptAnswerRequest {
-  const CheckAttemptAnswerRequest({
-    this.selectedOptionId,
-    this.writtenAnswer,
-    this.timeSpentMs,
-  });
-  
+  const CheckAttemptAnswerRequest({this.selectedOptionId, this.writtenAnswer, this.timeSpentMs});
+
   factory CheckAttemptAnswerRequest.fromJson(Map<String, Object?> json) => _$CheckAttemptAnswerRequestFromJson(json);
-  
+
   @JsonKey(includeIfNull: false)
   final String? selectedOptionId;
   @JsonKey(includeIfNull: false)

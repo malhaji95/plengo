@@ -12,9 +12,8 @@ HomeEnvelope _$HomeEnvelopeFromJson(Map<String, dynamic> json) => HomeEnvelope(
   error: json['error'],
 );
 
-Map<String, dynamic> _$HomeEnvelopeToJson(HomeEnvelope instance) =>
-    <String, dynamic>{
-      'success': instance.success,
-      'data': instance.data,
-      'error': instance.error,
-    };
+Map<String, dynamic> _$HomeEnvelopeToJson(HomeEnvelope instance) => <String, dynamic>{
+  'success': instance.success,
+  'data': instance.data,
+  'error': instance.error,
+};

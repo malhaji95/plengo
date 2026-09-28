@@ -18,18 +18,17 @@ OfflinePack _$OfflinePackFromJson(Map<String, dynamic> json) => OfflinePack(
   premium: json['premium'] as bool,
 );
 
-Map<String, dynamic> _$OfflinePackToJson(OfflinePack instance) =>
-    <String, dynamic>{
-      'packKey': instance.packKey,
-      'kind': instance.kind,
-      'unitId': instance.unitId,
-      'deckId': instance.deckId,
-      'titleAr': instance.titleAr,
-      'itemCount': instance.itemCount,
-      'sizeBytes': instance.sizeBytes,
-      'version': instance.version,
-      'premium': instance.premium,
-    };
+Map<String, dynamic> _$OfflinePackToJson(OfflinePack instance) => <String, dynamic>{
+  'packKey': instance.packKey,
+  'kind': instance.kind,
+  'unitId': instance.unitId,
+  'deckId': instance.deckId,
+  'titleAr': instance.titleAr,
+  'itemCount': instance.itemCount,
+  'sizeBytes': instance.sizeBytes,
+  'version': instance.version,
+  'premium': instance.premium,
+};
 
 const _$OfflinePackKindEnumMap = {
   OfflinePackKind.questions: 'questions',

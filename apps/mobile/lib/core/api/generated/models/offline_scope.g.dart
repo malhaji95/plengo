@@ -12,12 +12,11 @@ OfflineScope _$OfflineScopeFromJson(Map<String, dynamic> json) => OfflineScope(
   teacherTrackId: json['teacherTrackId'] as String?,
 );
 
-Map<String, dynamic> _$OfflineScopeToJson(OfflineScope instance) =>
-    <String, dynamic>{
-      'scopeType': instance.scopeType,
-      'subjectId': instance.subjectId,
-      'teacherTrackId': instance.teacherTrackId,
-    };
+Map<String, dynamic> _$OfflineScopeToJson(OfflineScope instance) => <String, dynamic>{
+  'scopeType': instance.scopeType,
+  'subjectId': instance.subjectId,
+  'teacherTrackId': instance.teacherTrackId,
+};
 
 const _$OfflineScopeScopeTypeEnumMap = {
   OfflineScopeScopeType.subject: 'subject',

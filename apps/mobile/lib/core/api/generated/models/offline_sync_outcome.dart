@@ -19,9 +19,9 @@ class OfflineSyncOutcome {
     required this.totalCount,
     required this.mismatches,
   });
-  
+
   factory OfflineSyncOutcome.fromJson(Map<String, Object?> json) => _$OfflineSyncOutcomeFromJson(json);
-  
+
   final String clientAttemptId;
   final OfflineSyncOutcomeStatus status;
   @JsonKey(includeIfNull: true)

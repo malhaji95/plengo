@@ -26,9 +26,7 @@ abstract class BookmarksClient {
   });
 
   @PUT('/api/v1/bookmarks')
-  Future<BookmarkEnvelope> addBookmark({
-    @Body() required BookmarkRequest body,
-  });
+  Future<BookmarkEnvelope> addBookmark({@Body() required BookmarkRequest body});
 
   @GET('/api/v1/bookmarks/keys')
   Future<BookmarkKeyListEnvelope> listBookmarkKeys();

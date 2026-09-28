@@ -10,14 +10,10 @@ part 'notification_page.g.dart';
 
 @JsonSerializable()
 class NotificationPage {
-  const NotificationPage({
-    required this.items,
-    required this.nextCursor,
-    required this.unreadCount,
-  });
-  
+  const NotificationPage({required this.items, required this.nextCursor, required this.unreadCount});
+
   factory NotificationPage.fromJson(Map<String, Object?> json) => _$NotificationPageFromJson(json);
-  
+
   final List<StudentNotification> items;
   @JsonKey(includeIfNull: true)
   final String? nextCursor;

@@ -10,14 +10,10 @@ part 'sent_result_envelope.g.dart';
 
 @JsonSerializable()
 class SentResultEnvelope {
-  const SentResultEnvelope({
-    required this.success,
-    required this.data,
-    required this.error,
-  });
-  
+  const SentResultEnvelope({required this.success, required this.data, required this.error});
+
   factory SentResultEnvelope.fromJson(Map<String, Object?> json) => _$SentResultEnvelopeFromJson(json);
-  
+
   final bool success;
   final SentResult data;
   final dynamic error;

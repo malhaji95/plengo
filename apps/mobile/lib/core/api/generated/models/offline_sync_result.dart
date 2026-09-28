@@ -10,12 +10,10 @@ part 'offline_sync_result.g.dart';
 
 @JsonSerializable()
 class OfflineSyncResult {
-  const OfflineSyncResult({
-    required this.results,
-  });
-  
+  const OfflineSyncResult({required this.results});
+
   factory OfflineSyncResult.fromJson(Map<String, Object?> json) => _$OfflineSyncResultFromJson(json);
-  
+
   final List<OfflineSyncOutcome> results;
 
   Map<String, Object?> toJson() => _$OfflineSyncResultToJson(this);

@@ -22,9 +22,9 @@ class Report {
     required this.createdAt,
     required this.resolvedAt,
   });
-  
+
   factory Report.fromJson(Map<String, Object?> json) => _$ReportFromJson(json);
-  
+
   final String id;
   final ReportItemType itemType;
   final String itemId;

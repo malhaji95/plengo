@@ -10,14 +10,11 @@ part 'user_content_sync_result_envelope.g.dart';
 
 @JsonSerializable()
 class UserContentSyncResultEnvelope {
-  const UserContentSyncResultEnvelope({
-    required this.success,
-    required this.data,
-    required this.error,
-  });
-  
-  factory UserContentSyncResultEnvelope.fromJson(Map<String, Object?> json) => _$UserContentSyncResultEnvelopeFromJson(json);
-  
+  const UserContentSyncResultEnvelope({required this.success, required this.data, required this.error});
+
+  factory UserContentSyncResultEnvelope.fromJson(Map<String, Object?> json) =>
+      _$UserContentSyncResultEnvelopeFromJson(json);
+
   final bool success;
   final UserContentSyncResult data;
   final dynamic error;

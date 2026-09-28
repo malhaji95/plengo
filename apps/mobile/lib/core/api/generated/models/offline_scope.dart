@@ -10,14 +10,10 @@ part 'offline_scope.g.dart';
 
 @JsonSerializable()
 class OfflineScope {
-  const OfflineScope({
-    required this.scopeType,
-    required this.subjectId,
-    required this.teacherTrackId,
-  });
-  
+  const OfflineScope({required this.scopeType, required this.subjectId, required this.teacherTrackId});
+
   factory OfflineScope.fromJson(Map<String, Object?> json) => _$OfflineScopeFromJson(json);
-  
+
   final OfflineScopeScopeType scopeType;
   @JsonKey(includeIfNull: true)
   final String? subjectId;

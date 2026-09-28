@@ -20,9 +20,9 @@ class OfflineDeck {
     required this.sortOrder,
     required this.cardIds,
   });
-  
+
   factory OfflineDeck.fromJson(Map<String, Object?> json) => _$OfflineDeckFromJson(json);
-  
+
   final String id;
   final String subjectId;
   @JsonKey(includeIfNull: true)

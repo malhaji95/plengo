@@ -8,14 +8,10 @@ part 'offline_option.g.dart';
 
 @JsonSerializable()
 class OfflineOption {
-  const OfflineOption({
-    required this.id,
-    required this.text,
-    required this.isCorrect,
-  });
-  
+  const OfflineOption({required this.id, required this.text, required this.isCorrect});
+
   factory OfflineOption.fromJson(Map<String, Object?> json) => _$OfflineOptionFromJson(json);
-  
+
   final String id;
   final String text;
   final bool isCorrect;

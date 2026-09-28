@@ -16,9 +16,9 @@ class UpdateProfileRequest {
     this.academicYearId,
     this.avatarMediaId,
   });
-  
+
   factory UpdateProfileRequest.fromJson(Map<String, Object?> json) => _$UpdateProfileRequestFromJson(json);
-  
+
   @JsonKey(includeIfNull: false)
   final String? fullName;
   @JsonKey(includeIfNull: false)

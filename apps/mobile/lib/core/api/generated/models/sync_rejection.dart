@@ -11,15 +11,10 @@ part 'sync_rejection.g.dart';
 
 @JsonSerializable()
 class SyncRejection {
-  const SyncRejection({
-    required this.type,
-    required this.id,
-    required this.code,
-    required this.reason,
-  });
-  
+  const SyncRejection({required this.type, required this.id, required this.code, required this.reason});
+
   factory SyncRejection.fromJson(Map<String, Object?> json) => _$SyncRejectionFromJson(json);
-  
+
   final SyncRejectionType type;
   final String id;
   final SyncRejectionCode code;

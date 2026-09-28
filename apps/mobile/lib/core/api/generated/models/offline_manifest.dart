@@ -17,9 +17,9 @@ class OfflineManifest {
     required this.normalizationVersion,
     required this.items,
   });
-  
+
   factory OfflineManifest.fromJson(Map<String, Object?> json) => _$OfflineManifestFromJson(json);
-  
+
   final String packKey;
   final String version;
   final bool premium;

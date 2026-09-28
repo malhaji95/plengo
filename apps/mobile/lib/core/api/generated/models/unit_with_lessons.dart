@@ -18,9 +18,9 @@ class UnitWithLessons {
     required this.sortOrder,
     required this.lessons,
   });
-  
+
   factory UnitWithLessons.fromJson(Map<String, Object?> json) => _$UnitWithLessonsFromJson(json);
-  
+
   final String id;
   final String subjectId;
   final String code;

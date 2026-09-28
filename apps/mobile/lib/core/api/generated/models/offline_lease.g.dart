@@ -14,21 +14,17 @@ OfflineLease _$OfflineLeaseFromJson(Map<String, dynamic> json) => OfflineLease(
   expiresAt: json['expiresAt'] as String?,
 );
 
-Map<String, dynamic> _$OfflineLeaseToJson(OfflineLease instance) =>
-    <String, dynamic>{
-      'scopeType': instance.scopeType,
-      'subjectId': instance.subjectId,
-      'teacherTrackId': instance.teacherTrackId,
-      'status': instance.status,
-      'expiresAt': instance.expiresAt,
-    };
+Map<String, dynamic> _$OfflineLeaseToJson(OfflineLease instance) => <String, dynamic>{
+  'scopeType': instance.scopeType,
+  'subjectId': instance.subjectId,
+  'teacherTrackId': instance.teacherTrackId,
+  'status': instance.status,
+  'expiresAt': instance.expiresAt,
+};
 
 const _$OfflineLeaseScopeTypeEnumMap = {
   OfflineLeaseScopeType.subject: 'subject',
   OfflineLeaseScopeType.teacherTrack: 'teacher_track',
 };
 
-const _$OfflineLeaseStatusEnumMap = {
-  OfflineLeaseStatus.active: 'active',
-  OfflineLeaseStatus.none: 'none',
-};
+const _$OfflineLeaseStatusEnumMap = {OfflineLeaseStatus.active: 'active', OfflineLeaseStatus.none: 'none'};

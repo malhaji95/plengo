@@ -14,9 +14,7 @@ SrsState _$SrsStateFromJson(Map<String, dynamic> json) => SrsState(
   ease: json['ease'] as num,
   reps: (json['reps'] as num).toInt(),
   lapses: (json['lapses'] as num).toInt(),
-  lastReviewedAt: json['lastReviewedAt'] == null
-      ? null
-      : DateTime.parse(json['lastReviewedAt'] as String),
+  lastReviewedAt: json['lastReviewedAt'] == null ? null : DateTime.parse(json['lastReviewedAt'] as String),
 );
 
 Map<String, dynamic> _$SrsStateToJson(SrsState instance) => <String, dynamic>{

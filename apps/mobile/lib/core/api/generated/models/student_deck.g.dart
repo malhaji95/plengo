@@ -22,19 +22,18 @@ StudentDeck _$StudentDeckFromJson(Map<String, dynamic> json) => StudentDeck(
   sortOrder: (json['sortOrder'] as num).toInt(),
 );
 
-Map<String, dynamic> _$StudentDeckToJson(StudentDeck instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'subjectId': instance.subjectId,
-      'teacherTrackId': instance.teacherTrackId,
-      'unitId': instance.unitId,
-      'lessonId': instance.lessonId,
-      'titleAr': instance.titleAr,
-      'description': instance.description,
-      'coverUrl': instance.coverUrl,
-      'cardCount': instance.cardCount,
-      'isFree': instance.isFree,
-      'locked': instance.locked,
-      'contentVersion': instance.contentVersion,
-      'sortOrder': instance.sortOrder,
-    };
+Map<String, dynamic> _$StudentDeckToJson(StudentDeck instance) => <String, dynamic>{
+  'id': instance.id,
+  'subjectId': instance.subjectId,
+  'teacherTrackId': instance.teacherTrackId,
+  'unitId': instance.unitId,
+  'lessonId': instance.lessonId,
+  'titleAr': instance.titleAr,
+  'description': instance.description,
+  'coverUrl': instance.coverUrl,
+  'cardCount': instance.cardCount,
+  'isFree': instance.isFree,
+  'locked': instance.locked,
+  'contentVersion': instance.contentVersion,
+  'sortOrder': instance.sortOrder,
+};

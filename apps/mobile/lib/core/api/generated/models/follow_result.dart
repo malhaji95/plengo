@@ -8,13 +8,10 @@ part 'follow_result.g.dart';
 
 @JsonSerializable()
 class FollowResult {
-  const FollowResult({
-    required this.following,
-    required this.followerCount,
-  });
-  
+  const FollowResult({required this.following, required this.followerCount});
+
   factory FollowResult.fromJson(Map<String, Object?> json) => _$FollowResultFromJson(json);
-  
+
   final bool following;
   final num followerCount;
 

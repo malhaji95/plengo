@@ -16,16 +16,15 @@ HomeBanner _$HomeBannerFromJson(Map<String, dynamic> json) => HomeBanner(
   actionTarget: json['actionTarget'] as String?,
 );
 
-Map<String, dynamic> _$HomeBannerToJson(HomeBanner instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'titleAr': instance.titleAr,
-      'imageUrl': instance.imageUrl,
-      'width': instance.width,
-      'height': instance.height,
-      'action': instance.action,
-      'actionTarget': instance.actionTarget,
-    };
+Map<String, dynamic> _$HomeBannerToJson(HomeBanner instance) => <String, dynamic>{
+  'id': instance.id,
+  'titleAr': instance.titleAr,
+  'imageUrl': instance.imageUrl,
+  'width': instance.width,
+  'height': instance.height,
+  'action': instance.action,
+  'actionTarget': instance.actionTarget,
+};
 
 const _$BannerActionEnumMap = {
   BannerAction.subject: 'subject',

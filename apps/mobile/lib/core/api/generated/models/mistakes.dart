@@ -8,13 +8,10 @@ part 'mistakes.g.dart';
 
 @JsonSerializable()
 class Mistakes {
-  const Mistakes({
-    required this.active,
-    required this.mastered,
-  });
-  
+  const Mistakes({required this.active, required this.mastered});
+
   factory Mistakes.fromJson(Map<String, Object?> json) => _$MistakesFromJson(json);
-  
+
   final int active;
   final int mastered;
 

@@ -10,14 +10,10 @@ part 'student_quiz_envelope.g.dart';
 
 @JsonSerializable()
 class StudentQuizEnvelope {
-  const StudentQuizEnvelope({
-    required this.success,
-    required this.data,
-    required this.error,
-  });
-  
+  const StudentQuizEnvelope({required this.success, required this.data, required this.error});
+
   factory StudentQuizEnvelope.fromJson(Map<String, Object?> json) => _$StudentQuizEnvelopeFromJson(json);
-  
+
   final bool success;
   final StudentQuiz data;
   final dynamic error;

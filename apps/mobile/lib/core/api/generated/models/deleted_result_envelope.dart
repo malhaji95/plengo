@@ -10,14 +10,10 @@ part 'deleted_result_envelope.g.dart';
 
 @JsonSerializable()
 class DeletedResultEnvelope {
-  const DeletedResultEnvelope({
-    required this.success,
-    required this.data,
-    required this.error,
-  });
-  
+  const DeletedResultEnvelope({required this.success, required this.data, required this.error});
+
   factory DeletedResultEnvelope.fromJson(Map<String, Object?> json) => _$DeletedResultEnvelopeFromJson(json);
-  
+
   final bool success;
   final DeletedResult data;
   final dynamic error;

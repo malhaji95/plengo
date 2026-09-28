@@ -125,6 +125,16 @@ class AuthController extends AsyncNotifier<Me?> {
     state = const AsyncData(null);
   }
 
+  /// Deletes the account (spec §33); this device is wiped as on logout. The push token disappears with
+  /// the account on the server.
+  Future<void> deleteAccount(String password) async {
+    await ref.read(authRepositoryProvider).deleteAccount(password);
+    await ref.read(pushRegistrationProvider).forget();
+    await ref.read(databaseProvider).wipe();
+    await ref.read(packFilesProvider).deleteAll();
+    state = const AsyncData(null);
+  }
+
   /// Replace the signed-in profile after it changed on the server (e.g. a new placement).
   void setMe(Me me) => state = AsyncData(me);
 

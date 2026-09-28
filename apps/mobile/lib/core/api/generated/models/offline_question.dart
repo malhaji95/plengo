@@ -28,9 +28,9 @@ class OfflineQuestion {
     required this.options,
     required this.acceptedAnswers,
   });
-  
+
   factory OfflineQuestion.fromJson(Map<String, Object?> json) => _$OfflineQuestionFromJson(json);
-  
+
   final String id;
   final OfflineQuestionType type;
   final String subjectId;

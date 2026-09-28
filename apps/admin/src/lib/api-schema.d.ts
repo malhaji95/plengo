@@ -212,6 +212,23 @@ export interface paths {
         patch: operations["updateMe"];
         trace?: never;
     };
+    "/api/v1/me/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Deletes the account after the password is confirmed (spec §33): personal data, sessions, access and student decks go; learning history stays anonymous. */
+        post: operations["deleteMyAccount"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/sessions": {
         parameters: {
             query?: never;
@@ -1860,6 +1877,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/students/{id}/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Deletes a student account on request (spec §33). Irreversible; audited. */
+        post: operations["adminDeleteStudent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/students/{id}/entitlements": {
         parameters: {
             query?: never;
@@ -3380,7 +3414,7 @@ export interface components {
             educationLevelId: string | null;
             emailVerified: boolean;
             /** @enum {string} */
-            status: "active" | "disabled";
+            status: "active" | "disabled" | "deleted";
             createdAt: string;
             activeEntitlementCount: number;
         };
@@ -6230,6 +6264,30 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MeEnvelope"];
+                };
+            };
+        };
+    };
+    deleteMyAccount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PasswordConfirmRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeletedResultEnvelope"];
                 };
             };
         };
@@ -9148,6 +9206,28 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AdminStudentDetailEnvelope"];
+                };
+            };
+        };
+    };
+    adminDeleteStudent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeletedResultEnvelope"];
                 };
             };
         };

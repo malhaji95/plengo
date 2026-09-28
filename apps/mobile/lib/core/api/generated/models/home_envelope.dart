@@ -10,14 +10,10 @@ part 'home_envelope.g.dart';
 
 @JsonSerializable()
 class HomeEnvelope {
-  const HomeEnvelope({
-    required this.success,
-    required this.data,
-    required this.error,
-  });
-  
+  const HomeEnvelope({required this.success, required this.data, required this.error});
+
   factory HomeEnvelope.fromJson(Map<String, Object?> json) => _$HomeEnvelopeFromJson(json);
-  
+
   final bool success;
   final Home data;
   final dynamic error;

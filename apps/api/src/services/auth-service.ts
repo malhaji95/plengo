@@ -100,6 +100,17 @@ export function createAuthService(deps: {
   }
 
   return {
+    /** Re-confirms a signed-in user's password (account deletion). */
+    async checkPassword(email: string, password: string) {
+      try {
+        await verifyCredentials(email, password);
+        return true;
+      } catch (err) {
+        if (err instanceof AppError && err.code === 'AUTH_INVALID_CREDENTIALS') return false;
+        throw err;
+      }
+    },
+
     async register(input: {
       fullName: string;
       email: string;

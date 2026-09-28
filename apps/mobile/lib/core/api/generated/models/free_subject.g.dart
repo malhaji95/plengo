@@ -12,9 +12,8 @@ FreeSubject _$FreeSubjectFromJson(Map<String, dynamic> json) => FreeSubject(
   freeCount: (json['freeCount'] as num).toInt(),
 );
 
-Map<String, dynamic> _$FreeSubjectToJson(FreeSubject instance) =>
-    <String, dynamic>{
-      'subjectId': instance.subjectId,
-      'nameAr': instance.nameAr,
-      'freeCount': instance.freeCount,
-    };
+Map<String, dynamic> _$FreeSubjectToJson(FreeSubject instance) => <String, dynamic>{
+  'subjectId': instance.subjectId,
+  'nameAr': instance.nameAr,
+  'freeCount': instance.freeCount,
+};

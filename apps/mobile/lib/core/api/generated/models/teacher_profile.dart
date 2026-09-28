@@ -11,13 +11,10 @@ part 'teacher_profile.g.dart';
 
 @JsonSerializable()
 class TeacherProfile {
-  const TeacherProfile({
-    required this.teacher,
-    required this.tracks,
-  });
-  
+  const TeacherProfile({required this.teacher, required this.tracks});
+
   factory TeacherProfile.fromJson(Map<String, Object?> json) => _$TeacherProfileFromJson(json);
-  
+
   final TeacherDetail teacher;
   final List<TeacherTrack> tracks;
 

@@ -10,14 +10,10 @@ part 'reset_result_envelope.g.dart';
 
 @JsonSerializable()
 class ResetResultEnvelope {
-  const ResetResultEnvelope({
-    required this.success,
-    required this.data,
-    required this.error,
-  });
-  
+  const ResetResultEnvelope({required this.success, required this.data, required this.error});
+
   factory ResetResultEnvelope.fromJson(Map<String, Object?> json) => _$ResetResultEnvelopeFromJson(json);
-  
+
   final bool success;
   final ResetResult data;
   final dynamic error;

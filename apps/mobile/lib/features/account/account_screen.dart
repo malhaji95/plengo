@@ -111,9 +111,26 @@ class AccountScreen extends ConsumerWidget {
               onTap: () => context.go(Routes.sessions),
             ),
             ListTile(
+              leading: const Icon(Icons.privacy_tip_outlined),
+              title: const Text('سياسة الخصوصية'),
+              trailing: const Icon(Icons.chevron_left),
+              onTap: () => context.push(Routes.privacy),
+            ),
+            ListTile(
+              leading: const Icon(Icons.gavel_outlined),
+              title: const Text('شروط الاستخدام'),
+              trailing: const Icon(Icons.chevron_left),
+              onTap: () => context.push(Routes.terms),
+            ),
+            ListTile(
               leading: Icon(Icons.logout, color: Theme.of(context).colorScheme.error),
               title: Text('تسجيل الخروج', style: TextStyle(color: Theme.of(context).colorScheme.error)),
               onTap: () => ref.read(authControllerProvider.notifier).logout(),
+            ),
+            ListTile(
+              leading: Icon(Icons.delete_forever_outlined, color: Theme.of(context).colorScheme.error),
+              title: Text('حذف الحساب', style: TextStyle(color: Theme.of(context).colorScheme.error)),
+              onTap: () => showDialog<void>(context: context, builder: (_) => const DeleteAccountDialog()),
             ),
           ],
         ),
@@ -186,4 +203,79 @@ class _AvatarButtonState extends ConsumerState<_AvatarButton> {
           : NetworkAvatar(url: widget.me.avatarUrl, name: widget.me.fullName),
     ),
   );
+}
+
+/// Account deletion (spec §33): explains what is removed and asks for the password.
+class DeleteAccountDialog extends ConsumerStatefulWidget {
+  const DeleteAccountDialog({super.key});
+
+  @override
+  ConsumerState<DeleteAccountDialog> createState() => _DeleteAccountDialogState();
+}
+
+class _DeleteAccountDialogState extends ConsumerState<DeleteAccountDialog> {
+  final _password = TextEditingController();
+  bool _busy = false;
+  String? _error;
+
+  @override
+  void dispose() {
+    _password.dispose();
+    super.dispose();
+  }
+
+  Future<void> _delete() async {
+    setState(() {
+      _busy = true;
+      _error = null;
+    });
+    try {
+      await ref.read(authControllerProvider.notifier).deleteAccount(_password.text);
+      if (mounted) Navigator.of(context).pop();
+    } on ApiException catch (e) {
+      setState(() => _error = e.code == 'AUTH_INVALID_CREDENTIALS' ? 'كلمة المرور غير صحيحة' : e.message);
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final error = Theme.of(context).colorScheme.error;
+    return AlertDialog(
+      title: const Text('حذف الحساب نهائياً'),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text(
+              'سيُحذف اسمك وبريدك وصورتك ومجموعات بطاقاتك الخاصة ومحفوظاتك، وتُلغى صلاحيات الوصول '
+              'بما فيها المفعّلة بالكوبونات، ويُسجَّل خروجك من كل الأجهزة. تبقى إحصاءات الإجابات '
+              'دون أي بيانات تعرّف بك. لا يمكن التراجع عن هذه الخطوة.',
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              key: const Key('delete.password'),
+              controller: _password,
+              obscureText: true,
+              enabled: !_busy,
+              textDirection: TextDirection.ltr,
+              decoration: const InputDecoration(labelText: 'أدخل كلمة المرور للتأكيد'),
+              onChanged: (_) => setState(() {}),
+            ),
+            if (_error != null) ...[const SizedBox(height: 8), Text(_error!, style: TextStyle(color: error))],
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(onPressed: _busy ? null : () => Navigator.of(context).pop(), child: const Text('إلغاء')),
+        FilledButton(
+          style: FilledButton.styleFrom(backgroundColor: error),
+          onPressed: _busy || _password.text.isEmpty ? null : _delete,
+          child: Text(_busy ? 'جارٍ الحذف…' : 'حذف الحساب'),
+        ),
+      ],
+    );
+  }
 }

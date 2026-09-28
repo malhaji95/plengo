@@ -18,9 +18,9 @@ class UserContentChanges {
     required this.hasMore,
     required this.urlsExpireAt,
   });
-  
+
   factory UserContentChanges.fromJson(Map<String, Object?> json) => _$UserContentChangesFromJson(json);
-  
+
   final List<UserDeck> decks;
   final List<UserCard> cards;
   final String cursor;

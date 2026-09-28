@@ -11,15 +11,10 @@ part 'create_report_request.g.dart';
 
 @JsonSerializable()
 class CreateReportRequest {
-  const CreateReportRequest({
-    required this.itemType,
-    required this.itemId,
-    required this.reason,
-    this.note,
-  });
-  
+  const CreateReportRequest({required this.itemType, required this.itemId, required this.reason, this.note});
+
   factory CreateReportRequest.fromJson(Map<String, Object?> json) => _$CreateReportRequestFromJson(json);
-  
+
   final ReportItemType itemType;
   final String itemId;
   final ReportReason reason;

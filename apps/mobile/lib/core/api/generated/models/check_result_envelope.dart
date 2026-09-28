@@ -10,14 +10,10 @@ part 'check_result_envelope.g.dart';
 
 @JsonSerializable()
 class CheckResultEnvelope {
-  const CheckResultEnvelope({
-    required this.success,
-    required this.data,
-    required this.error,
-  });
-  
+  const CheckResultEnvelope({required this.success, required this.data, required this.error});
+
   factory CheckResultEnvelope.fromJson(Map<String, Object?> json) => _$CheckResultEnvelopeFromJson(json);
-  
+
   final bool success;
   final CheckResult data;
   final dynamic error;

@@ -14,11 +14,10 @@ OfflineCard _$OfflineCardFromJson(Map<String, dynamic> json) => OfflineCard(
   back: OfflineImage.fromJson(json['back'] as Map<String, dynamic>),
 );
 
-Map<String, dynamic> _$OfflineCardToJson(OfflineCard instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'deckId': instance.deckId,
-      'sortOrder': instance.sortOrder,
-      'front': instance.front,
-      'back': instance.back,
-    };
+Map<String, dynamic> _$OfflineCardToJson(OfflineCard instance) => <String, dynamic>{
+  'id': instance.id,
+  'deckId': instance.deckId,
+  'sortOrder': instance.sortOrder,
+  'front': instance.front,
+  'back': instance.back,
+};

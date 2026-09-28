@@ -7,15 +7,10 @@ part of 'offline_option.dart';
 // **************************************************************************
 
 OfflineOption _$OfflineOptionFromJson(Map<String, dynamic> json) =>
-    OfflineOption(
-      id: json['id'] as String,
-      text: json['text'] as String,
-      isCorrect: json['isCorrect'] as bool,
-    );
+    OfflineOption(id: json['id'] as String, text: json['text'] as String, isCorrect: json['isCorrect'] as bool);
 
-Map<String, dynamic> _$OfflineOptionToJson(OfflineOption instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'text': instance.text,
-      'isCorrect': instance.isCorrect,
-    };
+Map<String, dynamic> _$OfflineOptionToJson(OfflineOption instance) => <String, dynamic>{
+  'id': instance.id,
+  'text': instance.text,
+  'isCorrect': instance.isCorrect,
+};

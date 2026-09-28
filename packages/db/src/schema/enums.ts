@@ -1,7 +1,8 @@
 import { pgEnum } from 'drizzle-orm/pg-core';
 
 export const userRoleEnum = pgEnum('user_role', ['student', 'admin']);
-export const userStatusEnum = pgEnum('user_status', ['active', 'disabled']);
+/** `deleted`: the account was deleted (§33); the row stays as an anonymous tombstone. */
+export const userStatusEnum = pgEnum('user_status', ['active', 'disabled', 'deleted']);
 export const sessionPlatformEnum = pgEnum('session_platform', ['android', 'ios', 'web', 'admin']);
 export const mediaKindEnum = pgEnum('media_kind', [
   'flashcard',

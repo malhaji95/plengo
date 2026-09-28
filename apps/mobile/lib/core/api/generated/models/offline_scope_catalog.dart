@@ -18,9 +18,9 @@ class OfflineScopeCatalog {
     required this.packs,
     required this.sizeBytes,
   });
-  
+
   factory OfflineScopeCatalog.fromJson(Map<String, Object?> json) => _$OfflineScopeCatalogFromJson(json);
-  
+
   final OfflineScope scope;
   final String titleAr;
   final bool entitled;

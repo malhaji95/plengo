@@ -54,6 +54,13 @@ class PushRegistration {
     }
   }
 
+  /// Stops listening without calling the server (the account is gone, and its tokens with it).
+  Future<void> forget() async {
+    unawaited(_refreshes?.cancel());
+    _refreshes = null;
+    _registered = null;
+  }
+
   Future<void> stop() async {
     // Not awaited: nothing depends on it, and some streams complete cancel on the root zone.
     unawaited(_refreshes?.cancel());

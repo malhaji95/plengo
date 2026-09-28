@@ -7,14 +7,11 @@ part of 'redeem_result.dart';
 // **************************************************************************
 
 RedeemResult _$RedeemResultFromJson(Map<String, dynamic> json) => RedeemResult(
-  entitlement: MyEntitlement.fromJson(
-    json['entitlement'] as Map<String, dynamic>,
-  ),
+  entitlement: MyEntitlement.fromJson(json['entitlement'] as Map<String, dynamic>),
   upgraded: json['upgraded'] as bool,
 );
 
-Map<String, dynamic> _$RedeemResultToJson(RedeemResult instance) =>
-    <String, dynamic>{
-      'entitlement': instance.entitlement,
-      'upgraded': instance.upgraded,
-    };
+Map<String, dynamic> _$RedeemResultToJson(RedeemResult instance) => <String, dynamic>{
+  'entitlement': instance.entitlement,
+  'upgraded': instance.upgraded,
+};

@@ -16,9 +16,9 @@ class TypeAccuracy {
     required this.accuracyPercent,
     required this.type,
   });
-  
+
   factory TypeAccuracy.fromJson(Map<String, Object?> json) => _$TypeAccuracyFromJson(json);
-  
+
   final int answered;
   final int correct;
   @JsonKey(includeIfNull: true)

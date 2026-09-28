@@ -10,13 +10,10 @@ part 'redeem_result.g.dart';
 
 @JsonSerializable()
 class RedeemResult {
-  const RedeemResult({
-    required this.entitlement,
-    required this.upgraded,
-  });
-  
+  const RedeemResult({required this.entitlement, required this.upgraded});
+
   factory RedeemResult.fromJson(Map<String, Object?> json) => _$RedeemResultFromJson(json);
-  
+
   final MyEntitlement entitlement;
   final bool upgraded;
 

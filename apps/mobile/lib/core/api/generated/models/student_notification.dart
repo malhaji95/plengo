@@ -21,9 +21,9 @@ class StudentNotification {
     required this.createdAt,
     required this.readAt,
   });
-  
+
   factory StudentNotification.fromJson(Map<String, Object?> json) => _$StudentNotificationFromJson(json);
-  
+
   final String id;
   final NotificationType type;
   final String titleAr;

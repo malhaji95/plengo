@@ -10,14 +10,10 @@ part 'mistake_list_envelope.g.dart';
 
 @JsonSerializable()
 class MistakeListEnvelope {
-  const MistakeListEnvelope({
-    required this.success,
-    required this.data,
-    required this.error,
-  });
-  
+  const MistakeListEnvelope({required this.success, required this.data, required this.error});
+
   factory MistakeListEnvelope.fromJson(Map<String, Object?> json) => _$MistakeListEnvelopeFromJson(json);
-  
+
   final bool success;
   final MistakeList data;
   final dynamic error;

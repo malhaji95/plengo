@@ -28,9 +28,9 @@ class Home {
     required this.followedTeachers,
     required this.activeMistakes,
   });
-  
+
   factory Home.fromJson(Map<String, Object?> json) => _$HomeFromJson(json);
-  
+
   final String greetingName;
   final int unreadNotifications;
   @JsonKey(includeIfNull: true)

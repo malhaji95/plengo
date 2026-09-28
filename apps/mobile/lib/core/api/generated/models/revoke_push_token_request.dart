@@ -8,12 +8,10 @@ part 'revoke_push_token_request.g.dart';
 
 @JsonSerializable()
 class RevokePushTokenRequest {
-  const RevokePushTokenRequest({
-    required this.token,
-  });
-  
+  const RevokePushTokenRequest({required this.token});
+
   factory RevokePushTokenRequest.fromJson(Map<String, Object?> json) => _$RevokePushTokenRequestFromJson(json);
-  
+
   final String token;
 
   Map<String, Object?> toJson() => _$RevokePushTokenRequestToJson(this);

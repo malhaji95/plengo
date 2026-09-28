@@ -27,9 +27,7 @@ abstract class NotificationsClient {
   });
 
   @POST('/api/v1/notifications/{id}/read')
-  Future<ReadResultEnvelope> markNotificationRead({
-    @Path('id') required String id,
-  });
+  Future<ReadResultEnvelope> markNotificationRead({@Path('id') required String id});
 
   @POST('/api/v1/notifications/read-all')
   Future<ReadResultEnvelope> markAllNotificationsRead();
@@ -43,12 +41,8 @@ abstract class NotificationsClient {
   });
 
   @POST('/api/v1/push-tokens')
-  Future<RegisteredResultEnvelope> registerPushToken({
-    @Body() required PushTokenRequest body,
-  });
+  Future<RegisteredResultEnvelope> registerPushToken({@Body() required PushTokenRequest body});
 
   @POST('/api/v1/push-tokens/revoke')
-  Future<RevokedResultEnvelope> revokePushToken({
-    @Body() required RevokePushTokenRequest body,
-  });
+  Future<RevokedResultEnvelope> revokePushToken({@Body() required RevokePushTokenRequest body});
 }

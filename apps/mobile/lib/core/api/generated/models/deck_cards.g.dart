@@ -8,9 +8,7 @@ part of 'deck_cards.dart';
 
 DeckCards _$DeckCardsFromJson(Map<String, dynamic> json) => DeckCards(
   deck: StudentDeck.fromJson(json['deck'] as Map<String, dynamic>),
-  cards: (json['cards'] as List<dynamic>)
-      .map((e) => StudentCard.fromJson(e as Map<String, dynamic>))
-      .toList(),
+  cards: (json['cards'] as List<dynamic>).map((e) => StudentCard.fromJson(e as Map<String, dynamic>)).toList(),
   urlsExpireAt: json['urlsExpireAt'] as String,
 );
 

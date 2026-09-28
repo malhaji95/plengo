@@ -22,9 +22,9 @@ class ReviewLog {
     this.durationMs,
     this.undone,
   });
-  
+
   factory ReviewLog.fromJson(Map<String, Object?> json) => _$ReviewLogFromJson(json);
-  
+
   final String id;
   @JsonKey(includeIfNull: false)
   final String? flashcardId;

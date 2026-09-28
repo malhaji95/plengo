@@ -8,13 +8,10 @@ part 'web_login_request.g.dart';
 
 @JsonSerializable()
 class WebLoginRequest {
-  const WebLoginRequest({
-    required this.email,
-    required this.password,
-  });
-  
+  const WebLoginRequest({required this.email, required this.password});
+
   factory WebLoginRequest.fromJson(Map<String, Object?> json) => _$WebLoginRequestFromJson(json);
-  
+
   final String email;
   final String password;
 

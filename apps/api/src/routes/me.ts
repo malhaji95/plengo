@@ -1,6 +1,8 @@
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
 import {
+  deletedSchema,
+  passwordConfirmBodySchema,
   meSchema,
   updateProfileBodySchema,
   revokedSchema,
@@ -10,6 +12,7 @@ import {
 import { authOf } from '../authorization/guards.js';
 import { AppError, ok } from '../lib/app-error.js';
 import type { Container } from '../container.js';
+import { forwardCookies, requestMeta } from './helpers.js';
 
 export function meRoutes(c: Container): FastifyPluginAsyncZod {
   return async (app) => {
@@ -34,6 +37,36 @@ export function meRoutes(c: Container): FastifyPluginAsyncZod {
         },
       },
       async (request) => ok(await c.catalog.updateProfile(authOf(request).userId, request.body)),
+    );
+
+    app.post(
+      '/me/delete',
+      {
+        schema: {
+          operationId: 'deleteMyAccount',
+          description:
+            'Deletes the account after the password is confirmed (spec §33): personal data, sessions, access and student decks go; learning history stays anonymous.',
+          tags: ['me'],
+          body: passwordConfirmBodySchema,
+          response: { 200: successEnvelope(deletedSchema) },
+        },
+        config: { rateLimit: { max: 10, timeWindow: 15 * 60_000 } },
+      },
+      async (request, reply) => {
+        const auth = authOf(request);
+        let setCookies: string[] = [];
+        const result = await c.accounts.deleteOwn(
+          auth.userId,
+          request.body.password,
+          request.ip,
+          async () => {
+            if (auth.via !== 'cookie') return;
+            setCookies = (await c.authService.cookieLogout(requestMeta(request, c.hashIp))).setCookies;
+          },
+        );
+        forwardCookies(reply, setCookies);
+        return ok(result);
+      },
     );
 
     app.get(

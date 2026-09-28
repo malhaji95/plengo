@@ -10,14 +10,10 @@ part 'push_token_request.g.dart';
 
 @JsonSerializable()
 class PushTokenRequest {
-  const PushTokenRequest({
-    required this.token,
-    required this.platform,
-    this.appVersion,
-  });
-  
+  const PushTokenRequest({required this.token, required this.platform, this.appVersion});
+
   factory PushTokenRequest.fromJson(Map<String, Object?> json) => _$PushTokenRequestFromJson(json);
-  
+
   final String token;
   final PushTokenRequestPlatform platform;
   @JsonKey(includeIfNull: false)

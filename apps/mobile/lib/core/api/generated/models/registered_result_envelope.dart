@@ -10,14 +10,10 @@ part 'registered_result_envelope.g.dart';
 
 @JsonSerializable()
 class RegisteredResultEnvelope {
-  const RegisteredResultEnvelope({
-    required this.success,
-    required this.data,
-    required this.error,
-  });
-  
+  const RegisteredResultEnvelope({required this.success, required this.data, required this.error});
+
   factory RegisteredResultEnvelope.fromJson(Map<String, Object?> json) => _$RegisteredResultEnvelopeFromJson(json);
-  
+
   final bool success;
   final RegisteredResult data;
   final dynamic error;

@@ -22,6 +22,7 @@ import '../features/bookmarks/saved_tab.dart';
 import '../features/home/home_tab.dart';
 import '../features/home/notification_screens.dart';
 import '../features/learning/mistakes_screen.dart';
+import '../features/legal/legal_screen.dart';
 import '../features/learning/stats_screen.dart';
 import '../features/my_decks/card_editor_screen.dart';
 import '../features/my_decks/my_deck_screen.dart';
@@ -78,6 +79,11 @@ abstract final class Routes {
   static const randomPractice = '/practice/random';
 
   static const public = {login, register, verifyEmail, forgotPassword, resetPassword};
+
+  /// Readable signed in or out (store listings link to them).
+  static const privacy = '/privacy';
+  static const terms = '/terms';
+  static const legal = {privacy, terms};
 }
 
 /// Bridges Riverpod auth/update state to GoRouter's refresh mechanism.
@@ -103,6 +109,7 @@ GoRouter buildRouter(Ref ref, {required bool couponRedemption}) {
     redirect: (context, state) {
       final location = state.matchedLocation;
       if (ref.read(updateRequiredProvider)) return location == Routes.update ? null : Routes.update;
+      if (Routes.legal.contains(location)) return null;
 
       final auth = ref.read(authControllerProvider);
       if (auth.isLoading || auth.hasError) {
@@ -131,6 +138,14 @@ GoRouter buildRouter(Ref ref, {required bool couponRedemption}) {
         builder: (_, state) => LoginScreen(initialEmail: state.uri.queryParameters['email']),
       ),
       GoRoute(path: Routes.register, builder: (_, _) => const RegisterScreen()),
+      GoRoute(
+        path: Routes.privacy,
+        builder: (_, _) => const LegalScreen(document: LegalDocument.privacy),
+      ),
+      GoRoute(
+        path: Routes.terms,
+        builder: (_, _) => const LegalScreen(document: LegalDocument.terms),
+      ),
       GoRoute(
         path: Routes.verifyEmail,
         builder: (_, state) => VerifyEmailScreen(email: state.uri.queryParameters['email'] ?? ''),

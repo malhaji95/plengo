@@ -10,14 +10,10 @@ part 'offline_manifest_item.g.dart';
 
 @JsonSerializable()
 class OfflineManifestItem {
-  const OfflineManifestItem({
-    required this.type,
-    required this.id,
-    required this.version,
-  });
-  
+  const OfflineManifestItem({required this.type, required this.id, required this.version});
+
   factory OfflineManifestItem.fromJson(Map<String, Object?> json) => _$OfflineManifestItemFromJson(json);
-  
+
   final OfflineItemType type;
   final String id;
   final int version;

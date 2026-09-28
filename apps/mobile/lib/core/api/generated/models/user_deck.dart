@@ -19,9 +19,9 @@ class UserDeck {
     required this.updatedAt,
     required this.deletedAt,
   });
-  
+
   factory UserDeck.fromJson(Map<String, Object?> json) => _$UserDeckFromJson(json);
-  
+
   final String id;
   final String name;
   @JsonKey(includeIfNull: true)

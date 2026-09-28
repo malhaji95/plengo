@@ -25,9 +25,9 @@ class OfflineAttempt {
     this.teacherTrackId,
     this.timeSpentMs,
   });
-  
+
   factory OfflineAttempt.fromJson(Map<String, Object?> json) => _$OfflineAttemptFromJson(json);
-  
+
   final String clientAttemptId;
   final OfflineAttemptSource source;
   final OfflineAttemptMode mode;

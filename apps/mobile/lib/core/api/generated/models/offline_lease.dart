@@ -18,9 +18,9 @@ class OfflineLease {
     required this.status,
     required this.expiresAt,
   });
-  
+
   factory OfflineLease.fromJson(Map<String, Object?> json) => _$OfflineLeaseFromJson(json);
-  
+
   final OfflineLeaseScopeType scopeType;
   @JsonKey(includeIfNull: true)
   final String? subjectId;

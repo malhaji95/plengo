@@ -10,14 +10,10 @@ part 'offline_items_page.g.dart';
 
 @JsonSerializable()
 class OfflineItemsPage {
-  const OfflineItemsPage({
-    required this.items,
-    required this.nextCursor,
-    required this.urlsExpireAt,
-  });
-  
+  const OfflineItemsPage({required this.items, required this.nextCursor, required this.urlsExpireAt});
+
   factory OfflineItemsPage.fromJson(Map<String, Object?> json) => _$OfflineItemsPageFromJson(json);
-  
+
   final List<OfflineItem> items;
   @JsonKey(includeIfNull: true)
   final String? nextCursor;

@@ -10,14 +10,11 @@ part 'notification_preferences_envelope.g.dart';
 
 @JsonSerializable()
 class NotificationPreferencesEnvelope {
-  const NotificationPreferencesEnvelope({
-    required this.success,
-    required this.data,
-    required this.error,
-  });
-  
-  factory NotificationPreferencesEnvelope.fromJson(Map<String, Object?> json) => _$NotificationPreferencesEnvelopeFromJson(json);
-  
+  const NotificationPreferencesEnvelope({required this.success, required this.data, required this.error});
+
+  factory NotificationPreferencesEnvelope.fromJson(Map<String, Object?> json) =>
+      _$NotificationPreferencesEnvelopeFromJson(json);
+
   final bool success;
   final NotificationPreferences data;
   final dynamic error;

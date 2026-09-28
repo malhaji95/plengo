@@ -10,14 +10,10 @@ part 'user_deck_list_envelope.g.dart';
 
 @JsonSerializable()
 class UserDeckListEnvelope {
-  const UserDeckListEnvelope({
-    required this.success,
-    required this.data,
-    required this.error,
-  });
-  
+  const UserDeckListEnvelope({required this.success, required this.data, required this.error});
+
   factory UserDeckListEnvelope.fromJson(Map<String, Object?> json) => _$UserDeckListEnvelopeFromJson(json);
-  
+
   final bool success;
   final UserDeckList data;
   final dynamic error;

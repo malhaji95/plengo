@@ -8,13 +8,10 @@ part 'day_count.g.dart';
 
 @JsonSerializable()
 class DayCount {
-  const DayCount({
-    required this.date,
-    required this.count,
-  });
-  
+  const DayCount({required this.date, required this.count});
+
   factory DayCount.fromJson(Map<String, Object?> json) => _$DayCountFromJson(json);
-  
+
   final String date;
   final int count;
 

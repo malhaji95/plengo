@@ -9,6 +9,6 @@ part of 'mobile_logout_request.dart';
 MobileLogoutRequest _$MobileLogoutRequestFromJson(Map<String, dynamic> json) =>
     MobileLogoutRequest(refreshToken: json['refreshToken'] as String);
 
-Map<String, dynamic> _$MobileLogoutRequestToJson(
-  MobileLogoutRequest instance,
-) => <String, dynamic>{'refreshToken': instance.refreshToken};
+Map<String, dynamic> _$MobileLogoutRequestToJson(MobileLogoutRequest instance) => <String, dynamic>{
+  'refreshToken': instance.refreshToken,
+};

@@ -8,12 +8,10 @@ part 'goal_settings.g.dart';
 
 @JsonSerializable()
 class GoalSettings {
-  const GoalSettings({
-    required this.dailyGoal,
-  });
-  
+  const GoalSettings({required this.dailyGoal});
+
   factory GoalSettings.fromJson(Map<String, Object?> json) => _$GoalSettingsFromJson(json);
-  
+
   final int dailyGoal;
 
   Map<String, Object?> toJson() => _$GoalSettingsToJson(this);

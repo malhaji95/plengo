@@ -6,14 +6,10 @@ part of 'refresh_leases_request.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-RefreshLeasesRequest _$RefreshLeasesRequestFromJson(
-  Map<String, dynamic> json,
-) => RefreshLeasesRequest(
-  scopes: (json['scopes'] as List<dynamic>)
-      .map((e) => LeaseScope.fromJson(e as Map<String, dynamic>))
-      .toList(),
+RefreshLeasesRequest _$RefreshLeasesRequestFromJson(Map<String, dynamic> json) => RefreshLeasesRequest(
+  scopes: (json['scopes'] as List<dynamic>).map((e) => LeaseScope.fromJson(e as Map<String, dynamic>)).toList(),
 );
 
-Map<String, dynamic> _$RefreshLeasesRequestToJson(
-  RefreshLeasesRequest instance,
-) => <String, dynamic>{'scopes': instance.scopes};
+Map<String, dynamic> _$RefreshLeasesRequestToJson(RefreshLeasesRequest instance) => <String, dynamic>{
+  'scopes': instance.scopes,
+};

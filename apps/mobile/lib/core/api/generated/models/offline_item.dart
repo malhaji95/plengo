@@ -23,9 +23,9 @@ class OfflineItem {
     required this.card,
     required this.quiz,
   });
-  
+
   factory OfflineItem.fromJson(Map<String, Object?> json) => _$OfflineItemFromJson(json);
-  
+
   final OfflineItemType type;
   final String id;
   final int version;

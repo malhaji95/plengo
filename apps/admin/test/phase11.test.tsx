@@ -412,3 +412,38 @@ describe('flashcard bulk upload (§27)', () => {
     });
   });
 });
+
+describe('student account deletion (§33)', () => {
+  it('deletes on confirmation and shows the account as deleted', async () => {
+    let status = 'active';
+    replies.set('GET /api/v1/admin/students/{id}', () =>
+      ok({
+        student: {
+          id: 'deck-1',
+          email: 'sara@example.com',
+          fullName: 'سارة',
+          educationLevelId: null,
+          emailVerified: true,
+          status,
+          createdAt: '2026-01-01T00:00:00Z',
+          activeEntitlements: 0,
+        },
+        entitlements: [],
+      }),
+    );
+    replies.set('GET /api/v1/admin/students/{id}/sessions', ok([]));
+    replies.set('GET /api/v1/admin/students/{id}/attempts', ok({ items: [], nextCursor: null }));
+    replies.set('POST /api/v1/admin/students/{id}/delete', () => {
+      status = 'deleted';
+      return ok({ deleted: true });
+    });
+    const { default: StudentPage } = await import('@/app/(dashboard)/students/[id]/page');
+    render(<StudentPage />);
+    fireEvent.click(await screen.findByRole('button', { name: 'حذف الحساب نهائياً' }));
+    expect(await screen.findByText(/الحساب محذوف/)).toBeTruthy();
+    expect(calls.find((c) => c.path === '/api/v1/admin/students/{id}/delete')?.init?.params).toEqual({
+      path: { id: 'deck-1' },
+    });
+    expect(screen.queryByRole('button', { name: 'حذف الحساب نهائياً' })).toBeNull();
+  });
+});

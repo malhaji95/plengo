@@ -16,9 +16,9 @@ class OfflineImage {
     required this.height,
     required this.sizeBytes,
   });
-  
+
   factory OfflineImage.fromJson(Map<String, Object?> json) => _$OfflineImageFromJson(json);
-  
+
   final String mediaId;
   final int version;
   final String url;

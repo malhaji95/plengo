@@ -99,6 +99,13 @@
       "when": 1790606059915,
       "tag": "0013_admin_productivity",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1790609427782,
+      "tag": "0014_account_deletion",
+      "breakpoints": true
     }
   ]
 }

@@ -22,9 +22,9 @@ class SrsSyncState {
     this.flashcardId,
     this.userCardId,
   });
-  
+
   factory SrsSyncState.fromJson(Map<String, Object?> json) => _$SrsSyncStateFromJson(json);
-  
+
   final SrsSyncStateState state;
   final int step;
   final DateTime dueAt;

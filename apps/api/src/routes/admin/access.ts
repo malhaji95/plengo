@@ -86,6 +86,19 @@ export function adminAccessRoutes(c: Container): FastifyPluginAsyncZod {
         async (request) => ok(await c.access.studentDetail(request.params.id)),
       );
       app.post(
+        '/students/:id/delete',
+        {
+          schema: {
+            operationId: 'adminDeleteStudent',
+            description: 'Deletes a student account on request (spec §33). Irreversible; audited.',
+            tags,
+            params: idParams,
+            response: { 200: successEnvelope(deletedSchema) },
+          },
+        },
+        async (request) => ok(await c.accounts.deleteByAdmin(actor(request), request.params.id)),
+      );
+      app.post(
         '/students/:id/entitlements',
         {
           schema: {

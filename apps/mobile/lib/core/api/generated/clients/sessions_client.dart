@@ -18,7 +18,5 @@ abstract class SessionsClient {
   Future<SessionListEnvelope> listSessions();
 
   @DELETE('/api/v1/sessions/{id}')
-  Future<RevokedResultEnvelope> revokeSession({
-    @Path('id') required String id,
-  });
+  Future<RevokedResultEnvelope> revokeSession({@Path('id') required String id});
 }

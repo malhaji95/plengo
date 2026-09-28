@@ -15,12 +15,11 @@ OfflineImage _$OfflineImageFromJson(Map<String, dynamic> json) => OfflineImage(
   sizeBytes: (json['sizeBytes'] as num).toInt(),
 );
 
-Map<String, dynamic> _$OfflineImageToJson(OfflineImage instance) =>
-    <String, dynamic>{
-      'mediaId': instance.mediaId,
-      'version': instance.version,
-      'url': instance.url,
-      'width': instance.width,
-      'height': instance.height,
-      'sizeBytes': instance.sizeBytes,
-    };
+Map<String, dynamic> _$OfflineImageToJson(OfflineImage instance) => <String, dynamic>{
+  'mediaId': instance.mediaId,
+  'version': instance.version,
+  'url': instance.url,
+  'width': instance.width,
+  'height': instance.height,
+  'sizeBytes': instance.sizeBytes,
+};

@@ -8,12 +8,10 @@ part 'mobile_logout_request.g.dart';
 
 @JsonSerializable()
 class MobileLogoutRequest {
-  const MobileLogoutRequest({
-    required this.refreshToken,
-  });
-  
+  const MobileLogoutRequest({required this.refreshToken});
+
   factory MobileLogoutRequest.fromJson(Map<String, Object?> json) => _$MobileLogoutRequestFromJson(json);
-  
+
   final String refreshToken;
 
   Map<String, Object?> toJson() => _$MobileLogoutRequestToJson(this);

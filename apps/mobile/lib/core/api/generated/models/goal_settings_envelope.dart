@@ -10,14 +10,10 @@ part 'goal_settings_envelope.g.dart';
 
 @JsonSerializable()
 class GoalSettingsEnvelope {
-  const GoalSettingsEnvelope({
-    required this.success,
-    required this.data,
-    required this.error,
-  });
-  
+  const GoalSettingsEnvelope({required this.success, required this.data, required this.error});
+
   factory GoalSettingsEnvelope.fromJson(Map<String, Object?> json) => _$GoalSettingsEnvelopeFromJson(json);
-  
+
   final bool success;
   final GoalSettings data;
   final dynamic error;

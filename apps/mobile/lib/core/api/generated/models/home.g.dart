@@ -9,19 +9,11 @@ part of 'home.dart';
 Home _$HomeFromJson(Map<String, dynamic> json) => Home(
   greetingName: json['greetingName'] as String,
   unreadNotifications: (json['unreadNotifications'] as num).toInt(),
-  countdown: json['countdown'] == null
-      ? null
-      : ExamCountdown.fromJson(json['countdown'] as Map<String, dynamic>),
-  banners: (json['banners'] as List<dynamic>)
-      .map((e) => HomeBanner.fromJson(e as Map<String, dynamic>))
-      .toList(),
+  countdown: json['countdown'] == null ? null : ExamCountdown.fromJson(json['countdown'] as Map<String, dynamic>),
+  banners: (json['banners'] as List<dynamic>).map((e) => HomeBanner.fromJson(e as Map<String, dynamic>)).toList(),
   today: Today.fromJson(json['today'] as Map<String, dynamic>),
-  resume: (json['resume'] as List<dynamic>)
-      .map((e) => ResumeItem.fromJson(e as Map<String, dynamic>))
-      .toList(),
-  myAccess: (json['myAccess'] as List<dynamic>)
-      .map((e) => MyEntitlement.fromJson(e as Map<String, dynamic>))
-      .toList(),
+  resume: (json['resume'] as List<dynamic>).map((e) => ResumeItem.fromJson(e as Map<String, dynamic>)).toList(),
+  myAccess: (json['myAccess'] as List<dynamic>).map((e) => MyEntitlement.fromJson(e as Map<String, dynamic>)).toList(),
   freeSubjects: (json['freeSubjects'] as List<dynamic>)
       .map((e) => FreeSubject.fromJson(e as Map<String, dynamic>))
       .toList(),

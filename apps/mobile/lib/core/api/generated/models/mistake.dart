@@ -29,9 +29,9 @@ class Mistake {
     required this.firstWrongAt,
     required this.lastWrongAt,
   });
-  
+
   factory Mistake.fromJson(Map<String, Object?> json) => _$MistakeFromJson(json);
-  
+
   final String questionId;
   final MistakeType type;
   final String questionText;

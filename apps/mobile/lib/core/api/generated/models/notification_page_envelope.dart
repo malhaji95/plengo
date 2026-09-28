@@ -10,14 +10,10 @@ part 'notification_page_envelope.g.dart';
 
 @JsonSerializable()
 class NotificationPageEnvelope {
-  const NotificationPageEnvelope({
-    required this.success,
-    required this.data,
-    required this.error,
-  });
-  
+  const NotificationPageEnvelope({required this.success, required this.data, required this.error});
+
   factory NotificationPageEnvelope.fromJson(Map<String, Object?> json) => _$NotificationPageEnvelopeFromJson(json);
-  
+
   final bool success;
   final NotificationPage data;
   final dynamic error;

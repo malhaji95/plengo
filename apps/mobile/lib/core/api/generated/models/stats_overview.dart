@@ -27,9 +27,9 @@ class StatsOverview {
     required this.weakestUnits,
     required this.mostMissed,
   });
-  
+
   factory StatsOverview.fromJson(Map<String, Object?> json) => _$StatsOverviewFromJson(json);
-  
+
   final Accuracy totals;
   final int quizzesCompleted;
   final int studyDays;

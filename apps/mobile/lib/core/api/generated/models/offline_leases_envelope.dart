@@ -10,14 +10,10 @@ part 'offline_leases_envelope.g.dart';
 
 @JsonSerializable()
 class OfflineLeasesEnvelope {
-  const OfflineLeasesEnvelope({
-    required this.success,
-    required this.data,
-    required this.error,
-  });
-  
+  const OfflineLeasesEnvelope({required this.success, required this.data, required this.error});
+
   factory OfflineLeasesEnvelope.fromJson(Map<String, Object?> json) => _$OfflineLeasesEnvelopeFromJson(json);
-  
+
   final bool success;
   final OfflineLeases data;
   final dynamic error;

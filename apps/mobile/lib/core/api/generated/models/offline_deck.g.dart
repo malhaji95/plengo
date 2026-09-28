@@ -19,16 +19,15 @@ OfflineDeck _$OfflineDeckFromJson(Map<String, dynamic> json) => OfflineDeck(
   cardIds: (json['cardIds'] as List<dynamic>).map((e) => e as String).toList(),
 );
 
-Map<String, dynamic> _$OfflineDeckToJson(OfflineDeck instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'subjectId': instance.subjectId,
-      'teacherTrackId': instance.teacherTrackId,
-      'unitId': instance.unitId,
-      'lessonId': instance.lessonId,
-      'titleAr': instance.titleAr,
-      'description': instance.description,
-      'isFree': instance.isFree,
-      'sortOrder': instance.sortOrder,
-      'cardIds': instance.cardIds,
-    };
+Map<String, dynamic> _$OfflineDeckToJson(OfflineDeck instance) => <String, dynamic>{
+  'id': instance.id,
+  'subjectId': instance.subjectId,
+  'teacherTrackId': instance.teacherTrackId,
+  'unitId': instance.unitId,
+  'lessonId': instance.lessonId,
+  'titleAr': instance.titleAr,
+  'description': instance.description,
+  'isFree': instance.isFree,
+  'sortOrder': instance.sortOrder,
+  'cardIds': instance.cardIds,
+};

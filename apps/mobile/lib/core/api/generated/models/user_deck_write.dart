@@ -18,9 +18,9 @@ class UserDeckWrite {
     this.color,
     this.deletedAt,
   });
-  
+
   factory UserDeckWrite.fromJson(Map<String, Object?> json) => _$UserDeckWriteFromJson(json);
-  
+
   final String id;
   final String name;
   @JsonKey(includeIfNull: false)

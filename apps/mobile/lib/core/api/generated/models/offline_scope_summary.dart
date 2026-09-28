@@ -16,9 +16,9 @@ class OfflineScopeSummary {
     required this.sizeBytes,
     required this.packCount,
   });
-  
+
   factory OfflineScopeSummary.fromJson(Map<String, Object?> json) => _$OfflineScopeSummaryFromJson(json);
-  
+
   final OfflineScope scope;
   final String titleAr;
   final int sizeBytes;

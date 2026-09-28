@@ -10,14 +10,10 @@ part 'report_envelope.g.dart';
 
 @JsonSerializable()
 class ReportEnvelope {
-  const ReportEnvelope({
-    required this.success,
-    required this.data,
-    required this.error,
-  });
-  
+  const ReportEnvelope({required this.success, required this.data, required this.error});
+
   factory ReportEnvelope.fromJson(Map<String, Object?> json) => _$ReportEnvelopeFromJson(json);
-  
+
   final bool success;
   final Report data;
   final dynamic error;

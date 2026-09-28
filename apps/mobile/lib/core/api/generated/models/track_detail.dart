@@ -23,9 +23,9 @@ class TrackDetail {
     required this.deckCount,
     required this.quizCount,
   });
-  
+
   factory TrackDetail.fromJson(Map<String, Object?> json) => _$TrackDetailFromJson(json);
-  
+
   final TeacherTrack track;
   final Teacher teacher;
   final Subject subject;

@@ -17,9 +17,9 @@ class RegisterRequest {
     this.facultyId,
     this.academicYearId,
   });
-  
+
   factory RegisterRequest.fromJson(Map<String, Object?> json) => _$RegisterRequestFromJson(json);
-  
+
   final String fullName;
   final String email;
   final String password;

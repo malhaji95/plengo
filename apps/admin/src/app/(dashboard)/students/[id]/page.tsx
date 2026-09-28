@@ -37,6 +37,23 @@ export default function StudentPage() {
   );
   const [error, setError] = useState<string | null>(null);
 
+  /** Account deletion on the student's request (spec §33): irreversible, audited. */
+  async function deleteAccount() {
+    if (
+      !window.confirm(
+        'سيُحذف الاسم والبريد والصورة والجلسات والصلاحيات ومجموعات البطاقات الخاصة لهذا الطالب نهائياً، وتبقى الإحصاءات دون هوية. متابعة؟',
+      )
+    )
+      return;
+    setError(null);
+    try {
+      await unwrap(api.POST('/api/v1/admin/students/{id}/delete', { params: { path: { id } } }));
+      await detail.reload();
+    } catch (err) {
+      setError(errorMessage(err));
+    }
+  }
+
   return (
     <div className="mx-auto max-w-5xl space-y-4">
       <Link href="/students" className="inline-flex items-center gap-1 text-sm text-brand">
@@ -54,9 +71,23 @@ export default function StudentPage() {
             تاريخ التسجيل {formatDate(s.createdAt)} ·{' '}
             {s.emailVerified ? 'البريد مُفعّل' : 'البريد غير مُفعّل'}
             {s.status === 'disabled' ? ' · الحساب معطّل' : ''}
+            {s.status === 'deleted' ? ' · الحساب محذوف' : ''}
           </p>
+          {s.status !== 'deleted' ? (
+            <div className="pt-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-danger"
+                onClick={() => void deleteAccount()}
+              >
+                حذف الحساب نهائياً
+              </Button>
+            </div>
+          ) : null}
         </Card>
       ) : null}
+      <FormError message={error} />
       <Card className="space-y-3 p-0 pt-4">
         <h2 className="px-4 font-semibold">صلاحيات الوصول</h2>
         <EntitlementTable items={detail.data?.entitlements ?? []} onChanged={detail.reload} />

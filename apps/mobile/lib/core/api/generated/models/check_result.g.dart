@@ -13,10 +13,9 @@ CheckResult _$CheckResultFromJson(Map<String, dynamic> json) => CheckResult(
   explanation: json['explanation'] as String?,
 );
 
-Map<String, dynamic> _$CheckResultToJson(CheckResult instance) =>
-    <String, dynamic>{
-      'isCorrect': instance.isCorrect,
-      'correctOptionId': instance.correctOptionId,
-      'correctAnswer': instance.correctAnswer,
-      'explanation': instance.explanation,
-    };
+Map<String, dynamic> _$CheckResultToJson(CheckResult instance) => <String, dynamic>{
+  'isCorrect': instance.isCorrect,
+  'correctOptionId': instance.correctOptionId,
+  'correctAnswer': instance.correctAnswer,
+  'explanation': instance.explanation,
+};

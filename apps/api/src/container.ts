@@ -25,6 +25,7 @@ import { createOfflineRepository } from './repositories/offline-repository.js';
 import { createHomeRepository } from './repositories/home-repository.js';
 import { createAdminToolsRepository } from './repositories/admin-tools-repository.js';
 import { createImportRepository } from './repositories/import-repository.js';
+import { createAccountRepository } from './repositories/account-repository.js';
 import { createReportRepository } from './repositories/report-repository.js';
 import { createUserContentRepository } from './repositories/user-content-repository.js';
 import { createAccessService, type AccessService } from './services/access-service.js';
@@ -60,6 +61,7 @@ import { createOfflineService, type OfflineService } from './services/offline-se
 import { createHomeService, type HomeService } from './services/home-service.js';
 import { createAdminToolsService, type AdminToolsService } from './services/admin-tools-service.js';
 import { createImportService, type ImportService } from './services/import-service.js';
+import { createAccountService, type AccountService } from './services/account-service.js';
 import { createNotificationService, type NotificationService } from './services/notification-service.js';
 import { FcmPushSender, RecordingPushSender, type PushSender } from './services/push.js';
 import { createReportService, type ReportService } from './services/report-service.js';
@@ -81,6 +83,7 @@ export interface Container {
   sessionsRepo: SessionsRepository;
   mobileTokens: MobileTokenService;
   authService: AuthService;
+  accounts: AccountService;
   configService: ConfigService;
   audit: AuditService;
   uploadService: UploadService;
@@ -356,6 +359,7 @@ export function createContainer(
     quizCounts: (scope) => quizzes.counts(scope),
     subjectTracks: (id) => teachers.subjectTracks(id),
   });
+  const authService = createAuthService({ auth, usersRepo, sessionsRepo, mobileTokens, catalog });
 
   return {
     env,
@@ -369,7 +373,17 @@ export function createContainer(
     usersRepo,
     sessionsRepo,
     mobileTokens,
-    authService: createAuthService({ auth, usersRepo, sessionsRepo, mobileTokens, catalog }),
+    authService,
+    accounts: createAccountService({
+      db,
+      repo: createAccountRepository(),
+      usersRepo,
+      storage,
+      audit,
+      verifyPassword: (email, password) => authService.checkPassword(email, password),
+      log,
+      now: overrides.now,
+    }),
     configService,
     audit,
     uploadService: createUploadService({ db, storage, jobs: overrides.jobs, appEnv: env.APP_ENV }),

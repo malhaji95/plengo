@@ -28,10 +28,7 @@ Map<String, dynamic> _$ReportToJson(Report instance) => <String, dynamic>{
   'resolvedAt': instance.resolvedAt,
 };
 
-const _$ReportItemTypeEnumMap = {
-  ReportItemType.question: 'question',
-  ReportItemType.flashcard: 'flashcard',
-};
+const _$ReportItemTypeEnumMap = {ReportItemType.question: 'question', ReportItemType.flashcard: 'flashcard'};
 
 const _$ReportReasonEnumMap = {
   ReportReason.wrongAnswer: 'wrong_answer',

@@ -11,14 +11,10 @@ part 'due_user_card.g.dart';
 
 @JsonSerializable()
 class DueUserCard {
-  const DueUserCard({
-    required this.card,
-    required this.deckName,
-    required this.state,
-  });
-  
+  const DueUserCard({required this.card, required this.deckName, required this.state});
+
   factory DueUserCard.fromJson(Map<String, Object?> json) => _$DueUserCardFromJson(json);
-  
+
   final UserCard card;
   final String deckName;
   final SrsCardState state;

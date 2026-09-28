@@ -145,6 +145,7 @@ export 'models/offline_sync_outcome.dart';
 export 'models/offline_sync_request.dart';
 export 'models/offline_sync_result.dart';
 export 'models/offline_sync_result_envelope.dart';
+export 'models/password_confirm_request.dart';
 export 'models/push_token_request.dart';
 export 'models/read_result.dart';
 export 'models/read_result_envelope.dart';
@@ -323,4 +324,3 @@ export 'models/sync_rejection_code.dart';
 export 'models/type_accuracy_type.dart';
 // Root client
 export 'plengo_api.dart';
-

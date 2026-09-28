@@ -1,4 +1,4 @@
-import { and, count, desc, eq, gt, ilike, inArray, isNull, lte, or, sql, type SQL } from 'drizzle-orm';
+import { and, count, desc, eq, gt, ilike, inArray, isNull, lte, or, sql, type SQL, ne } from 'drizzle-orm';
 import {
   coupons,
   entitlements,
@@ -77,7 +77,7 @@ export type StudentRow = {
   fullName: string | null;
   educationLevelId: string | null;
   emailVerified: boolean;
-  status: 'active' | 'disabled';
+  status: 'active' | 'disabled' | 'deleted';
   createdAt: Date;
 };
 
@@ -234,7 +234,7 @@ export function createAccessRepository(db: Db) {
       const [row] = await db
         .select({ id: users.id })
         .from(users)
-        .where(and(eq(users.id, userId), eq(users.role, 'student')))
+        .where(and(eq(users.id, userId), eq(users.role, 'student'), ne(users.status, 'deleted')))
         .limit(1);
       return Boolean(row);
     },
@@ -248,6 +248,8 @@ export function createAccessRepository(db: Db) {
         .where(
           and(
             eq(users.role, 'student'),
+            // Deleted accounts are anonymous tombstones (§33): not listed.
+            ne(users.status, 'deleted'),
             term
               ? or(
                   ilike(users.email, `%${term}%`),

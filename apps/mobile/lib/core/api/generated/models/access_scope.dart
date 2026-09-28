@@ -19,9 +19,9 @@ class AccessScope {
     required this.teacherNameAr,
     required this.educationLevelId,
   });
-  
+
   factory AccessScope.fromJson(Map<String, Object?> json) => _$AccessScopeFromJson(json);
-  
+
   final AccessScopeScopeType scopeType;
   final String subjectId;
   @JsonKey(includeIfNull: true)

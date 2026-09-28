@@ -10,14 +10,10 @@ part 'lease_scope.g.dart';
 
 @JsonSerializable()
 class LeaseScope {
-  const LeaseScope({
-    required this.scopeType,
-    this.subjectId,
-    this.teacherTrackId,
-  });
-  
+  const LeaseScope({required this.scopeType, this.subjectId, this.teacherTrackId});
+
   factory LeaseScope.fromJson(Map<String, Object?> json) => _$LeaseScopeFromJson(json);
-  
+
   final LeaseScopeScopeType scopeType;
   @JsonKey(includeIfNull: false)
   final String? subjectId;

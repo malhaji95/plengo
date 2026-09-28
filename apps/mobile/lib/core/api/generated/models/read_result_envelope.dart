@@ -10,14 +10,10 @@ part 'read_result_envelope.g.dart';
 
 @JsonSerializable()
 class ReadResultEnvelope {
-  const ReadResultEnvelope({
-    required this.success,
-    required this.data,
-    required this.error,
-  });
-  
+  const ReadResultEnvelope({required this.success, required this.data, required this.error});
+
   factory ReadResultEnvelope.fromJson(Map<String, Object?> json) => _$ReadResultEnvelopeFromJson(json);
-  
+
   final bool success;
   final ReadResult data;
   final dynamic error;

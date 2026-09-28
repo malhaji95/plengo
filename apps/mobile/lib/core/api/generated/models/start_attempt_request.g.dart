@@ -6,20 +6,15 @@ part of 'start_attempt_request.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-StartAttemptRequest _$StartAttemptRequestFromJson(Map<String, dynamic> json) =>
-    StartAttemptRequest(
-      clientAttemptId: json['clientAttemptId'] as String,
-      source: $enumDecode(_$StartAttemptRequestSourceEnumMap, json['source']),
-      mode: $enumDecode(_$StartAttemptRequestModeEnumMap, json['mode']),
-      quizId: json['quizId'] as String?,
-      filters: json['filters'] == null
-          ? null
-          : AttemptFilters.fromJson(json['filters'] as Map<String, dynamic>),
-    );
+StartAttemptRequest _$StartAttemptRequestFromJson(Map<String, dynamic> json) => StartAttemptRequest(
+  clientAttemptId: json['clientAttemptId'] as String,
+  source: $enumDecode(_$StartAttemptRequestSourceEnumMap, json['source']),
+  mode: $enumDecode(_$StartAttemptRequestModeEnumMap, json['mode']),
+  quizId: json['quizId'] as String?,
+  filters: json['filters'] == null ? null : AttemptFilters.fromJson(json['filters'] as Map<String, dynamic>),
+);
 
-Map<String, dynamic> _$StartAttemptRequestToJson(
-  StartAttemptRequest instance,
-) => <String, dynamic>{
+Map<String, dynamic> _$StartAttemptRequestToJson(StartAttemptRequest instance) => <String, dynamic>{
   'clientAttemptId': instance.clientAttemptId,
   'source': instance.source,
   'mode': instance.mode,

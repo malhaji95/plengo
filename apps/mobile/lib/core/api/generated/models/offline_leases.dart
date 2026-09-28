@@ -10,13 +10,10 @@ part 'offline_leases.g.dart';
 
 @JsonSerializable()
 class OfflineLeases {
-  const OfflineLeases({
-    required this.serverTime,
-    required this.leases,
-  });
-  
+  const OfflineLeases({required this.serverTime, required this.leases});
+
   factory OfflineLeases.fromJson(Map<String, Object?> json) => _$OfflineLeasesFromJson(json);
-  
+
   final String serverTime;
   final List<OfflineLease> leases;
 

@@ -7,6 +7,7 @@ import '../../app/router.dart';
 import '../../core/api/api_exception.dart';
 import '../../shared/widgets/form_widgets.dart';
 import '../subjects/placement_picker.dart';
+import '../legal/legal_screen.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -113,6 +114,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             ErrorBanner(_error),
             const SizedBox(height: 16),
             SubmitButton(key: const Key('register.submit'), label: 'إنشاء الحساب', busy: _busy, onPressed: _submit),
+            const SizedBox(height: 12),
+            LegalConsentText(
+              onOpen: (doc) => context.push(doc == LegalDocument.privacy ? Routes.privacy : Routes.terms),
+            ),
           ],
         ),
       ),

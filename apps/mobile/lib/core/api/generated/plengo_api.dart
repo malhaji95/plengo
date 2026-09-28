@@ -29,11 +29,7 @@ import 'clients/notifications_client.dart';
 
 /// Plengo API `v1.0.0`
 class PlengoApi {
-  PlengoApi(
-    Dio dio, {
-    String? baseUrl,
-  })  : _dio = dio,
-        _baseUrl = baseUrl;
+  PlengoApi(Dio dio, {String? baseUrl}) : _dio = dio, _baseUrl = baseUrl;
 
   final Dio _dio;
   final String? _baseUrl;

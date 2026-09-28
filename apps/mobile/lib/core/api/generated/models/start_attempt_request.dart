@@ -19,9 +19,9 @@ class StartAttemptRequest {
     this.quizId,
     this.filters,
   });
-  
+
   factory StartAttemptRequest.fromJson(Map<String, Object?> json) => _$StartAttemptRequestFromJson(json);
-  
+
   final String clientAttemptId;
   final StartAttemptRequestSource source;
   final StartAttemptRequestMode mode;

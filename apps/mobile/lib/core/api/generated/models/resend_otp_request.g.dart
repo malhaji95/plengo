@@ -9,5 +9,4 @@ part of 'resend_otp_request.dart';
 ResendOtpRequest _$ResendOtpRequestFromJson(Map<String, dynamic> json) =>
     ResendOtpRequest(email: json['email'] as String);
 
-Map<String, dynamic> _$ResendOtpRequestToJson(ResendOtpRequest instance) =>
-    <String, dynamic>{'email': instance.email};
+Map<String, dynamic> _$ResendOtpRequestToJson(ResendOtpRequest instance) => <String, dynamic>{'email': instance.email};

@@ -11,13 +11,10 @@ part 'user_content_sync_request.g.dart';
 
 @JsonSerializable()
 class UserContentSyncRequest {
-  const UserContentSyncRequest({
-    required this.decks,
-    required this.cards,
-  });
-  
+  const UserContentSyncRequest({required this.decks, required this.cards});
+
   factory UserContentSyncRequest.fromJson(Map<String, Object?> json) => _$UserContentSyncRequestFromJson(json);
-  
+
   final List<UserDeckWrite> decks;
   final List<UserCardWrite> cards;
 

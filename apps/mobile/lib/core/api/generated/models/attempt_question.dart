@@ -26,9 +26,9 @@ class AttemptQuestion {
     required this.timeSpentMs,
     required this.result,
   });
-  
+
   factory AttemptQuestion.fromJson(Map<String, Object?> json) => _$AttemptQuestionFromJson(json);
-  
+
   final String questionId;
   final AttemptQuestionType type;
   @JsonKey(includeIfNull: true)

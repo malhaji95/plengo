@@ -10,12 +10,10 @@ part 'refresh_leases_request.g.dart';
 
 @JsonSerializable()
 class RefreshLeasesRequest {
-  const RefreshLeasesRequest({
-    required this.scopes,
-  });
-  
+  const RefreshLeasesRequest({required this.scopes});
+
   factory RefreshLeasesRequest.fromJson(Map<String, Object?> json) => _$RefreshLeasesRequestFromJson(json);
-  
+
   final List<LeaseScope> scopes;
 
   Map<String, Object?> toJson() => _$RefreshLeasesRequestToJson(this);

@@ -8,13 +8,10 @@ part 'student_option.g.dart';
 
 @JsonSerializable()
 class StudentOption {
-  const StudentOption({
-    required this.id,
-    required this.text,
-  });
-  
+  const StudentOption({required this.id, required this.text});
+
   factory StudentOption.fromJson(Map<String, Object?> json) => _$StudentOptionFromJson(json);
-  
+
   final String id;
   final String text;
 

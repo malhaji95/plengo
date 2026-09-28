@@ -8,12 +8,10 @@ part 'registered_result.g.dart';
 
 @JsonSerializable()
 class RegisteredResult {
-  const RegisteredResult({
-    required this.registered,
-  });
-  
+  const RegisteredResult({required this.registered});
+
   factory RegisteredResult.fromJson(Map<String, Object?> json) => _$RegisteredResultFromJson(json);
-  
+
   final bool registered;
 
   Map<String, Object?> toJson() => _$RegisteredResultToJson(this);

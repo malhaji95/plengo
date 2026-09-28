@@ -10,12 +10,10 @@ part 'offline_catalog.g.dart';
 
 @JsonSerializable()
 class OfflineCatalog {
-  const OfflineCatalog({
-    required this.scopes,
-  });
-  
+  const OfflineCatalog({required this.scopes});
+
   factory OfflineCatalog.fromJson(Map<String, Object?> json) => _$OfflineCatalogFromJson(json);
-  
+
   final List<OfflineScopeSummary> scopes;
 
   Map<String, Object?> toJson() => _$OfflineCatalogToJson(this);

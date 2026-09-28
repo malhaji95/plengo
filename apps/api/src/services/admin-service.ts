@@ -44,7 +44,8 @@ export function createAdminService(deps: {
       id: r.u.id,
       email: r.u.email,
       fullName: r.fullName ?? r.u.name,
-      status: r.u.status,
+      // Account deletion applies to students only; admins are active or disabled.
+      status: r.u.status === 'deleted' ? 'disabled' : r.u.status,
       twoFactorEnabled: r.u.twoFactorEnabled,
       createdAt: r.u.createdAt.toISOString(),
       lastSeenAt: r.lastSeen ? new Date(r.lastSeen).toISOString() : null,

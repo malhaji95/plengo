@@ -9,5 +9,6 @@ part of 'registered_result.dart';
 RegisteredResult _$RegisteredResultFromJson(Map<String, dynamic> json) =>
     RegisteredResult(registered: json['registered'] as bool);
 
-Map<String, dynamic> _$RegisteredResultToJson(RegisteredResult instance) =>
-    <String, dynamic>{'registered': instance.registered};
+Map<String, dynamic> _$RegisteredResultToJson(RegisteredResult instance) => <String, dynamic>{
+  'registered': instance.registered,
+};

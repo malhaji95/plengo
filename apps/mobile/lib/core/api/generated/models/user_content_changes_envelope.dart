@@ -10,14 +10,10 @@ part 'user_content_changes_envelope.g.dart';
 
 @JsonSerializable()
 class UserContentChangesEnvelope {
-  const UserContentChangesEnvelope({
-    required this.success,
-    required this.data,
-    required this.error,
-  });
-  
+  const UserContentChangesEnvelope({required this.success, required this.data, required this.error});
+
   factory UserContentChangesEnvelope.fromJson(Map<String, Object?> json) => _$UserContentChangesEnvelopeFromJson(json);
-  
+
   final bool success;
   final UserContentChanges data;
   final dynamic error;

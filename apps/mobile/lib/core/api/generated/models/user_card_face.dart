@@ -10,14 +10,10 @@ part 'user_card_face.g.dart';
 
 @JsonSerializable()
 class UserCardFace {
-  const UserCardFace({
-    required this.text,
-    required this.mediaId,
-    required this.image,
-  });
-  
+  const UserCardFace({required this.text, required this.mediaId, required this.image});
+
   factory UserCardFace.fromJson(Map<String, Object?> json) => _$UserCardFaceFromJson(json);
-  
+
   @JsonKey(includeIfNull: true)
   final String? text;
   @JsonKey(includeIfNull: true)

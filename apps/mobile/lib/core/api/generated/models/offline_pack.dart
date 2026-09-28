@@ -21,9 +21,9 @@ class OfflinePack {
     required this.version,
     required this.premium,
   });
-  
+
   factory OfflinePack.fromJson(Map<String, Object?> json) => _$OfflinePackFromJson(json);
-  
+
   final String packKey;
   final OfflinePackKind kind;
   @JsonKey(includeIfNull: true)

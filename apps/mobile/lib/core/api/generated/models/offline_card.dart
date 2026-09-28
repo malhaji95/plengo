@@ -17,9 +17,9 @@ class OfflineCard {
     required this.front,
     required this.back,
   });
-  
+
   factory OfflineCard.fromJson(Map<String, Object?> json) => _$OfflineCardFromJson(json);
-  
+
   final String id;
   final String deckId;
   final int sortOrder;

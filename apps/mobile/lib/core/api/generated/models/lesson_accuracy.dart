@@ -15,9 +15,9 @@ class LessonAccuracy {
     required this.lessonId,
     required this.lessonNameAr,
   });
-  
+
   factory LessonAccuracy.fromJson(Map<String, Object?> json) => _$LessonAccuracyFromJson(json);
-  
+
   final int answered;
   final int correct;
   @JsonKey(includeIfNull: true)

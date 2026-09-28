@@ -19,9 +19,9 @@ class HomeBanner {
     required this.action,
     required this.actionTarget,
   });
-  
+
   factory HomeBanner.fromJson(Map<String, Object?> json) => _$HomeBannerFromJson(json);
-  
+
   final String id;
   final String titleAr;
   final String imageUrl;

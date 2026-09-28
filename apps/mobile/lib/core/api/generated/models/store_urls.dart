@@ -8,13 +8,10 @@ part 'store_urls.g.dart';
 
 @JsonSerializable()
 class StoreUrls {
-  const StoreUrls({
-    required this.android,
-    required this.ios,
-  });
-  
+  const StoreUrls({required this.android, required this.ios});
+
   factory StoreUrls.fromJson(Map<String, Object?> json) => _$StoreUrlsFromJson(json);
-  
+
   final String android;
   final String ios;
 

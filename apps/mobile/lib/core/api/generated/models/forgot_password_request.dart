@@ -8,12 +8,10 @@ part 'forgot_password_request.g.dart';
 
 @JsonSerializable()
 class ForgotPasswordRequest {
-  const ForgotPasswordRequest({
-    required this.email,
-  });
-  
+  const ForgotPasswordRequest({required this.email});
+
   factory ForgotPasswordRequest.fromJson(Map<String, Object?> json) => _$ForgotPasswordRequestFromJson(json);
-  
+
   final String email;
 
   Map<String, Object?> toJson() => _$ForgotPasswordRequestToJson(this);

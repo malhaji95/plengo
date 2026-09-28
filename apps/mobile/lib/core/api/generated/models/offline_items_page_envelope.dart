@@ -10,14 +10,10 @@ part 'offline_items_page_envelope.g.dart';
 
 @JsonSerializable()
 class OfflineItemsPageEnvelope {
-  const OfflineItemsPageEnvelope({
-    required this.success,
-    required this.data,
-    required this.error,
-  });
-  
+  const OfflineItemsPageEnvelope({required this.success, required this.data, required this.error});
+
   factory OfflineItemsPageEnvelope.fromJson(Map<String, Object?> json) => _$OfflineItemsPageEnvelopeFromJson(json);
-  
+
   final bool success;
   final OfflineItemsPage data;
   final dynamic error;

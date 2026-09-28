@@ -10,14 +10,10 @@ part 'resume_list_envelope.g.dart';
 
 @JsonSerializable()
 class ResumeListEnvelope {
-  const ResumeListEnvelope({
-    required this.success,
-    required this.data,
-    required this.error,
-  });
-  
+  const ResumeListEnvelope({required this.success, required this.data, required this.error});
+
   factory ResumeListEnvelope.fromJson(Map<String, Object?> json) => _$ResumeListEnvelopeFromJson(json);
-  
+
   final bool success;
   final ResumeList data;
   final dynamic error;

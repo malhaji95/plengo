@@ -10,14 +10,10 @@ part 'redeem_result_envelope.g.dart';
 
 @JsonSerializable()
 class RedeemResultEnvelope {
-  const RedeemResultEnvelope({
-    required this.success,
-    required this.data,
-    required this.error,
-  });
-  
+  const RedeemResultEnvelope({required this.success, required this.data, required this.error});
+
   factory RedeemResultEnvelope.fromJson(Map<String, Object?> json) => _$RedeemResultEnvelopeFromJson(json);
-  
+
   final bool success;
   final RedeemResult data;
   final dynamic error;

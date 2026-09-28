@@ -18,9 +18,9 @@ class SubjectTrack {
     required this.coverUrl,
     required this.hasAccess,
   });
-  
+
   factory SubjectTrack.fromJson(Map<String, Object?> json) => _$SubjectTrackFromJson(json);
-  
+
   final String id;
   final String teacherId;
   final String teacherNameAr;

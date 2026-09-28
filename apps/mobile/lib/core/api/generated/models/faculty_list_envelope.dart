@@ -10,14 +10,10 @@ part 'faculty_list_envelope.g.dart';
 
 @JsonSerializable()
 class FacultyListEnvelope {
-  const FacultyListEnvelope({
-    required this.success,
-    required this.data,
-    required this.error,
-  });
-  
+  const FacultyListEnvelope({required this.success, required this.data, required this.error});
+
   factory FacultyListEnvelope.fromJson(Map<String, Object?> json) => _$FacultyListEnvelopeFromJson(json);
-  
+
   final bool success;
   final FacultyList data;
   final dynamic error;

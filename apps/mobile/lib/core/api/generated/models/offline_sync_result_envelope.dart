@@ -10,14 +10,10 @@ part 'offline_sync_result_envelope.g.dart';
 
 @JsonSerializable()
 class OfflineSyncResultEnvelope {
-  const OfflineSyncResultEnvelope({
-    required this.success,
-    required this.data,
-    required this.error,
-  });
-  
+  const OfflineSyncResultEnvelope({required this.success, required this.data, required this.error});
+
   factory OfflineSyncResultEnvelope.fromJson(Map<String, Object?> json) => _$OfflineSyncResultEnvelopeFromJson(json);
-  
+
   final bool success;
   final OfflineSyncResult data;
   final dynamic error;

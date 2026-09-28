@@ -8,14 +8,10 @@ part 'exam_countdown.g.dart';
 
 @JsonSerializable()
 class ExamCountdown {
-  const ExamCountdown({
-    required this.titleAr,
-    required this.examDate,
-    required this.daysLeft,
-  });
-  
+  const ExamCountdown({required this.titleAr, required this.examDate, required this.daysLeft});
+
   factory ExamCountdown.fromJson(Map<String, Object?> json) => _$ExamCountdownFromJson(json);
-  
+
   final String titleAr;
   final String examDate;
   final int daysLeft;

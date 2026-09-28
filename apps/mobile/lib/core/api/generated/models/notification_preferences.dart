@@ -8,14 +8,10 @@ part 'notification_preferences.g.dart';
 
 @JsonSerializable()
 class NotificationPreferences {
-  const NotificationPreferences({
-    required this.learning,
-    required this.promotions,
-    required this.reminderTime,
-  });
-  
+  const NotificationPreferences({required this.learning, required this.promotions, required this.reminderTime});
+
   factory NotificationPreferences.fromJson(Map<String, Object?> json) => _$NotificationPreferencesFromJson(json);
-  
+
   final bool learning;
   final bool promotions;
   final String reminderTime;

@@ -121,7 +121,7 @@ export const adminStudentSchema = z.object({
   fullName: z.string().nullable(),
   educationLevelId: z.string().nullable(),
   emailVerified: z.boolean(),
-  status: z.enum(['active', 'disabled']),
+  status: z.enum(['active', 'disabled', 'deleted']),
   createdAt: z.string(),
   activeEntitlementCount: z.number(),
 });

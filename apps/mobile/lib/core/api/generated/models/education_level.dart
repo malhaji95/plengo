@@ -15,9 +15,9 @@ class EducationLevel {
     required this.sortOrder,
     required this.isCollege,
   });
-  
+
   factory EducationLevel.fromJson(Map<String, Object?> json) => _$EducationLevelFromJson(json);
-  
+
   final String id;
   final String code;
   final String nameAr;

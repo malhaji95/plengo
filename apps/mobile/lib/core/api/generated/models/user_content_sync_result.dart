@@ -10,14 +10,10 @@ part 'user_content_sync_result.g.dart';
 
 @JsonSerializable()
 class UserContentSyncResult {
-  const UserContentSyncResult({
-    required this.appliedDecks,
-    required this.appliedCards,
-    required this.rejected,
-  });
-  
+  const UserContentSyncResult({required this.appliedDecks, required this.appliedCards, required this.rejected});
+
   factory UserContentSyncResult.fromJson(Map<String, Object?> json) => _$UserContentSyncResultFromJson(json);
-  
+
   final int appliedDecks;
   final int appliedCards;
   final List<SyncRejection> rejected;

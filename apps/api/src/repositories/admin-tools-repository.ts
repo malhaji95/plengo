@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gte, ilike, isNull, like, lt, or, sql, type SQL } from 'drizzle-orm';
+import { and, asc, desc, eq, gte, ilike, isNull, like, lt, ne, or, sql, type SQL } from 'drizzle-orm';
 import {
   auditLogs,
   contentReports,
@@ -80,7 +80,12 @@ export function createAdminToolsRepository(db: Db) {
         db
           .select({ id: users.id, name: users.name, email: users.email, role: users.role })
           .from(users)
-          .where(or(ilike(users.name, pattern), ilike(users.email, pattern), byId(users.id)))
+          .where(
+            and(
+              ne(users.status, 'deleted'),
+              or(ilike(users.name, pattern), ilike(users.email, pattern), byId(users.id)),
+            ),
+          )
           .orderBy(asc(users.name))
           .limit(limit * 2),
         db

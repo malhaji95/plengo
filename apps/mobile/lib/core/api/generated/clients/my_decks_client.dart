@@ -21,18 +21,11 @@ abstract class MyDecksClient {
   Future<UserDeckListEnvelope> listMyDecks();
 
   @GET('/api/v1/my-decks/changes')
-  Future<UserContentChangesEnvelope> myDeckChanges({
-    @Query('limit') int? limit = 500,
-    @Query('since') String? since,
-  });
+  Future<UserContentChangesEnvelope> myDeckChanges({@Query('limit') int? limit = 500, @Query('since') String? since});
 
   @POST('/api/v1/my-decks/sync')
-  Future<UserContentSyncResultEnvelope> syncMyDecks({
-    @Body() required UserContentSyncRequest body,
-  });
+  Future<UserContentSyncResultEnvelope> syncMyDecks({@Body() required UserContentSyncRequest body});
 
   @GET('/api/v1/my-decks/{id}/cards')
-  Future<UserDeckCardsEnvelope> getMyDeckCards({
-    @Path('id') required String id,
-  });
+  Future<UserDeckCardsEnvelope> getMyDeckCards({@Path('id') required String id});
 }

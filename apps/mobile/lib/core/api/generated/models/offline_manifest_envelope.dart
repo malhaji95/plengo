@@ -10,14 +10,10 @@ part 'offline_manifest_envelope.g.dart';
 
 @JsonSerializable()
 class OfflineManifestEnvelope {
-  const OfflineManifestEnvelope({
-    required this.success,
-    required this.data,
-    required this.error,
-  });
-  
+  const OfflineManifestEnvelope({required this.success, required this.data, required this.error});
+
   factory OfflineManifestEnvelope.fromJson(Map<String, Object?> json) => _$OfflineManifestEnvelopeFromJson(json);
-  
+
   final bool success;
   final OfflineManifest data;
   final dynamic error;

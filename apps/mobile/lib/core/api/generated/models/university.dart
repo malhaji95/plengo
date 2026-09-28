@@ -15,9 +15,9 @@ class University {
     required this.sortOrder,
     required this.isActive,
   });
-  
+
   factory University.fromJson(Map<String, Object?> json) => _$UniversityFromJson(json);
-  
+
   final String id;
   final String code;
   final String nameAr;

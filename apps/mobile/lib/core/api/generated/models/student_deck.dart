@@ -23,9 +23,9 @@ class StudentDeck {
     required this.contentVersion,
     required this.sortOrder,
   });
-  
+
   factory StudentDeck.fromJson(Map<String, Object?> json) => _$StudentDeckFromJson(json);
-  
+
   final String id;
   final String subjectId;
   @JsonKey(includeIfNull: true)

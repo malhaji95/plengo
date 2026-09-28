@@ -18,9 +18,9 @@ class ScopeAccess {
     required this.promotionTitleAr,
     required this.promotionEndsAt,
   });
-  
+
   factory ScopeAccess.fromJson(Map<String, Object?> json) => _$ScopeAccessFromJson(json);
-  
+
   final bool hasAccess;
   @JsonKey(includeIfNull: true)
   final ScopeAccessReason? reason;

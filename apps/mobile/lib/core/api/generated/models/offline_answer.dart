@@ -16,9 +16,9 @@ class OfflineAnswer {
     this.timeSpentMs,
     this.localIsCorrect,
   });
-  
+
   factory OfflineAnswer.fromJson(Map<String, Object?> json) => _$OfflineAnswerFromJson(json);
-  
+
   final String questionId;
   @JsonKey(includeIfNull: false)
   final String? selectedOptionId;
