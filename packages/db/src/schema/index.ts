@@ -11,3 +11,4 @@ export * from './srs.js';
 export * from './learning.js';
 export * from './student-content.js';
 export * from './offline.js';
+export * from './home.js';

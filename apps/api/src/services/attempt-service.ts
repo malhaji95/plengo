@@ -269,6 +269,7 @@ export function createAttemptService(deps: {
       at,
     };
     await learningRepo.recordMistake(tx, g, masteryStreak);
+    await learningRepo.addDailyActivity(tx, attempt.userId, at, 1);
     await learningRepo.addSubjectStats(tx, g);
     await learningRepo.addQuestionStats(tx, g);
     await learningRepo.touchProgress(tx, {

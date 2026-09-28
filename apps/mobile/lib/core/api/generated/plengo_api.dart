@@ -24,6 +24,8 @@ import 'clients/progress_client.dart';
 import 'clients/my_decks_client.dart';
 import 'clients/reports_client.dart';
 import 'clients/offline_client.dart';
+import 'clients/home_client.dart';
+import 'clients/notifications_client.dart';
 
 /// Plengo API `v1.0.0`
 class PlengoApi {
@@ -58,6 +60,8 @@ class PlengoApi {
   MyDecksClient? _myDecks;
   ReportsClient? _reports;
   OfflineClient? _offline;
+  HomeClient? _home;
+  NotificationsClient? _notifications;
 
   ConfigClient get config => _config ??= ConfigClient(_dio, baseUrl: _baseUrl);
 
@@ -98,4 +102,8 @@ class PlengoApi {
   ReportsClient get reports => _reports ??= ReportsClient(_dio, baseUrl: _baseUrl);
 
   OfflineClient get offline => _offline ??= OfflineClient(_dio, baseUrl: _baseUrl);
+
+  HomeClient get home => _home ??= HomeClient(_dio, baseUrl: _baseUrl);
+
+  NotificationsClient get notifications => _notifications ??= NotificationsClient(_dio, baseUrl: _baseUrl);
 }

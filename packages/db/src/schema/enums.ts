@@ -84,3 +84,33 @@ export const reportReasonEnum = pgEnum('report_reason', [
   'other',
 ]);
 export const reportStatusEnum = pgEnum('report_status', ['open', 'resolved', 'dismissed']);
+
+/* Home and communication (spec §19, §20). */
+export const bannerActionEnum = pgEnum('banner_action', [
+  'subject',
+  'teacher',
+  'teacher_track',
+  'quiz',
+  'deck',
+  'internal_route',
+  'external_url',
+  'none',
+]);
+export const notificationTypeEnum = pgEnum('notification_type', [
+  'new_content',
+  'teacher_update',
+  'due_reminder',
+  'study_reminder',
+  'announcement',
+  'promotion',
+  'report_resolved',
+]);
+export const notificationTargetEnum = pgEnum('notification_target', [
+  'all',
+  'level',
+  'subject_entitlement',
+  'track_entitlement',
+  'teacher_followers',
+  'students',
+]);
+export const notificationStatusEnum = pgEnum('notification_status', ['queued', 'sending', 'sent', 'failed']);

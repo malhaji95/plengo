@@ -9,6 +9,8 @@ export const QUEUES = {
   expireEntitlements: 'access.expire-entitlements',
   renormalizeAnswers: 'questions.renormalize',
   abandonAttempts: 'attempts.abandon-stale',
+  notificationsFanout: 'notifications.fanout',
+  dueReminders: 'notifications.due-reminders',
 } as const;
 
 export type QueueName = (typeof QUEUES)[keyof typeof QUEUES];
@@ -25,6 +27,8 @@ export interface JobPayloads {
   'access.expire-entitlements': Record<string, never>;
   'questions.renormalize': Record<string, never>;
   'attempts.abandon-stale': Record<string, never>;
+  'notifications.fanout': { notificationId: string };
+  'notifications.due-reminders': Record<string, never>;
 }
 
 /** What services depend on: enqueueing only. Workers are registered at process start. */
@@ -61,6 +65,8 @@ export class PgBossQueue implements JobQueue {
     await this.boss.schedule(QUEUES.expireEntitlements, '5 0 * * *', {}, { tz: 'Asia/Damascus' });
     // Attempts idle for 7 days become abandoned (§15.5).
     await this.boss.schedule(QUEUES.abandonAttempts, '20 3 * * *', {}, { tz: 'Asia/Damascus' });
+    // Due-card reminders at each student's chosen time (§20.3); the job picks this hour's students.
+    await this.boss.schedule(QUEUES.dueReminders, '0 * * * *', {}, { tz: 'Asia/Damascus' });
     // After a deploy that bumps the normalizer version, stored accepted answers catch up (§14.5).
     await this.boss.send(QUEUES.renormalizeAnswers, {}, { singletonKey: 'startup' });
     for (const name of Object.values(QUEUES)) {

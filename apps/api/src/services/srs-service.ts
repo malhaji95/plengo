@@ -143,6 +143,9 @@ export function createSrsService(deps: {
             devicePlatform: platform,
           });
           if (inserted) acceptedLogs += 1;
+          // Each new rating counts toward the daily goal of its day (§19.4).
+          if (inserted && !log.undone)
+            await learningRepo.addDailyActivity(tx, userId, new Date(log.reviewedAt), 1);
 
           if (!log.undone) continue;
           if (!(await repo.markLogUndone(tx, log.id, userId))) continue;

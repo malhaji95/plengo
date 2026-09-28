@@ -31,6 +31,11 @@ export function createReportService(deps: {
   structureRepo: StructureRepository;
   teacherRepo: TeacherRepository;
   audit: AuditService;
+  /** Tells the student their report was handled (optional, §21). */
+  notify?: (
+    userId: string,
+    input: { type: 'report_resolved'; titleAr: string; bodyAr: string },
+  ) => Promise<unknown>;
   now?: () => Date;
 }) {
   const { repo, questionRepo, flashcardRepo, structureRepo, teacherRepo, audit } = deps;
@@ -155,7 +160,11 @@ export function createReportService(deps: {
     async resolve(
       actor: AdminActor,
       id: string,
-      input: { status: 'resolved' | 'dismissed'; resolutionNote?: string | null | undefined },
+      input: {
+        status: 'resolved' | 'dismissed';
+        resolutionNote?: string | null | undefined;
+        notifyStudent?: boolean | undefined;
+      },
     ) {
       const row = await repo.get(id);
       if (!row) throw new AppError('NOT_FOUND');
@@ -165,6 +174,16 @@ export function createReportService(deps: {
         resolutionNote: input.resolutionNote?.trim() || null,
         resolvedAt: now(),
       });
+      if (input.notifyStudent && row.report.status === 'open') {
+        await deps.notify?.(row.report.userId, {
+          type: 'report_resolved',
+          titleAr: 'شكراً لبلاغك',
+          bodyAr:
+            input.status === 'resolved'
+              ? 'راجعنا المشكلة التي أبلغت عنها وتم تصحيحها.'
+              : 'راجعنا بلاغك ولم نجد ما يحتاج إلى تعديل.',
+        });
+      }
       await audit.record({
         actorAdminId: actor.adminId,
         action: `report.${input.status}`,

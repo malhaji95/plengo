@@ -1124,6 +1124,134 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/home": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getHome"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getGoalSettings"];
+        put: operations["updateGoalSettings"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listNotifications"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/{id}/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["markNotificationRead"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/read-all": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["markAllNotificationsRead"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/preferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getNotificationPreferences"];
+        put: operations["updateNotificationPreferences"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/push-tokens": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["registerPushToken"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/push-tokens/revoke": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["revokePushToken"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/auth/login": {
         parameters: {
             query?: never;
@@ -2501,6 +2629,102 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/banners": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminListBanners"];
+        put?: never;
+        post: operations["adminCreateBanner"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/banners/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["adminDeleteBanner"];
+        options?: never;
+        head?: never;
+        patch: operations["adminUpdateBanner"];
+        trace?: never;
+    };
+    "/api/v1/admin/banners/reorder": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["adminReorderBanners"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/countdowns": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminListCountdowns"];
+        put?: never;
+        post: operations["adminCreateCountdown"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/countdowns/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["adminDeleteCountdown"];
+        options?: never;
+        head?: never;
+        patch: operations["adminUpdateCountdown"];
+        trace?: never;
+    };
+    "/api/v1/admin/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminListNotifications"];
+        put?: never;
+        post: operations["adminSendNotification"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -2579,6 +2803,34 @@ export interface components {
             data: components["schemas"]["AdminAccountList"];
             error: null;
         };
+        AdminBanner: {
+            id: string;
+            titleAr: string;
+            imageMediaId: string;
+            imageUrl: string | null;
+            action: components["schemas"]["BannerAction"];
+            actionTarget: string | null;
+            educationLevelId: string | null;
+            startsAt: string | null;
+            endsAt: string | null;
+            isActive: boolean;
+            sortOrder: number;
+            live: boolean;
+            updatedAt: string;
+        };
+        AdminBannerEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AdminBanner"];
+            error: null;
+        };
+        AdminBannerList: components["schemas"]["AdminBanner"][];
+        AdminBannerListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AdminBannerList"];
+            error: null;
+        };
         AdminCard: {
             id: string;
             deckId: string;
@@ -2600,6 +2852,27 @@ export interface components {
             /** @constant */
             success: true;
             data: components["schemas"]["AdminCardList"];
+            error: null;
+        };
+        AdminCountdown: {
+            id: string;
+            educationLevelId: string;
+            titleAr: string;
+            examDate: string;
+            isActive: boolean;
+            daysLeft: number;
+        };
+        AdminCountdownEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AdminCountdown"];
+            error: null;
+        };
+        AdminCountdownList: components["schemas"]["AdminCountdown"][];
+        AdminCountdownListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AdminCountdownList"];
             error: null;
         };
         AdminCoupon: {
@@ -2707,6 +2980,40 @@ export interface components {
             /** @constant */
             success: true;
             data: components["schemas"]["AdminLoginResult"];
+            error: null;
+        };
+        AdminNotification: {
+            id: string;
+            type: components["schemas"]["NotificationType"];
+            titleAr: string;
+            bodyAr: string;
+            action: components["schemas"]["BannerAction"];
+            actionTarget: string | null;
+            targetType: components["schemas"]["NotificationTargetType"];
+            target: components["schemas"]["NotificationTarget"];
+            /** @enum {string} */
+            status: "queued" | "sending" | "sent" | "failed";
+            recipientCount: number;
+            pushCount: number;
+            pushFailures: number;
+            readCount: number;
+            createdAt: string;
+            sentAt: string | null;
+        };
+        AdminNotificationEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AdminNotification"];
+            error: null;
+        };
+        AdminNotificationPage: {
+            items: components["schemas"]["AdminNotification"][];
+            nextCursor: string | null;
+        };
+        AdminNotificationPageEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AdminNotificationPage"];
             error: null;
         };
         AdminQuestion: {
@@ -3019,6 +3326,11 @@ export interface components {
         BackupCodeRequest: {
             code: string;
         };
+        /** @enum {string} */
+        BannerAction: "subject" | "teacher" | "teacher_track" | "quiz" | "deck" | "internal_route" | "external_url" | "none";
+        BannerReorderRequest: {
+            ids: string[];
+        };
         Bookmark: {
             id: string;
             itemType: components["schemas"]["BookmarkItemType"];
@@ -3167,11 +3479,31 @@ export interface components {
             fullName: string;
             password: string;
         };
+        CreateBannerRequest: {
+            titleAr: string;
+            /** Format: uuid */
+            imageMediaId: string;
+            /** @default none */
+            action: components["schemas"]["BannerAction"];
+            actionTarget?: string | null;
+            educationLevelId?: string | null;
+            startsAt?: string | null;
+            endsAt?: string | null;
+            isActive?: boolean;
+        };
         CreateCardRequest: {
             /** Format: uuid */
             frontMediaId: string;
             /** Format: uuid */
             backMediaId: string;
+        };
+        CreateCountdownRequest: {
+            /** Format: uuid */
+            educationLevelId: string;
+            titleAr: string;
+            /** Format: date */
+            examDate: string;
+            isActive?: boolean;
         };
         CreateCouponBatchRequest: {
             name: string;
@@ -3211,6 +3543,18 @@ export interface components {
             unitId?: string | null;
             code: string;
             titleAr: string;
+        };
+        CreateNotificationRequest: {
+            /** @enum {string} */
+            type: "new_content" | "teacher_update" | "study_reminder" | "announcement" | "promotion";
+            titleAr: string;
+            bodyAr: string;
+            /** @default none */
+            action: components["schemas"]["BannerAction"];
+            actionTarget?: string | null;
+            targetType: components["schemas"]["NotificationTargetType"];
+            /** @default {} */
+            target: components["schemas"]["NotificationTarget"];
         };
         CreatePromotionRequest: {
             /** @enum {string} */
@@ -3407,6 +3751,11 @@ export interface components {
             data: components["schemas"]["EnrolledResult"];
             error: null;
         };
+        ExamCountdown: {
+            titleAr: string;
+            examDate: string;
+            daysLeft: number;
+        };
         ExtendEntitlementRequest: {
             makePermanent?: boolean;
             expiresOn?: string | null;
@@ -3513,6 +3862,20 @@ export interface components {
             ruleType: "manual" | "first_n_items" | "first_n_lessons" | "first_unit" | "percentage";
             ruleValue?: number | null;
         };
+        FreeSubject: {
+            subjectId: string;
+            nameAr: string;
+            freeCount: number;
+        };
+        GoalSettings: {
+            dailyGoal: number;
+        };
+        GoalSettingsEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["GoalSettings"];
+            error: null;
+        };
         GrantEntitlementRequest: {
             /** @enum {string} */
             scopeType: "subject" | "teacher_track";
@@ -3521,6 +3884,33 @@ export interface components {
             permanentAccess?: boolean;
             accessDurationDays?: number | null;
             accessExpiresOn?: string | null;
+        };
+        Home: {
+            greetingName: string;
+            unreadNotifications: number;
+            countdown: components["schemas"]["ExamCountdown"] | null;
+            banners: components["schemas"]["HomeBanner"][];
+            today: components["schemas"]["Today"];
+            resume: components["schemas"]["ResumeItem"][];
+            myAccess: components["schemas"]["MyEntitlement"][];
+            freeSubjects: components["schemas"]["FreeSubject"][];
+            followedTeachers: components["schemas"]["Teacher"][];
+            activeMistakes: number;
+        };
+        HomeBanner: {
+            id: string;
+            titleAr: string;
+            imageUrl: string;
+            width: number | null;
+            height: number | null;
+            action: components["schemas"]["BannerAction"];
+            actionTarget: string | null;
+        };
+        HomeEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["Home"];
+            error: null;
         };
         LearningSettings: {
             mistakeMasteryStreak: number;
@@ -3703,6 +4093,43 @@ export interface components {
         NormalizePreviewRequest: {
             answers: string[];
         };
+        NotificationPage: {
+            items: components["schemas"]["StudentNotification"][];
+            nextCursor: string | null;
+            unreadCount: number;
+        };
+        NotificationPageEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["NotificationPage"];
+            error: null;
+        };
+        NotificationPreferences: {
+            learning: boolean;
+            promotions: boolean;
+            reminderTime: string;
+        };
+        NotificationPreferencesEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["NotificationPreferences"];
+            error: null;
+        };
+        NotificationTarget: {
+            /** Format: uuid */
+            educationLevelId?: string;
+            /** Format: uuid */
+            subjectId?: string;
+            /** Format: uuid */
+            teacherTrackId?: string;
+            /** Format: uuid */
+            teacherId?: string;
+            userIds?: string[];
+        };
+        /** @enum {string} */
+        NotificationTargetType: "all" | "level" | "subject_entitlement" | "track_entitlement" | "teacher_followers" | "students";
+        /** @enum {string} */
+        NotificationType: "new_content" | "teacher_update" | "due_reminder" | "study_reminder" | "announcement" | "promotion" | "report_resolved";
         OfflineAcceptedAnswer: {
             original: string;
             normalized: string;
@@ -3955,6 +4382,12 @@ export interface components {
             data: components["schemas"]["PromotionList"];
             error: null;
         };
+        PushTokenRequest: {
+            token: string;
+            /** @enum {string} */
+            platform: "android" | "ios" | "web";
+            appVersion?: string;
+        };
         QuestionFreeRequest: {
             /** @enum {string} */
             mode: "rule" | "free" | "paid";
@@ -3975,6 +4408,15 @@ export interface components {
         QuizQuestionsRequest: {
             questionIds: string[];
         };
+        ReadResult: {
+            unreadCount: number;
+        };
+        ReadResultEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["ReadResult"];
+            error: null;
+        };
         RedeemCouponRequest: {
             code: string;
         };
@@ -3990,6 +4432,15 @@ export interface components {
         };
         RefreshLeasesRequest: {
             scopes: components["schemas"]["LeaseScope"][];
+        };
+        RegisteredResult: {
+            registered: boolean;
+        };
+        RegisteredResultEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["RegisteredResult"];
+            error: null;
         };
         RegisterRequest: {
             fullName: string;
@@ -4105,6 +4556,7 @@ export interface components {
             /** @enum {string} */
             status: "resolved" | "dismissed";
             resolutionNote?: string | null;
+            notifyStudent?: boolean;
         };
         ResumeItem: {
             subjectId: string;
@@ -4156,6 +4608,9 @@ export interface components {
         };
         RevokeEntitlementRequest: {
             reason?: string | null;
+        };
+        RevokePushTokenRequest: {
+            token: string;
         };
         SaveAnswerRequest: {
             selectedOptionId?: string | null;
@@ -4397,6 +4852,16 @@ export interface components {
             data: components["schemas"]["StudentDeckList"];
             error: null;
         };
+        StudentNotification: {
+            id: string;
+            type: components["schemas"]["NotificationType"];
+            titleAr: string;
+            bodyAr: string;
+            action: components["schemas"]["BannerAction"];
+            actionTarget: string | null;
+            createdAt: string;
+            readAt: string | null;
+        };
         StudentOption: {
             id: string;
             text: string;
@@ -4618,6 +5083,13 @@ export interface components {
             description: string | null;
             coverUrl: string | null;
         };
+        Today: {
+            dueCards: number;
+            goal: number;
+            done: number;
+            goalMet: boolean;
+            streak: number;
+        };
         TokenPair: {
             accessToken: string;
             /** Format: date-time */
@@ -4760,6 +5232,18 @@ export interface components {
             nameAr?: string;
             isActive?: boolean;
         };
+        UpdateBannerRequest: {
+            titleAr?: string;
+            /** Format: uuid */
+            imageMediaId?: string;
+            /** @default none */
+            action: components["schemas"]["BannerAction"];
+            actionTarget?: string | null;
+            educationLevelId?: string | null;
+            startsAt?: string | null;
+            endsAt?: string | null;
+            isActive?: boolean;
+        };
         UpdateCardRequest: {
             /** Format: uuid */
             frontMediaId?: string;
@@ -4767,6 +5251,14 @@ export interface components {
             backMediaId?: string;
             /** @enum {string} */
             status?: "draft" | "published" | "archived";
+        };
+        UpdateCountdownRequest: {
+            /** Format: uuid */
+            educationLevelId?: string;
+            titleAr?: string;
+            /** Format: date */
+            examDate?: string;
+            isActive?: boolean;
         };
         UpdateDeckRequest: {
             unitId?: string | null;
@@ -4788,6 +5280,11 @@ export interface components {
         UpdateLevelRequest: {
             nameAr?: string;
             sortOrder?: number;
+        };
+        UpdateNotificationPreferences: {
+            learning?: boolean;
+            promotions?: boolean;
+            reminderTime?: string;
         };
         UpdateProfileRequest: {
             fullName?: string;
@@ -6714,6 +7211,227 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["OfflineSyncResultEnvelope"];
+                };
+            };
+        };
+    };
+    getHome: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HomeEnvelope"];
+                };
+            };
+        };
+    };
+    getGoalSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GoalSettingsEnvelope"];
+                };
+            };
+        };
+    };
+    updateGoalSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GoalSettings"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GoalSettingsEnvelope"];
+                };
+            };
+        };
+    };
+    listNotifications: {
+        parameters: {
+            query?: {
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationPageEnvelope"];
+                };
+            };
+        };
+    };
+    markNotificationRead: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReadResultEnvelope"];
+                };
+            };
+        };
+    };
+    markAllNotificationsRead: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReadResultEnvelope"];
+                };
+            };
+        };
+    };
+    getNotificationPreferences: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationPreferencesEnvelope"];
+                };
+            };
+        };
+    };
+    updateNotificationPreferences: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateNotificationPreferences"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationPreferencesEnvelope"];
+                };
+            };
+        };
+    };
+    registerPushToken: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PushTokenRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RegisteredResultEnvelope"];
+                };
+            };
+        };
+    };
+    revokePushToken: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RevokePushTokenRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RevokedResultEnvelope"];
                 };
             };
         };
@@ -9615,6 +10333,261 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AdminReportEnvelope"];
+                };
+            };
+        };
+    };
+    adminListBanners: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminBannerListEnvelope"];
+                };
+            };
+        };
+    };
+    adminCreateBanner: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateBannerRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminBannerEnvelope"];
+                };
+            };
+        };
+    };
+    adminDeleteBanner: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeletedResultEnvelope"];
+                };
+            };
+        };
+    };
+    adminUpdateBanner: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateBannerRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminBannerEnvelope"];
+                };
+            };
+        };
+    };
+    adminReorderBanners: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BannerReorderRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReorderedResultEnvelope"];
+                };
+            };
+        };
+    };
+    adminListCountdowns: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminCountdownListEnvelope"];
+                };
+            };
+        };
+    };
+    adminCreateCountdown: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCountdownRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminCountdownEnvelope"];
+                };
+            };
+        };
+    };
+    adminDeleteCountdown: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeletedResultEnvelope"];
+                };
+            };
+        };
+    };
+    adminUpdateCountdown: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCountdownRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminCountdownEnvelope"];
+                };
+            };
+        };
+    };
+    adminListNotifications: {
+        parameters: {
+            query?: {
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminNotificationPageEnvelope"];
+                };
+            };
+        };
+    };
+    adminSendNotification: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateNotificationRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminNotificationEnvelope"];
                 };
             };
         };

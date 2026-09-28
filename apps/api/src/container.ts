@@ -22,6 +22,7 @@ import { createStructureRepository, type StructureRepository } from './repositor
 import { createTeacherRepository } from './repositories/teacher-repository.js';
 import { createUsersRepository, type UsersRepository } from './repositories/users-repository.js';
 import { createOfflineRepository } from './repositories/offline-repository.js';
+import { createHomeRepository } from './repositories/home-repository.js';
 import { createReportRepository } from './repositories/report-repository.js';
 import { createUserContentRepository } from './repositories/user-content-repository.js';
 import { createAccessService, type AccessService } from './services/access-service.js';
@@ -54,6 +55,9 @@ import { createStructureService, type StructureService } from './services/struct
 import { createTeacherService, type TeacherService } from './services/teacher-service.js';
 import { createUploadService, type UploadService } from './services/upload-service.js';
 import { createOfflineService, type OfflineService } from './services/offline-service.js';
+import { createHomeService, type HomeService } from './services/home-service.js';
+import { createNotificationService, type NotificationService } from './services/notification-service.js';
+import { FcmPushSender, RecordingPushSender, type PushSender } from './services/push.js';
 import { createReportService, type ReportService } from './services/report-service.js';
 import { createUserContentService, type UserContentService } from './services/user-content-service.js';
 import { MemoryStorage } from './storage/memory-storage.js';
@@ -95,6 +99,9 @@ export interface Container {
   userContent: UserContentService;
   reports: ReportService;
   offline: OfflineService;
+  home: HomeService;
+  notifications: NotificationService;
+  push: PushSender;
   media: MediaProcessor;
   guards: Guards;
   jobHandlers: JobHandlers;
@@ -134,6 +141,7 @@ export function createContainer(
     storage?: ObjectStorage;
     jobs: JobQueue;
     now?: () => Date;
+    push?: PushSender;
   },
 ): Container {
   const pool = overrides.pool ?? createPool(env.DATABASE_URL, env.DATABASE_POOL_MAX);
@@ -204,6 +212,8 @@ export function createContainer(
     audit,
     inOpenExam: (userId, questionId) => attemptRepo.inOpenExam(userId, questionId),
     onVisibilityChange: (questionId) => quizRepo.bumpContaining(questionId),
+    onGraded: (userId) =>
+      learningRepo.addDailyActivity(db, userId, (overrides.now ?? (() => new Date()))(), 1),
     now: overrides.now,
   });
   const flashcards = createFlashcardService({
@@ -298,6 +308,30 @@ export function createContainer(
     deckCounts: (scope) => flashcards.counts(scope),
     quizCounts: (scope) => quizzes.counts(scope),
   });
+  const push =
+    overrides.push ??
+    (env.FCM_PROJECT_ID && env.FCM_CLIENT_EMAIL && env.FCM_PRIVATE_KEY
+      ? new FcmPushSender(
+          {
+            projectId: env.FCM_PROJECT_ID,
+            clientEmail: env.FCM_CLIENT_EMAIL,
+            // Env files keep the key on one line with escaped newlines.
+            privateKey: env.FCM_PRIVATE_KEY.replace(/\\n/g, '\n'),
+          },
+          log,
+        )
+      : new RecordingPushSender(log));
+  const homeRepo = createHomeRepository(db);
+  const notifications = createNotificationService({
+    db,
+    repo: homeRepo,
+    structureRepo,
+    teacherRepo,
+    audit,
+    jobs: overrides.jobs,
+    push,
+    now: overrides.now,
+  });
   const catalog = createCatalogService({
     repo: structureRepo,
     usersRepo,
@@ -353,6 +387,26 @@ export function createContainer(
       storage,
       now: overrides.now,
     }),
+    notifications,
+    push,
+    home: createHomeService({
+      repo: homeRepo,
+      structureRepo,
+      storage,
+      audit,
+      catalog,
+      access,
+      learning,
+      srs,
+      teachers,
+      notifications,
+      counts: [
+        (scope) => questions.counts(scope),
+        (scope) => flashcards.counts(scope),
+        (scope) => quizzes.counts(scope),
+      ],
+      now: overrides.now,
+    }),
     reports: createReportService({
       repo: createReportRepository(db),
       questionRepo,
@@ -360,6 +414,7 @@ export function createContainer(
       structureRepo,
       teacherRepo,
       audit,
+      notify: (userId, input) => notifications.notifyUser(userId, input),
       now: overrides.now,
     }),
     guards: createGuards({ auth, sessionsRepo, mobileTokens, now: overrides.now }),
@@ -383,6 +438,10 @@ export function createContainer(
       },
       'attempts.abandon-stale': async () => {
         await attempts.abandonStale();
+      },
+      'notifications.fanout': (data) => notifications.fanout(data.notificationId),
+      'notifications.due-reminders': async () => {
+        await notifications.dueReminders();
       },
     },
   };

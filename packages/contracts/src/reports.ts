@@ -60,6 +60,8 @@ export const adminReportQuerySchema = z.object({
 export const resolveReportBodySchema = z.object({
   status: z.enum(['resolved', 'dismissed']),
   resolutionNote: z.string().trim().max(1000).nullable().optional(),
+  /** Tell the student in their inbox that the report was handled (§21). */
+  notifyStudent: z.boolean().optional(),
 });
 
 export type Report = z.infer<typeof reportSchema>;

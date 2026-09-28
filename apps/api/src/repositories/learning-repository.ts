@@ -1,3 +1,4 @@
+import { businessDay, DAY } from '@plengo/srs';
 import { and, desc, eq, inArray, isNull, ne, sql } from 'drizzle-orm';
 import {
   lessons,
@@ -163,6 +164,22 @@ export function createLearningRepository(db: Db) {
      * Wrong → active with the streak reset (re-activates removed and mastered mistakes). Correct on
      * an active mistake → streak + 1, mastered at `masteryStreak`. Correct otherwise → no change.
      */
+    /**
+     * Counts items toward the daily goal (§19.4) on the business day of `at` (04:00 Damascus). The
+     * day keeps the goal it started with, so changing the goal never rewrites past days.
+     */
+    async addDailyActivity(conn: Db | Tx, userId: string, at: Date, count: number) {
+      if (count <= 0) return;
+      const day = new Date(businessDay(at.getTime()) * DAY).toISOString().slice(0, 10);
+      await conn.execute(sql`
+        insert into user_daily_activity (user_id, day, items_done, goal, goal_met)
+        select ${userId}, ${day}::date, ${count}, p.daily_goal, ${count} >= p.daily_goal
+        from profiles p where p.user_id = ${userId}
+        on conflict (user_id, day) do update set
+          items_done = user_daily_activity.items_done + excluded.items_done,
+          goal_met = user_daily_activity.items_done + excluded.items_done >= user_daily_activity.goal`);
+    },
+
     async recordMistake(tx: Tx, g: GradedAnswer, masteryStreak: number) {
       if (!g.isCorrect) {
         await tx

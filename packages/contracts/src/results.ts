@@ -10,6 +10,7 @@ export const resetSchema = z.object({ reset: z.boolean() }).meta({ id: 'ResetRes
 export const signedInSchema = z.object({ signedIn: z.boolean() }).meta({ id: 'SignedInResult' });
 export const signedOutSchema = z.object({ signedOut: z.boolean() }).meta({ id: 'SignedOutResult' });
 export const revokedSchema = z.object({ revoked: z.boolean() }).meta({ id: 'RevokedResult' });
+export const registeredSchema = z.object({ registered: z.boolean() }).meta({ id: 'RegisteredResult' });
 export const enrolledSchema = z.object({ enrolled: z.boolean() }).meta({ id: 'EnrolledResult' });
 export const adminLoginResultSchema = z
   .object({ next: z.enum(['totp', 'enroll']) })

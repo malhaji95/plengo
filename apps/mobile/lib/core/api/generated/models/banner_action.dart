@@ -1,0 +1,40 @@
+// coverage:ignore-file
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, unused_import, invalid_annotation_target, unnecessary_import
+
+import 'package:json_annotation/json_annotation.dart';
+
+@JsonEnum()
+enum BannerAction {
+  @JsonValue('subject')
+  subject('subject'),
+  @JsonValue('teacher')
+  teacher('teacher'),
+  @JsonValue('teacher_track')
+  teacherTrack('teacher_track'),
+  @JsonValue('quiz')
+  quiz('quiz'),
+  @JsonValue('deck')
+  deck('deck'),
+  @JsonValue('internal_route')
+  internalRoute('internal_route'),
+  @JsonValue('external_url')
+  externalUrl('external_url'),
+  @JsonValue('none')
+  none('none');
+
+  const BannerAction(this.json);
+
+  final String? json;
+  String toJson() {
+    final value = json;
+    if (value == null) {
+      throw StateError('Cannot convert enum value with null JSON representation to String. '
+          'This usually happens for \$unknown or @JsonValue(null) entries.');
+    }
+    return value as String;
+  }
+
+  @override
+  String toString() => json?.toString() ?? super.toString();
+}

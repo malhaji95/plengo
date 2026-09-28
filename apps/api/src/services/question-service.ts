@@ -68,6 +68,8 @@ export function createQuestionService(deps: {
   audit: AuditService;
   /** Exams give no feedback until the end (§15.2): the stateless check is refused meanwhile. */
   inOpenExam?: (userId: string, questionId: string) => Promise<boolean>;
+  /** A graded check counts toward the daily goal (§19.4). */
+  onGraded?: (userId: string) => Promise<void>;
   /** Publishing, unpublishing or deleting a question changes the quizzes that contain it. */
   onVisibilityChange?: (questionId: string) => Promise<void>;
   now?: () => Date;
@@ -505,7 +507,9 @@ export function createQuestionService(deps: {
       if (await deps.inOpenExam?.(userId, id)) {
         throw new AppError('VALIDATION_ERROR', { details: { field: 'id', reason: 'exam_in_progress' } });
       }
-      return grade(q, input);
+      const result = grade(q, input);
+      await deps.onGraded?.(userId);
+      return result;
     },
   };
 }

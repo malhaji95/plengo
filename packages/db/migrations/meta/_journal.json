@@ -85,6 +85,13 @@
       "when": 1790600396902,
       "tag": "0011_offline",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1790603484451,
+      "tag": "0012_home_notifications",
+      "breakpoints": true
     }
   ]
 }

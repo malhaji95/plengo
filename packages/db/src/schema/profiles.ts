@@ -1,4 +1,4 @@
-import { integer, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { boolean, integer, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 import { users } from './identity.js';
 import { academicYears, educationLevels, faculties, universities } from './structure.js';
 import { mediaFiles } from './media.js';
@@ -15,6 +15,11 @@ export const profiles = pgTable('profiles', {
   academicYearId: uuid('academic_year_id').references(() => academicYears.id, { onDelete: 'set null' }),
   avatarMediaId: uuid('avatar_media_id').references(() => mediaFiles.id, { onDelete: 'set null' }),
   dailyGoal: integer('daily_goal').notNull().default(20),
+  /** Notification consent (§20.2): learning on by default, promotions only by explicit opt-in. */
+  notifyLearning: boolean('notify_learning').notNull().default(true),
+  notifyPromotions: boolean('notify_promotions').notNull().default(false),
+  /** Due-card reminder time, HH:MM Asia/Damascus (§20.3). */
+  reminderTime: text('reminder_time').notNull().default('18:00'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });

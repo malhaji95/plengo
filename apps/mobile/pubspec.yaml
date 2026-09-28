@@ -92,3 +92,5 @@ swagger_parser:
     - admin-quizzes
     - admin-admins
     - admin-reports
+    - admin-home
+    - admin-notifications
