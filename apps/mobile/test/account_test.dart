@@ -54,6 +54,7 @@ void main() {
     await typeInto(tester, 'رمز التحقق', '123456');
     await typeInto(tester, 'كلمة المرور الجديدة', 'new-password-123');
     await typeInto(tester, 'تأكيد كلمة المرور', 'new-password-123');
+    await tester.ensureVisible(find.text('حفظ كلمة المرور'));
     await tester.tap(find.text('حفظ كلمة المرور'));
     await tester.pumpAndSettle();
     verify(

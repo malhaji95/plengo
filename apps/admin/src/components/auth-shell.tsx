@@ -10,7 +10,8 @@ export function AuthShell({
   children: React.ReactNode;
 }) {
   return (
-    <main className="flex min-h-dvh items-center justify-center p-4">
+    <main className="flex min-h-dvh flex-col items-center justify-center gap-6 bg-accent/40 p-4">
+      <img src="/wordmark-blue.svg" alt="Plengo" className="h-14 w-auto" />
       <Card className="w-full max-w-sm space-y-6">
         <div className="space-y-1">
           <CardTitle>{title}</CardTitle>

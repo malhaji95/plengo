@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand yellow (design/brand): adaptive icon background and launch screen. -->
+    <color name="ic_launcher_background">#FFD62C</color>
+    <color name="brand_yellow">#FFD62C</color>
+</resources>

@@ -43,8 +43,8 @@ function render(markdown) {
 <style>
 body { font-family: system-ui, sans-serif; line-height: 1.8; color: #1b1f1e; background: #F5FAF8; margin: 0; }
 main { max-width: 720px; margin: 0 auto; padding: 24px 16px 48px; }
-h1 { color: #00796B; } h2 { margin-top: 28px; }
-@media (prefers-color-scheme: dark) { body { color: #e1e3e2; background: #101413; } h1 { color: #80CBC4; } }
+h1 { color: #0074B4; } h2 { margin-top: 28px; }
+@media (prefers-color-scheme: dark) { body { color: #e1e3e2; background: #101413; } h1 { color: #4FB3EE; } }
 </style>
 </head>
 <body>

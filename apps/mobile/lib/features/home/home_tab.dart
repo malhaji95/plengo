@@ -13,6 +13,7 @@ import '../offline/offline_providers.dart';
 import 'home_providers.dart';
 import 'notification_screens.dart';
 import '../../shared/widgets/responsive.dart';
+import '../../app/theme.dart';
 
 /// Home (spec §19.1): greeting and bell, exam countdown, banners, today's work with goal and streak,
 /// continue learning, my subjects and tracks, free content, followed teachers, mistakes shortcut.
@@ -180,20 +181,20 @@ class _CountdownCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    // Brand yellow with dark text (yellow never carries white text: 1.4:1).
     return Card(
-      color: scheme.primaryContainer,
+      color: BrandColors.yellow,
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            Icon(Icons.event_outlined, color: scheme.onPrimaryContainer),
+            const Icon(Icons.event_outlined, color: BrandColors.ink),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 countdownText(countdown),
-                style: TextStyle(color: scheme.onPrimaryContainer, fontWeight: FontWeight.w600),
+                style: const TextStyle(color: BrandColors.ink, fontWeight: FontWeight.w600),
               ),
             ),
           ],
@@ -296,7 +297,7 @@ class _TodayCard extends ConsumerWidget {
             Row(
               children: [
                 Expanded(child: Text('اليوم', style: Theme.of(context).textTheme.titleMedium)),
-                Icon(Icons.local_fire_department, color: t.streak > 0 ? Colors.deepOrange : scheme.outline),
+                Icon(Icons.local_fire_department, color: t.streak > 0 ? BrandColors.orange : scheme.outline),
                 const SizedBox(width: 4),
                 Text(streakText(t.streak)),
               ],

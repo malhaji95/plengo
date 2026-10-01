@@ -50,6 +50,7 @@ flutter:
   generate: true
   assets:
     - assets/legal/
+    - assets/brand/
   # Bundled so web never fetches fonts from a CDN (spec §24). Placeholder until branding (§44).
   fonts:
     - family: IBMPlexSansArabic

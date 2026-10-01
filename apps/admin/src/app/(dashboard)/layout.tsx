@@ -51,7 +51,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             menuOpen ? 'block' : 'hidden',
           )}
         >
-          <div className="mb-4 px-2 py-3 text-lg font-semibold">لوحة الإدارة</div>
+          <div className="mb-4 flex items-center gap-3 px-2 py-3">
+            <img src="/wordmark-blue.svg" alt="Plengo" className="h-8 w-auto" />
+            <span className="text-sm font-medium text-muted">لوحة الإدارة</span>
+          </div>
           <nav className="space-y-0.5">
             {NAV_ITEMS.map((item) => {
               const enabled = item.phase <= CURRENT_PHASE;

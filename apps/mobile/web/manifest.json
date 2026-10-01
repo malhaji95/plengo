@@ -3,8 +3,8 @@
   "short_name": "Plengo",
   "start_url": "/",
   "display": "browser",
-  "background_color": "#F5FAF8",
-  "theme_color": "#00796B",
+  "background_color": "#FFD62C",
+  "theme_color": "#FFD62C",
   "description": "تطبيق تعليمي للطلاب",
   "prefer_related_applications": false,
   "icons": [

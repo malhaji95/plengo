@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'brand_logo.dart';
 
 /// Arabic validators shared by the auth forms (spec §25).
 abstract final class Validators {
@@ -136,6 +137,8 @@ class AuthScaffold extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  const Center(child: BrandLogo(height: 64)),
+                  const SizedBox(height: 24),
                   Text(title, style: text.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
                   if (subtitle != null) ...[const SizedBox(height: 8), Text(subtitle!, style: text.bodyMedium)],
                   const SizedBox(height: 24),
