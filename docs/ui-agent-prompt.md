@@ -56,7 +56,7 @@ change how the product behaves.
   `color` on yellow, `blue` on light surfaces and `white` in dark mode. Never redraw or recolour
   the logo. If an icon or logo must change, edit `design/brand/make_brand.py` and run
   `python3 design/brand/make_brand.py` (needs `pip install pymupdf pillow`).
-- Font: the student app bundles IBM Plex Sans Arabic (Regular and Medium). The admin panel uses
+- Font: the student app bundles IBM Plex Sans Arabic (Regular, Medium and Bold). The admin panel uses
   system fonts. Proposing a better Arabic font is welcome, but it must be bundled locally (no
   font CDN), licensed for apps, and stay within the size budgets in §34.
 
