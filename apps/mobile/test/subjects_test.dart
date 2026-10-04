@@ -105,6 +105,7 @@ void main() {
     expect(find.text('الميكانيك'), findsOneWidget);
     expect(find.text('درسان'), findsOneWidget);
     expect(find.text('الحركة'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('مراجعة عامة'), 200, scrollable: find.byType(Scrollable).first);
     expect(find.text('دروس عامة'), findsOneWidget);
     expect(find.text('مراجعة عامة'), findsOneWidget);
   });

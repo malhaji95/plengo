@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/api/generated/export.dart';
 import '../../shared/text/bidi.dart';
+import '../questions/question_view.dart';
 
 /// Question text plus its options or a text field. Options show correctness only when [result]
 /// is set (after grading); before that nothing reveals the answer (spec §14.3).
@@ -46,7 +47,16 @@ class _AttemptQuestionBodyState extends State<AttemptQuestionBody> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(isolateLtr(q.questionText), style: Theme.of(context).textTheme.titleMedium?.copyWith(height: 1.6)),
+        Card(
+          margin: EdgeInsets.zero,
+          child: Padding(
+            padding: const EdgeInsets.all(18),
+            child: Text(
+              isolateLtr(q.questionText),
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(height: 1.7),
+            ),
+          ),
+        ),
         const SizedBox(height: 16),
         if (q.type == AttemptQuestionType.written)
           TextField(
@@ -64,29 +74,15 @@ class _AttemptQuestionBodyState extends State<AttemptQuestionBody> {
   }
 
   Widget _option(AttemptOption option) {
-    final scheme = Theme.of(context).colorScheme;
-    final selected = widget.selectedOptionId == option.id;
     final graded = widget.result != null;
-    final correct = graded && (option.isCorrect ?? option.id == widget.result!.correctOptionId);
-    final (Color? border, IconData icon) = switch ((graded, selected, correct)) {
-      (false, true, _) => (scheme.primary, Icons.radio_button_checked),
-      (false, false, _) => (null, Icons.radio_button_unchecked),
-      (true, _, true) => (Colors.green.shade600, Icons.check_circle),
-      (true, true, false) => (scheme.error, Icons.cancel),
-      _ => (null, Icons.radio_button_unchecked),
-    };
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: border ?? scheme.outlineVariant, width: border == null ? 1 : 2),
+    return AnswerOptionTile(
+      text: option.text,
+      state: OptionState.of(
+        graded: graded,
+        selected: widget.selectedOptionId == option.id,
+        correct: graded && (option.isCorrect ?? option.id == widget.result!.correctOptionId),
       ),
-      child: ListTile(
-        leading: Icon(icon, color: border),
-        title: Text(isolateLtr(option.text)),
-        selected: selected,
-        onTap: widget.enabled ? () => widget.onSelect?.call(option.id) : null,
-      ),
+      onTap: widget.enabled ? () => widget.onSelect?.call(option.id) : null,
     );
   }
 }

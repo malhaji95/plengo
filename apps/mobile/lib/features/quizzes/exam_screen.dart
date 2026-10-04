@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../app/theme.dart';
 import '../../core/api/api_exception.dart';
 import '../../shared/text/bidi.dart';
 import '../../shared/widgets/async_view.dart';
@@ -121,12 +122,27 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
       builder: (context) => SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-          child: _QuestionGrid(
-            state: s,
-            onTap: (i) {
-              Navigator.pop(context);
-              _controller.goTo(i);
-            },
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('شبكة الأسئلة', style: Theme.of(context).textTheme.titleMedium),
+              const SizedBox(height: 4),
+              Text(
+                'أجبت عن ${s.answeredCount} من ${s.questions.length}',
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+              ),
+              const SizedBox(height: 12),
+              _QuestionGrid(
+                state: s,
+                onTap: (i) {
+                  Navigator.pop(context);
+                  _controller.goTo(i);
+                },
+              ),
+              const SizedBox(height: 16),
+              const _GridLegend(),
+            ],
           ),
         ),
       ),
@@ -147,9 +163,18 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
               padding: const EdgeInsetsDirectional.only(end: 8),
               child: Center(
                 child: Chip(
-                  avatar: const Icon(Icons.timer_outlined, size: 18),
-                  label: Text(isolateLtr(formatDuration(left)), key: const Key('exam-timer')),
-                  backgroundColor: left < 60000 ? Theme.of(context).colorScheme.errorContainer : null,
+                  avatar: Icon(
+                    Icons.timer_outlined,
+                    size: 18,
+                    color: left < 60000 ? BrandColors.error : BrandColors.ink,
+                  ),
+                  label: Text(
+                    isolateLtr(formatDuration(left)),
+                    key: const Key('exam-timer'),
+                    style: const TextStyle(color: BrandColors.ink, fontWeight: FontWeight.w700),
+                  ),
+                  side: BorderSide.none,
+                  backgroundColor: left < 60000 ? BrandColors.tintRed : BrandColors.tintYellow,
                 ),
               ),
             ),
@@ -301,15 +326,19 @@ class _QuestionGrid extends StatelessWidget {
             builder: (context) {
               final a = state.answerOf(q.questionId);
               return InkWell(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(12),
                 onTap: () => onTap(i),
                 child: Container(
-                  width: 44,
-                  height: 44,
+                  width: 48,
+                  height: 48,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: a.answered ? scheme.primaryContainer : null,
-                    borderRadius: BorderRadius.circular(8),
+                    color: a.answered
+                        ? (Theme.of(context).brightness == Brightness.dark
+                              ? BrandColors.tintBlue.withValues(alpha: 0.2)
+                              : BrandColors.tintBlue)
+                        : null,
+                    borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: i == state.index ? scheme.primary : scheme.outlineVariant,
                       width: i == state.index ? 2 : 1,
@@ -331,6 +360,43 @@ class _QuestionGrid extends StatelessWidget {
               );
             },
           ),
+      ],
+    );
+  }
+}
+
+/// What the grid cells mean, in words as well as colour.
+class _GridLegend extends StatelessWidget {
+  const _GridLegend();
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    Widget item(Widget mark, String label) => Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        mark,
+        const SizedBox(width: 6),
+        Text(label, style: Theme.of(context).textTheme.bodySmall),
+      ],
+    );
+    Widget box({Color? fill, Color? border, double width = 1}) => Container(
+      width: 16,
+      height: 16,
+      decoration: BoxDecoration(
+        color: fill,
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: border ?? scheme.outlineVariant, width: width),
+      ),
+    );
+    return Wrap(
+      spacing: 16,
+      runSpacing: 8,
+      children: [
+        item(box(fill: BrandColors.tintBlue), 'مُجاب'),
+        item(box(), 'غير مُجاب'),
+        item(box(border: scheme.primary, width: 2), 'السؤال الحالي'),
+        item(Icon(Icons.flag, size: 16, color: scheme.error), 'معلّم للمراجعة'),
       ],
     );
   }

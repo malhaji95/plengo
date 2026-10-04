@@ -6,6 +6,7 @@ import '../../app/providers.dart';
 import '../../app/router.dart';
 import '../../core/api/api_exception.dart';
 import '../../shared/widgets/form_widgets.dart';
+import '../onboarding/onboarding.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key, this.initialEmail});
@@ -54,6 +55,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final seen = ref.watch(onboardingSeenProvider);
+    if (seen.value == false) return const OnboardingView();
+    // A brief blank frame while the flag loads, so a first visit never flashes the form.
+    if (!seen.hasValue && !seen.hasError) return const Scaffold();
     return AuthScaffold(
       title: 'تسجيل الدخول',
       subtitle: 'أهلاً بعودتك! أدخل بريدك الإلكتروني وكلمة المرور.',

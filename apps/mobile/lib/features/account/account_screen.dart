@@ -123,6 +123,12 @@ class AccountScreen extends ConsumerWidget {
               onTap: () => context.push(Routes.terms),
             ),
             ListTile(
+              leading: const Icon(Icons.description_outlined),
+              title: const Text('تراخيص البرمجيات والخطوط'),
+              trailing: const Icon(Icons.chevron_left),
+              onTap: () => showLicensePage(context: context, applicationName: 'Plengo'),
+            ),
+            ListTile(
               leading: Icon(Icons.logout, color: Theme.of(context).colorScheme.error),
               title: Text('تسجيل الخروج', style: TextStyle(color: Theme.of(context).colorScheme.error)),
               onTap: () => ref.read(authControllerProvider.notifier).logout(),

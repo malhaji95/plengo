@@ -11,6 +11,7 @@ import { ImageUpload, uploadImage } from '@/components/image-upload';
 import { PlacementPicker, type Placement } from '@/components/questions/placement-picker';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { FilePicker } from '@/components/ui/file-picker';
 import { Input, Label } from '@/components/ui/input';
 import { api, unwrap } from '@/lib/api';
 import type { components } from '@/lib/api-schema';
@@ -232,6 +233,8 @@ function DeckDetails({ deck, onSaved }: { deck: Deck; onSaved: () => void }) {
   );
 }
 
+const IMAGE_TYPES = 'image/png,image/jpeg,image/webp';
+
 /** Pick the front and back images, upload both, then add the card. */
 function NewCard({ deckId, onCreated }: { deckId: string; onCreated: () => void }) {
   const [front, setFront] = useState<File | null>(null);
@@ -266,26 +269,14 @@ function NewCard({ deckId, onCreated }: { deckId: string; onCreated: () => void 
 
   return (
     <div className="flex flex-wrap items-end gap-3 rounded-lg border border-dashed border-border p-3">
-      <div className="space-y-1">
-        <Label htmlFor="card-front">الوجه الأمامي</Label>
-        <input
-          id="card-front"
-          type="file"
-          accept="image/png,image/jpeg,image/webp"
-          className="block text-sm"
-          onChange={(e) => setFront(e.target.files?.[0] ?? null)}
-        />
-      </div>
-      <div className="space-y-1">
-        <Label htmlFor="card-back">الوجه الخلفي</Label>
-        <input
-          id="card-back"
-          type="file"
-          accept="image/png,image/jpeg,image/webp"
-          className="block text-sm"
-          onChange={(e) => setBack(e.target.files?.[0] ?? null)}
-        />
-      </div>
+      <FilePicker
+        id="card-front"
+        label="الوجه الأمامي"
+        accept={IMAGE_TYPES}
+        file={front}
+        onChange={setFront}
+      />
+      <FilePicker id="card-back" label="الوجه الخلفي" accept={IMAGE_TYPES} file={back} onChange={setBack} />
       <Button disabled={!front || !back || busy} onClick={() => void add()}>
         {busy ? (
           <Loader2 className="size-4 animate-spin" aria-hidden />

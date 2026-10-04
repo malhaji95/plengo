@@ -51,7 +51,9 @@ flutter:
   assets:
     - assets/legal/
     - assets/brand/
-  # Bundled so web never fetches fonts from a CDN (spec §24). Placeholder until branding (§44).
+    - assets/fonts/OFL.txt
+    - assets/fonts/OFL-NotoKufiArabic.txt
+  # Bundled so web never fetches fonts from a CDN (spec §24). Licences are shown on the licences page.
   fonts:
     - family: IBMPlexSansArabic
       fonts:
@@ -59,6 +61,11 @@ flutter:
         - asset: assets/fonts/IBMPlexSansArabic-Medium.ttf
           weight: 500
         - asset: assets/fonts/IBMPlexSansArabic-Bold.ttf
+          weight: 700
+    # Major headings and onboarding titles only (AppTheme.headingFont); body text stays IBM Plex.
+    - family: NotoKufiArabic
+      fonts:
+        - asset: assets/fonts/NotoKufiArabic-Bold.ttf
           weight: 700
 
 # Encrypted local database (spec §22.5): package:sqlite3 bundles the SQLCipher build on native

@@ -644,3 +644,34 @@ from Phase 1; Phase 2 adds the college hierarchy and admin CRUD.
 - **Device-bound work** (FCM client, free-space check, OS background downloads, signing, store
   submission, the physical-device smoke test) is specified in `release.md` rather than guessed at:
   none of it can be compiled or run in the cloud container.
+
+### ADR-024 — Brand UI direction
+
+- **Source of truth.** The owner-approved direction: the supplied logo assets unchanged, action
+  blue `#0074B4` (dark mode `#4FB3EE`), brand yellow `#FFD62C`, and the logo's letter colours as
+  secondaries. Bright fills (yellow, green, orange, pink, and `sky` derived from the logo blue)
+  carry ink `#1B1B1B` text only, at 7.9:1 or better; white text never sits on them. Pale tints of the
+  same colours sit behind icons and status rows. Tokens live in `lib/app/theme.dart` and
+  `apps/admin/src/app/globals.css`.
+- **Type.** IBM Plex Sans Arabic for body text and educational content; Noto Kufi Arabic Bold for
+  display/headline styles and app bar titles in the app, and `h1` in the admin. One Kufi weight keeps
+  the web first load inside §34.3 (Chrome set 3.4 MB brotli).
+- **Shared pieces.** `shared/widgets/ui_kit.dart` (icon badges, nav cards, section headers,
+  progress rings, brand tiles, spot illustrations) and `AnswerOptionTile` (one look for idle,
+  selected, correct and wrong options in the bank, practice and exams). Status never relies on
+  colour alone: every state also has an icon and words.
+- **Screens keep every feature.** Home keeps countdown, banners, daily goal and streak, due cards,
+  mistakes, continue learning, subjects and tracks, free content and followed teachers, and has no
+  student search (none exists). Subject and track pages put quizzes, random practice, flashcards and
+  the question bank in a tile grid under a progress header, followed by units/lessons and teacher
+  tracks with "متاح/مقفل" labels; the locked explanation stays §8.7's `LockedNotice`. Study mode
+  has undo only (no previous/next); practice keeps تحقق before feedback; exams keep the timer, the
+  question grid (now with a legend) and previous/next.
+- **Onboarding** (§23.2 screen 2): three pages shown once per installation before the first
+  sign-in, stored in the local key-value table (`onboarding.seen`).
+- **Admin.** All 23 sections stay, grouped under headings (accounts, structure, content, access,
+  communication, quality, system). The dashboard shows only numbers existing endpoints return
+  (open reports, flagged questions, active banners, active admins), the latest audit entries in
+  Arabic, and shortcuts; usage charts wait until the API records usage. Native file inputs are
+  replaced by an Arabic `FilePicker`; bulk card upload gains a drop zone, thumbnails in the
+  front/back pair grid and a paired/needs-fixing count, with the 300-card limit unchanged.

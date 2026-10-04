@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../app/theme.dart';
+import '../../shared/widgets/ui_kit.dart';
 import '../../core/api/api_exception.dart';
 import '../../core/api/generated/export.dart';
 import '../../shared/text/bidi.dart';
@@ -149,40 +151,90 @@ class _Summary extends StatelessWidget {
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
     final scheme = Theme.of(context).colorScheme;
+    final b = Theme.of(context).brightness;
     final passed = summary.passed;
+    final score = summary.scorePercent ?? 0;
+    final correct = summary.correctCount ?? 0;
+    final wrong = summary.wrongCount ?? 0;
+    final skipped = summary.skippedCount ?? 0;
+    final total = correct + wrong + skipped;
+    // Celebrate a pass, or a strong score on quizzes without a passing mark.
+    final great = passed ?? score >= 70;
     return Card(
       margin: EdgeInsets.zero,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
         child: Column(
           children: [
-            Text(summary.titleAr, style: text.titleMedium, textAlign: TextAlign.center),
-            const SizedBox(height: 8),
+            _Celebration(great: great),
+            const SizedBox(height: 12),
+            Text(great ? 'أحسنت!' : 'واصل التدريب', style: text.headlineSmall),
+            const SizedBox(height: 4),
             Text(
-              percent(summary.scorePercent ?? 0),
+              summary.titleAr,
+              style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 12),
+            if (total > 0)
+              Text(
+                isolateLtr('$correct / $total'),
+                style: text.headlineMedium?.copyWith(fontFamily: AppTheme.fontFamily, fontWeight: FontWeight.w700),
+              ),
+            Text(
+              percent(score),
               key: const Key('score'),
-              style: text.displaySmall?.copyWith(fontWeight: FontWeight.bold, color: scheme.primary),
+              style: text.headlineSmall?.copyWith(
+                fontFamily: AppTheme.fontFamily,
+                fontWeight: FontWeight.w700,
+                color: great ? BrandColors.success(b) : scheme.primary,
+              ),
             ),
             if (passed != null)
               Text(
                 passed ? 'ناجح' : 'لم تبلغ علامة النجاح (${percent(summary.passingScorePercent ?? 0)})',
-                style: TextStyle(color: passed ? Colors.green.shade700 : scheme.error, fontWeight: FontWeight.w600),
+                style: TextStyle(color: passed ? BrandColors.success(b) : scheme.error, fontWeight: FontWeight.w600),
               ),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 16,
-              runSpacing: 8,
-              alignment: WrapAlignment.center,
-              children: [
-                _Stat(label: 'صحيحة', value: summary.correctCount ?? 0, color: Colors.green.shade700),
-                _Stat(label: 'خاطئة', value: summary.wrongCount ?? 0, color: scheme.error),
-                _Stat(label: 'متروكة', value: summary.skippedCount ?? 0, color: scheme.outline),
-              ],
+            const SizedBox(height: 16),
+            IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: _Stat(
+                      label: 'صحيحة',
+                      value: '$correct',
+                      tint: BrandColors.tintGreen,
+                      icon: Icons.check_circle,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: _Stat(label: 'خاطئة', value: '$wrong', tint: BrandColors.tintRed, icon: Icons.cancel),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: _Stat(
+                      label: 'متروكة',
+                      value: '$skipped',
+                      tint: BrandColors.tintYellow,
+                      icon: Icons.remove_circle_outline,
+                    ),
+                  ),
+                  if (summary.timeSpentMs != null) ...[
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _Stat(
+                        label: 'الوقت',
+                        value: humanDuration(summary.timeSpentMs!),
+                        tint: BrandColors.tintBlue,
+                        icon: Icons.timer_outlined,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
             ),
-            if (summary.timeSpentMs != null) ...[
-              const SizedBox(height: 8),
-              Text('الوقت: ${humanDuration(summary.timeSpentMs!)}', style: text.bodySmall),
-            ],
             if (summary.submittedLate) ...[
               const SizedBox(height: 8),
               Text('تم التسليم بعد انتهاء الوقت', style: TextStyle(color: scheme.error)),
@@ -194,23 +246,105 @@ class _Summary extends StatelessWidget {
   }
 }
 
-class _Stat extends StatelessWidget {
-  const _Stat({required this.label, required this.value, required this.color});
+/// A trophy with confetti in the logo colours for a good result, a gentle target otherwise.
+/// The pop-in is skipped when the system asks for reduced motion.
+class _Celebration extends StatelessWidget {
+  const _Celebration({required this.great});
 
-  final String label;
-  final int value;
-  final Color color;
+  final bool great;
 
   @override
-  Widget build(BuildContext context) => Column(
-    children: [
-      Text(
-        '$value',
-        style: Theme.of(context).textTheme.titleLarge?.copyWith(color: color, fontWeight: FontWeight.bold),
+  Widget build(BuildContext context) {
+    final still = MediaQuery.of(context).disableAnimations;
+    const pieces = [
+      (Alignment(-0.95, -0.6), 0.4),
+      (Alignment(-0.6, -1.0), -0.3),
+      (Alignment(0.65, -0.95), 0.6),
+      (Alignment(1.0, -0.4), -0.5),
+      (Alignment(-1.0, 0.35), 0.2),
+      (Alignment(0.95, 0.45), 0.9),
+      (Alignment(-0.3, -0.85), 1.2),
+      (Alignment(0.3, -1.0), -0.9),
+    ];
+    final icon = SpotIcon(
+      great ? Icons.emoji_events_rounded : Icons.track_changes_rounded,
+      tint: great ? BrandColors.tintYellow : BrandColors.tintBlue,
+      color: great ? const Color(0xFF8A6100) : null,
+      size: 96,
+    );
+    return ExcludeSemantics(
+      child: SizedBox(
+        width: 200,
+        height: 120,
+        child: Stack(
+          children: [
+            if (great)
+              for (final (i, (align, turn)) in pieces.indexed)
+                Align(
+                  alignment: align,
+                  child: Transform.rotate(
+                    angle: turn,
+                    child: Container(
+                      width: i.isEven ? 10 : 6,
+                      height: i.isEven ? 6 : 12,
+                      decoration: BoxDecoration(
+                        color: BrandColors.accents[i % BrandColors.accents.length],
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                ),
+            Center(
+              child: still
+                  ? icon
+                  : TweenAnimationBuilder<double>(
+                      tween: Tween(begin: 0.6, end: 1),
+                      duration: const Duration(milliseconds: 450),
+                      curve: Curves.easeOutBack,
+                      builder: (_, scale, child) => Transform.scale(scale: scale, child: child),
+                      child: icon,
+                    ),
+            ),
+          ],
+        ),
       ),
-      Text(label),
-    ],
-  );
+    );
+  }
+}
+
+class _Stat extends StatelessWidget {
+  const _Stat({required this.label, required this.value, required this.tint, required this.icon});
+
+  final String label;
+  final String value;
+  final Color tint;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final ink = dark ? Theme.of(context).colorScheme.onSurface : BrandColors.ink;
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
+      decoration: BoxDecoration(
+        color: dark ? tint.withValues(alpha: 0.16) : tint,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 18, color: ink),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: TextStyle(color: ink, fontWeight: FontWeight.w700, fontSize: 16),
+            textAlign: TextAlign.center,
+          ),
+          Text(label, style: TextStyle(color: ink, fontSize: 12)),
+        ],
+      ),
+    );
+  }
 }
 
 class _ResultCard extends StatelessWidget {
@@ -228,7 +362,7 @@ class _ResultCard extends StatelessWidget {
     final (IconData icon, Color color, String status) = !answered
         ? (Icons.remove_circle_outline, scheme.outline, 'متروك')
         : r?.isCorrect == true
-        ? (Icons.check_circle, Colors.green.shade700, 'صحيح')
+        ? (Icons.check_circle, BrandColors.success(Theme.of(context).brightness), 'صحيح')
         : (Icons.cancel, scheme.error, 'خاطئ');
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
@@ -270,7 +404,7 @@ class _ResultCard extends StatelessWidget {
                             : Icons.circle_outlined,
                         size: 18,
                         color: o.isCorrect == true
-                            ? Colors.green.shade700
+                            ? BrandColors.success(Theme.of(context).brightness)
                             : o.id == q.selectedOptionId
                             ? scheme.error
                             : scheme.outlineVariant,

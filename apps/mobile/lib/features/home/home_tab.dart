@@ -13,6 +13,7 @@ import '../offline/offline_providers.dart';
 import 'home_providers.dart';
 import 'notification_screens.dart';
 import '../../shared/widgets/responsive.dart';
+import '../../shared/widgets/ui_kit.dart';
 import '../../app/theme.dart';
 
 /// Home (spec §19.1): greeting and bell, exam countdown, banners, today's work with goal and streak,
@@ -25,9 +26,32 @@ class HomeTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final home = ref.watch(homeProvider);
     final unread = home.value?.unreadNotifications ?? 0;
+    final me = ref.watch(authControllerProvider).value;
+    final name = home.value?.greetingName ?? me?.fullName;
     return Scaffold(
       appBar: AppBar(
-        title: Text(_greeting(home.value?.greetingName ?? ref.watch(authControllerProvider).value?.fullName)),
+        toolbarHeight: 72,
+        titleSpacing: 16,
+        title: Row(
+          children: [
+            NetworkAvatar(url: me?.avatarUrl, name: name ?? '', radius: 22),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(_greeting(name), overflow: TextOverflow.ellipsis),
+                  Text(
+                    'واصل رحلتك التعليمية',
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
         actions: [
           IconButton(
             tooltip: 'الإشعارات',
@@ -38,6 +62,7 @@ class HomeTab extends ConsumerWidget {
               child: const Icon(Icons.notifications_outlined),
             ),
           ),
+          const SizedBox(width: 8),
         ],
       ),
       body: ContentWidth(
@@ -72,78 +97,74 @@ class _HomeBody extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final h = home;
-    final titles = Theme.of(context).textTheme.titleMedium;
-    Widget section(String title) => Padding(
-      padding: const EdgeInsets.only(top: 20, bottom: 8),
-      child: Text(title, style: titles),
-    );
+    final subjects = [
+      for (final e in h.myAccess)
+        (
+          title: scopeTitle(e.scope),
+          subtitle: scopeSubtitle(e.scope),
+          track: e.scope.scopeType == AccessScopeScopeType.teacherTrack,
+          path: e.scope.scopeType == AccessScopeScopeType.teacherTrack
+              ? '${Routes.tracks}/${e.scope.teacherTrackId}'
+              : '${Routes.subjects}/${e.scope.subjectId}',
+        ),
+    ];
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
       children: [
         if (h.countdown != null) _CountdownCard(countdown: h.countdown!),
         if (h.banners.isNotEmpty) _BannerSlider(banners: h.banners),
         _TodayCard(today: h.today),
         if (h.activeMistakes > 0)
-          Card(
-            margin: const EdgeInsets.only(top: 12),
-            child: ListTile(
-              leading: const Icon(Icons.error_outline),
-              title: const Text('مراجعة الأخطاء'),
-              subtitle: Text('${countedQuestions(h.activeMistakes)} في بنك الأخطاء'),
-              trailing: const Icon(Icons.chevron_left),
-              onTap: () => context.go(Routes.mistakes),
-            ),
+          NavCard(
+            icon: Icons.replay_rounded,
+            tint: BrandColors.tintRed,
+            title: 'مراجعة الأخطاء',
+            subtitle: '${countedQuestions(h.activeMistakes)} في بنك الأخطاء',
+            onTap: () => context.go(Routes.mistakes),
           ),
-        section('متابعة التعلم'),
+        const SectionHeader('متابعة التعلم'),
         if (h.resume.isEmpty)
-          Card(
-            child: ListTile(
-              leading: const Icon(Icons.menu_book_outlined),
-              title: const Text('ابدأ من المواد'),
-              subtitle: const Text('اختر مادة وابدأ التدريب أو الاختبارات'),
-              onTap: () => context.go(Routes.subjects),
-            ),
+          NavCard(
+            icon: Icons.menu_book_rounded,
+            tint: BrandColors.tintYellow,
+            title: 'ابدأ من المواد',
+            subtitle: 'اختر مادة وابدأ التدريب أو الاختبارات',
+            onTap: () => context.go(Routes.subjects),
           )
         else
           for (final r in h.resume) ResumeTile(item: r),
-        if (h.myAccess.isNotEmpty) ...[
-          section('موادّي ومساراتي'),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
+        if (subjects.isNotEmpty) ...[
+          SectionHeader('موادّي ومساراتي', action: 'كل المواد', onAction: () => context.go(Routes.subjects)),
+          _TileRow(
             children: [
-              for (final e in h.myAccess)
-                ActionChip(
-                  avatar: Icon(
-                    e.scope.scopeType == AccessScopeScopeType.teacherTrack ? Icons.route_outlined : Icons.menu_book,
-                    size: 18,
-                  ),
-                  label: Text(scopeTitle(e.scope)),
-                  onPressed: () => context.go(
-                    e.scope.scopeType == AccessScopeScopeType.teacherTrack
-                        ? '${Routes.tracks}/${e.scope.teacherTrackId}'
-                        : '${Routes.subjects}/${e.scope.subjectId}',
-                  ),
+              for (final (i, sub) in subjects.indexed)
+                BrandTile(
+                  index: i,
+                  icon: sub.track ? Icons.route_rounded : Icons.menu_book_rounded,
+                  title: sub.title,
+                  subtitle: sub.subtitle,
+                  onTap: () => context.go(sub.path),
                 ),
             ],
           ),
         ],
         if (h.freeSubjects.isNotEmpty) ...[
-          section('محتوى مجاني'),
-          for (final f in h.freeSubjects)
-            Card(
-              margin: const EdgeInsets.only(bottom: 8),
-              child: ListTile(
-                leading: const Icon(Icons.lock_open_outlined),
-                title: Text(f.nameAr),
-                subtitle: Text('${f.freeCount} عنصراً مجانياً'),
-                trailing: const Icon(Icons.chevron_left),
-                onTap: () => context.go('${Routes.subjects}/${f.subjectId}'),
-              ),
-            ),
+          const SectionHeader('محتوى مجاني'),
+          _TileRow(
+            children: [
+              for (final (i, f) in h.freeSubjects.indexed)
+                BrandTile(
+                  index: i + subjects.length,
+                  icon: Icons.lock_open_rounded,
+                  title: f.nameAr,
+                  subtitle: '${f.freeCount} عنصراً مجانياً',
+                  onTap: () => context.go('${Routes.subjects}/${f.subjectId}'),
+                ),
+            ],
+          ),
         ],
         if (h.followedTeachers.isNotEmpty) ...[
-          section('مدرسون أتابعهم'),
+          const SectionHeader('مدرسون أتابعهم'),
           // Sized by its content, so larger font steps (§25) never overflow.
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
@@ -174,6 +195,29 @@ class _HomeBody extends ConsumerWidget {
   }
 }
 
+/// A horizontal strip of tiles that keeps its natural height at every font size.
+class _TileRow extends StatelessWidget {
+  const _TileRow({required this.children});
+
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      clipBehavior: Clip.none,
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (final (i, c) in children.indexed) ...[if (i > 0) const SizedBox(width: 10), c],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _CountdownCard extends StatelessWidget {
   const _CountdownCard({required this.countdown});
 
@@ -184,17 +228,17 @@ class _CountdownCard extends StatelessWidget {
     // Brand yellow with dark text (yellow never carries white text: 1.4:1).
     return Card(
       color: BrandColors.yellow,
-      margin: const EdgeInsets.only(bottom: 12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radius)),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(14),
         child: Row(
           children: [
-            const Icon(Icons.event_outlined, color: BrandColors.ink),
+            const IconBadge(Icons.event_rounded, tint: Colors.white, color: BrandColors.ink, size: 40),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 countdownText(countdown),
-                style: const TextStyle(color: BrandColors.ink, fontWeight: FontWeight.w600),
+                style: const TextStyle(color: BrandColors.ink, fontWeight: FontWeight.w700),
               ),
             ),
           ],
@@ -288,6 +332,8 @@ class _TodayCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = today;
     final scheme = Theme.of(context).colorScheme;
+    final text = Theme.of(context).textTheme;
+    final ratio = t.goal == 0 ? 0.0 : (t.done / t.goal).clamp(0, 1).toDouble();
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -296,25 +342,63 @@ class _TodayCard extends ConsumerWidget {
           children: [
             Row(
               children: [
-                Expanded(child: Text('اليوم', style: Theme.of(context).textTheme.titleMedium)),
-                Icon(Icons.local_fire_department, color: t.streak > 0 ? BrandColors.orange : scheme.outline),
-                const SizedBox(width: 4),
-                Text(streakText(t.streak)),
+                Expanded(child: Text('اليوم', style: text.titleMedium)),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: t.streak > 0 ? BrandColors.tintOrange : scheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.local_fire_department_rounded,
+                        size: 18,
+                        color: t.streak > 0 ? const Color(0xFFB45309) : scheme.outline,
+                      ),
+                      const SizedBox(width: 4),
+                      Flexible(
+                        child: Text(
+                          streakText(t.streak),
+                          style: TextStyle(
+                            color: t.streak > 0 ? BrandColors.ink : scheme.onSurfaceVariant,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 12),
             Row(
               children: [
-                Expanded(child: Text(t.goalMet ? 'أنجزت هدف اليوم ✓' : 'هدف اليوم: ${t.done} من ${t.goal}')),
-                TextButton(onPressed: () => editDailyGoal(context, ref, t.goal), child: const Text('تعديل الهدف')),
+                ProgressRing(value: ratio, label: '${(ratio * 100).round()}%', size: 64),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        t.goalMet ? 'أنجزت هدف اليوم ✓' : 'هدف اليوم: ${t.done} من ${t.goal}',
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      Align(
+                        alignment: AlignmentDirectional.centerStart,
+                        child: TextButton(
+                          style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                          onPressed: () => editDailyGoal(context, ref, t.goal),
+                          child: const Text('تعديل الهدف'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
-            LinearProgressIndicator(
-              value: t.goal == 0 ? 0 : (t.done / t.goal).clamp(0, 1).toDouble(),
-              minHeight: 8,
-              borderRadius: BorderRadius.circular(4),
-            ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             if (t.dueCards > 0)
               FilledButton.icon(
                 onPressed: () => context.push(Routes.dueStudy),
@@ -322,7 +406,15 @@ class _TodayCard extends ConsumerWidget {
                 label: Text('مراجعة البطاقات المستحقة (${t.dueCards})'),
               )
             else
-              Text('لا بطاقات مستحقة الآن', style: TextStyle(color: scheme.outline)),
+              Row(
+                children: [
+                  Icon(Icons.check_circle_outline, size: 18, color: BrandColors.success(Theme.of(context).brightness)),
+                  const SizedBox(width: 6),
+                  Flexible(
+                    child: Text('لا بطاقات مستحقة الآن', style: TextStyle(color: scheme.onSurfaceVariant)),
+                  ),
+                ],
+              ),
           ],
         ),
       ),
@@ -339,30 +431,20 @@ class _OfflineHome extends ConsumerWidget {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        Card(
-          child: ListTile(
-            leading: const Icon(Icons.cloud_off_outlined),
-            title: const Text('أنت غير متصل بالإنترنت'),
-            subtitle: const Text('يمكنك متابعة المراجعة والمحتوى المحمّل'),
-            trailing: TextButton(onPressed: () => ref.invalidate(homeProvider), child: const Text('تحديث')),
-          ),
+        NavCard(
+          icon: Icons.cloud_off_rounded,
+          tint: BrandColors.tintOrange,
+          title: 'أنت غير متصل بالإنترنت',
+          subtitle: 'يمكنك متابعة المراجعة والمحتوى المحمّل',
+          trailing: TextButton(onPressed: () => ref.invalidate(homeProvider), child: const Text('تحديث')),
         ),
-        Card(
-          child: ListTile(
-            leading: const Icon(Icons.style_outlined),
-            title: const Text('المراجعة'),
-            trailing: const Icon(Icons.chevron_left),
-            onTap: () => context.go(Routes.review),
-          ),
-        ),
+        NavCard(icon: Icons.style_rounded, title: 'المراجعة', onTap: () => context.go(Routes.review)),
         if (ref.watch(offlinePacksAvailableProvider))
-          Card(
-            child: ListTile(
-              leading: const Icon(Icons.download_done_outlined),
-              title: const Text('المحتوى المحمّل'),
-              trailing: const Icon(Icons.chevron_left),
-              onTap: () => context.go(Routes.offlineStorage),
-            ),
+          NavCard(
+            icon: Icons.download_done_rounded,
+            tint: BrandColors.tintGreen,
+            title: 'المحتوى المحمّل',
+            onTap: () => context.go(Routes.offlineStorage),
           ),
       ],
     );
@@ -377,39 +459,40 @@ class ResumeTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final r = item;
-    final (IconData icon, String action) = switch (r.activityType) {
-      ResumeItemActivityType.quiz => (Icons.assignment_outlined, r.attemptId != null ? 'متابعة الاختبار' : 'اختبار'),
-      ResumeItemActivityType.deck => (Icons.style_outlined, 'بطاقات'),
-      _ => (Icons.quiz_outlined, 'أسئلة'),
+    final (IconData icon, Color tint, String action) = switch (r.activityType) {
+      ResumeItemActivityType.quiz => (
+        Icons.assignment_rounded,
+        BrandColors.tintBlue,
+        r.attemptId != null ? 'متابعة الاختبار' : 'اختبار',
+      ),
+      ResumeItemActivityType.deck => (Icons.style_rounded, BrandColors.tintPink, 'بطاقات'),
+      _ => (Icons.quiz_rounded, BrandColors.tintGreen, 'أسئلة'),
     };
     final where = [
       r.subjectNameAr,
       if (r.trackTitleAr != null) r.trackTitleAr!,
       if (r.lessonNameAr != null) r.lessonNameAr!,
     ];
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        leading: Icon(icon),
-        title: Text(r.itemTitleAr ?? r.unitNameAr ?? r.subjectNameAr),
-        subtitle: Text('$action · ${where.join(' · ')}'),
-        trailing: const Icon(Icons.chevron_left),
-        onTap: () {
-          if (r.attemptId != null) {
-            context.push('/attempts/${r.attemptId}');
-          } else if (r.activityType == ResumeItemActivityType.quiz && r.itemId != null) {
-            context.go('${Routes.quizzes}/${r.itemId}');
-          } else if (r.activityType == ResumeItemActivityType.deck && r.itemId != null) {
-            context.go('${Routes.decks}/${r.itemId}');
-          } else if (r.lessonId != null) {
-            context.go('${Routes.subjects}/${r.subjectId}/questions?lessonId=${r.lessonId}');
-          } else if (r.teacherTrackId != null) {
-            context.go('${Routes.tracks}/${r.teacherTrackId}');
-          } else {
-            context.go('${Routes.subjects}/${r.subjectId}');
-          }
-        },
-      ),
+    return NavCard(
+      icon: icon,
+      tint: tint,
+      title: r.itemTitleAr ?? r.unitNameAr ?? r.subjectNameAr,
+      subtitle: '$action · ${where.join(' · ')}',
+      onTap: () {
+        if (r.attemptId != null) {
+          context.push('/attempts/${r.attemptId}');
+        } else if (r.activityType == ResumeItemActivityType.quiz && r.itemId != null) {
+          context.go('${Routes.quizzes}/${r.itemId}');
+        } else if (r.activityType == ResumeItemActivityType.deck && r.itemId != null) {
+          context.go('${Routes.decks}/${r.itemId}');
+        } else if (r.lessonId != null) {
+          context.go('${Routes.subjects}/${r.subjectId}/questions?lessonId=${r.lessonId}');
+        } else if (r.teacherTrackId != null) {
+          context.go('${Routes.tracks}/${r.teacherTrackId}');
+        } else {
+          context.go('${Routes.subjects}/${r.subjectId}');
+        }
+      },
     );
   }
 }

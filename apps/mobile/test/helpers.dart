@@ -174,6 +174,7 @@ Future<PumpedApp> pumpApp(
   Uint8List? pickedImage,
   bool couponRedemption = true,
   bool offlinePacks = false,
+  bool onboardingSeen = true,
   List<Override> extraOverrides = const [],
 }) async {
   registerFallbacks();
@@ -226,6 +227,7 @@ Future<PumpedApp> pumpApp(
 
   final db = AppDatabase(NativeDatabase.memory());
   addTearDown(db.close);
+  if (onboardingSeen) await db.setValue('onboarding.seen', '1');
   final container = ProviderContainer(
     // Failed providers are not retried in tests (a retry timer would outlive the test).
     retry: (_, _) => null,

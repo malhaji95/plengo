@@ -1,3 +1,4 @@
+import '../../app/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -89,27 +90,66 @@ class _QuestionViewState extends ConsumerState<QuestionView> {
   }
 
   Widget _optionTile(StudentOption option, CheckResult? result) {
-    final scheme = Theme.of(context).colorScheme;
     final selected = _selected == option.id;
-    final isCorrect = result?.correctOptionId == option.id;
-    final (Color? border, IconData icon) = switch ((result, selected, isCorrect)) {
-      (null, true, _) => (scheme.primary, Icons.radio_button_checked),
-      (null, false, _) => (null, Icons.radio_button_unchecked),
-      (_, _, true) => (Colors.green.shade600, Icons.check_circle),
-      (_, true, false) => (scheme.error, Icons.cancel),
-      _ => (null, Icons.radio_button_unchecked),
+    return AnswerOptionTile(
+      text: option.text,
+      state: OptionState.of(graded: result != null, selected: selected, correct: result?.correctOptionId == option.id),
+      onTap: result == null ? () => setState(() => _selected = option.id) : null,
+    );
+  }
+}
+
+/// How an answer option looks: before grading only the selection shows; after grading the correct
+/// option and a wrong pick are marked with an icon and a tint, never colour alone (§14.3).
+enum OptionState {
+  idle,
+  selected,
+  correct,
+  wrong;
+
+  static OptionState of({required bool graded, required bool selected, required bool correct}) =>
+      switch ((graded, selected, correct)) {
+        (false, true, _) => OptionState.selected,
+        (true, _, true) => OptionState.correct,
+        (true, true, false) => OptionState.wrong,
+        _ => OptionState.idle,
+      };
+}
+
+class AnswerOptionTile extends StatelessWidget {
+  const AnswerOptionTile({super.key, required this.text, required this.state, this.onTap});
+
+  final String text;
+  final OptionState state;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final b = Theme.of(context).brightness;
+    final dark = b == Brightness.dark;
+    final (Color? tint, Color? mark, IconData icon) = switch (state) {
+      OptionState.idle => (null, null, Icons.radio_button_unchecked),
+      OptionState.selected => (BrandColors.tintBlue, scheme.primary, Icons.radio_button_checked),
+      OptionState.correct => (BrandColors.tintGreen, BrandColors.success(b), Icons.check_circle),
+      OptionState.wrong => (BrandColors.tintRed, scheme.error, Icons.cancel),
     };
     return Card(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.only(bottom: 10),
+      color: tint == null ? null : (dark ? tint.withValues(alpha: 0.16) : tint),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: border ?? scheme.outlineVariant, width: border == null ? 1 : 2),
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: mark ?? scheme.outlineVariant, width: mark == null ? 1 : 2),
       ),
+      clipBehavior: Clip.antiAlias,
       child: ListTile(
-        leading: Icon(icon, color: border),
-        title: Text(isolateLtr(option.text)),
-        selected: selected,
-        onTap: result == null ? () => setState(() => _selected = option.id) : null,
+        leading: Icon(icon, color: mark ?? scheme.outline),
+        title: Text(
+          isolateLtr(text),
+          style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w500),
+        ),
+        selected: state == OptionState.selected,
+        onTap: onTap,
       ),
     );
   }
@@ -125,9 +165,12 @@ class AnswerFeedback extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final color = result.isCorrect ? Colors.green.shade700 : scheme.error;
+    final b = Theme.of(context).brightness;
+    final color = result.isCorrect ? BrandColors.success(b) : scheme.error;
+    final tint = result.isCorrect ? BrandColors.tintGreen : BrandColors.tintRed;
     return Card(
-      color: color.withValues(alpha: 0.08),
+      color: b == Brightness.dark ? tint.withValues(alpha: 0.14) : tint,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       margin: EdgeInsets.zero,
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -140,7 +183,7 @@ class AnswerFeedback extends StatelessWidget {
                 const SizedBox(width: 8),
                 Text(
                   result.isCorrect ? 'إجابة صحيحة' : 'إجابة خاطئة',
-                  style: TextStyle(color: color, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: b == Brightness.dark ? color : BrandColors.ink, fontWeight: FontWeight.bold),
                 ),
               ],
             ),

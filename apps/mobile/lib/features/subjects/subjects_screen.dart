@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../app/theme.dart';
+import '../../shared/widgets/ui_kit.dart';
+
 import '../../app/providers.dart';
 import '../../app/router.dart';
 import '../../core/api/generated/export.dart';
@@ -182,7 +185,7 @@ class _SubjectList extends ConsumerWidget {
             : ResponsiveList(
                 padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
                 itemCount: items.length,
-                itemBuilder: (context, i) => _SubjectCard(subject: items[i]),
+                itemBuilder: (context, i) => _SubjectCard(subject: items[i], index: i),
               ),
       ),
     );
@@ -190,23 +193,28 @@ class _SubjectList extends ConsumerWidget {
 }
 
 class _SubjectCard extends StatelessWidget {
-  const _SubjectCard({required this.subject});
+  const _SubjectCard({required this.subject, required this.index});
 
   final Subject subject;
+  final int index;
+
+  static const _tints = [
+    BrandColors.tintYellow,
+    BrandColors.tintBlue,
+    BrandColors.tintGreen,
+    BrandColors.tintOrange,
+    BrandColors.tintPink,
+  ];
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     return Card(
       margin: EdgeInsets.zero,
       clipBehavior: Clip.antiAlias,
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        leading: CircleAvatar(
-          backgroundColor: scheme.primaryContainer,
-          child: Icon(Icons.menu_book, color: scheme.onPrimaryContainer),
-        ),
-        title: Text(subject.nameAr, style: const TextStyle(fontWeight: FontWeight.w500)),
+        leading: IconBadge(Icons.menu_book_rounded, tint: _tints[index % _tints.length], size: 48),
+        title: Text(subject.nameAr, style: const TextStyle(fontWeight: FontWeight.w700)),
         subtitle: subject.description == null
             ? null
             : Text(subject.description!, maxLines: 2, overflow: TextOverflow.ellipsis),

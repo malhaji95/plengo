@@ -399,3 +399,96 @@ describe('notifications (§20.2)', () => {
     });
   });
 });
+
+describe('dashboard home (§26)', () => {
+  it('shows what needs attention, recent activity in Arabic and shortcuts, from existing endpoints only', async () => {
+    replies.set('GET /api/v1/admin/reports', ok({ items: [{ id: 'r1' }, { id: 'r2' }], nextCursor: null }));
+    replies.set('GET /api/v1/admin/question-analytics', ok({ items: [{ id: 'q1' }], nextCursor: 'more' }));
+    replies.set(
+      'GET /api/v1/admin/banners',
+      ok([
+        { id: 'b1', isActive: true },
+        { id: 'b2', isActive: false },
+      ]),
+    );
+    replies.set('GET /api/v1/admin/admins', ok(admins));
+    replies.set(
+      'GET /api/v1/admin/audit-logs',
+      ok({
+        items: [
+          {
+            id: 'e1',
+            actorAdminId: 'me',
+            actorName: 'أنا',
+            actorEmail: 'me@example.com',
+            action: 'question.created',
+            resourceType: 'question',
+            resourceId: 'q9',
+            metadata: {},
+            createdAt: new Date().toISOString(),
+          },
+          {
+            id: 'e2',
+            actorAdminId: null,
+            actorName: null,
+            actorEmail: null,
+            action: 'weird.unknown',
+            resourceType: 'x',
+            resourceId: null,
+            metadata: {},
+            createdAt: new Date().toISOString(),
+          },
+        ],
+        nextCursor: null,
+      }),
+    );
+    const { default: Home } = await import('@/app/(dashboard)/page');
+    render(<Home />);
+
+    expect(await screen.findByText('إنشاء سؤال')).toBeTruthy();
+    expect(screen.getByText('weird.unknown')).toBeTruthy();
+    expect(screen.getByText('النظام')).toBeTruthy();
+    // Open reports (2), flagged questions (a full page → "1+"), active banners 1 of 2, active admins 2.
+    expect(screen.getByRole('link', { name: /بلاغات مفتوحة/ }).textContent).toContain('2');
+    expect(screen.getByRole('link', { name: /أسئلة بحاجة لمراجعة/ }).textContent).toContain('1+');
+    expect(screen.getByRole('link', { name: /إعلانات نشطة/ }).textContent).toContain('من 2 إعلاناً');
+    expect(screen.getByRole('link', { name: 'رفع بطاقات' }).getAttribute('href')).toBe('/flashcards');
+    const reportsCall = calls.find((c) => c.path === '/api/v1/admin/reports');
+    expect(reportsCall?.init?.params).toEqual({ query: { status: 'open', limit: 200 } });
+  });
+});
+
+describe('Arabic file picker', () => {
+  it('replaces the browser control with an Arabic button and shows the chosen name', async () => {
+    const { FilePicker } = await import('@/components/ui/file-picker');
+    const picked: (File | null)[] = [];
+    const { rerender } = render(
+      <FilePicker
+        id="f"
+        label="الوجه الأمامي"
+        accept="image/png"
+        file={null}
+        onChange={(f) => picked.push(f)}
+      />,
+    );
+    expect(screen.getByText('اختيار ملف')).toBeTruthy();
+    expect(screen.getByText('لم يُختر ملف')).toBeTruthy();
+    const file = new File(['x'], 'front.png', { type: 'image/png' });
+    fireEvent.change(screen.getByLabelText('الوجه الأمامي'), { target: { files: [file] } });
+    expect(picked).toEqual([file]);
+
+    rerender(
+      <FilePicker
+        id="f"
+        label="الوجه الأمامي"
+        accept="image/png"
+        file={file}
+        onChange={(f) => picked.push(f)}
+      />,
+    );
+    expect(screen.getByText('front.png')).toBeTruthy();
+    expect(screen.getByText('تغيير الملف')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'إزالة الوجه الأمامي' }));
+    expect(picked.at(-1)).toBeNull();
+  });
+});

@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { damascusDate, scopeBody, scopeLabel, termBody } from '@/lib/access';
 import { ApiError, unwrap } from '@/lib/api';
-import { NAV_ITEMS, CURRENT_PHASE } from '@/lib/nav';
+import { activityLabel, timeAgo } from '@/lib/activity';
+import { isActive, NAV_GROUPS } from '@/lib/nav';
 import { freeLabel, MODE_LABELS } from '@/lib/questions';
 
 const response = (status: number) => new Response(null, { status });
@@ -77,12 +78,68 @@ describe('access helpers', () => {
 });
 
 describe('navigation (§26.1)', () => {
-  it('lists the spec sections in order and enables those built so far', () => {
-    expect(NAV_ITEMS.map((i) => i.label)[1]).toBe('المشرفون');
-    const enabled = NAV_ITEMS.filter((i) => i.phase <= CURRENT_PHASE).map((i) => i.href);
-    for (const href of ['/admins', '/students', '/questions', '/flashcards', '/quizzes', '/settings']) {
-      expect(enabled).toContain(href);
-    }
+  const SECTIONS = [
+    '/',
+    '/admins',
+    '/students',
+    '/teachers',
+    '/tracks',
+    '/levels',
+    '/universities',
+    '/subjects',
+    '/questions',
+    '/flashcards',
+    '/quizzes',
+    '/free-rules',
+    '/promotions',
+    '/coupons',
+    '/entitlements',
+    '/banners',
+    '/countdowns',
+    '/notifications',
+    '/reports',
+    '/question-analytics',
+    '/import-export',
+    '/audit-log',
+    '/settings',
+  ];
+
+  it('keeps every spec section exactly once, grouped under a heading', () => {
+    const hrefs = NAV_GROUPS.flatMap((g) => g.items.map((i) => i.href));
+    expect([...hrefs].sort()).toEqual([...SECTIONS].sort());
+    expect(new Set(hrefs).size).toBe(hrefs.length);
+    expect(NAV_GROUPS[0]!.items[0]!.href).toBe('/');
+    for (const group of NAV_GROUPS.slice(1)) expect(group.title).toBeTruthy();
+  });
+
+  it('highlights a section on its detail pages but the dashboard only on itself', () => {
+    expect(isActive('/flashcards', '/flashcards/123')).toBe(true);
+    expect(isActive('/flashcards', '/flashcards')).toBe(true);
+    expect(isActive('/quizzes', '/question-analytics')).toBe(false);
+    expect(isActive('/', '/')).toBe(true);
+    expect(isActive('/', '/admins')).toBe(false);
+  });
+});
+
+describe('dashboard activity', () => {
+  it('turns audit actions into Arabic, and leaves unknown ones to the caller', () => {
+    expect(activityLabel('question.created')).toBe('إنشاء سؤال');
+    expect(activityLabel('coupon_batch.revoked')).toBe('إلغاء دفعة كوبونات');
+    expect(activityLabel('structure.level.updated')).toBe('تعديل مرحلة تعليمية');
+    expect(activityLabel('structure.teacher_track.created')).toBe('إنشاء مسار');
+    expect(activityLabel('admin.2fa_enrolled')).toBe('تفعيل التحقق الثنائي لحساب مشرف');
+    expect(activityLabel('quiz.published')).toBe('نشر اختبار');
+    expect(activityLabel('question.free_override')).toBe('تغيير الوصول المجاني (سؤال)');
+    expect(activityLabel('admin.created_via_cli')).toBe('إنشاء مشرف من سطر الأوامر');
+    expect(activityLabel('question.flag_cleared')).toBe('إزالة علامة المراجعة عن سؤال');
+    expect(activityLabel('mystery.thing')).toBeNull();
+  });
+
+  it('says how long ago something happened', () => {
+    const now = Date.parse('2026-10-04T12:00:00Z');
+    expect(timeAgo('2026-10-04T11:59:40Z', now)).toBe('الآن');
+    expect(timeAgo('2026-10-04T11:55:00Z', now)).toContain('5');
+    expect(timeAgo('2026-10-03T12:00:00Z', now)).toBe('أمس');
   });
 });
 

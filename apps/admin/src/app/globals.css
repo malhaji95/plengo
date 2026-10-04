@@ -2,10 +2,39 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* The student app's fonts, served from /fonts (no font CDN; OFL licences alongside). IBM Plex Sans
+   Arabic for text, Noto Kufi Arabic for page headings only. */
+@font-face {
+  font-family: 'IBM Plex Sans Arabic';
+  src: url('/fonts/IBMPlexSansArabic-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'IBM Plex Sans Arabic';
+  src: url('/fonts/IBMPlexSansArabic-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'IBM Plex Sans Arabic';
+  src: url('/fonts/IBMPlexSansArabic-Bold.ttf') format('truetype');
+  font-weight: 600 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Noto Kufi Arabic';
+  src: url('/fonts/NotoKufiArabic-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-display: swap;
+}
+
 /* Plengo brand (design/brand). Blue is the logo blue deepened to 5:1 with white text; yellow is
    the brand accent behind dark text. */
 @theme {
-  --font-sans: 'Segoe UI', Tahoma, 'Noto Sans Arabic', 'Geeza Pro', system-ui, sans-serif;
+  --font-sans:
+    'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, 'Noto Sans Arabic', 'Geeza Pro', system-ui, sans-serif;
+  --font-heading: 'Noto Kufi Arabic', 'IBM Plex Sans Arabic', system-ui, sans-serif;
   --color-brand: #0074b4;
   --color-brand-foreground: #ffffff;
   --color-accent: #ffd62c;
@@ -31,5 +60,8 @@
   }
   body {
     @apply bg-surface-muted text-foreground antialiased;
+  }
+  h1 {
+    font-family: var(--font-heading);
   }
 }

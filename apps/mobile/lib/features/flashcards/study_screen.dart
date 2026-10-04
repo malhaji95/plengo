@@ -3,7 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/srs/scheduler.dart';
+import '../../app/theme.dart';
 import '../../shared/widgets/async_view.dart';
+import '../../shared/widgets/ui_kit.dart';
 import 'card_face.dart';
 import 'flashcard_providers.dart';
 
@@ -48,42 +50,63 @@ class StudyScreen extends ConsumerWidget {
                   child: ListView(
                     padding: const EdgeInsets.all(16),
                     children: [
-                      Text(
-                        'جديدة ${q.newCount} · تعلّم ${q.learningCount} · مراجعة ${q.reviewCount}',
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.labelLarge,
+                      Center(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+                          ),
+                          child: Text(
+                            'جديدة ${q.newCount} · تعلّم ${q.learningCount} · مراجعة ${q.reviewCount}',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.labelLarge,
+                          ),
+                        ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 16),
                       if (card == null)
                         _Done(nextDueAt: q.nextDueAt)
                       else ...[
                         FlashcardView(card: card, flipped: s.flipped, onTap: ctl.flip),
-                        const SizedBox(height: 16),
-                        if (previews == null)
-                          FilledButton(onPressed: ctl.flip, child: const Text('اقلب البطاقة'))
-                        else
+                        const SizedBox(height: 12),
+                        if (previews == null) ...[
                           Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              for (final (rating, label) in [
-                                (Rating.again, 'مرة أخرى'),
-                                (Rating.good, 'جيد'),
-                                (Rating.easy, 'سهل'),
-                              ]) ...[
-                                Expanded(
-                                  child: _RatingButton(
-                                    label: label,
-                                    interval: previews[rating]!.label,
-                                    color: switch (rating) {
-                                      Rating.again => Theme.of(context).colorScheme.error,
-                                      Rating.good => Theme.of(context).colorScheme.primary,
-                                      Rating.easy => Colors.green.shade700,
-                                    },
-                                    onPressed: () => ctl.rate(rating),
-                                  ),
-                                ),
-                                if (rating != Rating.easy) const SizedBox(width: 8),
-                              ],
+                              Icon(Icons.touch_app_outlined, size: 18, color: Theme.of(context).colorScheme.primary),
+                              const SizedBox(width: 6),
+                              Text(
+                                'اضغط على البطاقة لعرض الإجابة',
+                                style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                              ),
                             ],
+                          ),
+                          const SizedBox(height: 12),
+                          FilledButton(onPressed: ctl.flip, child: const Text('اقلب البطاقة')),
+                        ] else
+                          IntrinsicHeight(
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                for (final (rating, label) in [
+                                  (Rating.again, 'مرة أخرى'),
+                                  (Rating.good, 'جيد'),
+                                  (Rating.easy, 'سهل'),
+                                ]) ...[
+                                  Expanded(
+                                    child: _RatingButton(
+                                      rating: rating,
+                                      label: label,
+                                      interval: previews[rating]!.label,
+                                      onPressed: () => ctl.rate(rating),
+                                    ),
+                                  ),
+                                  if (rating != Rating.easy) const SizedBox(width: 10),
+                                ],
+                              ],
+                            ),
                           ),
                       ],
                       const SizedBox(height: 12),
@@ -106,25 +129,44 @@ class StudyScreen extends ConsumerWidget {
   }
 }
 
+/// One of the three ratings (§13.3): a tinted tile with an icon, the label and the predicted
+/// interval, so the choice never relies on colour alone. Ink text on pale tints in both themes.
 class _RatingButton extends StatelessWidget {
-  const _RatingButton({required this.label, required this.interval, required this.color, required this.onPressed});
+  const _RatingButton({required this.rating, required this.label, required this.interval, required this.onPressed});
 
+  final Rating rating;
   final String label;
   final String interval;
-  final Color color;
   final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
-    return FilledButton(
-      style: FilledButton.styleFrom(backgroundColor: color, padding: const EdgeInsets.symmetric(vertical: 12)),
-      onPressed: onPressed,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(label),
-          Text(interval, style: const TextStyle(fontSize: 12)),
-        ],
+    final (Color tint, Color mark, IconData icon) = switch (rating) {
+      Rating.again => (BrandColors.tintRed, BrandColors.error, Icons.replay_rounded),
+      Rating.good => (BrandColors.tintYellow, const Color(0xFF8A6100), Icons.thumb_up_alt_rounded),
+      Rating.easy => (BrandColors.tintGreen, const Color(0xFF13852A), Icons.check_circle_rounded),
+    };
+    return Material(
+      color: tint,
+      borderRadius: BorderRadius.circular(16),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onPressed,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: mark, size: 22),
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: const TextStyle(color: BrandColors.ink, fontWeight: FontWeight.w700),
+              ),
+              Text(interval, style: const TextStyle(color: BrandColors.ink, fontSize: 12)),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -145,7 +187,9 @@ class _Done extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 32),
       child: Column(
         children: [
-          const Text('أنهيت مراجعة اليوم 🎉', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+          const SpotIcon(Icons.emoji_events_rounded, tint: BrandColors.tintYellow, color: Color(0xFF8A6100), size: 120),
+          const SizedBox(height: 16),
+          Text('أنهيت مراجعة اليوم 🎉', style: Theme.of(context).textTheme.headlineSmall),
           if (next != null) ...[
             const SizedBox(height: 8),
             Text('البطاقة التالية: ${next.year}/${next.month}/${next.day} ${two(next.hour)}:${two(next.minute)}'),

@@ -7,7 +7,8 @@ import '../../shared/widgets/async_view.dart';
 import '../../shared/widgets/network_avatar.dart';
 import '../access/access_banner.dart';
 import '../learning/scope_learning.dart';
-import '../questions/question_providers.dart';
+import '../../app/theme.dart';
+import '../../shared/widgets/ui_kit.dart';
 import 'teacher_providers.dart';
 import '../offline/download_widgets.dart';
 
@@ -21,7 +22,6 @@ class TrackScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final detail = ref.watch(trackProvider(trackId));
-    final text = Theme.of(context).textTheme;
     return Scaffold(
       appBar: AppBar(title: Text(detail.value?.track.titleAr ?? '')),
       body: AsyncView(
@@ -33,32 +33,30 @@ class TrackScreen extends ConsumerWidget {
             child: ListView(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
               children: [
-                Text(d.track.titleAr, style: text.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
-                if (d.track.description != null) ...[
-                  const SizedBox(height: 8),
-                  Text(d.track.description!, style: text.bodyMedium),
-                ],
-                const SizedBox(height: 16),
+                ScopeHero(
+                  title: d.track.titleAr,
+                  subtitle: d.track.description ?? '${d.teacher.nameAr} · ${d.subject.nameAr}',
+                  subjectId: d.subject.id,
+                  teacherTrackId: d.track.id,
+                ),
                 ScopeAccessBanner(access: d.access),
                 Card(
-                  margin: const EdgeInsets.only(bottom: 8),
+                  clipBehavior: Clip.antiAlias,
                   child: ListTile(
-                    leading: NetworkAvatar(url: d.teacher.photoUrl, name: d.teacher.nameAr),
-                    title: Text(d.teacher.nameAr),
+                    leading: NetworkAvatar(url: d.teacher.photoUrl, name: d.teacher.nameAr, radius: 22),
+                    title: Text(d.teacher.nameAr, style: const TextStyle(fontWeight: FontWeight.w600)),
                     subtitle: const Text('المدرس'),
                     trailing: const Icon(Icons.chevron_left),
                     onTap: () => context.go('${Routes.teachers}/${d.teacher.id}'),
                   ),
                 ),
-                Card(
+                NavCard(
+                  icon: Icons.menu_book_rounded,
+                  tint: BrandColors.tintYellow,
+                  title: d.subject.nameAr,
+                  subtitle: 'المادة',
                   margin: const EdgeInsets.only(bottom: 16),
-                  child: ListTile(
-                    leading: const Icon(Icons.menu_book_outlined),
-                    title: Text(d.subject.nameAr),
-                    subtitle: const Text('المادة'),
-                    trailing: const Icon(Icons.chevron_left),
-                    onTap: () => context.go('${Routes.subjects}/${d.subject.id}'),
-                  ),
+                  onTap: () => context.go('${Routes.subjects}/${d.subject.id}'),
                 ),
                 ScopeLearning(
                   subjectId: d.subject.id,
@@ -66,33 +64,14 @@ class TrackScreen extends ConsumerWidget {
                   quizCount: d.quizCount,
                   questionCount: d.questionCount,
                   quizzesPath: '${Routes.tracks}/${d.track.id}/quizzes',
+                  deckCount: d.deckCount,
+                  decksPath: '${Routes.tracks}/${d.track.id}/decks',
+                  decksLabel: 'بطاقات المسار',
+                  questionsPath: '${Routes.tracks}/${d.track.id}/questions',
+                  questionsLabel: 'أسئلة المسار',
                 ),
                 OfflineDownloadTile(scope: (subjectId: d.subject.id, teacherTrackId: d.track.id), label: 'تحميل الكل'),
-                if (d.deckCount.total > 0)
-                  Card(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    child: ListTile(
-                      leading: const Icon(Icons.style_outlined),
-                      title: const Text('بطاقات المسار'),
-                      trailing: const Icon(Icons.chevron_left),
-                      onTap: () => context.go('${Routes.tracks}/${d.track.id}/decks'),
-                    ),
-                  ),
-                if (d.questionCount.total > 0)
-                  Card(
-                    child: ListTile(
-                      leading: const Icon(Icons.quiz_outlined),
-                      title: const Text('أسئلة المسار'),
-                      subtitle: Text(
-                        d.questionCount.free > 0
-                            ? '${questionCountLabel(d.questionCount.total)} · ${d.questionCount.free} مجاني'
-                            : questionCountLabel(d.questionCount.total),
-                      ),
-                      trailing: const Icon(Icons.chevron_left),
-                      onTap: () => context.go('${Routes.tracks}/${d.track.id}/questions'),
-                    ),
-                  )
-                else if (d.deckCount.total == 0 && d.quizCount.total == 0)
+                if (d.deckCount.total == 0 && d.quizCount.total == 0 && d.questionCount.total == 0)
                   const EmptyState('محتوى هذا المسار قيد الإعداد', icon: Icons.hourglass_empty),
               ],
             ),

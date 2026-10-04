@@ -1,7 +1,7 @@
 'use client';
 
-import { ArrowLeftRight, Loader2, Trash2, Upload } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { ArrowLeftRight, CloudUpload, Loader2, Trash2 } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { selectClass } from '@/components/access/scope-picker';
 import { FormError } from '@/components/form-error';
 import { uploadImage } from '@/components/image-upload';
@@ -50,6 +50,22 @@ export function BulkUpload({ deckId, onDone }: { deckId: string; onDone: () => v
     }
   }
 
+  // Thumbnails for the pair grid, revoked when the selection changes. A file the browser cannot
+  // preview simply has none.
+  const thumbs = useMemo(() => {
+    const urls = new Map<string, string>();
+    for (const [name, f] of files) {
+      try {
+        urls.set(name, URL.createObjectURL(f));
+      } catch {
+        // no preview
+      }
+    }
+    return urls;
+  }, [files]);
+  useEffect(() => () => thumbs.forEach((u) => URL.revokeObjectURL(u)), [thumbs]);
+  const [dragging, setDragging] = useState(false);
+
   const used = new Set(rows.flatMap((r) => [r.front, r.back]).filter(Boolean));
   const unmatched = [...files.keys()].filter((n) => !used.has(n)).sort(naturalCompare);
   const names = [...files.keys()].sort(naturalCompare);
@@ -87,29 +103,50 @@ export function BulkUpload({ deckId, onDone }: { deckId: string; onDone: () => v
   }
 
   return (
-    <div className="space-y-3 rounded-lg border border-dashed border-border p-3">
-      <div className="flex flex-wrap items-center gap-3">
-        <span className="text-sm font-medium">رفع جماعي</span>
-        <Button variant="outline" size="sm" disabled={!!progress} onClick={() => input.current?.click()}>
-          <Upload className="size-4" aria-hidden />
-          اختيار صور أو ملف ZIP
-        </Button>
-        <span className="text-xs text-muted" dir="ltr">
-          001-front.png · 001-back.png
+    <div className="space-y-3">
+      <button
+        type="button"
+        disabled={!!progress}
+        onClick={() => input.current?.click()}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDragging(true);
+        }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDragging(false);
+          void pick(e.dataTransfer.files);
+        }}
+        className={`flex w-full flex-col items-center gap-2 rounded-xl border-2 border-dashed p-6 text-center transition-colors ${
+          dragging ? 'border-brand bg-brand/5' : 'border-border hover:bg-surface-muted'
+        }`}
+      >
+        <CloudUpload className="size-8 text-brand" aria-hidden />
+        <span className="font-semibold">رفع جماعي: اسحب الصور أو ملف ZIP هنا، أو اضغط للاختيار</span>
+        <span className="text-xs text-muted">
+          PNG · JPG · WEBP حتى 10 ميغابايت للصورة، وحتى {MAX_PAIRS} بطاقة في المرة. تُقرن الملفات بالاسم:{' '}
+          <span dir="ltr">001-front.png · 001-back.png</span>
         </span>
-        <input
-          ref={input}
-          type="file"
-          multiple
-          accept="image/png,image/jpeg,image/webp,.zip,application/zip"
-          className="hidden"
-          aria-label="ملفات الرفع الجماعي"
-          onChange={(e) => void pick(e.target.files)}
-        />
-      </div>
+      </button>
+      <input
+        ref={input}
+        type="file"
+        multiple
+        accept="image/png,image/jpeg,image/webp,.zip,application/zip"
+        className="hidden"
+        aria-label="ملفات الرفع الجماعي"
+        onChange={(e) => void pick(e.target.files)}
+      />
       {rows.length ? (
         <>
-          <div className="max-h-96 overflow-auto rounded-lg border border-border">
+          <p className="text-sm">
+            <span className="font-semibold">{complete.length}</span> بطاقة مقترنة
+            {rows.length > complete.length ? (
+              <span className="text-danger"> · {rows.length - complete.length} بحاجة إلى تصحيح</span>
+            ) : null}
+          </p>
+          <div className="max-h-[28rem] overflow-auto rounded-lg border border-border">
             <table className="w-full text-sm">
               <thead className="sticky top-0 bg-surface text-muted">
                 <tr>
@@ -127,20 +164,31 @@ export function BulkUpload({ deckId, onDone }: { deckId: string; onDone: () => v
                     </td>
                     {(['front', 'back'] as const).map((sideName) => (
                       <td key={sideName} className="p-2">
-                        <select
-                          aria-label={`${sideName === 'front' ? 'أمامي' : 'خلفي'} ${r.key}`}
-                          className={`${selectClass} ${r[sideName] ? '' : 'border-danger'}`}
-                          dir="ltr"
-                          value={r[sideName]}
-                          onChange={(e) => update(i, { [sideName]: e.target.value })}
-                        >
-                          <option value="">—</option>
-                          {names.map((n) => (
-                            <option key={n} value={n}>
-                              {n}
-                            </option>
-                          ))}
-                        </select>
+                        <div className="flex items-center gap-2">
+                          {thumbs.get(r[sideName]) ? (
+                            <img
+                              src={thumbs.get(r[sideName])}
+                              alt=""
+                              className="size-12 shrink-0 rounded-md border border-border object-cover"
+                            />
+                          ) : (
+                            <span className="size-12 shrink-0 rounded-md border border-dashed border-border" />
+                          )}
+                          <select
+                            aria-label={`${sideName === 'front' ? 'أمامي' : 'خلفي'} ${r.key}`}
+                            className={`${selectClass} ${r[sideName] ? '' : 'border-danger'}`}
+                            dir="ltr"
+                            value={r[sideName]}
+                            onChange={(e) => update(i, { [sideName]: e.target.value })}
+                          >
+                            <option value="">—</option>
+                            {names.map((n) => (
+                              <option key={n} value={n}>
+                                {n}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
                       </td>
                     ))}
                     <td className="p-2">

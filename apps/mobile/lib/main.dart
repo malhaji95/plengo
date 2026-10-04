@@ -1,4 +1,8 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -16,6 +20,8 @@ import 'core/platform/app_platform.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   usePathUrlStrategy();
+  LicenseRegistry.addLicense(_fontLicenses);
+  await _decodeSplashLogo();
 
   final info = await PackageInfo.fromPlatform();
   final env = AppEnvironment(platform: appPlatformName(), appVersion: info.version);
@@ -42,4 +48,28 @@ Future<void> main() async {
     options.release = 'plengo@${info.version}+${info.buildNumber}';
     options.sendDefaultPii = false;
   }, appRunner: () => runApp(app));
+}
+
+/// Both bundled fonts are under the SIL Open Font License, which travels with the app.
+Stream<LicenseEntry> _fontLicenses() async* {
+  for (final (font, file) in [
+    ('IBM Plex Sans Arabic', 'assets/fonts/OFL.txt'),
+    ('Noto Kufi Arabic', 'assets/fonts/OFL-NotoKufiArabic.txt'),
+  ]) {
+    yield LicenseEntryWithLineBreaks([font], await rootBundle.loadString(file));
+  }
+}
+
+/// The splash shows the logo from its first frame instead of popping it in after the spinner.
+Future<void> _decodeSplashLogo() async {
+  final done = Completer<void>();
+  final stream = const AssetImage('assets/brand/wordmark-color.png').resolve(ImageConfiguration.empty);
+  late final ImageStreamListener listener;
+  listener = ImageStreamListener(
+    (_, _) => done.isCompleted ? null : done.complete(),
+    onError: (_, _) => done.isCompleted ? null : done.complete(),
+  );
+  stream.addListener(listener);
+  await done.future.timeout(const Duration(seconds: 2), onTimeout: () {});
+  stream.removeListener(listener);
 }
