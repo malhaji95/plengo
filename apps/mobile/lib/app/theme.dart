@@ -49,12 +49,12 @@ abstract final class BrandColors {
 abstract final class AppTheme {
   static const seed = BrandColors.blue;
 
-  /// Body text and long educational content (questions, explanations).
-  static const fontFamily = 'IBMPlexSansArabic';
+  /// Montserrat Arabic (Kief Type Foundry, SIL OFL) for everything: body text and educational
+  /// content in Regular/Medium, and major headings in Bold.
+  static const fontFamily = 'MontserratArabic';
 
-  /// Major headings and onboarding titles only: display and headline styles, and app bar titles.
-  /// One weight (Bold) is bundled to keep the web first load small (§34.3).
-  static const headingFont = 'NotoKufiArabic';
+  /// Display and headline styles and app bar titles: the same family in Bold.
+  static const headingFont = fontFamily;
 
   static const radius = 20.0;
 

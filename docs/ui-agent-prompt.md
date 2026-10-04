@@ -56,9 +56,9 @@ change how the product behaves.
   `color` on yellow, `blue` on light surfaces and `white` in dark mode. Never redraw or recolour
   the logo. If an icon or logo must change, edit `design/brand/make_brand.py` and run
   `python3 design/brand/make_brand.py` (needs `pip install pymupdf pillow`).
-- Fonts (decided): IBM Plex Sans Arabic for body text and long educational content; Noto Kufi
-  Arabic (Bold) only for major headings and onboarding titles. Both are bundled locally in the app
-  and the admin panel (no font CDN) under the SIL Open Font License.
+- Font (decided): Montserrat Arabic for all text (Regular/Medium for body and educational
+  content, SemiBold for emphasis, Bold for major headings and onboarding titles). It is bundled
+  locally in the app and the admin panel (no font CDN) under the SIL Open Font License.
 - Splash: the official tagline "Play .. Learn .. Go!" stays exactly as part of the logo. Arabic
   copy may appear as a secondary line elsewhere, never as a replacement.
 

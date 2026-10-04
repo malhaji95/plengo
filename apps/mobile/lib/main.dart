@@ -50,14 +50,9 @@ Future<void> main() async {
   }, appRunner: () => runApp(app));
 }
 
-/// Both bundled fonts are under the SIL Open Font License, which travels with the app.
+/// The bundled font is under the SIL Open Font License, which travels with the app.
 Stream<LicenseEntry> _fontLicenses() async* {
-  for (final (font, file) in [
-    ('IBM Plex Sans Arabic', 'assets/fonts/OFL.txt'),
-    ('Noto Kufi Arabic', 'assets/fonts/OFL-NotoKufiArabic.txt'),
-  ]) {
-    yield LicenseEntryWithLineBreaks([font], await rootBundle.loadString(file));
-  }
+  yield LicenseEntryWithLineBreaks(['Montserrat Arabic'], await rootBundle.loadString('assets/fonts/OFL.txt'));
 }
 
 /// The splash shows the logo from its first frame instead of popping it in after the spinner.

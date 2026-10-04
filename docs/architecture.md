@@ -259,8 +259,7 @@ web, §22.8). Logout wipes the database except device preferences (`settings.*`:
 
 ### ADR-009 — Web build without third-party CDNs
 
-The Arabic font is bundled (IBM Plex Sans Arabic, OFL, a placeholder until branding is decided,
-§44) and web builds use `--no-web-resources-cdn` so CanvasKit is served from the app origin.
+The Arabic font is bundled (Montserrat Arabic, OFL; see ADR-024) and web builds use `--no-web-resources-cdn` so CanvasKit is served from the app origin.
 The PWA manifest ships with `display: browser` so browsers do not offer installation under Plan A;
 Plan B changes it to `standalone`.
 
@@ -653,9 +652,10 @@ from Phase 1; Phase 2 adds the college hierarchy and admin CRUD.
   carry ink `#1B1B1B` text only, at 7.9:1 or better; white text never sits on them. Pale tints of the
   same colours sit behind icons and status rows. Tokens live in `lib/app/theme.dart` and
   `apps/admin/src/app/globals.css`.
-- **Type.** IBM Plex Sans Arabic for body text and educational content; Noto Kufi Arabic Bold for
-  display/headline styles and app bar titles in the app, and `h1` in the admin. One Kufi weight keeps
-  the web first load inside §34.3 (Chrome set 3.4 MB brotli).
+- **Type.** Montserrat Arabic (Mohamed Gaber, Kief Type Foundry; SIL OFL 1.1 as stated in the font
+  files) for everything, chosen by the owner: Regular/Medium for body text and educational content,
+  SemiBold for emphasis, Bold for display/headline styles, app bar titles and admin `h1`. Four
+  weights are bundled (OTF) in the app and the admin; the web first load stays inside §34.3.
 - **Shared pieces.** `shared/widgets/ui_kit.dart` (icon badges, nav cards, section headers,
   progress rings, brand tiles, spot illustrations) and `AnswerOptionTile` (one look for idle,
   selected, correct and wrong options in the bank, practice and exams). Status never relies on
