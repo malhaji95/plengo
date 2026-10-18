@@ -1,5 +1,6 @@
 # Student web to Cloudflare Pages (spec §4, §24). Manual: pick the environment; the API and media
 # origins come from that environment's variables, the Cloudflare credentials from its secrets.
+# apps/mobile/functions holds the optional /api proxy used by demo hosting (docs/demo-hosting.md).
 name: Deploy student web
 
 on:
@@ -40,6 +41,14 @@ jobs:
           SENTRY_ORIGIN: ${{ vars.SENTRY_ORIGIN }}
       - name: First-load budget
         run: node tool/web_size.mjs build/web --budget-kb 4096
+      - name: Create the Pages project on first deploy
+        continue-on-error: true
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: apps/mobile
+          command: pages project create ${{ vars.CLOUDFLARE_PAGES_PROJECT }} --production-branch=main
       - name: Publish to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:

@@ -163,3 +163,20 @@ describe('admin security headers (§31)', () => {
     }
   });
 });
+
+describe('demo API proxy (docs/demo-hosting.md)', () => {
+  it('forwards /api to API_PROXY_TARGET only when it is set', async () => {
+    const env = process.env as Record<string, string | undefined>;
+    const { default: config } = await import('../next.config');
+    delete env.API_PROXY_TARGET;
+    expect(await config.rewrites!()).toEqual([]);
+    env.API_PROXY_TARGET = 'https://plengo-api.onrender.com/';
+    try {
+      expect(await config.rewrites!()).toEqual([
+        { source: '/api/:path*', destination: 'https://plengo-api.onrender.com/api/:path*' },
+      ]);
+    } finally {
+      delete env.API_PROXY_TARGET;
+    }
+  });
+});

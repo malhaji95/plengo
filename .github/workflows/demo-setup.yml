@@ -1,0 +1,74 @@
+# Demo database setup (docs/demo-hosting.md). Manual: runs the migrations against the demo
+# database, optionally loads the sample content, and optionally creates your admin account.
+# Everything comes from the "demo" environment, whose secrets must match the API's on Render
+# (the coupon secrets in particular, or seeded codes will not redeem).
+name: Demo database setup
+
+on:
+  workflow_dispatch:
+    inputs:
+      seed:
+        description: Load the sample content and demo accounts
+        type: boolean
+        default: true
+      admin_email:
+        description: Your admin email (leave empty to skip; password = ADMIN_PASSWORD secret)
+        type: string
+        default: ''
+      admin_name:
+        description: Your admin display name
+        type: string
+        default: 'المشرف'
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    environment: demo
+    env:
+      NODE_ENV: production
+      APP_ENV: staging
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+      BETTER_AUTH_URL: ${{ vars.API_URL }}
+      APP_WEB_ORIGIN: ${{ vars.APP_WEB_ORIGIN }}
+      ADMIN_ORIGIN: ${{ vars.ADMIN_ORIGIN }}
+      MOBILE_ACCESS_JWT_SECRET: ${{ secrets.MOBILE_ACCESS_JWT_SECRET }}
+      MOBILE_REFRESH_TOKEN_PEPPER: ${{ secrets.MOBILE_REFRESH_TOKEN_PEPPER }}
+      COUPON_HMAC_SECRET: ${{ secrets.COUPON_HMAC_SECRET }}
+      COUPON_ENCRYPTION_KEY: ${{ secrets.COUPON_ENCRYPTION_KEY }}
+      STORAGE_DRIVER: ${{ vars.STORAGE_DRIVER || 'memory' }}
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      R2_PRIVATE_BUCKET: ${{ vars.R2_PRIVATE_BUCKET }}
+      R2_PUBLIC_BUCKET: ${{ vars.R2_PUBLIC_BUCKET }}
+      R2_PUBLIC_BASE_URL: ${{ vars.R2_PUBLIC_BASE_URL }}
+      EMAIL_PROVIDER: console
+      JOBS_ENABLED: 'false'
+      SEED_PASSWORD: ${{ secrets.SEED_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --filter @plengo/api...
+      - name: Migrations
+        run: pnpm --filter @plengo/api migrate:dev
+      - name: Sample content and demo accounts
+        if: inputs.seed
+        run: pnpm --filter @plengo/api seed
+      - name: Your admin account
+        if: inputs.admin_email != ''
+        env:
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          ADMIN_EMAIL: ${{ inputs.admin_email }}
+          ADMIN_NAME: ${{ inputs.admin_name }}
+        run: |
+          if [ -z "$ADMIN_PASSWORD" ]; then echo "Set the ADMIN_PASSWORD secret in the demo environment first"; exit 1; fi
+          out=$(pnpm --filter @plengo/api admin:create --email "$ADMIN_EMAIL" --name "$ADMIN_NAME" 2>&1) || {
+            if echo "$out" | grep -q 'already exists'; then echo "Admin $ADMIN_EMAIL already exists; nothing to do."; exit 0; fi
+            echo "$out"; exit 1;
+          }
+          echo "$out"

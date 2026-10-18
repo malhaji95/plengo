@@ -322,7 +322,8 @@ export async function seedTeachers(db: Db) {
   }
 }
 
-const SEED_PASSWORD = 'seed-pass-12345';
+/** A hosted demo sets SEED_PASSWORD so the sample accounts' password is not the public default. */
+const SEED_PASSWORD = process.env.SEED_PASSWORD || 'seed-pass-12345';
 const SEED_BATCH = 'بذرة — فيزياء بكالوريا';
 
 async function seedUser(c: Container, email: string, name: string, role: 'student' | 'admin') {
@@ -940,7 +941,11 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       `structure, teachers, access, questions, flashcards, quizzes, student decks and home seeded (${createdQuestions} new questions, ${createdDecks} new decks, ${createdQuizzes} new quizzes)`,
     );
     console.log(`students: ${access.students.join(', ')} · admins: ${access.admins.join(', ')}`);
-    console.log(`password for all seed accounts: ${SEED_PASSWORD} (admins enroll in 2FA at first login)`);
+    console.log(
+      process.env.SEED_PASSWORD
+        ? 'password for all seed accounts: the SEED_PASSWORD you set (admins enroll in 2FA at first login)'
+        : `password for all seed accounts: ${SEED_PASSWORD} (admins enroll in 2FA at first login)`,
+    );
     console.log('coupon batch (permanent, Grade 12 Physics):');
     for (const { code, status } of access.codes) console.log(`  ${code}  ${status}`);
   } finally {

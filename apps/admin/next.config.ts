@@ -4,6 +4,13 @@ const nextConfig: NextConfig = {
   output: 'standalone',
   poweredByHeader: false,
   reactStrictMode: true,
+  // Demo hosting without a shared domain (docs/demo-hosting.md): the browser calls /api on the
+  // admin's own origin and Next.js forwards it to the API, so the session cookie is first-party.
+  // Set NEXT_PUBLIC_API_BASE_URL to the admin's own URL when API_PROXY_TARGET is used.
+  async rewrites() {
+    const target = process.env.API_PROXY_TARGET?.replace(/\/+$/, '');
+    return target ? [{ source: '/api/:path*', destination: `${target}/api/:path*` }] : [];
+  },
   // HTTPS only once deployed (spec §31); local development stays on http.
   async headers() {
     if (process.env.NODE_ENV !== 'production') return [];
