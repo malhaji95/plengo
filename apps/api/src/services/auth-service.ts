@@ -69,6 +69,8 @@ export function createAuthService(deps: {
   sessionsRepo: SessionsRepository;
   mobileTokens: MobileTokenService;
   catalog: CatalogService;
+  /** False only in a pre-launch demo (env ADMIN_2FA_REQUIRED). */
+  adminTwoFactorRequired?: boolean;
 }) {
   const { auth, usersRepo, sessionsRepo, mobileTokens, catalog } = deps;
 
@@ -249,7 +251,11 @@ export function createAuthService(deps: {
         }
         const sessionId = await sessionIdFromToken((response as { token?: string }).token);
         if (sessionId) await sessionsRepo.annotate(sessionId, { platform: 'admin', ...sessionFields(meta) });
-        return { data: { next: 'enroll' as const }, setCookies };
+        // Not enrolled yet: enrollment is next, unless a demo turned admin 2FA off.
+        return {
+          data: { next: deps.adminTwoFactorRequired === false ? ('done' as const) : ('enroll' as const) },
+          setCookies,
+        };
       } catch (err) {
         mapAuthError(err, 'AUTH_INVALID_CREDENTIALS');
       }

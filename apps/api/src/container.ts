@@ -359,7 +359,14 @@ export function createContainer(
     quizCounts: (scope) => quizzes.counts(scope),
     subjectTracks: (id) => teachers.subjectTracks(id),
   });
-  const authService = createAuthService({ auth, usersRepo, sessionsRepo, mobileTokens, catalog });
+  const authService = createAuthService({
+    auth,
+    usersRepo,
+    sessionsRepo,
+    mobileTokens,
+    catalog,
+    adminTwoFactorRequired: env.ADMIN_2FA_REQUIRED,
+  });
 
   return {
     env,
@@ -452,7 +459,13 @@ export function createContainer(
       timeZone: env.TZ_BUSINESS,
     }),
     imports,
-    guards: createGuards({ auth, sessionsRepo, mobileTokens, now: overrides.now }),
+    guards: createGuards({
+      auth,
+      sessionsRepo,
+      mobileTokens,
+      adminTwoFactorRequired: env.ADMIN_2FA_REQUIRED,
+      now: overrides.now,
+    }),
     jobHandlers: {
       'media.process': (data) => media.process(data),
       'media.cleanup-orphans': async () => {

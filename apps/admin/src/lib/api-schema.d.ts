@@ -3204,7 +3204,7 @@ export interface components {
         };
         AdminLoginResult: {
             /** @enum {string} */
-            next: "totp" | "enroll";
+            next: "totp" | "enroll" | "done";
         };
         AdminLoginResultEnvelope: {
             /** @constant */

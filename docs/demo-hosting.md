@@ -167,19 +167,21 @@ _Skipping R2? Jump to step 4 and use the "without R2" values there._
    | `JOBS_ENABLED`                | `true`                      |
    | `EMAIL_PROVIDER`              | `console`                   |
 
-   **With R2 (step 3) add:**
+| `ADMIN_2FA_REQUIRED` | `false` |
 
-   | Key                    | Value                      |
-   | ---------------------- | -------------------------- |
-   | `STORAGE_DRIVER`       | `r2`                       |
-   | `R2_ACCOUNT_ID`        | your Cloudflare Account ID |
-   | `R2_ACCESS_KEY_ID`     | from step 3.5              |
-   | `R2_SECRET_ACCESS_KEY` | from step 3.5              |
-   | `R2_PRIVATE_BUCKET`    | `media-private`            |
-   | `R2_PUBLIC_BUCKET`     | `media-public`             |
-   | `R2_PUBLIC_BASE_URL`   | your R2 public URL         |
+**With R2 (step 3) add:**
 
-   **Without R2 add instead:** `STORAGE_DRIVER` = `memory`.
+| Key                    | Value                      |
+| ---------------------- | -------------------------- |
+| `STORAGE_DRIVER`       | `r2`                       |
+| `R2_ACCOUNT_ID`        | your Cloudflare Account ID |
+| `R2_ACCESS_KEY_ID`     | from step 3.5              |
+| `R2_SECRET_ACCESS_KEY` | from step 3.5              |
+| `R2_PRIVATE_BUCKET`    | `media-private`            |
+| `R2_PUBLIC_BUCKET`     | `media-public`             |
+| `R2_PUBLIC_BASE_URL`   | your R2 public URL         |
+
+**Without R2 add instead:** `STORAGE_DRIVER` = `memory`.
 
 5. **Advanced** → **Health Check Path:** `/health`.
 6. **Create Web Service.** The first build takes about 5–10 minutes. Wait for **Live**.
@@ -246,7 +248,8 @@ You now have:
    `NEXT_PUBLIC_API_BASE_URL` (Settings → Environment Variables), then **Deployments** → latest
    → **⋯** → **Redeploy**. Also update `ADMIN_ORIGIN` on Render and in the GitHub `demo`
    environment, and the R2 CORS rule.
-7. **Log in:** open the admin URL → your email + `ADMIN_PASSWORD`. The first login asks you to
+7. **Log in:** open the admin URL → your email + `ADMIN_PASSWORD`. With `ADMIN_2FA_REQUIRED=false`
+   (the demo setting) you go straight to the dashboard. With it removed, the first login asks you to
    set up two-step verification: install **Google Authenticator** or **Microsoft
    Authenticator** on your phone, scan the QR code, type the 6-digit code. Save the backup codes
    it shows.

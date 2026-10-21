@@ -17,6 +17,8 @@ smoke test (spec §39 Phase 13).
 - **Application IDs**: `com.plengo.plengo` (Android `applicationId`, iOS bundle id) is permanent after
   the first upload — change it first if needed.
 - **Production environment**: see `deployment.md` (secrets, R2 CORS, HSTS, backups workflow).
+- **Admin two-step verification**: remove `ADMIN_2FA_REQUIRED=false` if it was set for the demo.
+  Production refuses to start with it off; every admin then enrolls in TOTP at the next login.
 - **Admins**: `pnpm --filter @plengo/api admin:create --email … --name …` for each admin; each
   enrols in TOTP at first login.
 

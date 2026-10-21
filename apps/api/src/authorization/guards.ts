@@ -44,9 +44,12 @@ export function createGuards(deps: {
   auth: Auth;
   sessionsRepo: SessionsRepository;
   mobileTokens: MobileTokenService;
+  /** False only in a pre-launch demo (env ADMIN_2FA_REQUIRED). */
+  adminTwoFactorRequired?: boolean;
   now?: () => Date;
 }) {
   const { auth, sessionsRepo, mobileTokens } = deps;
+  const require2fa = deps.adminTwoFactorRequired ?? true;
   const now = deps.now ?? (() => new Date());
 
   async function resolve(request: FastifyRequest): Promise<AuthContext | null> {
@@ -105,12 +108,12 @@ export function createGuards(deps: {
       if (ctx.role !== 'student') throw new AppError('NOT_AUTHORIZED');
     },
 
-    /** Admin with a 2FA-verified cookie session (spec §0.3, §11.3). */
+    /** Admin with a 2FA-verified cookie session (spec §0.3, §11.3), unless a demo turned 2FA off. */
     async requireAdmin(request: FastifyRequest, _reply: FastifyReply) {
       const ctx = await resolve(request);
       if (!ctx) throw new AppError('UNAUTHENTICATED');
       if (ctx.role !== 'admin') throw new AppError('NOT_AUTHORIZED');
-      if (!ctx.twoFactorEnabled) throw new AppError('AUTH_2FA_REQUIRED');
+      if (require2fa && !ctx.twoFactorEnabled) throw new AppError('AUTH_2FA_REQUIRED');
     },
 
     /** Admin session that has passed the password step but may still need to enroll in 2FA. */

@@ -52,6 +52,11 @@ const envSchema = z
     /** Proxies in front of the API (load balancer = 1). `X-Forwarded-For` beyond them is ignored. */
     TRUST_PROXY_HOPS: z.coerce.number().int().min(0).max(5).default(1),
     JOBS_ENABLED: bool.default(true),
+    /**
+     * Admin TOTP (spec §11.3). Only a pre-launch demo may turn it off, so admins who have not
+     * enrolled sign in with their password alone; production refuses to start without it.
+     */
+    ADMIN_2FA_REQUIRED: bool.default(true),
     TZ_BUSINESS: z.string().default('Asia/Damascus'),
   })
   .superRefine((env, ctx) => {
@@ -82,6 +87,13 @@ const envSchema = z
       (env.STORAGE_DRIVER === 'memory' || env.EMAIL_PROVIDER === 'console')
     ) {
       ctx.addIssue({ code: 'custom', message: 'production requires r2 storage and a real email provider' });
+    }
+    if (env.APP_ENV === 'production' && !env.ADMIN_2FA_REQUIRED) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['ADMIN_2FA_REQUIRED'],
+        message: 'production requires admin 2FA',
+      });
     }
   });
 

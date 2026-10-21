@@ -1079,7 +1079,8 @@
             "type": "string",
             "enum": [
               "totp",
-              "enroll"
+              "enroll",
+              "done"
             ]
           }
         },

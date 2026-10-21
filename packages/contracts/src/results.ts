@@ -13,7 +13,7 @@ export const revokedSchema = z.object({ revoked: z.boolean() }).meta({ id: 'Revo
 export const registeredSchema = z.object({ registered: z.boolean() }).meta({ id: 'RegisteredResult' });
 export const enrolledSchema = z.object({ enrolled: z.boolean() }).meta({ id: 'EnrolledResult' });
 export const adminLoginResultSchema = z
-  .object({ next: z.enum(['totp', 'enroll']) })
+  .object({ next: z.enum(['totp', 'enroll', 'done']) })
   .meta({ id: 'AdminLoginResult' });
 export const totpEnrollmentSchema = z
   .object({ totpUri: z.string(), backupCodes: z.array(z.string()) })

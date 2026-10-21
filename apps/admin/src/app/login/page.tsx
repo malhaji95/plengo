@@ -24,7 +24,7 @@ export default function LoginPage() {
           body: { email: String(form.get('email')), password: String(form.get('password')) },
         }),
       );
-      router.replace(res.next === 'totp' ? '/login/totp' : '/enroll');
+      router.replace(res.next === 'totp' ? '/login/totp' : res.next === 'done' ? '/' : '/enroll');
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'حدث خطأ، حاول لاحقاً');
     } finally {
