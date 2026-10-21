@@ -24,7 +24,8 @@ the server on Render, so logins work on these free addresses without buying a do
 Android app talks to Render directly.
 
 **Free-tier limits to expect:** Render's free server sleeps after 15 minutes without visitors,
-so the first visit after a pause takes up to about a minute. Neon's free database also pauses
+so the first visit after a pause takes up to about a minute (see "Keep it awake during demo
+hours" below for a free fix during set hours). Neon's free database also pauses
 when idle and wakes in about a second. Fine for a demo; not for real students.
 
 ## Before you start: your worksheet
@@ -311,6 +312,47 @@ Open the API URL `/health` first to wake the server, then:
 - [ ] Android app: log in as `student2@example.com` → **حسابي** → **إدخال كود التفعيل** → enter
       one of the codes from step 5 → the whole Baccalaureate Physics subject unlocks.
 - [ ] Admin: **الإشعارات** → send an announcement → it appears in the students' inbox (bell).
+
+## Keep it awake during demo hours (free)
+
+Render's free server sleeps after 15 minutes without visitors. A free scheduler can visit it every
+10 minutes during the hours you demo, so it never sleeps then, and lets it sleep at night to stay
+inside both free allowances:
+
+| Free allowance                    | 12 hours a day (09:00–21:00) | Limit       |
+| --------------------------------- | ---------------------------- | ----------- |
+| Render instance hours             | ≈ 380 a month                | 750 a month |
+| Neon compute at the smallest size | ≈ 95 CU-hours a month        | 100 a month |
+
+Neon is the tight one: whenever the server is awake its job queue keeps the database awake too.
+Keep the window at 12 hours or less, or take weekends off for more margin.
+
+1. **Cap Neon at the smallest size** so a busy moment cannot use up the allowance faster: Neon
+   console → your project → **Branches** → `main` → **Computes** → **Edit** → set the
+   autoscaling range to **0.25 – 0.25 CU** → **Save**. Leave scale to zero on.
+2. **cron-job.org** → **Sign up** (free) → confirm your email → **Settings** (account) → set
+   **Time zone** to **Asia/Damascus**.
+3. **Cronjobs** → **Create cronjob**:
+   - **Title:** `Plengo demo – keep awake`
+   - **URL:** `https://<your-api>.onrender.com/health`
+   - **Execution schedule:** **Custom** → **Minutes:** `0, 10, 20, 30, 40, 50` → **Hours:**
+     `9` to `20` → **Days of month:** every day → **Days of week:** every day (or untick Friday
+     and Saturday) → **Months:** every month
+   - **Advanced:** request method **GET**, **Time zone** Asia/Damascus if offered here, request
+     timeout the maximum allowed
+   - **Notifications:** turn off "notify on failure" (the 09:00 visit can time out while the
+     server wakes up; the 09:10 visit succeeds)
+   - **Create**
+4. **Check the next day:** the job's **History** shows status `200` from 09:10 on; in Render the
+   service **Events** show it staying up through the day.
+5. **Watch the allowances weekly:** Render → **Billing** (free instance hours) and Neon →
+   **Usage** (compute). If Neon passes about 70 CU-hours before the 20th, shorten the window or
+   drop weekends.
+
+Outside the window the first visit still takes about a minute; open `/health` before an
+unplanned demo. Do not use an always-on monitor (for example a 5-minute UptimeRobot check with
+no schedule): running 24 hours a day uses up Neon's free compute in about half a month, and the
+database then stays off until the next month.
 
 ## Step 10 — Email (optional, later)
 
