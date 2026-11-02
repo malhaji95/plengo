@@ -1,12 +1,13 @@
 'use client';
 
-import { ArrowDown, ArrowRight, ArrowUp, Loader2, Plus, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowRight, ArrowUp, Eye, Loader2, Plus, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { selectClass } from '@/components/access/scope-picker';
 import { FormError } from '@/components/form-error';
 import { BulkUpload } from '@/components/flashcards/bulk-upload';
+import { CardPreview } from '@/components/flashcards/card-preview';
 import { ImageUpload, uploadImage } from '@/components/image-upload';
 import { PlacementPicker, type Placement } from '@/components/questions/placement-picker';
 import { Button } from '@/components/ui/button';
@@ -31,6 +32,7 @@ export default function DeckPage() {
     [id],
   );
   const [error, setError] = useState<string | null>(null);
+  const [preview, setPreview] = useState<number | null>(null);
 
   async function run(call: () => Promise<unknown>) {
     setError(null);
@@ -147,7 +149,15 @@ export default function DeckPage() {
       ) : null}
 
       <Card className="space-y-3">
-        <h2 className="font-semibold">البطاقات ({list.length})</h2>
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="font-semibold">البطاقات ({list.length})</h2>
+          {list.length ? (
+            <Button size="sm" variant="outline" onClick={() => setPreview(0)}>
+              <Eye className="size-4" aria-hidden />
+              معاينة المجموعة
+            </Button>
+          ) : null}
+        </div>
         <NewCard deckId={id} onCreated={() => void run(async () => {})} />
         <BulkUpload deckId={id} onDone={() => void run(async () => {})} />
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -158,11 +168,15 @@ export default function DeckPage() {
               index={i}
               count={list.length}
               onMove={(delta) => void move(i, delta)}
+              onPreview={() => setPreview(i)}
               run={run}
             />
           ))}
         </div>
       </Card>
+      {preview !== null ? (
+        <CardPreview cards={list} start={preview} onClose={() => setPreview(null)} />
+      ) : null}
     </div>
   );
 }
@@ -295,12 +309,14 @@ function CardTile({
   index,
   count,
   onMove,
+  onPreview,
   run,
 }: {
   card: AdminCard;
   index: number;
   count: number;
   onMove: (delta: number) => void;
+  onPreview: () => void;
   run: (call: () => Promise<unknown>) => Promise<void>;
 }) {
   const update = (body: components['schemas']['UpdateCardRequest']) =>
@@ -314,6 +330,10 @@ function CardTile({
           {index + 1} · {STATUS_LABELS[card.status]}
         </span>
         <div className="flex gap-1">
+          <Button size="sm" variant="ghost" onClick={onPreview}>
+            <Eye className="size-4" aria-hidden />
+            عرض
+          </Button>
           <Button
             size="sm"
             variant="ghost"
