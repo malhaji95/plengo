@@ -357,7 +357,7 @@ void main() {
       await d.download(deckKey);
       expect((await store.pack(deckKey))!.status, 'ready');
       expect(files.files, hasLength(40));
-      expect(server.maxImagesInFlight, inInclusiveRange(2, 6));
+      expect(server.maxImagesInFlight, inInclusiveRange(2, 16));
       // One update per image (40) plus the final one, never going backwards.
       expect(progress.length, greaterThanOrEqualTo(40));
       await pumpEventQueue();

@@ -70,7 +70,11 @@ class TrackScreen extends ConsumerWidget {
                   questionsPath: '${Routes.tracks}/${d.track.id}/questions',
                   questionsLabel: 'أسئلة المسار',
                 ),
-                OfflineDownloadTile(scope: (subjectId: d.subject.id, teacherTrackId: d.track.id), label: 'تحميل الكل'),
+                OfflineDownloadTile(
+                  scope: (subjectId: d.subject.id, teacherTrackId: d.track.id),
+                  label: 'تحميل الكل',
+                  doneLabel: 'المسار محمّل',
+                ),
                 if (d.deckCount.total == 0 && d.quizCount.total == 0 && d.questionCount.total == 0)
                   const EmptyState('محتوى هذا المسار قيد الإعداد', icon: Icons.hourglass_empty),
               ],

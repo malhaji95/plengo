@@ -70,7 +70,10 @@ void main() {
     }
     await tester.pumpAndSettle();
     expect(server.calls.where((c) => c.uri.host == 'cdn.test'), hasLength(4));
-    expect(find.textContaining('محمّل للاستخدام دون اتصال'), findsOneWidget);
+    expect(find.textContaining('متاح دون اتصال'), findsOneWidget);
+    // Once downloaded, the tile no longer offers the download.
+    expect(find.text('البطاقات محمّلة'), findsOneWidget);
+    expect(find.text('تحميل البطاقات'), findsNothing);
 
     app.container.read(routerProvider).go(Routes.offlineStorage);
     await tester.pumpAndSettle();

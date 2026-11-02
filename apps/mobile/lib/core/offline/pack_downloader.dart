@@ -13,8 +13,9 @@ import 'pack_store.dart';
 /// Items fetched per request (ids travel in the query string).
 const _chunk = 50;
 
-/// Card images fetched at once; one at a time made a 130-card deck take minutes.
-const _parallelImages = 6;
+/// Card images fetched at once. Each is small (~15 KB), so time goes to round trips: for a
+/// 130-card deck, 1 at a time took 99 s, 6 took 17 s and 16 took 8 s.
+const _parallelImages = 16;
 
 /// A stalled image request fails (the pack stays resumable) instead of hanging the download.
 const _imageTimeout = Duration(seconds: 45);

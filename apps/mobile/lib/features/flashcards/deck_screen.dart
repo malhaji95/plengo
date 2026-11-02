@@ -59,6 +59,7 @@ class DeckScreen extends ConsumerWidget {
                     scope: (subjectId: d.subjectId, teacherTrackId: d.teacherTrackId),
                     deckId: deckId,
                     label: 'تحميل البطاقات',
+                    doneLabel: 'البطاقات محمّلة',
                   ),
                 ],
               ],

@@ -12,10 +12,22 @@ const _compact = ButtonStyle(minimumSize: WidgetStatePropertyAll(Size(0, 40)));
 /// track ("تحميل الكل") (spec §22.1–§22.2): shows the size first, then progress with pause and
 /// cancel, "تحديث متاح" when the server has a newer version, and "محمّل" when done.
 class OfflineDownloadTile extends ConsumerWidget {
-  const OfflineDownloadTile({super.key, required this.scope, required this.label, this.unitId, this.deckId});
+  const OfflineDownloadTile({
+    super.key,
+    required this.scope,
+    required this.label,
+    required this.doneLabel,
+    this.unitId,
+    this.deckId,
+  });
 
   final ScopeQuery scope;
+
+  /// The action, e.g. «تحميل الوحدة».
   final String label;
+
+  /// Shown instead of [label] once everything is on the device, e.g. «الوحدة محمّلة».
+  final String doneLabel;
   final String? unitId;
   final String? deckId;
 
@@ -128,7 +140,7 @@ class OfflineDownloadTile extends ConsumerWidget {
         child: const Text('تحديث'),
       );
     } else if (allReady) {
-      subtitle = Text('محمّل للاستخدام دون اتصال · ${formatBytes(size)}');
+      subtitle = Text('متاح دون اتصال · ${formatBytes(size)}');
       trailing = IconButton(
         tooltip: 'حذف التحميل',
         icon: const Icon(Icons.delete_outline),
@@ -150,7 +162,7 @@ class OfflineDownloadTile extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
         leading: Icon(allReady && stale.isEmpty ? Icons.offline_pin : Icons.download_for_offline_outlined),
-        title: Text(label),
+        title: Text(allReady && stale.isEmpty ? doneLabel : label),
         subtitle: subtitle,
         trailing: trailing,
       ),
