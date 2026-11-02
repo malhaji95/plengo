@@ -37,6 +37,9 @@ class PackServer implements HttpClientAdapter {
   Map<String, Object?> Function(RequestOptions o)? sync;
   bool offline = false;
   final reports = <Map<String, Object?>>[];
+  Duration imageDelay = Duration.zero;
+  var imagesInFlight = 0;
+  var maxImagesInFlight = 0;
 
   @override
   Future<ResponseBody> fetch(RequestOptions o, Stream<Uint8List>? body, Future<void>? cancel) async {
@@ -45,6 +48,10 @@ class PackServer implements HttpClientAdapter {
     Object? json;
     final path = o.uri.path;
     if (o.uri.host == 'cdn.test') {
+      imagesInFlight++;
+      if (imagesInFlight > maxImagesInFlight) maxImagesInFlight = imagesInFlight;
+      await Future<void>.delayed(imageDelay);
+      imagesInFlight--;
       return ResponseBody.fromBytes(utf8.encode('image:${o.uri.pathSegments.last}'), 200);
     }
     if (path.endsWith('/manifest')) {
@@ -326,6 +333,35 @@ void main() {
           .expand((o) => (o.queryParameters['ids'] as String).split(','))
           .toList();
       expect(fetched.toSet().length, fetched.length);
+    });
+
+    test('a large deck fetches several images at once and reports progress after each one', () async {
+      final cards = [for (var i = 0; i < 20; i++) 'c$i'];
+      server.items['d1'] = deckItem(cards: cards);
+      for (final c in cards) {
+        server.items[c] = cardItem(c);
+      }
+      server.packs[deckKey] = ['d1', ...cards];
+      server.imageDelay = const Duration(milliseconds: 5);
+      final progress = <int>[];
+      late final PackDownloader d;
+      d = PackDownloader(
+        client: client,
+        store: store,
+        files: files,
+        onWifi: () async => true,
+        clock: () => now,
+        onProgress: (key) async => progress.add((await store.pack(key))!.downloadedBytes),
+      );
+      await d.enqueue(packOf(deckKey), scope: scope, scopeTitle: 'الكيمياء');
+      await d.download(deckKey);
+      expect((await store.pack(deckKey))!.status, 'ready');
+      expect(files.files, hasLength(40));
+      expect(server.maxImagesInFlight, inInclusiveRange(2, 6));
+      // One update per image (40) plus the final one, never going backwards.
+      expect(progress.length, greaterThanOrEqualTo(40));
+      await pumpEventQueue();
+      expect([...progress]..sort(), progress);
     });
 
     test('cancelling removes the pack and its files', () async {

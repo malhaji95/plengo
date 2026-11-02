@@ -13,6 +13,12 @@ import 'pack_store.dart';
 /// Items fetched per request (ids travel in the query string).
 const _chunk = 50;
 
+/// Card images fetched at once; one at a time made a 130-card deck take minutes.
+const _parallelImages = 6;
+
+/// A stalled image request fails (the pack stays resumable) instead of hanging the download.
+const _imageTimeout = Duration(seconds: 45);
+
 /// Why a download stopped early.
 enum DownloadStop { paused, cancelled, waitingWifi }
 
@@ -140,15 +146,20 @@ class PackDownloader {
       final page = await guardApi(
         () async => (await client.api.offline.offlineItems(packKey: key, ids: ids.join(','))).data,
       );
-      for (final item in page.items) {
-        final card = item.card;
-        if (card != null) {
-          for (final img in [card.front, card.back]) {
-            await _saveImage(key, img);
-            _checkStop(key);
-          }
-        }
-      }
+      final images = <String, OfflineImage>{
+        for (final item in page.items)
+          if (item.card case final card?)
+            for (final img in [card.front, card.back]) '${img.mediaId}:${img.version}': img,
+      };
+      // Progress moves with every image, so a large deck never looks frozen between chunks.
+      final perImage = images.isEmpty ? 0 : ids.length * perItem ~/ images.length;
+      var chunkBytes = 0;
+      await _saveImages(key, images.values.toList(), () async {
+        chunkBytes += perImage;
+        await store.updatePack(key, OfflinePacksCompanion(downloadedBytes: Value(downloaded + chunkBytes)));
+        onProgress?.call(key);
+      });
+      _checkStop(key);
       await store.putItems(key, page.items);
       done += ids.length;
       downloaded += ids.length * perItem;
@@ -178,6 +189,21 @@ class PackDownloader {
     assert(done == changed.length);
   }
 
+  /// Saves [images] with up to [_parallelImages] requests in flight, stopping between images when
+  /// the download is paused or cancelled.
+  Future<void> _saveImages(String key, List<OfflineImage> images, Future<void> Function() onSaved) async {
+    var next = 0;
+    Future<void> worker() async {
+      while (next < images.length) {
+        _checkStop(key);
+        await _saveImage(key, images[next++]);
+        await onSaved();
+      }
+    }
+
+    await Future.wait([for (var i = 0; i < _parallelImages && i < images.length; i++) worker()]);
+  }
+
   Future<void> _saveImage(String key, OfflineImage img) async {
     final existing = await store.file(key, img.mediaId);
     if (existing != null && existing.version == img.version) return;
@@ -185,7 +211,10 @@ class PackDownloader {
     var path = shared != null && shared.version == img.version ? shared.path : null;
     if (path == null) {
       final res = await guardApi(
-        () => client.uploadDio.get<List<int>>(img.url, options: Options(responseType: ResponseType.bytes)),
+        () => client.uploadDio.get<List<int>>(
+          img.url,
+          options: Options(responseType: ResponseType.bytes, receiveTimeout: _imageTimeout),
+        ),
       );
       path = await files.write('${img.mediaId}-${img.version}', Uint8List.fromList(res.data!));
     }
