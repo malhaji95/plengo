@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app/router.dart';
+import '../../core/api/generated/export.dart';
 import '../../core/content/flashcard_repository.dart';
 import '../../shared/widgets/async_view.dart';
 import '../subjects/catalog_providers.dart';
@@ -41,25 +42,34 @@ class DecksScreen extends ConsumerWidget {
                   constraints: const BoxConstraints(maxWidth: 720),
                   child: ListView(
                     padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-                    children: [
-                      for (final d in list)
-                        Card(
-                          margin: const EdgeInsets.only(bottom: 8),
-                          child: ListTile(
-                            leading: const Icon(Icons.style_outlined),
-                            title: Text(d.titleAr),
-                            subtitle: Text([cardCountLabel(d.cardCount), if (d.isFree) 'مجانية'].join(' · ')),
-                            trailing: Icon(
-                              d.locked ? Icons.lock_outline : Icons.chevron_left,
-                              semanticLabel: d.locked ? 'مقفل' : null,
-                            ),
-                            onTap: () => context.go('${Routes.decks}/${d.id}'),
-                          ),
-                        ),
-                    ],
+                    children: [for (final d in list) DeckTile(deck: d)],
                   ),
                 ),
               ),
+      ),
+    );
+  }
+}
+
+/// One official deck in a list; a locked deck shows a lock instead of the chevron (§8.7).
+class DeckTile extends StatelessWidget {
+  const DeckTile({super.key, required this.deck});
+
+  final StudentDeck deck;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: ListTile(
+        leading: const Icon(Icons.style_outlined),
+        title: Text(deck.titleAr),
+        subtitle: Text([cardCountLabel(deck.cardCount), if (deck.isFree) 'مجانية'].join(' · ')),
+        trailing: Icon(
+          deck.locked ? Icons.lock_outline : Icons.chevron_left,
+          semanticLabel: deck.locked ? 'مقفل' : null,
+        ),
+        onTap: () => context.go('${Routes.decks}/${deck.id}'),
       ),
     );
   }

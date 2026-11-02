@@ -71,7 +71,11 @@ class _OutlineView extends ConsumerWidget {
               decksPath: '${Routes.subjects}/$id/decks',
               questionsPath: '${Routes.subjects}/$id/questions',
             ),
-            OfflineDownloadTile(scope: (subjectId: id, teacherTrackId: null), label: 'تحميل الكل'),
+            OfflineDownloadTile(
+              scope: (subjectId: id, teacherTrackId: null),
+              label: 'تحميل الكل',
+              doneLabel: 'المادة محمّلة',
+            ),
             if (empty) const EmptyState('محتوى هذه المادة قيد الإعداد', icon: Icons.hourglass_empty),
             if (outline.units.isNotEmpty) const SectionHeader('الوحدات', top: 12),
             for (final (i, unit) in outline.units.indexed)
@@ -100,6 +104,7 @@ class _OutlineView extends ConsumerWidget {
                         scope: (subjectId: id, teacherTrackId: null),
                         unitId: unit.id,
                         label: 'تحميل الوحدة',
+                        doneLabel: 'الوحدة محمّلة',
                       ),
                     ),
                     if (unit.lessons.isEmpty) const ListTile(title: Text('لا توجد دروس في هذه الوحدة بعد')),
@@ -210,7 +215,7 @@ class _LessonTile extends StatelessWidget {
       leading: Icon(Icons.article_outlined, color: Theme.of(context).colorScheme.primary),
       title: Text(lesson.titleAr),
       trailing: const Icon(Icons.chevron_left),
-      onTap: () => context.go('${Routes.subjects}/$subjectId/questions?lessonId=${lesson.id}'),
+      onTap: () => context.go('${Routes.subjects}/$subjectId/lessons/${lesson.id}'),
     );
   }
 }

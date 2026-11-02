@@ -32,6 +32,7 @@ import '../features/quizzes/quizzes_screen.dart';
 import '../features/quizzes/random_practice_screen.dart';
 import '../features/quizzes/results_screen.dart';
 import '../features/questions/questions_screen.dart';
+import '../features/subjects/lesson_screen.dart';
 import '../features/shell/home_shell.dart';
 import '../features/splash/splash_screen.dart';
 import '../features/subjects/subject_screen.dart';
@@ -174,6 +175,13 @@ GoRouter buildRouter(Ref ref, {required bool couponRedemption}) {
                       GoRoute(
                         path: 'decks',
                         builder: (_, state) => SubjectDecksRoute(subjectId: state.pathParameters['id']!),
+                      ),
+                      GoRoute(
+                        path: 'lessons/:lessonId',
+                        builder: (_, state) => LessonScreen(
+                          subjectId: state.pathParameters['id']!,
+                          lessonId: state.pathParameters['lessonId']!,
+                        ),
                       ),
                       GoRoute(
                         path: 'quizzes',

@@ -125,7 +125,57 @@ void main() {
     expect(find.byType(QuestionsScreen), findsOneWidget);
   });
 
-  testWidgets('a lesson opens its own questions', (tester) async {
+  testWidgets('a lesson opens its own page: its decks, quizzes and questions', (tester) async {
+    final app = await pumpApp(
+      tester,
+      signedInAs: testMe,
+      arrangeCatalog: (c) => when(() => c.outline('p')).thenAnswer((_) async => outlineWithQuestions()),
+      arrangeQuestions: (q) => when(() => q.page(any(), cursor: any(named: 'cursor'))).thenAnswer(
+        (_) async => StudentQuestionPage(items: [mcq, written], nextCursor: null, totalCount: 2, accessibleCount: 2),
+      ),
+      arrangeFlashcards: (f) => when(() => f.decks(any())).thenAnswer(
+        (_) async => const [
+          StudentDeck(
+            id: 'd1',
+            subjectId: 'p',
+            teacherTrackId: null,
+            unitId: null,
+            lessonId: lessonId,
+            titleAr: 'مفردات الحركة',
+            description: null,
+            coverUrl: null,
+            cardCount: 12,
+            isFree: false,
+            locked: false,
+            contentVersion: 1,
+            sortOrder: 0,
+          ),
+        ],
+      ),
+      arrangeLearning: (l) => when(() => l.quizzes(any())).thenAnswer((_) async => const []),
+    );
+    app.container.read(routerProvider).go('/subjects/p');
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('الحركة'));
+    await tester.pumpAndSettle();
+    const query = (subjectId: 'p', teacherTrackId: null, unitId: null, lessonId: lessonId);
+    expect(verify(() => app.flashcards.decks(captureAny())).captured.single, query);
+    expect(verify(() => app.questions.page(captureAny(), cursor: any(named: 'cursor'))).captured.single, query);
+    expect(find.text('البطاقات التعليمية'), findsOneWidget);
+    expect(find.text('مفردات الحركة'), findsOneWidget);
+    expect(find.text('الاختبارات'), findsNothing); // no quizzes in this lesson
+    expect(find.text('سؤالان'), findsOneWidget);
+
+    await tester.tap(find.text('أسئلة الدرس'));
+    await tester.pumpAndSettle();
+    expect(find.byType(QuestionsScreen), findsOneWidget);
+    expect(
+      app.container.read(routerProvider).routeInformationProvider.value.uri.toString(),
+      '/subjects/p/questions?lessonId=l1',
+    );
+  });
+
+  testWidgets('an empty lesson says so', (tester) async {
     final app = await pumpApp(
       tester,
       signedInAs: testMe,
@@ -133,17 +183,11 @@ void main() {
       arrangeQuestions: (q) => when(() => q.page(any(), cursor: any(named: 'cursor'))).thenAnswer(
         (_) async => const StudentQuestionPage(items: [], nextCursor: null, totalCount: 0, accessibleCount: 0),
       ),
+      arrangeFlashcards: (f) => when(() => f.decks(any())).thenAnswer((_) async => const []),
+      arrangeLearning: (l) => when(() => l.quizzes(any())).thenAnswer((_) async => const []),
     );
-    app.container.read(routerProvider).go('/subjects/p');
+    app.container.read(routerProvider).go('/subjects/p/lessons/l1');
     await tester.pumpAndSettle();
-    await tester.tap(find.text('الحركة'));
-    await tester.pumpAndSettle();
-    final captured = verify(() => app.questions.page(captureAny(), cursor: any(named: 'cursor'))).captured;
-    expect(captured.single, (subjectId: 'p', teacherTrackId: null, unitId: null, lessonId: lessonId));
-    expect(find.text('لا توجد أسئلة هنا بعد'), findsOneWidget);
-    expect(
-      app.container.read(routerProvider).routeInformationProvider.value.uri.toString(),
-      '/subjects/p/questions?lessonId=l1',
-    );
+    expect(find.text('لا يوجد محتوى في هذا الدرس بعد'), findsOneWidget);
   });
 }

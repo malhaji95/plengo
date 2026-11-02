@@ -47,29 +47,7 @@ class QuizzesScreen extends ConsumerWidget {
                   constraints: const BoxConstraints(maxWidth: 720),
                   child: ListView(
                     padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-                    children: [
-                      for (final q in list)
-                        Card(
-                          margin: const EdgeInsets.only(bottom: 8),
-                          child: ListTile(
-                            leading: Icon(q.isMockExam ? Icons.timer_outlined : Icons.assignment_outlined),
-                            title: Text(q.titleAr),
-                            subtitle: Text(
-                              [
-                                availabilityLabel(q),
-                                quizModesLabel(q),
-                                if (q.isMockExam) 'امتحان تجريبي',
-                                if (q.bestScorePercent != null) 'أفضل نتيجة ${percent(q.bestScorePercent!)}',
-                              ].join(' · '),
-                            ),
-                            trailing: Icon(
-                              q.locked ? Icons.lock_outline : Icons.chevron_left,
-                              semanticLabel: q.locked ? 'مقفل' : null,
-                            ),
-                            onTap: () => context.go('${Routes.quizzes}/${q.id}'),
-                          ),
-                        ),
-                    ],
+                    children: [for (final q in list) QuizTile(quiz: q)],
                   ),
                 ),
               ),
@@ -223,6 +201,35 @@ class _History extends ConsumerWidget {
             ),
           ),
       ],
+    );
+  }
+}
+
+/// One curated quiz in a list; a locked quiz shows a lock instead of the chevron (§8.7).
+class QuizTile extends StatelessWidget {
+  const QuizTile({super.key, required this.quiz});
+
+  final StudentQuiz quiz;
+
+  @override
+  Widget build(BuildContext context) {
+    final q = quiz;
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: ListTile(
+        leading: Icon(q.isMockExam ? Icons.timer_outlined : Icons.assignment_outlined),
+        title: Text(q.titleAr),
+        subtitle: Text(
+          [
+            availabilityLabel(q),
+            quizModesLabel(q),
+            if (q.isMockExam) 'امتحان تجريبي',
+            if (q.bestScorePercent != null) 'أفضل نتيجة ${percent(q.bestScorePercent!)}',
+          ].join(' · '),
+        ),
+        trailing: Icon(q.locked ? Icons.lock_outline : Icons.chevron_left, semanticLabel: q.locked ? 'مقفل' : null),
+        onTap: () => context.go('${Routes.quizzes}/${q.id}'),
+      ),
     );
   }
 }
