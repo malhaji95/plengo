@@ -34,13 +34,17 @@ export function uploadRoutes(c: Container, audience: 'student' | 'admin'): Fasti
     app.post(
       '/uploads',
       {
-        config: {
-          rateLimit: {
-            max: 60,
-            timeWindow: HOUR,
-            keyGenerator: (request: FastifyRequest) => request.auth?.userId ?? request.ip,
-          },
-        },
+        // 60 / hour applies to students only (spec §31): an admin bulk upload of 300 cards needs 600.
+        config:
+          audience === 'student'
+            ? {
+                rateLimit: {
+                  max: 60,
+                  timeWindow: HOUR,
+                  keyGenerator: (request: FastifyRequest) => request.auth?.userId ?? request.ip,
+                },
+              }
+            : {},
         schema: {
           operationId: `${prefix}CreateUpload`,
           tags,

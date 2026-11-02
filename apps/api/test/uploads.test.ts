@@ -4,7 +4,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { mediaFiles } from '@plengo/db';
 import { STUDENT_IMAGE_QUOTA } from '../src/services/upload-service.js';
 import { objectKey } from '../src/storage/keys.js';
-import { body, createTestApp, tokensFor, type TestContext } from './helpers.js';
+import { body, createTestApp, enrolledAdminSession, tokensFor, type TestContext } from './helpers.js';
 
 let t: TestContext;
 beforeAll(async () => {
@@ -180,6 +180,21 @@ describe('upload limits and budgets (§12.4, §31)', () => {
     for (let i = 0; i < 61; i++) codes.push((await studentUpload(accessToken, bytes)).statusCode);
     expect(codes.slice(0, 60).every((c) => c === 200)).toBe(true);
     expect(codes[60]).toBe(429);
+  });
+
+  it('does not limit admin uploads, so a 300-card bulk upload fits', async () => {
+    const { headers } = await enrolledAdminSession(t);
+    const codes = new Set<number>();
+    for (let i = 0; i < 61; i++) {
+      const res = await t.app.inject({
+        method: 'POST',
+        url: '/api/v1/admin/uploads',
+        headers,
+        payload: { kind: 'flashcard', contentType: 'image/png', size: 100 },
+      });
+      codes.add(res.statusCode);
+    }
+    expect([...codes]).toEqual([200]);
   });
 
   it('steps quality down until a detailed image fits its budget', async () => {
