@@ -438,7 +438,7 @@ class PracticeScreen extends ConsumerStatefulWidget {
 
   /// Exit sheet copy: question-bank practice is not resumable (DECISIONS #13).
   static const exitTitle = 'الخروج من التدريب؟';
-  static const exitMessage = 'إجاباتك محفوظة في إحصائياتك وبنك الأخطاء';
+  static const exitMessage = 'تُحسب إجاباتك في هدفك اليومي، وعند العودة يبدأ التدريب من جديد.';
 
   @override
   ConsumerState<PracticeScreen> createState() => _PracticeScreenState();

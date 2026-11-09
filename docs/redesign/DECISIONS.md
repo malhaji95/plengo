@@ -41,7 +41,8 @@ Phase 0. They override DESIGN_SPEC.md where they differ.
 12. **Exam exit sheet.** The timer runs on the server, so the copy is «إجاباتك محفوظة، لكن الوقت
     مستمر. يمكنك العودة من صفحة الاختبار بزر «متابعة الاختبار».»
 13. **Practice exit sheet.** In a quiz practice attempt: «تقدّمك محفوظ». In question-bank practice
-    (not resumable): «إجاباتك محفوظة في إحصائياتك وبنك الأخطاء».
+    (not resumable; a bank check counts toward the daily goal but does not record mistakes):
+    «تُحسب إجاباتك في هدفك اليومي، وعند العودة يبدأ التدريب من جديد.»
 14. **Official flashcard images** are shown as they are (they already carry their frame and logo).
     No extra deck-colour frame or logo around them.
 15. **«جرّب الدروس المجانية أولاً» (V-Redeem)** opens the subject the student came from (its free
