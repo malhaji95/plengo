@@ -113,7 +113,7 @@ void main() {
     expect(await app.db.getValue('settings.font_step'), '2');
     expect(tester.widget<MaterialApp>(find.byType(MaterialApp)).themeMode, ThemeMode.dark);
     final context = tester.element(find.text('حسابي').first);
-    expect(MediaQuery.textScalerOf(context).scale(10), closeTo(10 * 2.0 * 1.15, 0.001));
+    expect(MediaQuery.textScalerOf(context).scale(10), closeTo(10 * 2.0 * 1.16, 0.001));
   });
 
   testWidgets('force update: a store button on Android (§10.2)', (tester) async {

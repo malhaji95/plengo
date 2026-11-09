@@ -1,192 +1,334 @@
 import 'package:flutter/material.dart';
 
-/// Plengo brand colours (design/brand/plengo-logo.pdf; sampled from the master artwork).
+import '../shared/ui/tokens.dart';
+
+/// Older names for the brand colours, kept so existing screens compile while they move to
+/// [PlengoColors] / [PlengoSurface] (docs/redesign). Values follow the redesign tokens.
 ///
-/// The logo letters use these exact values. In the interface, blue carries actions and links (in
-/// the slightly deeper [action] shade so white labels pass WCAG AA), and the bright colours are
-/// fills behind dark [ink] text — never white text, never text on white.
+/// Blue carries actions and links; the bright colours are fills behind dark [ink] text, never
+/// white text, never text on white.
 abstract final class BrandColors {
   static const yellow = Color(0xFFFFD62C);
   static const pink = Color(0xFFE3A4E8);
   static const red = Color(0xFFE54E4E);
   static const green = Color(0xFF1FCD33);
-  static const blue = Color(0xFF0080C6);
+  static const blue = Color(0xFF0074B4);
   static const orange = Color(0xFFF99A2C);
-  static const ink = Color(0xFF1B1B1B);
+  static const ink = PlengoColors.ink;
 
-  /// [blue] darkened just enough for 5:1 with white (buttons, links, selected states).
+  /// Primary actions on light surfaces (5:1 with white).
   static const action = Color(0xFF0074B4);
 
-  /// [blue] lightened for dark mode (8:1 on the dark surface).
-  static const actionDark = Color(0xFF4FB3EE);
+  /// Primary actions in dark mode (takes ink text).
+  static const actionDark = Color(0xFF5CB8EE);
 
-  /// [red] darkened for error text on white.
-  static const error = Color(0xFFC73B3B);
+  /// Red text on light surfaces (red ink).
+  static const error = Color(0xFFB42323);
 
-  /// [blue] lightened until ink text reads on it (10:1); the blue member of [tiles].
+  /// Light blue fill that carries ink text; the blue member of [tiles].
   static const sky = Color(0xFF8FD0F2);
 
   /// The logo's letter colours in order, for decorative accents (charts, confetti).
   static const accents = [pink, yellow, red, green, blue, orange];
 
-  /// Fills for content tiles (subject cards). Every one carries [ink] text at 7.9:1 or better.
+  /// Fills for content tiles. Every one carries [ink] text.
   static const tiles = [yellow, sky, green, orange, pink];
 
-  /// Pale tints of the logo colours behind icons and status rows; ink text reads at 12:1 or better.
-  static const tintYellow = Color(0xFFFFF1B8);
-  static const tintBlue = Color(0xFFCDEBFA);
-  static const tintGreen = Color(0xFFD9F7DD);
-  static const tintOrange = Color(0xFFFDE3C2);
-  static const tintPink = Color(0xFFF6DDF8);
-  static const tintRed = Color(0xFFFBD5D5);
+  /// Soft tints of the logo colours (redesign "soft"); ink text reads on all of them.
+  static const tintYellow = Color(0xFFFFF4C2);
+  static const tintBlue = Color(0xFFE3F1FA);
+  static const tintGreen = Color(0xFFE3F8E6);
+  static const tintOrange = Color(0xFFFEEEDB);
+  static const tintPink = Color(0xFFF7E6F9);
+  static const tintRed = Color(0xFFFDE8E8);
 
   /// Status colours that keep 4.5:1 for text and icons on light and dark surfaces.
-  static Color success(Brightness b) => b == Brightness.dark ? const Color(0xFF6EE07A) : const Color(0xFF13852A);
-  static Color warning(Brightness b) => b == Brightness.dark ? const Color(0xFFFFC266) : const Color(0xFF9A5B00);
+  static Color success(Brightness b) => b == Brightness.dark ? const Color(0xFF6EE07A) : const Color(0xFF157A22);
+  static Color warning(Brightness b) => b == Brightness.dark ? const Color(0xFFFFC266) : const Color(0xFF9A5205);
 }
 
-/// Every screen reads colours and text styles from here, so the brand is a one-file change.
+/// Light and dark [ThemeData] built from the redesign tokens ([PlengoSurface], [PlengoColors]).
 abstract final class AppTheme {
   static const seed = BrandColors.blue;
 
-  /// Montserrat Arabic (Kief Type Foundry, SIL OFL) for everything: body text and educational
-  /// content in Regular/Medium, and major headings in Bold.
-  static const fontFamily = 'MontserratArabic';
-
-  /// Display and headline styles and app bar titles: the same family in Bold.
+  /// Montserrat Arabic (Kief Type Foundry, SIL OFL) for everything.
+  static const fontFamily = PlengoType.family;
   static const headingFont = fontFamily;
 
-  static const radius = 20.0;
+  /// Default card radius of the older widgets; new code uses [PlengoRadius].
+  static const radius = PlengoRadius.row;
 
-  static ThemeData light() => _build(Brightness.light);
-  static ThemeData dark() => _build(Brightness.dark);
+  static ThemeData light() => _build(PlengoSurface.light);
+  static ThemeData dark() => _build(PlengoSurface.dark);
 
-  static ThemeData _build(Brightness brightness) {
-    final dark = brightness == Brightness.dark;
+  static ThemeData _build(PlengoSurface s) {
+    final dark = s.isDark;
+    final brightness = s.brightness;
     final scheme =
         ColorScheme.fromSeed(
           seedColor: seed,
           brightness: brightness,
           dynamicSchemeVariant: DynamicSchemeVariant.fidelity,
         ).copyWith(
-          primary: dark ? BrandColors.actionDark : BrandColors.action,
-          onPrimary: dark ? BrandColors.ink : Colors.white,
-          secondary: BrandColors.yellow,
-          onSecondary: BrandColors.ink,
-          secondaryContainer: dark ? const Color(0xFF4A3F00) : BrandColors.tintYellow,
-          onSecondaryContainer: dark ? const Color(0xFFFFE680) : BrandColors.ink,
+          primary: s.action,
+          onPrimary: s.onAction,
+          primaryContainer: PlengoColors.blue.soft,
+          onPrimaryContainer: PlengoColors.blue.ink,
+          secondary: PlengoColors.yellow.base,
+          onSecondary: PlengoColors.ink,
+          secondaryContainer: PlengoColors.yellow.soft,
+          onSecondaryContainer: PlengoColors.yellow.ink,
           tertiary: BrandColors.success(brightness),
-          error: dark ? const Color(0xFFFF8A80) : BrandColors.error,
-          surface: dark ? const Color(0xFF14171C) : Colors.white,
-          surfaceContainerLowest: dark ? const Color(0xFF0F1216) : const Color(0xFFF5F7FB),
+          onTertiary: PlengoColors.ink,
+          tertiaryContainer: PlengoColors.green.soft,
+          onTertiaryContainer: PlengoColors.green.ink,
+          error: dark ? const Color(0xFFFF8A80) : PlengoColors.red.ink,
+          onError: dark ? PlengoColors.ink : Colors.white,
+          errorContainer: PlengoColors.red.soft,
+          onErrorContainer: PlengoColors.red.ink,
+          surface: s.card,
+          onSurface: s.ink,
+          onSurfaceVariant: s.mute,
+          outline: s.mute,
+          outlineVariant: s.line,
+          surfaceContainerLowest: s.background,
+          surfaceContainerLow: s.card,
+          surfaceContainer: s.card,
+          surfaceContainerHigh: s.track,
+          surfaceContainerHighest: s.track,
+          surfaceTint: Colors.transparent,
+          shadow: const Color(0xFF3C2D0A),
+          scrim: PlengoColors.scrim,
         );
-    final background = scheme.surfaceContainerLowest;
     final base = ThemeData(colorScheme: scheme, useMaterial3: true, brightness: brightness, fontFamily: fontFamily);
     final text = base.textTheme;
-    TextStyle? heading(TextStyle? s, FontWeight w) => s?.copyWith(fontFamily: headingFont, fontWeight: w, height: 1.5);
-    final rounded = RoundedRectangleBorder(borderRadius: BorderRadius.circular(14));
-    final border = BorderSide(color: scheme.outlineVariant.withValues(alpha: dark ? 0.5 : 0.6));
+    TextStyle? bold(TextStyle? t, [double height = 1.5]) =>
+        t?.copyWith(fontFamily: headingFont, fontWeight: FontWeight.w700, height: height);
+    final line = BorderSide(color: s.line);
+    final buttonShape = RoundedRectangleBorder(borderRadius: BorderRadius.circular(PlengoRadius.button));
+    final inputRadius = BorderRadius.circular(PlengoRadius.input);
+    OutlineInputBorder inputBorder(Color c) => OutlineInputBorder(
+      borderRadius: inputRadius,
+      borderSide: BorderSide(color: c, width: 2),
+    );
     return base.copyWith(
-      scaffoldBackgroundColor: background,
+      scaffoldBackgroundColor: s.background,
+      canvasColor: s.background,
+      dividerColor: s.line,
+      extensions: [s, PlengoBrand.standard],
       textTheme: text.copyWith(
-        displayLarge: heading(text.displayLarge, FontWeight.w700),
-        displayMedium: heading(text.displayMedium, FontWeight.w700),
-        displaySmall: heading(text.displaySmall, FontWeight.w700),
-        headlineLarge: heading(text.headlineLarge, FontWeight.w700),
-        headlineMedium: heading(text.headlineMedium, FontWeight.w700),
-        headlineSmall: heading(text.headlineSmall, FontWeight.w700),
-        titleMedium: text.titleMedium?.copyWith(fontWeight: FontWeight.w600),
-        titleSmall: text.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+        displayLarge: bold(text.displayLarge, 1.2),
+        displayMedium: bold(text.displayMedium, 1.2),
+        displaySmall: bold(text.displaySmall?.copyWith(fontSize: 30), 1.2),
+        headlineLarge: bold(text.headlineLarge, 1.4),
+        headlineMedium: bold(text.headlineMedium, 1.4),
+        headlineSmall: bold(text.headlineSmall?.copyWith(fontSize: 26), 1.45),
+        titleLarge: bold(text.titleLarge?.copyWith(fontSize: 20)),
+        titleMedium: bold(text.titleMedium?.copyWith(fontSize: 16)),
+        titleSmall: bold(text.titleSmall?.copyWith(fontSize: 14)),
+        bodyLarge: text.bodyLarge?.copyWith(fontSize: 16, fontWeight: FontWeight.w500, height: 1.6),
+        bodyMedium: text.bodyMedium?.copyWith(fontSize: 14, height: 1.6),
+        bodySmall: text.bodySmall?.copyWith(fontSize: 12, height: 1.6, color: s.mute),
+        labelLarge: text.labelLarge?.copyWith(fontWeight: FontWeight.w700),
+        labelMedium: text.labelMedium?.copyWith(fontWeight: FontWeight.w600),
+        labelSmall: text.labelSmall?.copyWith(fontWeight: FontWeight.w600),
       ),
+      iconTheme: IconThemeData(color: s.ink),
       appBarTheme: AppBarTheme(
-        backgroundColor: background,
-        foregroundColor: scheme.onSurface,
+        backgroundColor: s.background,
+        foregroundColor: s.ink,
         surfaceTintColor: Colors.transparent,
         scrolledUnderElevation: 0,
         elevation: 0,
-        titleTextStyle: heading(text.titleLarge, FontWeight.w700)?.copyWith(color: scheme.onSurface, fontSize: 20),
+        centerTitle: false,
+        titleTextStyle: TextStyle(fontFamily: headingFont, fontSize: 20, fontWeight: FontWeight.w700, color: s.ink),
       ),
       cardTheme: CardThemeData(
-        color: scheme.surface,
+        color: s.card,
         surfaceTintColor: Colors.transparent,
-        elevation: 0,
-        margin: const EdgeInsets.only(bottom: 10),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(radius), side: border),
+        shadowColor: const Color(0x143C2D0A),
+        elevation: dark ? 0 : 1,
+        margin: const EdgeInsets.only(bottom: PlengoSpace.listGap),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(radius), side: dark ? line : BorderSide.none),
       ),
       listTileTheme: ListTileThemeData(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(radius)),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(PlengoRadius.row)),
+        contentPadding: const EdgeInsetsDirectional.symmetric(horizontal: 14, vertical: 2),
         minVerticalPadding: 10,
+        iconColor: s.ink,
+        titleTextStyle: TextStyle(fontFamily: fontFamily, fontSize: 15, fontWeight: FontWeight.w700, color: s.ink),
+        subtitleTextStyle: TextStyle(fontFamily: fontFamily, fontSize: 12, height: 1.6, color: s.mute),
       ),
       inputDecorationTheme: InputDecorationTheme(
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: border),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: border),
+        border: inputBorder(s.line),
+        enabledBorder: inputBorder(s.line),
+        focusedBorder: inputBorder(s.action),
+        errorBorder: inputBorder(PlengoColors.redStrong),
+        focusedErrorBorder: inputBorder(PlengoColors.redStrong),
         filled: true,
-        fillColor: scheme.surface,
+        fillColor: s.card,
+        contentPadding: const EdgeInsetsDirectional.symmetric(horizontal: 16, vertical: 16),
+        hintStyle: TextStyle(fontFamily: fontFamily, color: s.mute, fontWeight: FontWeight.w500),
+        labelStyle: TextStyle(fontFamily: fontFamily, color: s.mute, fontWeight: FontWeight.w500),
+        errorStyle: TextStyle(fontFamily: fontFamily, fontWeight: FontWeight.w700, color: scheme.error),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          minimumSize: const Size.fromHeight(52),
-          shape: rounded,
-          textStyle: const TextStyle(fontFamily: fontFamily, fontSize: 16, fontWeight: FontWeight.w600),
+          disabledBackgroundColor: s.track,
+          disabledForegroundColor: s.mute,
+          minimumSize: const Size.fromHeight(PlengoSpace.button),
+          padding: const EdgeInsetsDirectional.symmetric(horizontal: 20),
+          shape: buttonShape,
+          textStyle: const TextStyle(fontFamily: fontFamily, fontSize: 16, fontWeight: FontWeight.w700),
+        ),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: PlengoColors.yellow.base,
+          foregroundColor: PlengoColors.ink,
+          elevation: 0,
+          minimumSize: const Size(48, PlengoSpace.buttonSmall),
+          shape: buttonShape,
+          textStyle: const TextStyle(fontFamily: fontFamily, fontSize: 16, fontWeight: FontWeight.w700),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
+          foregroundColor: s.action,
+          backgroundColor: s.card,
           minimumSize: const Size(48, 48),
-          shape: rounded,
-          side: BorderSide(color: scheme.outlineVariant),
-          textStyle: const TextStyle(fontFamily: fontFamily, fontWeight: FontWeight.w600),
+          shape: buttonShape,
+          side: BorderSide(color: s.action, width: 2),
+          textStyle: const TextStyle(fontFamily: fontFamily, fontWeight: FontWeight.w700),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
+          foregroundColor: s.action,
           minimumSize: const Size(48, 48),
-          textStyle: const TextStyle(fontFamily: fontFamily, fontWeight: FontWeight.w600),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(PlengoRadius.buttonSmall)),
+          textStyle: const TextStyle(fontFamily: fontFamily, fontWeight: FontWeight.w700),
+        ),
+      ),
+      iconButtonTheme: IconButtonThemeData(
+        style: IconButton.styleFrom(
+          foregroundColor: s.ink,
+          minimumSize: const Size.square(48),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(PlengoRadius.iconButton)),
         ),
       ),
       chipTheme: ChipThemeData(
         shape: const StadiumBorder(),
-        side: border,
-        backgroundColor: scheme.surface,
-        selectedColor: scheme.secondaryContainer,
+        side: BorderSide(color: s.line, width: 1.5),
+        backgroundColor: s.card,
+        selectedColor: dark ? PlengoColors.yellow.base : PlengoColors.ink,
+        secondarySelectedColor: dark ? PlengoColors.yellow.base : PlengoColors.ink,
         showCheckmark: true,
-        checkmarkColor: scheme.onSecondaryContainer,
-        labelStyle: TextStyle(fontFamily: fontFamily, color: scheme.onSurface),
+        checkmarkColor: dark ? PlengoColors.ink : Colors.white,
+        labelStyle: WidgetStateTextStyle.resolveWith(
+          (st) => TextStyle(
+            fontFamily: fontFamily,
+            fontWeight: FontWeight.w600,
+            color: st.contains(WidgetState.selected) ? (dark ? PlengoColors.ink : Colors.white) : s.ink,
+          ),
+        ),
       ),
       segmentedButtonTheme: SegmentedButtonThemeData(
         style: SegmentedButton.styleFrom(
-          selectedBackgroundColor: scheme.secondaryContainer,
-          selectedForegroundColor: scheme.onSecondaryContainer,
+          backgroundColor: s.track,
+          foregroundColor: s.mute,
+          selectedBackgroundColor: s.card,
+          selectedForegroundColor: s.ink,
+          side: BorderSide(color: s.track, width: 2),
+          textStyle: const TextStyle(fontFamily: fontFamily, fontWeight: FontWeight.w700),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(PlengoRadius.iconButton)),
+        ),
+      ),
+      radioTheme: RadioThemeData(
+        fillColor: WidgetStateProperty.resolveWith((st) => st.contains(WidgetState.selected) ? s.action : s.mute),
+      ),
+      checkboxTheme: CheckboxThemeData(
+        fillColor: WidgetStateProperty.resolveWith((st) => st.contains(WidgetState.selected) ? s.action : null),
+        checkColor: WidgetStatePropertyAll(s.onAction),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+      ),
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith((st) => st.contains(WidgetState.selected) ? s.onAction : s.mute),
+        trackColor: WidgetStateProperty.resolveWith((st) => st.contains(WidgetState.selected) ? s.action : s.track),
+        trackOutlineColor: WidgetStateProperty.resolveWith(
+          (st) => st.contains(WidgetState.selected) ? s.action : s.mute,
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: scheme.surface,
+        backgroundColor: s.nav,
         surfaceTintColor: Colors.transparent,
-        indicatorColor: scheme.secondaryContainer,
+        indicatorColor: PlengoColors.yellow.base,
         elevation: 0,
+        height: 72,
+        iconTheme: WidgetStateProperty.resolveWith(
+          (st) => IconThemeData(size: 22, color: st.contains(WidgetState.selected) ? PlengoColors.ink : s.mute),
+        ),
         labelTextStyle: WidgetStateProperty.resolveWith(
-          (s) => TextStyle(
+          (st) => TextStyle(
             fontFamily: fontFamily,
-            fontSize: 12,
-            fontWeight: s.contains(WidgetState.selected) ? FontWeight.w600 : FontWeight.w400,
+            fontSize: 11,
+            color: st.contains(WidgetState.selected) ? s.ink : s.mute,
+            fontWeight: st.contains(WidgetState.selected) ? FontWeight.w700 : FontWeight.w600,
           ),
         ),
       ),
       navigationRailTheme: NavigationRailThemeData(
-        backgroundColor: scheme.surface,
-        indicatorColor: scheme.secondaryContainer,
+        backgroundColor: s.card,
+        indicatorColor: PlengoColors.yellow.base,
+        selectedIconTheme: const IconThemeData(color: PlengoColors.ink),
+      ),
+      tabBarTheme: TabBarThemeData(
+        labelColor: s.ink,
+        unselectedLabelColor: s.mute,
+        indicatorColor: s.action,
+        dividerColor: s.line,
+        labelStyle: const TextStyle(fontFamily: fontFamily, fontWeight: FontWeight.w700),
+        unselectedLabelStyle: const TextStyle(fontFamily: fontFamily, fontWeight: FontWeight.w600),
       ),
       progressIndicatorTheme: ProgressIndicatorThemeData(
-        linearTrackColor: scheme.surfaceContainerHighest,
-        circularTrackColor: scheme.surfaceContainerHighest,
-        linearMinHeight: 8,
-        borderRadius: BorderRadius.circular(8),
+        color: s.action,
+        linearTrackColor: s.track,
+        circularTrackColor: s.track,
+        linearMinHeight: 10,
+        borderRadius: BorderRadius.circular(PlengoRadius.pill),
       ),
-      dividerTheme: DividerThemeData(color: scheme.outlineVariant.withValues(alpha: 0.5)),
+      dividerTheme: DividerThemeData(color: s.line, thickness: 1, space: 1),
       expansionTileTheme: const ExpansionTileThemeData(shape: Border(), collapsedShape: Border()),
-      snackBarTheme: const SnackBarThemeData(behavior: SnackBarBehavior.floating),
-      bottomSheetTheme: const BottomSheetThemeData(showDragHandle: true),
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: dark ? s.card : PlengoColors.ink,
+        contentTextStyle: TextStyle(fontFamily: fontFamily, color: dark ? s.ink : Colors.white),
+        actionTextColor: PlengoColors.yellow.base,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(PlengoRadius.buttonSmall)),
+      ),
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: s.card,
+        surfaceTintColor: Colors.transparent,
+        modalBarrierColor: PlengoColors.scrim,
+        showDragHandle: true,
+        dragHandleColor: s.line,
+        dragHandleSize: const Size(40, 5),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(PlengoRadius.sheetTop)),
+        ),
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: s.card,
+        surfaceTintColor: Colors.transparent,
+        barrierColor: PlengoColors.scrim,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(PlengoRadius.card)),
+        titleTextStyle: TextStyle(fontFamily: fontFamily, fontSize: 18, fontWeight: FontWeight.w700, color: s.ink),
+      ),
+      popupMenuTheme: PopupMenuThemeData(
+        color: s.card,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(PlengoRadius.buttonSmall)),
+      ),
     );
   }
 }
