@@ -4,8 +4,9 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/api/api_exception.dart';
 import '../../core/api/generated/export.dart';
+import '../../shared/ui/ui.dart';
 import '../../shared/widgets/async_view.dart';
-import '../../shared/widgets/form_widgets.dart';
+import '../questions/question_view.dart';
 import '../subjects/catalog_providers.dart';
 import 'quiz_providers.dart';
 
@@ -67,9 +68,18 @@ class _RandomPracticeScreenState extends ConsumerState<RandomPracticeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final s = context.surface;
     final outline = ref.watch(subjectOutlineProvider(widget.subjectId));
+    Widget label(String text) => Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Text(text, style: PlengoType.rowTitle.copyWith(color: s.ink)),
+    );
     return Scaffold(
-      appBar: AppBar(title: const Text('تدريب عشوائي')),
+      appBar: AppBar(
+        leading: const PlengoBackButton(),
+        leadingWidth: kPlengoLeadingWidth,
+        title: const Text('تدريب عشوائي'),
+      ),
       body: AsyncView(
         value: outline,
         onRetry: () => ref.invalidate(subjectOutlineProvider(widget.subjectId)),
@@ -82,78 +92,154 @@ class _RandomPracticeScreenState extends ConsumerState<RandomPracticeScreen> {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 560),
               child: ListView(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsetsDirectional.fromSTEB(20, 8, 20, 24),
                 children: [
-                  Text(o.subject.nameAr, style: Theme.of(context).textTheme.titleMedium),
-                  const SizedBox(height: 16),
-                  if (o.units.isNotEmpty) ...[
-                    DropdownButtonFormField<String?>(
-                      initialValue: _unitId,
-                      decoration: const InputDecoration(labelText: 'الوحدة'),
-                      items: [
-                        const DropdownMenuItem(value: null, child: Text('كل الوحدات')),
-                        for (final u in o.units) DropdownMenuItem(value: u.id, child: Text(u.titleAr)),
-                      ],
-                      onChanged: (v) => setState(() {
-                        _unitId = v;
-                        _lessonId = null;
-                      }),
-                    ),
-                    const SizedBox(height: 12),
-                  ],
-                  if (lessons.isNotEmpty) ...[
-                    DropdownButtonFormField<String?>(
-                      key: ValueKey(_unitId),
-                      initialValue: _lessonId,
-                      decoration: const InputDecoration(labelText: 'الدرس'),
-                      items: [
-                        const DropdownMenuItem(value: null, child: Text('كل الدروس')),
-                        for (final l in lessons) DropdownMenuItem(value: l.id, child: Text(l.titleAr)),
-                      ],
-                      onChanged: (v) => setState(() => _lessonId = v),
-                    ),
-                    const SizedBox(height: 16),
-                  ],
-                  const Text('أنواع الأسئلة'),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
+                  Row(
                     children: [
-                      for (final t in AttemptFiltersTypes.values)
-                        FilterChip(
-                          label: Text(_typeLabels[t]!),
-                          selected: _types.contains(t),
-                          onSelected: (on) => setState(() => on ? _types.add(t) : _types.remove(t)),
+                      const SubjectIconTile(icon: Icons.shuffle_rounded, hue: PlengoColors.orange),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(o.subject.nameAr, style: PlengoType.section.copyWith(color: s.ink)),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  PlengoCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        if (o.units.isNotEmpty) ...[
+                          DropdownButtonFormField<String?>(
+                            initialValue: _unitId,
+                            isExpanded: true,
+                            decoration: const InputDecoration(labelText: 'الوحدة'),
+                            items: [
+                              const DropdownMenuItem(value: null, child: Text('كل الوحدات')),
+                              for (final u in o.units) DropdownMenuItem(value: u.id, child: Text(u.titleAr)),
+                            ],
+                            onChanged: (v) => setState(() {
+                              _unitId = v;
+                              _lessonId = null;
+                            }),
+                          ),
+                          const SizedBox(height: 12),
+                        ],
+                        if (lessons.isNotEmpty) ...[
+                          DropdownButtonFormField<String?>(
+                            key: ValueKey(_unitId),
+                            initialValue: _lessonId,
+                            isExpanded: true,
+                            decoration: const InputDecoration(labelText: 'الدرس'),
+                            items: [
+                              const DropdownMenuItem(value: null, child: Text('كل الدروس')),
+                              for (final l in lessons) DropdownMenuItem(value: l.id, child: Text(l.titleAr)),
+                            ],
+                            onChanged: (v) => setState(() => _lessonId = v),
+                          ),
+                          const SizedBox(height: 16),
+                        ],
+                        label('أنواع الأسئلة'),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            for (final t in AttemptFiltersTypes.values)
+                              _TypeToggle(
+                                label: _typeLabels[t]!,
+                                selected: _types.contains(t),
+                                onTap: () => setState(() => _types.contains(t) ? _types.remove(t) : _types.add(t)),
+                              ),
+                          ],
                         ),
-                    ],
+                        const SizedBox(height: 16),
+                        label('عدد الأسئلة: ${_count.round()}'),
+                        Slider(
+                          value: _count,
+                          min: 5,
+                          max: 50,
+                          divisions: 9,
+                          label: '${_count.round()}',
+                          activeColor: s.action,
+                          inactiveColor: s.track,
+                          semanticFormatterCallback: (v) => '${v.round()} سؤالاً',
+                          onChanged: (v) => setState(() => _count = v),
+                        ),
+                        const SizedBox(height: 8),
+                        SegmentedControl<StartAttemptRequestMode>(
+                          segments: const [
+                            PlengoOption(StartAttemptRequestMode.practice, 'تدريب'),
+                            PlengoOption(StartAttemptRequestMode.exam, 'امتحان'),
+                          ],
+                          selected: _mode,
+                          onChanged: (m) => setState(() => _mode = m),
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 16),
-                  Text('عدد الأسئلة: ${_count.round()}'),
-                  Slider(
-                    value: _count,
-                    min: 5,
-                    max: 50,
-                    divisions: 9,
-                    label: '${_count.round()}',
-                    onChanged: (v) => setState(() => _count = v),
-                  ),
-                  const SizedBox(height: 8),
-                  SegmentedButton<StartAttemptRequestMode>(
-                    segments: const [
-                      ButtonSegment(value: StartAttemptRequestMode.practice, label: Text('تدريب')),
-                      ButtonSegment(value: StartAttemptRequestMode.exam, label: Text('امتحان')),
-                    ],
-                    selected: {_mode},
-                    onSelectionChanged: (s) => setState(() => _mode = s.first),
-                  ),
-                  const SizedBox(height: 16),
-                  ErrorBanner(_error),
-                  SubmitButton(label: 'ابدأ', busy: _busy, onPressed: _start),
+                  if (_error != null) ...[InlineError(_error), const SizedBox(height: 12)],
+                  PlengoButton(label: 'ابدأ', busy: _busy, onPressed: _busy ? null : _start),
                 ],
               ),
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+/// A multi-select pill: ink fill + ✓ when on (dark mode: yellow), never colour alone.
+class _TypeToggle extends StatelessWidget {
+  const _TypeToggle({required this.label, required this.selected, required this.onTap});
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = context.surface;
+    final bg = selected ? (s.isDark ? PlengoColors.yellow.base : PlengoColors.ink) : s.card;
+    final fg = selected ? (s.isDark ? PlengoColors.ink : Colors.white) : s.ink;
+    final r = BorderRadius.circular(PlengoRadius.pill);
+    return Semantics(
+      button: true,
+      toggled: selected,
+      label: label,
+      excludeSemantics: true,
+      onTap: onTap,
+      child: Material(
+        color: bg,
+        shape: RoundedRectangleBorder(
+          borderRadius: r,
+          side: BorderSide(color: selected ? bg : s.line, width: 1.5),
+        ),
+        child: InkWell(
+          borderRadius: r,
+          onTap: onTap,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 44, minWidth: 48),
+            child: Padding(
+              padding: const EdgeInsetsDirectional.symmetric(horizontal: 14, vertical: 6),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (selected) ...[Icon(Icons.check_rounded, size: 18, color: fg), const SizedBox(width: 6)],
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontFamily: PlengoType.family,
+                      fontSize: 14,
+                      fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
+                      color: fg,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
