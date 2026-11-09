@@ -5,7 +5,9 @@ import '../../core/api/generated/export.dart';
 import '../../core/content/question_repository.dart';
 import '../../shared/text/bidi.dart';
 import '../../shared/widgets/async_view.dart';
+import '../../shared/ui/ui.dart';
 import '../access/access_banner.dart';
+import '../subjects/scope_widgets.dart';
 import '../bookmarks/bookmark_button.dart';
 import '../reports/report_sheet.dart';
 import '../subjects/catalog_providers.dart';
@@ -30,52 +32,54 @@ class QuestionsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final list = ref.watch(questionListProvider(query));
+    final s = context.surface;
     return Scaffold(
-      appBar: AppBar(title: Text(title)),
+      appBar: AppBar(leading: const PlengoBackButton(), leadingWidth: kPlengoLeadingWidth, title: Text(title)),
       body: AsyncView(
         value: list,
         onRetry: () => ref.invalidate(questionListProvider(query)),
         data: (state) => state.items.isEmpty
-            ? const EmptyState('لا توجد أسئلة هنا بعد', icon: Icons.quiz_outlined)
+            ? const PlengoEmptyState(title: 'لا توجد أسئلة هنا بعد', icon: Icons.quiz_outlined)
             : NotificationListener<ScrollNotification>(
                 onNotification: (n) {
                   if (n.metrics.extentAfter < 400) ref.read(questionListProvider(query).notifier).loadMore();
                   return false;
                 },
-                child: Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 720),
-                    child: ListView(
-                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-                      children: [
-                        Text(
-                          '${state.accessibleCount} من ${state.totalCount} ${state.totalCount == 1 ? 'سؤال' : 'أسئلة'} متاح',
-                          style: Theme.of(context).textTheme.titleSmall,
+                child: ContentWidthBox(
+                  child: ListView(
+                    padding: const EdgeInsetsDirectional.fromSTEB(PlengoSpace.screen, 8, PlengoSpace.screen, 28),
+                    children: [
+                      Text(
+                        '${state.accessibleCount} من ${state.totalCount} ${state.totalCount == 1 ? 'سؤال' : 'أسئلة'} متاح',
+                        style: PlengoType.rowTitle.copyWith(color: s.ink, fontSize: 14),
+                      ),
+                      const SizedBox(height: 12),
+                      if (state.accessibleCount < state.totalCount) const LockedNotice(),
+                      if (state.accessible.isNotEmpty) ...[
+                        PlengoButton(
+                          label: 'ابدأ التدريب',
+                          icon: Icons.play_arrow_rounded,
+                          onPressed: () => _practice(context, state.accessible, 0),
                         ),
-                        const SizedBox(height: 12),
-                        if (state.accessibleCount < state.totalCount) const LockedNotice(),
-                        if (state.accessible.isNotEmpty)
-                          FilledButton.icon(
-                            onPressed: () => _practice(context, state.accessible, 0),
-                            icon: const Icon(Icons.play_arrow),
-                            label: const Text('ابدأ التدريب'),
-                          ),
-                        const SizedBox(height: 12),
-                        for (final (i, q) in state.items.indexed)
-                          _QuestionTile(
+                        const SizedBox(height: PlengoSpace.section),
+                      ],
+                      for (final (i, q) in state.items.indexed)
+                        Padding(
+                          padding: const EdgeInsetsDirectional.only(bottom: PlengoSpace.listGap),
+                          child: _QuestionTile(
                             index: i + 1,
                             question: q,
                             onTap: q.locked
                                 ? null
                                 : () => _practice(context, state.accessible, state.accessible.indexOf(q)),
                           ),
-                        if (state.loadingMore)
-                          const Padding(
-                            padding: EdgeInsets.all(16),
-                            child: Center(child: CircularProgressIndicator()),
-                          ),
-                      ],
-                    ),
+                        ),
+                      if (state.loadingMore)
+                        const Padding(
+                          padding: EdgeInsets.all(16),
+                          child: Center(child: CircularProgressIndicator()),
+                        ),
+                    ],
                   ),
                 ),
               ),
@@ -92,6 +96,8 @@ class QuestionsScreen extends ConsumerWidget {
   }
 }
 
+/// One question of the list: its number, two lines of text (or «سؤال مقفل»), type and «مجاني»; a
+/// locked question shows the «مقفل» chip and is not tappable.
 class _QuestionTile extends StatelessWidget {
   const _QuestionTile({required this.index, required this.question, this.onTap});
 
@@ -101,19 +107,56 @@ class _QuestionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        leading: CircleAvatar(radius: 14, child: Text('$index', style: const TextStyle(fontSize: 12))),
-        title: question.locked
-            ? Text('سؤال مقفل', style: TextStyle(color: scheme.outline))
-            : Text(isolateLtr(question.questionText ?? ''), maxLines: 2, overflow: TextOverflow.ellipsis),
-        subtitle: Text([_typeLabels[question.type]!, if (question.isFree) 'مجاني'].join(' · ')),
-        trailing: question.locked
-            ? Icon(Icons.lock_outline, color: scheme.outline, semanticLabel: 'مقفل')
-            : const Icon(Icons.chevron_left),
-        onTap: onTap,
+    final s = context.surface;
+    final locked = question.locked;
+    final hue = locked ? PlengoColors.red : PlengoColors.blue;
+    return PlengoCard(
+      radius: PlengoRadius.row,
+      padding: const EdgeInsetsDirectional.symmetric(horizontal: 14, vertical: 10),
+      onTap: onTap,
+      child: MergeSemantics(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 44),
+          child: Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(color: hue.soft, shape: BoxShape.circle),
+                child: Text('$index', style: PlengoType.chip.copyWith(color: hue.ink)),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    locked
+                        ? Text('سؤال مقفل', style: PlengoType.rowTitle.copyWith(color: s.mute))
+                        : Text(
+                            isolateLtr(question.questionText ?? ''),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: PlengoType.rowTitle.copyWith(color: s.ink, fontWeight: FontWeight.w600),
+                          ),
+                    const SizedBox(height: 2),
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 4,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        Text(_typeLabels[question.type]!, style: PlengoType.caption.copyWith(color: s.mute)),
+                        if (question.isFree) const PlengoChip(label: 'مجاني', hue: PlengoColors.green),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              if (locked) const LockedChip() else Icon(Icons.chevron_right_rounded, color: s.mute),
+            ],
+          ),
+        ),
       ),
     );
   }
