@@ -64,6 +64,17 @@ class FakePush implements PushMessaging {
   Stream<String> get tokenRefreshes => refreshes.stream;
 }
 
+/// Scrolls Home down until [finder] is built and on screen.
+Future<void> reveal(WidgetTester tester, Finder finder) async {
+  final page = find.byType(Scrollable).first;
+  for (var i = 0; i < 30 && finder.evaluate().isEmpty; i++) {
+    await tester.drag(page, const Offset(0, -200));
+    await tester.pumpAndSettle();
+  }
+  await tester.ensureVisible(finder);
+  await tester.pumpAndSettle();
+}
+
 void main() {
   group('text helpers', () {
     ExamCountdown c(int days) =>
@@ -120,15 +131,15 @@ void main() {
     );
     expect(find.text('مرحباً، سارة'), findsOneWidget);
     expect(find.text('3'), findsOneWidget); // bell badge
-    expect(find.text('باقي 87 يوماً على امتحان الشهادة الثانوية'), findsOneWidget);
-    expect(find.text('banner:عرض الصيف'), findsOneWidget);
-    expect(find.text('هدف اليوم: 8 من 20'), findsOneWidget);
+    // Every section is on the page (in either order of RedesignFlags.homeOrderV2).
+    await reveal(tester, find.text('ابدأ من المواد'));
+    await reveal(tester, find.text('هدف اليوم: 8 من 20'));
     expect(find.text('4 أيام متتالية'), findsOneWidget);
-    expect(find.text('مراجعة البطاقات المستحقة (12)'), findsOneWidget);
-    final page = find.byType(Scrollable).first;
-    await tester.scrollUntilVisible(find.text('ابدأ من المواد'), 200, scrollable: page);
-    await tester.scrollUntilVisible(find.text('6 أسئلة في بنك الأخطاء'), 200, scrollable: page);
-    await tester.scrollUntilVisible(find.text('أ. أحمد'), 200, scrollable: page);
+    await reveal(tester, find.text('مراجعة البطاقات المستحقة (12)'));
+    await reveal(tester, find.text('6 أسئلة في بنك الأخطاء'));
+    await reveal(tester, find.text('باقي 87 يوماً على امتحان الشهادة الثانوية'));
+    await reveal(tester, find.text('banner:عرض الصيف'));
+    await reveal(tester, find.text('أ. أحمد'));
     expect(find.text('الفيزياء'), findsWidgets);
     expect(find.text('أ. أحمد — فيزياء بكالوريا'), findsOneWidget);
     expect(find.text('14 عنصراً مجانياً'), findsOneWidget);
@@ -147,6 +158,7 @@ void main() {
         ),
       ),
     );
+    await reveal(tester, find.text('banner:داخلي'));
     await tester.tap(find.text('banner:داخلي'));
     await tester.pumpAndSettle();
     expect(location(app), Routes.myAccess);
@@ -160,6 +172,7 @@ void main() {
         (_) async => testHome(banners: [banner('b1', 'رابط', BannerAction.externalUrl, 'https://example.com/offer')]),
       ),
     );
+    await reveal(tester, find.text('banner:رابط'));
     await tester.tap(find.text('banner:رابط'));
     await tester.pumpAndSettle();
     expect(app.launched, [Uri.parse('https://example.com/offer')]);
@@ -183,7 +196,12 @@ void main() {
     expect(find.text('لا بطاقات مستحقة الآن'), findsOneWidget);
     await tester.tap(find.text('تعديل الهدف'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('50'));
+    // The same labelled list as the onboarding goal step (V-Goal).
+    for (final label in ['خفيف', 'عادي', 'جاد', 'مكثّف', 'تحدٍّ']) {
+      expect(find.text(label), findsOneWidget);
+    }
+    expect(find.text('50 عنصراً · حوالي 25 د'), findsOneWidget);
+    await tester.tap(find.text('مكثّف'));
     await tester.tap(find.text('حفظ'));
     await tester.pumpAndSettle();
     verify(() => app.home.setGoal(50)).called(1);
