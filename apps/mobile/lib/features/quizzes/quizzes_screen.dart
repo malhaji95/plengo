@@ -12,6 +12,9 @@ import '../access/access_banner.dart';
 import '../questions/question_providers.dart';
 import '../subjects/catalog_providers.dart';
 import '../teachers/teacher_providers.dart';
+import '../../shared/ui/ui.dart';
+import '../access/access_format.dart';
+import '../subjects/scope_widgets.dart';
 import 'attempt_widgets.dart';
 import 'quiz_providers.dart';
 
@@ -36,19 +39,22 @@ class QuizzesScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final quizzes = ref.watch(quizzesProvider(query));
     return Scaffold(
-      appBar: AppBar(title: Text(title)),
+      appBar: AppBar(leading: const PlengoBackButton(), leadingWidth: kPlengoLeadingWidth, title: Text(title)),
       body: AsyncView(
         value: quizzes,
         onRetry: () => ref.invalidate(quizzesProvider(query)),
         data: (list) => list.isEmpty
-            ? const EmptyState('لا توجد اختبارات هنا بعد', icon: Icons.assignment_outlined)
-            : Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 720),
-                  child: ListView(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-                    children: [for (final q in list) QuizTile(quiz: q)],
-                  ),
+            ? const PlengoEmptyState(title: 'لا توجد اختبارات هنا بعد', icon: Icons.assignment_outlined)
+            : ContentWidthBox(
+                child: ListView(
+                  padding: const EdgeInsetsDirectional.fromSTEB(PlengoSpace.screen, 8, PlengoSpace.screen, 28),
+                  children: [
+                    for (final q in list)
+                      Padding(
+                        padding: const EdgeInsetsDirectional.only(bottom: PlengoSpace.listGap),
+                        child: QuizTile(quiz: q),
+                      ),
+                  ],
                 ),
               ),
       ),
@@ -56,7 +62,8 @@ class QuizzesScreen extends ConsumerWidget {
   }
 }
 
-/// A quiz: availability, mode choice (when both are allowed), resume, and past results.
+/// A quiz (V-Quiz): chips, duration / pass mark / attempts tiles, resume, the mode choice, past
+/// attempts, and a bottom button whose label follows the chosen mode.
 class QuizScreen extends ConsumerStatefulWidget {
   const QuizScreen({super.key, required this.quizId});
 
@@ -68,6 +75,7 @@ class QuizScreen extends ConsumerStatefulWidget {
 
 class _QuizScreenState extends ConsumerState<QuizScreen> {
   bool _starting = false;
+  StartAttemptRequestMode? _mode;
 
   Future<void> _start(StudentQuiz q, StartAttemptRequestMode mode) async {
     setState(() => _starting = true);
@@ -92,81 +100,195 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
   @override
   Widget build(BuildContext context) {
     final quiz = ref.watch(quizProvider(widget.quizId));
+    final q = quiz.value;
+    final s = context.surface;
+    final exhausted = q != null && q.maxAttempts != null && q.attemptsUsed >= q.maxAttempts!;
+    final modes = switch (q?.allowedModes) {
+      StudentQuizAllowedModes.practice => [StartAttemptRequestMode.practice],
+      StudentQuizAllowedModes.exam => [StartAttemptRequestMode.exam],
+      _ => [StartAttemptRequestMode.practice, StartAttemptRequestMode.exam],
+    };
+    final canStart = q != null && !q.locked && !exhausted;
+    final mode = modes.contains(_mode) ? _mode! : modes.first;
     return Scaffold(
-      appBar: AppBar(title: Text(quiz.value?.titleAr ?? 'الاختبار')),
+      appBar: AppBar(
+        leading: const PlengoBackButton(),
+        leadingWidth: kPlengoLeadingWidth,
+        title: q == null ? const Text('الاختبار') : null,
+      ),
+      bottomNavigationBar: canStart
+          ? _BottomBar(
+              child: PlengoButton(
+                key: const Key('quiz.start'),
+                label: mode == StartAttemptRequestMode.practice ? 'ابدأ التدريب' : 'ابدأ الامتحان',
+                icon: Icons.play_arrow_rounded,
+                busy: _starting,
+                onPressed: () => _start(q, mode),
+              ),
+            )
+          : null,
       body: AsyncView(
         value: quiz,
         onRetry: () => ref.invalidate(quizProvider(widget.quizId)),
         data: (q) {
-          final text = Theme.of(context).textTheme;
-          final exhausted = q.maxAttempts != null && q.attemptsUsed >= q.maxAttempts!;
-          final modes = switch (q.allowedModes) {
-            StudentQuizAllowedModes.practice => [StartAttemptRequestMode.practice],
-            StudentQuizAllowedModes.exam => [StartAttemptRequestMode.exam],
-            _ => [StartAttemptRequestMode.practice, StartAttemptRequestMode.exam],
-          };
-          return Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 720),
-              child: ListView(
-                padding: const EdgeInsets.all(16),
-                children: [
-                  if (q.description != null) ...[Text(q.description!), const SizedBox(height: 12)],
-                  Text(availabilityLabel(q), style: text.titleSmall),
-                  const SizedBox(height: 4),
-                  Text(
-                    [
-                      if (q.timeLimitSeconds != null) 'مدة الامتحان ${humanDuration(q.timeLimitSeconds! * 1000)}',
-                      if (q.passingScorePercent != null) 'علامة النجاح ${percent(q.passingScorePercent!)}',
-                      if (q.maxAttempts != null) 'المحاولات ${q.attemptsUsed} من ${q.maxAttempts}',
-                    ].join(' · '),
-                    style: text.bodySmall,
+          final tiles = [
+            if (q.timeLimitSeconds != null)
+              (PlengoColors.blue, 'المدة', humanDuration(q.timeLimitSeconds! * 1000), 'مدة الامتحان'),
+            if (q.passingScorePercent != null)
+              (PlengoColors.green, 'علامة النجاح', percent(q.passingScorePercent!), 'علامة النجاح'),
+            if (q.maxAttempts != null)
+              (PlengoColors.orange, 'المحاولات', '${q.attemptsUsed} من ${q.maxAttempts}', 'المحاولات'),
+          ];
+          return ContentWidthBox(
+            child: ListView(
+              padding: const EdgeInsetsDirectional.fromSTEB(PlengoSpace.screen, 0, PlengoSpace.screen, 28),
+              children: [
+                if (q.isMockExam || q.bestScorePercent != null) ...[
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    children: [
+                      if (q.isMockExam) const PlengoChip(label: 'امتحان تجريبي', hue: PlengoColors.pink),
+                      if (q.bestScorePercent != null)
+                        PlengoChip(
+                          label: 'أفضل نتيجة ${percent(q.bestScorePercent!)}',
+                          hue: PlengoColors.green,
+                          icon: Icons.emoji_events_rounded,
+                        ),
+                    ],
                   ),
-                  const SizedBox(height: 16),
-                  if (q.locked || q.lockedCount > 0) const LockedNotice(),
-                  if (q.inProgressAttemptId != null)
+                  const SizedBox(height: 10),
+                ],
+                Semantics(
+                  header: true,
+                  child: Text(q.titleAr, style: PlengoType.title.copyWith(color: s.ink)),
+                ),
+                if (q.description != null) Text(q.description!, style: PlengoType.sub.copyWith(color: s.mute)),
+                Text(availabilityLabel(q), style: PlengoType.chip.copyWith(color: s.mute, fontSize: 13)),
+                const SizedBox(height: PlengoSpace.section),
+                if (tiles.isNotEmpty) ...[
+                  IntrinsicHeight(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        for (final (i, (hue, caption, value, spoken)) in tiles.indexed) ...[
+                          if (i > 0) const SizedBox(width: 8),
+                          Expanded(
+                            child: _InfoTile(hue: hue, caption: caption, value: value, spoken: spoken),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: PlengoSpace.section),
+                ],
+                if (q.locked || q.lockedCount > 0) const LockedNotice(),
+                if (q.inProgressAttemptId != null) ...[
+                  ListRow(
+                    key: const Key('quiz.resume'),
+                    background: PlengoColors.yellow.soft,
+                    leading: const SubjectIconTile(icon: Icons.play_arrow_rounded, hue: PlengoColors.yellow, size: 40),
+                    title: 'لديك اختبار لم يكتمل',
+                    trailing: Text(
+                      'متابعة الاختبار',
+                      style: PlengoType.chip.copyWith(color: PlengoColors.blue.ink, fontSize: 14),
+                    ),
+                    onTap: () async {
+                      await context.push('/attempts/${q.inProgressAttemptId}');
+                      ref.invalidate(quizProvider(widget.quizId));
+                      ref.invalidate(quizHistoryProvider(widget.quizId));
+                    },
+                  ),
+                  const SizedBox(height: PlengoSpace.section),
+                ],
+                if (!q.locked && !exhausted) ...[
+                  const SectionHeader('اختر الوضع', top: 0),
+                  for (final m in modes)
                     Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: FilledButton.icon(
-                        onPressed: () async {
-                          await context.push('/attempts/${q.inProgressAttemptId}');
-                          ref.invalidate(quizProvider(widget.quizId));
-                          ref.invalidate(quizHistoryProvider(widget.quizId));
-                        },
-                        icon: const Icon(Icons.play_arrow),
-                        label: const Text('متابعة الاختبار'),
+                      padding: const EdgeInsetsDirectional.only(bottom: PlengoSpace.listGap),
+                      child: RadioRow(
+                        key: Key('quiz.mode.${m.name}'),
+                        title: m == StartAttemptRequestMode.practice ? 'وضع التدريب' : 'وضع الامتحان',
+                        caption: m == StartAttemptRequestMode.practice
+                            ? 'تحقق من كل إجابة واقرأ الشرح فوراً'
+                            : 'لا تصحيح حتى النهاية، مع شبكة الأسئلة والتعليم للمراجعة',
+                        selected: m == mode,
+                        onTap: _starting ? null : () => setState(() => _mode = m),
                       ),
                     ),
-                  if (!q.locked && !exhausted)
-                    for (final mode in modes)
-                      Card(
-                        margin: const EdgeInsets.only(bottom: 8),
-                        child: ListTile(
-                          enabled: !_starting,
-                          leading: Icon(
-                            mode == StartAttemptRequestMode.practice ? Icons.school_outlined : Icons.timer_outlined,
-                          ),
-                          title: Text(mode == StartAttemptRequestMode.practice ? 'وضع التدريب' : 'وضع الامتحان'),
-                          subtitle: Text(
-                            mode == StartAttemptRequestMode.practice
-                                ? 'تحقق من كل إجابة واقرأ الشرح فوراً'
-                                : 'لا تصحيح حتى النهاية، مع شبكة الأسئلة والتعليم للمراجعة',
-                          ),
-                          trailing: const Icon(Icons.chevron_left),
-                          onTap: () => _start(q, mode),
-                        ),
-                      ),
-                  if (exhausted) Text('استنفدت عدد المحاولات المسموح', style: TextStyle(color: Colors.orange.shade800)),
-                  const SizedBox(height: 16),
-                  _History(quizId: q.id),
                 ],
-              ),
+                if (exhausted)
+                  ListRow(
+                    background: PlengoColors.orange.soft,
+                    leading: const SubjectIconTile(icon: Icons.block_rounded, hue: PlengoColors.orange, size: 40),
+                    title: 'استنفدت عدد المحاولات المسموح',
+                  ),
+                _History(quizId: q.id),
+              ],
             ),
           );
         },
       ),
     );
   }
+}
+
+/// The bottom slot of the quiz page: card background, 28 top radius, safe area.
+class _BottomBar extends StatelessWidget {
+  const _BottomBar({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = context.surface;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: s.card,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(PlengoRadius.sheetTop)),
+        border: s.isDark ? Border(top: BorderSide(color: s.line)) : null,
+        boxShadow: s.isDark ? null : const [BoxShadow(color: Color(0x0F3C2D0A), offset: Offset(0, -6), blurRadius: 20)],
+      ),
+      child: SafeArea(
+        top: false,
+        child: Align(
+          heightFactor: 1,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: PlengoSpace.contentMaxWide),
+            child: Padding(padding: const EdgeInsetsDirectional.fromSTEB(20, 14, 20, 14), child: child),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A coloured info tile: a small caption in the hue's ink above the bold value.
+class _InfoTile extends StatelessWidget {
+  const _InfoTile({required this.hue, required this.caption, required this.value, required this.spoken});
+
+  final PlengoHue hue;
+  final String caption;
+  final String value;
+  final String spoken;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    label: '$spoken $value',
+    excludeSemantics: true,
+    child: Container(
+      padding: const EdgeInsetsDirectional.all(14),
+      decoration: BoxDecoration(color: hue.soft, borderRadius: BorderRadius.circular(PlengoRadius.row)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(caption, style: PlengoType.caption.copyWith(color: hue.ink)),
+          const SizedBox(height: 4),
+          Text(value, style: PlengoType.rowTitle.copyWith(color: PlengoColors.ink)),
+        ],
+      ),
+    ),
+  );
 }
 
 class _History extends ConsumerWidget {
@@ -181,22 +303,29 @@ class _History extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text('محاولاتي', style: Theme.of(context).textTheme.titleSmall),
-        const SizedBox(height: 8),
+        const SectionHeader('محاولاتي', top: 12),
         for (final a in items)
-          Card(
-            margin: const EdgeInsets.only(bottom: 8),
-            child: ListTile(
-              title: Text(
-                '${percent(a.scorePercent ?? 0)} · ${a.mode == AttemptSummaryMode.exam ? 'امتحان' : 'تدريب'}',
+          Padding(
+            padding: const EdgeInsetsDirectional.only(bottom: PlengoSpace.listGap),
+            child: ListRow(
+              leading: PlengoChip(
+                label: percent(a.scorePercent ?? 0),
+                hue: switch (a.passed) {
+                  true => PlengoColors.green,
+                  false => PlengoColors.red,
+                  null => PlengoColors.blue,
+                },
               ),
-              subtitle: Text(
-                [
-                  '${a.correctCount ?? 0} صحيحة من ${a.totalCount}',
-                  if (a.submittedLate) 'بعد انتهاء الوقت',
-                ].join(' · '),
-              ),
-              trailing: const Icon(Icons.chevron_left),
+              title: [
+                if (a.passed == true) 'ناجح',
+                if (a.passed == false) 'لم تبلغ علامة النجاح',
+                '${a.correctCount ?? 0} صحيحة من ${a.totalCount}',
+              ].join(' · '),
+              caption: [
+                if (a.submittedAt != null) damascusDate(a.submittedAt!),
+                a.mode == AttemptSummaryMode.exam ? 'وضع الامتحان' : 'وضع التدريب',
+                if (a.submittedLate) 'بعد انتهاء الوقت',
+              ].join(' · '),
               onTap: () => context.push('/attempts/${a.id}/results'),
             ),
           ),
@@ -205,7 +334,8 @@ class _History extends ConsumerWidget {
   }
 }
 
-/// One curated quiz in a list; a locked quiz shows a lock instead of the chevron (§8.7).
+/// One curated quiz in a list: an orange row with availability, modes, mock badge and best score;
+/// a locked quiz shows the «مقفل» chip instead of the chevron (§8.7).
 class QuizTile extends StatelessWidget {
   const QuizTile({super.key, required this.quiz});
 
@@ -214,22 +344,18 @@ class QuizTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final q = quiz;
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        leading: Icon(q.isMockExam ? Icons.timer_outlined : Icons.assignment_outlined),
-        title: Text(q.titleAr),
-        subtitle: Text(
-          [
-            availabilityLabel(q),
-            quizModesLabel(q),
-            if (q.isMockExam) 'امتحان تجريبي',
-            if (q.bestScorePercent != null) 'أفضل نتيجة ${percent(q.bestScorePercent!)}',
-          ].join(' · '),
-        ),
-        trailing: Icon(q.locked ? Icons.lock_outline : Icons.chevron_left, semanticLabel: q.locked ? 'مقفل' : null),
-        onTap: () => context.go('${Routes.quizzes}/${q.id}'),
-      ),
+    return ListRow(
+      icon: q.isMockExam ? Icons.timer_rounded : Icons.assignment_rounded,
+      hue: PlengoColors.orange,
+      title: q.titleAr,
+      caption: [
+        availabilityLabel(q),
+        quizModesLabel(q),
+        if (q.isMockExam) 'امتحان تجريبي',
+        if (q.bestScorePercent != null) 'أفضل نتيجة ${percent(q.bestScorePercent!)}',
+      ].join(' · '),
+      trailing: q.locked ? const LockedChip() : null,
+      onTap: () => context.go('${Routes.quizzes}/${q.id}'),
     );
   }
 }

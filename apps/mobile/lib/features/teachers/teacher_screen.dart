@@ -5,8 +5,10 @@ import 'package:go_router/go_router.dart';
 import '../../app/router.dart';
 import '../../core/api/api_exception.dart';
 import '../../core/api/generated/export.dart';
+import '../../shared/ui/ui.dart';
 import '../../shared/widgets/async_view.dart';
-import '../../shared/widgets/network_avatar.dart';
+import '../subjects/scope_widgets.dart';
+import 'teacher_avatar.dart';
 import 'teacher_providers.dart';
 
 /// A teacher's profile with follow button and tracks (spec §7, §23.2 #12).
@@ -18,39 +20,41 @@ class TeacherScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profile = ref.watch(teacherProfileProvider(teacherId));
+    final s = context.surface;
     return Scaffold(
-      appBar: AppBar(title: Text(profile.value?.teacher.nameAr ?? '')),
+      appBar: AppBar(leading: const PlengoBackButton(), leadingWidth: kPlengoLeadingWidth),
       body: AsyncView(
         value: profile,
         onRetry: () => ref.invalidate(teacherProfileProvider(teacherId)),
-        data: (p) => Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 720),
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-              children: [
-                _Header(teacher: p.teacher),
-                if (p.teacher.bio != null) ...[
-                  const SizedBox(height: 16),
-                  Text(p.teacher.bio!, style: Theme.of(context).textTheme.bodyMedium),
-                ],
-                const SizedBox(height: 24),
-                Text('المسارات', style: Theme.of(context).textTheme.titleMedium),
-                const SizedBox(height: 8),
-                if (p.tracks.isEmpty) const EmptyState('لا توجد مسارات منشورة لهذا المدرس بعد'),
-                for (final track in p.tracks)
-                  Card(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    child: ListTile(
-                      leading: const Icon(Icons.route_outlined),
-                      title: Text(track.titleAr),
-                      subtitle: Text(track.subjectNameAr),
-                      trailing: const Icon(Icons.chevron_left),
-                      onTap: () => context.go('${Routes.tracks}/${track.id}'),
-                    ),
-                  ),
+        data: (p) => ContentWidthBox(
+          child: ListView(
+            padding: const EdgeInsetsDirectional.fromSTEB(PlengoSpace.screen, 0, PlengoSpace.screen, 28),
+            children: [
+              _Header(teacher: p.teacher),
+              if (p.teacher.bio != null) ...[
+                const SizedBox(height: PlengoSpace.section),
+                PlengoCard(
+                  child: Text(p.teacher.bio!, style: PlengoType.sub.copyWith(color: s.ink)),
+                ),
               ],
-            ),
+              const SectionHeader('المسارات'),
+              if (p.tracks.isEmpty)
+                const PlengoEmptyState(
+                  title: 'لا توجد مسارات منشورة لهذا المدرس بعد',
+                  icon: Icons.route_outlined,
+                  hue: PlengoColors.pink,
+                ),
+              for (final track in p.tracks)
+                Padding(
+                  padding: const EdgeInsetsDirectional.only(bottom: PlengoSpace.listGap),
+                  child: ListRow(
+                    leading: SubjectIconTile.forSubject(track.subjectId, icon: Icons.route_rounded),
+                    title: track.titleAr,
+                    caption: track.subjectNameAr,
+                    onTap: () => context.go('${Routes.tracks}/${track.id}'),
+                  ),
+                ),
+            ],
           ),
         ),
       ),
@@ -84,41 +88,69 @@ class _HeaderState extends ConsumerState<_Header> {
   @override
   Widget build(BuildContext context) {
     final t = widget.teacher;
-    final text = Theme.of(context).textTheme;
     final canFollow = ref.watch(teacherFollowingEnabledProvider);
-    return Column(
-      children: [
-        NetworkAvatar(url: t.photoUrl, name: t.nameAr, radius: 48),
-        const SizedBox(height: 12),
-        Text(t.nameAr, style: text.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
-        if (t.shortDescription != null) ...[
-          const SizedBox(height: 4),
-          Text(t.shortDescription!, textAlign: TextAlign.center, style: text.bodyMedium),
-        ],
-        const SizedBox(height: 8),
-        Text(followersLabel(t.followerCount), style: text.bodySmall),
-        if (canFollow) ...[
+    final pink = PlengoColors.pink;
+    return PlengoCard(
+      color: pink.soft,
+      radius: PlengoRadius.hero,
+      padding: const EdgeInsetsDirectional.all(PlengoSpace.heroPadding),
+      child: Column(
+        children: [
+          TeacherAvatar(url: t.photoUrl, name: t.nameAr, radius: 44),
           const SizedBox(height: 12),
-          SizedBox(
-            width: 200,
-            child: t.isFollowing
-                ? OutlinedButton.icon(
-                    key: const Key('teacher.unfollow'),
-                    onPressed: _busy ? null : _toggle,
-                    icon: const Icon(Icons.check),
-                    label: const Text('تتابعه'),
-                  )
-                : FilledButton.icon(
-                    key: const Key('teacher.follow'),
-                    onPressed: _busy ? null : _toggle,
-                    icon: const Icon(Icons.add),
-                    label: const Text('متابعة'),
-                  ),
+          Semantics(
+            header: true,
+            child: Text(
+              t.nameAr,
+              textAlign: TextAlign.center,
+              style: PlengoType.section.copyWith(color: PlengoColors.ink, fontSize: 22),
+            ),
           ),
-          const SizedBox(height: 4),
-          Text('المتابعة تبقيك على اطلاع بجديد المدرس، ولا تفتح المحتوى', style: text.bodySmall),
+          if (t.shortDescription != null) ...[
+            const SizedBox(height: 2),
+            Text(
+              t.shortDescription!,
+              textAlign: TextAlign.center,
+              style: PlengoType.sub.copyWith(color: PlengoColors.ink),
+            ),
+          ],
+          const SizedBox(height: 8),
+          PlengoChip(
+            label: followersLabel(t.followerCount),
+            hue: pink,
+            background: Colors.white,
+            icon: Icons.people_alt_rounded,
+          ),
+          if (canFollow) ...[
+            const SizedBox(height: 14),
+            ConstrainedBox(
+              constraints: const BoxConstraints(minWidth: 200),
+              child: t.isFollowing
+                  ? PlengoButton(
+                      key: const Key('teacher.unfollow'),
+                      label: 'تتابعه',
+                      icon: Icons.check_rounded,
+                      variant: PlengoButtonVariant.secondary,
+                      expand: false,
+                      onPressed: _busy ? null : _toggle,
+                    )
+                  : PlengoButton(
+                      key: const Key('teacher.follow'),
+                      label: 'متابعة',
+                      icon: Icons.add_rounded,
+                      expand: false,
+                      onPressed: _busy ? null : _toggle,
+                    ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'المتابعة تبقيك على اطلاع بجديد المدرس، ولا تفتح المحتوى',
+              textAlign: TextAlign.center,
+              style: PlengoType.caption.copyWith(color: pink.ink),
+            ),
+          ],
         ],
-      ],
+      ),
     );
   }
 }

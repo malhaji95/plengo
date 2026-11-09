@@ -92,7 +92,8 @@ void main() {
     );
     app.container.read(routerProvider).go('/subjects/p');
     await tester.pumpAndSettle();
-    expect(find.text('3 أسئلة · 1 مجاني'), findsOneWidget);
+    // The shortcut shows «N · k مجاني».
+    expect(find.text('3 · 1 مجاني'), findsOneWidget);
     await tester.tap(find.text('بنك الأسئلة'));
     await tester.pumpAndSettle();
     expect(find.byType(QuestionsScreen), findsOneWidget);
@@ -172,7 +173,8 @@ void main() {
     expect(find.text('الاختبارات'), findsNothing); // no quizzes in this lesson
     expect(find.text('سؤالان'), findsOneWidget);
 
-    await tester.tap(find.text('أسئلة الدرس'));
+    expect(find.text('أسئلة الدرس'), findsOneWidget);
+    await tester.tap(find.text('ابدأ التدريب'));
     await tester.pumpAndSettle();
     expect(find.byType(QuestionsScreen), findsOneWidget);
     expect(

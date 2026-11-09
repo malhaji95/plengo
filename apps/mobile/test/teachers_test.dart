@@ -149,6 +149,50 @@ void main() {
     expect(find.text('محتوى هذا المسار قيد الإعداد'), findsOneWidget);
   });
 
+  testWidgets('followed teachers are marked «تتابعه» in the list', (tester) async {
+    await pumpApp(
+      tester,
+      signedInAs: testMe,
+      arrangeTeachers: (t) => when(() => t.teachers()).thenAnswer((_) async => [teacher(following: true)]),
+    );
+    await tester.tap(find.text('المواد').last);
+    await tester.pumpAndSettle();
+    await tester.tap(fieldByKey('subjects.teachers'));
+    await tester.pumpAndSettle();
+    expect(find.text('أ. أحمد'), findsOneWidget);
+    expect(find.text('تتابعه'), findsOneWidget);
+  });
+
+  testWidgets('a locked track shows the lock and its shortcuts', (tester) async {
+    await pumpApp(
+      tester,
+      signedInAs: testMe,
+      arrangeTeachers: (t) {
+        when(() => t.teachers()).thenAnswer((_) async => [teacher()]);
+        when(() => t.profile('t1')).thenAnswer((_) async => profile());
+        when(() => t.track('tr1')).thenAnswer(
+          (_) async => TrackDetail(
+            track: profile().tracks.first,
+            teacher: teacher(),
+            subject: subject('p', 'الفيزياء'),
+            access: noAccess,
+            questionCount: const ContentCount(total: 30, free: 5),
+            deckCount: noQuestions,
+            quizCount: const ContentCount(total: 2, free: 0),
+          ),
+        );
+      },
+    );
+    await openTeacher(tester);
+    await tester.tap(find.text('أ. أحمد — فيزياء بكالوريا'));
+    await tester.pumpAndSettle();
+    expect(find.text('هذا المحتوى يحتاج إلى تفعيل'), findsOneWidget);
+    expect(find.text('أسئلة المسار'), findsOneWidget);
+    expect(find.text('30 · 5 مجاني'), findsOneWidget);
+    expect(find.text('الاختبارات'), findsOneWidget);
+    expect(find.text('محتوى هذا المسار قيد الإعداد'), findsNothing);
+  });
+
   test('follower counts follow Arabic number agreement', () {
     expect([0, 1, 2, 5, 11].map(followersLabel), [
       'لا متابعين بعد',

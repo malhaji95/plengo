@@ -165,7 +165,14 @@ void main() {
     expect(find.text('وضع التدريب'), findsOneWidget);
     expect(find.text('وضع الامتحان'), findsOneWidget);
 
+    // Choosing a mode only selects it; the bottom button, labelled after the mode, starts it.
+    await tester.tap(find.text('وضع الامتحان'));
+    await tester.pump();
+    expect(find.text('ابدأ الامتحان'), findsOneWidget);
     await tester.tap(find.text('وضع التدريب'));
+    await tester.pump();
+    verifyNever(() => app.learning.start(any()));
+    await tester.tap(find.byKey(const Key('quiz.start')));
     await tester.pumpAndSettle();
     final req = verify(() => app.learning.start(captureAny())).captured.single as StartAttemptRequest;
     expect(req.source, StartAttemptRequestSource.curated);
