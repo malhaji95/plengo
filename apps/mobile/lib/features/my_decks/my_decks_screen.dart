@@ -12,9 +12,6 @@ import '../flashcards/decks_screen.dart';
 import '../flashcards/flashcard_ui.dart';
 import 'my_decks_providers.dart';
 
-/// Deck colours the student can pick (stored as #RRGGBB): the six base hues, in picker order.
-final deckColors = [for (final h in PlengoColors.all) _hex(h.base)];
-
 /// Spoken names of the six hues.
 const deckColorNames = {
   'yellow': 'أصفر',
@@ -26,8 +23,6 @@ const deckColorNames = {
 };
 
 String _hex(Color c) => '#${(c.toARGB32() & 0xFFFFFF).toRadixString(16).padLeft(6, '0').toUpperCase()}';
-
-Color? deckColor(String? hex) => hex == null ? null : Color(int.parse('FF${hex.substring(1)}', radix: 16));
 
 /// Colours offered before the redesign, drawn as the nearest of the six hues.
 const _legacyHues = {

@@ -284,6 +284,16 @@ void main() {
         signedInAs: testMe,
         arrangeHome: (h) {
           when(() => h.setGoal(any())).thenAnswer((i) async => i.positionalArguments.first as int);
+          when(() => h.setPreferences(reviewReminder: any(named: 'reviewReminder'))).thenAnswer((i) async {
+            final on = i.namedArguments[#reviewReminder] as bool;
+            saved.add(on);
+            return NotificationPreferences(
+              learning: true,
+              promotions: false,
+              reminderTime: '19:00',
+              reviewReminder: on,
+            );
+          });
           when(() => h.preferences()).thenAnswer(
             (_) async => const NotificationPreferences(
               learning: true,
@@ -293,7 +303,6 @@ void main() {
             ),
           );
         },
-        extraOverrides: [reviewReminderSaverProvider.overrideWithValue((on) async => saved.add(on))],
       );
       await app.container.read(appearanceProvider.notifier).setFontStep(fontStep);
       app.container.read(routerProvider).go(Routes.onboardingGoal);
@@ -444,8 +453,17 @@ void main() {
             ),
           );
           when(() => h.goal()).thenAnswer((_) async => 20);
+          when(() => h.setPreferences(reviewReminder: any(named: 'reviewReminder'))).thenAnswer((i) async {
+            final on = i.namedArguments[#reviewReminder] as bool;
+            saved.add(on);
+            return NotificationPreferences(
+              learning: true,
+              promotions: false,
+              reminderTime: '19:00',
+              reviewReminder: on,
+            );
+          });
         },
-        extraOverrides: [reviewReminderSaverProvider.overrideWithValue((on) async => saved.add(on))],
       );
       app.container.read(routerProvider).go('${Routes.account}/notifications');
       await tester.pumpAndSettle();

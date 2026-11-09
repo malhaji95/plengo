@@ -308,6 +308,7 @@ void main() {
             learning: any(named: 'learning'),
             promotions: any(named: 'promotions'),
             reminderTime: any(named: 'reminderTime'),
+            reviewReminder: any(named: 'reviewReminder'),
           ),
         ).thenAnswer(
           (_) async => const NotificationPreferences(

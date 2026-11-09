@@ -29,9 +29,20 @@ class HomeRepository {
   Future<NotificationPreferences> preferences() =>
       guardApi(() async => (await client.api.notifications.getNotificationPreferences()).data);
 
-  Future<NotificationPreferences> setPreferences({bool? learning, bool? promotions, String? reminderTime}) => guardApi(
+  /// Changes only the given preferences. [reviewReminder] is the due-card reminder (DECISIONS #3).
+  Future<NotificationPreferences> setPreferences({
+    bool? learning,
+    bool? promotions,
+    String? reminderTime,
+    bool? reviewReminder,
+  }) => guardApi(
     () async => (await client.api.notifications.updateNotificationPreferences(
-      body: UpdateNotificationPreferences(learning: learning, promotions: promotions, reminderTime: reminderTime),
+      body: UpdateNotificationPreferences(
+        learning: learning,
+        promotions: promotions,
+        reminderTime: reminderTime,
+        reviewReminder: reviewReminder,
+      ),
     )).data,
   );
 

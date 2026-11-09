@@ -29,7 +29,7 @@ class _GoalStepScreenState extends ConsumerState<GoalStepScreen> {
     setState(() => _saving = true);
     try {
       await ref.read(homeRepositoryProvider).setGoal(_goal);
-      await ref.read(reviewReminderSaverProvider)(_reminder);
+      await ref.read(homeRepositoryProvider).setPreferences(reviewReminder: _reminder);
       ref.invalidate(homeProvider);
       ref.invalidate(dailyGoalProvider);
       ref.invalidate(notificationPreferencesProvider);

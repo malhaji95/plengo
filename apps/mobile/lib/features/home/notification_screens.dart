@@ -76,16 +76,6 @@ StudentNotification _read(StudentNotification n, String at) => StudentNotificati
 
 final inboxProvider = AsyncNotifierProvider.autoDispose<InboxController, InboxState>(InboxController.new);
 
-/// Saves the review-reminder preference (DECISIONS #3). `HomeRepository.setPreferences` has no
-/// `reviewReminder` argument yet, so this sends the generated request directly; replaced in tests.
-final reviewReminderSaverProvider = Provider<Future<void> Function(bool)>((ref) {
-  final client = ref.watch(apiClientProvider);
-  return (on) => guardApi(
-    () =>
-        client.api.notifications.updateNotificationPreferences(body: UpdateNotificationPreferences(reviewReminder: on)),
-  );
-});
-
 /// Icon and colour by notification type (V-Notifications): new content blue, review reminders yellow,
 /// teacher updates pink, handled reports green, offers orange, announcements red.
 ({IconData icon, PlengoHue hue}) notificationStyle(NotificationType type) => switch (type) {
@@ -334,7 +324,7 @@ class NotificationSettingsScreen extends ConsumerWidget {
       ref.invalidate(notificationPreferencesProvider);
     });
     Future<void> saveReviewReminder(bool on) => _guard(context, () async {
-      await ref.read(reviewReminderSaverProvider)(on);
+      await ref.read(homeRepositoryProvider).setPreferences(reviewReminder: on);
       ref.invalidate(notificationPreferencesProvider);
     });
     Widget section(String title, List<Widget> children) => Padding(
