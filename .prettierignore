@@ -7,3 +7,4 @@ packages/db/migrations
 docs/spec.md
 packages/contracts/openapi.json
 apps/admin/src/lib/api-schema.d.ts
+docs/redesign
