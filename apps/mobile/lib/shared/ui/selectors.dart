@@ -88,37 +88,49 @@ class PlengoPill extends StatelessWidget {
       label: semanticsLabel ?? label,
       excludeSemantics: true,
       onTap: onTap,
-      child: AnimatedContainer(
-        duration: PlengoMotion.of(context, PlengoMotion.press),
-        decoration: BoxDecoration(
-          color: bg,
-          borderRadius: r,
-          border: Border.all(color: border, width: 1.5),
-        ),
-        child: Material(
-          type: MaterialType.transparency,
-          child: InkWell(
-            borderRadius: r,
-            onTap: onTap,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(minHeight: 44, minWidth: 48),
-              child: Padding(
-                padding: const EdgeInsetsDirectional.symmetric(horizontal: 16, vertical: 6),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (icon != null) ...[Icon(icon, size: 18, color: fg), const SizedBox(width: 6)],
-                    Text(
-                      label,
-                      style: TextStyle(
-                        fontFamily: PlengoType.family,
-                        fontSize: 14,
-                        fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
-                        color: fg,
+      // The pill is drawn 44 high (plus its border); the touch target around it is 48 (brief §1.5).
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        excludeFromSemantics: true,
+        onTap: onTap,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 48),
+          child: Center(
+            heightFactor: 1,
+            child: AnimatedContainer(
+              duration: PlengoMotion.of(context, PlengoMotion.press),
+              decoration: BoxDecoration(
+                color: bg,
+                borderRadius: r,
+                border: Border.all(color: border, width: 1.5),
+              ),
+              child: Material(
+                type: MaterialType.transparency,
+                child: InkWell(
+                  borderRadius: r,
+                  onTap: onTap,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(minHeight: 44, minWidth: 48),
+                    child: Padding(
+                      padding: const EdgeInsetsDirectional.symmetric(horizontal: 16, vertical: 6),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          if (icon != null) ...[Icon(icon, size: 18, color: fg), const SizedBox(width: 6)],
+                          Text(
+                            label,
+                            style: TextStyle(
+                              fontFamily: PlengoType.family,
+                              fontSize: 14,
+                              fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
+                              color: fg,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),

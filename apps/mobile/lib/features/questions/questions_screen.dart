@@ -111,11 +111,12 @@ class _QuestionTile extends StatelessWidget {
     final s = context.surface;
     final locked = question.locked;
     final hue = locked ? PlengoColors.red : PlengoColors.blue;
-    return PlengoCard(
-      radius: PlengoRadius.row,
-      padding: const EdgeInsetsDirectional.symmetric(horizontal: 14, vertical: 10),
-      onTap: onTap,
-      child: MergeSemantics(
+    // One node for TalkBack: the row's text is the button's label.
+    return MergeSemantics(
+      child: PlengoCard(
+        radius: PlengoRadius.row,
+        padding: const EdgeInsetsDirectional.symmetric(horizontal: 14, vertical: 10),
+        onTap: onTap,
         child: ConstrainedBox(
           constraints: const BoxConstraints(minHeight: 44),
           child: Row(
