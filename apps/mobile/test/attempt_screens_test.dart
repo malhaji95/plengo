@@ -438,7 +438,7 @@ void main() {
       await tester.tap(find.byKey(const Key('results-continue')));
       await tester.pumpAndSettle();
       expect(find.byType(StreakScreen), findsOneWidget);
-      await tester.tap(find.byTooltip('خروج'));
+      await tester.tap(find.descendant(of: find.byType(StreakScreen), matching: find.text('متابعة')));
       await tester.pumpAndSettle();
       expect(app.container.read(routerProvider).routeInformationProvider.value.uri.path, Routes.home);
 
