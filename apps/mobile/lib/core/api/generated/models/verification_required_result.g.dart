@@ -6,9 +6,12 @@ part of 'verification_required_result.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-VerificationRequiredResult _$VerificationRequiredResultFromJson(Map<String, dynamic> json) =>
-    VerificationRequiredResult(verificationRequired: json['verificationRequired'] as bool);
+VerificationRequiredResult _$VerificationRequiredResultFromJson(
+  Map<String, dynamic> json,
+) => VerificationRequiredResult(
+  verificationRequired: json['verificationRequired'] as bool,
+);
 
-Map<String, dynamic> _$VerificationRequiredResultToJson(VerificationRequiredResult instance) => <String, dynamic>{
-  'verificationRequired': instance.verificationRequired,
-};
+Map<String, dynamic> _$VerificationRequiredResultToJson(
+  VerificationRequiredResult instance,
+) => <String, dynamic>{'verificationRequired': instance.verificationRequired};

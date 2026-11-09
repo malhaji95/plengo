@@ -8,10 +8,13 @@ part 'content_count.g.dart';
 
 @JsonSerializable()
 class ContentCount {
-  const ContentCount({required this.total, required this.free});
-
+  const ContentCount({
+    required this.total,
+    required this.free,
+  });
+  
   factory ContentCount.fromJson(Map<String, Object?> json) => _$ContentCountFromJson(json);
-
+  
   final int total;
   final int free;
 

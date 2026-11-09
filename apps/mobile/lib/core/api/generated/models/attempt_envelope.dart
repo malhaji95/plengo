@@ -10,10 +10,14 @@ part 'attempt_envelope.g.dart';
 
 @JsonSerializable()
 class AttemptEnvelope {
-  const AttemptEnvelope({required this.success, required this.data, required this.error});
-
+  const AttemptEnvelope({
+    required this.success,
+    required this.data,
+    required this.error,
+  });
+  
   factory AttemptEnvelope.fromJson(Map<String, Object?> json) => _$AttemptEnvelopeFromJson(json);
-
+  
   final bool success;
   final Attempt data;
   final dynamic error;

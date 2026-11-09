@@ -7,8 +7,12 @@ part of 'due_cards.dart';
 // **************************************************************************
 
 DueCards _$DueCardsFromJson(Map<String, dynamic> json) => DueCards(
-  cards: (json['cards'] as List<dynamic>).map((e) => DueCard.fromJson(e as Map<String, dynamic>)).toList(),
-  userCards: (json['userCards'] as List<dynamic>).map((e) => DueUserCard.fromJson(e as Map<String, dynamic>)).toList(),
+  cards: (json['cards'] as List<dynamic>)
+      .map((e) => DueCard.fromJson(e as Map<String, dynamic>))
+      .toList(),
+  userCards: (json['userCards'] as List<dynamic>)
+      .map((e) => DueUserCard.fromJson(e as Map<String, dynamic>))
+      .toList(),
   urlsExpireAt: json['urlsExpireAt'] as String,
 );
 

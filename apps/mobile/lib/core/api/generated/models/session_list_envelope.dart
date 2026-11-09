@@ -10,10 +10,14 @@ part 'session_list_envelope.g.dart';
 
 @JsonSerializable()
 class SessionListEnvelope {
-  const SessionListEnvelope({required this.success, required this.data, required this.error});
-
+  const SessionListEnvelope({
+    required this.success,
+    required this.data,
+    required this.error,
+  });
+  
   factory SessionListEnvelope.fromJson(Map<String, Object?> json) => _$SessionListEnvelopeFromJson(json);
-
+  
   final bool success;
   final SessionList data;
   final dynamic error;

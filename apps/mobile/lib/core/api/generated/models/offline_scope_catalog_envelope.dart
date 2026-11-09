@@ -10,11 +10,14 @@ part 'offline_scope_catalog_envelope.g.dart';
 
 @JsonSerializable()
 class OfflineScopeCatalogEnvelope {
-  const OfflineScopeCatalogEnvelope({required this.success, required this.data, required this.error});
-
-  factory OfflineScopeCatalogEnvelope.fromJson(Map<String, Object?> json) =>
-      _$OfflineScopeCatalogEnvelopeFromJson(json);
-
+  const OfflineScopeCatalogEnvelope({
+    required this.success,
+    required this.data,
+    required this.error,
+  });
+  
+  factory OfflineScopeCatalogEnvelope.fromJson(Map<String, Object?> json) => _$OfflineScopeCatalogEnvelopeFromJson(json);
+  
   final bool success;
   final OfflineScopeCatalog data;
   final dynamic error;

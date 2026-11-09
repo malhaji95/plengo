@@ -26,8 +26,8 @@ void main() {
               inv.positionalArguments.first
                   as ({String levelId, String? universityId, String? facultyId, String? academicYearId});
           return q.levelId == 'l12'
-              ? [subject('p', 'الفيزياء', description: 'فيزياء البكالوريا'), subject('m', 'الرياضيات')]
-              : [subject('g9', 'العلوم', levelId: 'l9')];
+              ? [catalogSubject('p', 'الفيزياء', description: 'فيزياء البكالوريا'), catalogSubject('m', 'الرياضيات')]
+              : [catalogSubject('g9', 'العلوم', levelId: 'l9')];
         });
       },
     );
@@ -70,7 +70,7 @@ void main() {
       tester,
       signedInAs: testMe,
       arrangeCatalog: (c) {
-        when(() => c.subjects(any())).thenAnswer((_) async => [subject('p', 'الفيزياء')]);
+        when(() => c.subjects(any())).thenAnswer((_) async => [catalogSubject('p', 'الفيزياء')]);
         when(() => c.outline('p')).thenAnswer(
           (_) async => SubjectOutline(
             subject: subject('p', 'الفيزياء'),

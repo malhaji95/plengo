@@ -23,5 +23,7 @@ abstract class QuizzesClient {
   });
 
   @GET('/api/v1/quizzes/{id}')
-  Future<StudentQuizEnvelope> getQuiz({@Path('id') required String id});
+  Future<StudentQuizEnvelope> getQuiz({
+    @Path('id') required String id,
+  });
 }

@@ -21,9 +21,9 @@ class MyEntitlement {
     required this.isPermanent,
     required this.state,
   });
-
+  
   factory MyEntitlement.fromJson(Map<String, Object?> json) => _$MyEntitlementFromJson(json);
-
+  
   final String id;
   final AccessScope scope;
   final MyEntitlementSource source;

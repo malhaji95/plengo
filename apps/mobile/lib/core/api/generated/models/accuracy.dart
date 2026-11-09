@@ -8,10 +8,14 @@ part 'accuracy.g.dart';
 
 @JsonSerializable()
 class Accuracy {
-  const Accuracy({required this.answered, required this.correct, required this.accuracyPercent});
-
+  const Accuracy({
+    required this.answered,
+    required this.correct,
+    required this.accuracyPercent,
+  });
+  
   factory Accuracy.fromJson(Map<String, Object?> json) => _$AccuracyFromJson(json);
-
+  
   final int answered;
   final int correct;
   @JsonKey(includeIfNull: true)

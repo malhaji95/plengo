@@ -8,10 +8,12 @@ part 'redeem_coupon_request.g.dart';
 
 @JsonSerializable()
 class RedeemCouponRequest {
-  const RedeemCouponRequest({required this.code});
-
+  const RedeemCouponRequest({
+    required this.code,
+  });
+  
   factory RedeemCouponRequest.fromJson(Map<String, Object?> json) => _$RedeemCouponRequestFromJson(json);
-
+  
   final String code;
 
   Map<String, Object?> toJson() => _$RedeemCouponRequestToJson(this);

@@ -19,9 +19,9 @@ class MediaFile {
     required this.height,
     required this.version,
   });
-
+  
   factory MediaFile.fromJson(Map<String, Object?> json) => _$MediaFileFromJson(json);
-
+  
   final String id;
   final MediaKind kind;
   final MediaFileStatus status;

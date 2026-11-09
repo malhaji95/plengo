@@ -195,7 +195,7 @@ class _SubjectList extends ConsumerWidget {
 class _SubjectCard extends StatelessWidget {
   const _SubjectCard({required this.subject, required this.index});
 
-  final Subject subject;
+  final CatalogSubject subject;
   final int index;
 
   static const _tints = [

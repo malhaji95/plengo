@@ -17,9 +17,9 @@ class MistakeList {
     required this.masteryStreak,
     required this.nextCursor,
   });
-
+  
   factory MistakeList.fromJson(Map<String, Object?> json) => _$MistakeListFromJson(json);
-
+  
   final List<Mistake> items;
   final int activeCount;
   final int masteredCount;

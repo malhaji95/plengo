@@ -12,6 +12,7 @@ Today _$TodayFromJson(Map<String, dynamic> json) => Today(
   done: (json['done'] as num).toInt(),
   goalMet: json['goalMet'] as bool,
   streak: (json['streak'] as num).toInt(),
+  week: (json['week'] as List<dynamic>).map((e) => e as bool).toList(),
 );
 
 Map<String, dynamic> _$TodayToJson(Today instance) => <String, dynamic>{
@@ -20,4 +21,5 @@ Map<String, dynamic> _$TodayToJson(Today instance) => <String, dynamic>{
   'done': instance.done,
   'goalMet': instance.goalMet,
   'streak': instance.streak,
+  'week': instance.week,
 };

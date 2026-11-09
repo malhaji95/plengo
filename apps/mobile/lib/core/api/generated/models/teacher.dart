@@ -17,9 +17,9 @@ class Teacher {
     required this.followerCount,
     required this.isFollowing,
   });
-
+  
   factory Teacher.fromJson(Map<String, Object?> json) => _$TeacherFromJson(json);
-
+  
   final String id;
   final String nameAr;
   final String slug;

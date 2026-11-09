@@ -2,7 +2,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, unused_import, invalid_annotation_target, unnecessary_import
 
-import 'subject.dart';
-export 'subject.dart';
+import 'catalog_subject.dart';
+export 'catalog_subject.dart';
 
-typedef SubjectList = List<Subject>;
+typedef CatalogSubjectList = List<CatalogSubject>;

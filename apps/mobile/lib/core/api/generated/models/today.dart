@@ -14,15 +14,17 @@ class Today {
     required this.done,
     required this.goalMet,
     required this.streak,
+    required this.week,
   });
-
+  
   factory Today.fromJson(Map<String, Object?> json) => _$TodayFromJson(json);
-
+  
   final int dueCards;
   final int goal;
   final int done;
   final bool goalMet;
   final int streak;
+  final List<bool> week;
 
   Map<String, Object?> toJson() => _$TodayToJson(this);
 }

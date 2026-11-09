@@ -20,9 +20,13 @@ abstract class MeClient {
   Future<MeEnvelope> getMe();
 
   @PATCH('/api/v1/me')
-  Future<MeEnvelope> updateMe({@Body() required UpdateProfileRequest body});
+  Future<MeEnvelope> updateMe({
+    @Body() required UpdateProfileRequest body,
+  });
 
   /// Deletes the account after the password is confirmed (spec §33): personal data, sessions, access and student decks go; learning history stays anonymous.
   @POST('/api/v1/me/delete')
-  Future<DeletedResultEnvelope> deleteMyAccount({@Body() required PasswordConfirmRequest body});
+  Future<DeletedResultEnvelope> deleteMyAccount({
+    @Body() required PasswordConfirmRequest body,
+  });
 }

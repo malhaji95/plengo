@@ -18,9 +18,9 @@ class FlashcardStats {
     required this.retentionPercent,
     required this.byState,
   });
-
+  
   factory FlashcardStats.fromJson(Map<String, Object?> json) => _$FlashcardStatsFromJson(json);
-
+  
   final int dueToday;
   final List<DayCount> forecast;
   final List<DayCount> reviewsPerDay;

@@ -24,7 +24,7 @@ class CatalogRepository {
   Future<List<AcademicYear>> academicYears(String facultyId) =>
       guardApi(() async => (await client.api.structure.listAcademicYears(facultyId: facultyId)).data);
 
-  Future<List<Subject>> subjects(SubjectQuery q) => guardApi(
+  Future<List<CatalogSubject>> subjects(SubjectQuery q) => guardApi(
     () async => (await client.api.structure.listSubjects(
       levelId: q.levelId,
       universityId: q.universityId,

@@ -23,14 +23,22 @@ abstract class TeachersClient {
   Future<TeacherListEnvelope> listFollowedTeachers();
 
   @GET('/api/v1/teachers/{id}')
-  Future<TeacherProfileEnvelope> getTeacherProfile({@Path('id') required String id});
+  Future<TeacherProfileEnvelope> getTeacherProfile({
+    @Path('id') required String id,
+  });
 
   @PUT('/api/v1/teachers/{id}/follow')
-  Future<FollowResultEnvelope> followTeacher({@Path('id') required String id});
+  Future<FollowResultEnvelope> followTeacher({
+    @Path('id') required String id,
+  });
 
   @DELETE('/api/v1/teachers/{id}/follow')
-  Future<FollowResultEnvelope> unfollowTeacher({@Path('id') required String id});
+  Future<FollowResultEnvelope> unfollowTeacher({
+    @Path('id') required String id,
+  });
 
   @GET('/api/v1/teacher-tracks/{id}')
-  Future<TrackDetailEnvelope> getTrack({@Path('id') required String id});
+  Future<TrackDetailEnvelope> getTrack({
+    @Path('id') required String id,
+  });
 }

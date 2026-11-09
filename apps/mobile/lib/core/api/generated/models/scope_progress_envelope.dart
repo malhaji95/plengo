@@ -10,10 +10,14 @@ part 'scope_progress_envelope.g.dart';
 
 @JsonSerializable()
 class ScopeProgressEnvelope {
-  const ScopeProgressEnvelope({required this.success, required this.data, required this.error});
-
+  const ScopeProgressEnvelope({
+    required this.success,
+    required this.data,
+    required this.error,
+  });
+  
   factory ScopeProgressEnvelope.fromJson(Map<String, Object?> json) => _$ScopeProgressEnvelopeFromJson(json);
-
+  
   final bool success;
   final ScopeProgress data;
   final dynamic error;

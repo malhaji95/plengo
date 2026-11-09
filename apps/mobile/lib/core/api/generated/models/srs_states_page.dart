@@ -10,10 +10,13 @@ part 'srs_states_page.g.dart';
 
 @JsonSerializable()
 class SrsStatesPage {
-  const SrsStatesPage({required this.items, required this.nextCursor});
-
+  const SrsStatesPage({
+    required this.items,
+    required this.nextCursor,
+  });
+  
   factory SrsStatesPage.fromJson(Map<String, Object?> json) => _$SrsStatesPageFromJson(json);
-
+  
   final List<SrsCardState> items;
   @JsonKey(includeIfNull: true)
   final String? nextCursor;

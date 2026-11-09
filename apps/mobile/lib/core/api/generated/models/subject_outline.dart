@@ -25,9 +25,9 @@ class SubjectOutline {
     required this.deckCount,
     required this.quizCount,
   });
-
+  
   factory SubjectOutline.fromJson(Map<String, Object?> json) => _$SubjectOutlineFromJson(json);
-
+  
   final Subject subject;
   final List<UnitWithLessons> units;
   final List<Lesson> lessons;

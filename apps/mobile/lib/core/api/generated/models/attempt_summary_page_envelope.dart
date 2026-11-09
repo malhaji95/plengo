@@ -10,10 +10,14 @@ part 'attempt_summary_page_envelope.g.dart';
 
 @JsonSerializable()
 class AttemptSummaryPageEnvelope {
-  const AttemptSummaryPageEnvelope({required this.success, required this.data, required this.error});
-
+  const AttemptSummaryPageEnvelope({
+    required this.success,
+    required this.data,
+    required this.error,
+  });
+  
   factory AttemptSummaryPageEnvelope.fromJson(Map<String, Object?> json) => _$AttemptSummaryPageEnvelopeFromJson(json);
-
+  
   final bool success;
   final AttemptSummaryPage data;
   final dynamic error;

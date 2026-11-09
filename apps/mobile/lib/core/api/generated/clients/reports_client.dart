@@ -16,7 +16,9 @@ abstract class ReportsClient {
   factory ReportsClient(Dio dio, {String? baseUrl}) = _ReportsClient;
 
   @POST('/api/v1/reports')
-  Future<ReportEnvelope> createReport({@Body() required CreateReportRequest body});
+  Future<ReportEnvelope> createReport({
+    @Body() required CreateReportRequest body,
+  });
 
   @GET('/api/v1/reports')
   Future<ReportListEnvelope> listMyReports();

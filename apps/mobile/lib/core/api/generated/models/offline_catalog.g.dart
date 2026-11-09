@@ -6,10 +6,12 @@ part of 'offline_catalog.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-OfflineCatalog _$OfflineCatalogFromJson(Map<String, dynamic> json) => OfflineCatalog(
-  scopes: (json['scopes'] as List<dynamic>)
-      .map((e) => OfflineScopeSummary.fromJson(e as Map<String, dynamic>))
-      .toList(),
-);
+OfflineCatalog _$OfflineCatalogFromJson(Map<String, dynamic> json) =>
+    OfflineCatalog(
+      scopes: (json['scopes'] as List<dynamic>)
+          .map((e) => OfflineScopeSummary.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
 
-Map<String, dynamic> _$OfflineCatalogToJson(OfflineCatalog instance) => <String, dynamic>{'scopes': instance.scopes};
+Map<String, dynamic> _$OfflineCatalogToJson(OfflineCatalog instance) =>
+    <String, dynamic>{'scopes': instance.scopes};

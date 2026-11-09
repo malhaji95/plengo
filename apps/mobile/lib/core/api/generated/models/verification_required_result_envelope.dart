@@ -10,11 +10,14 @@ part 'verification_required_result_envelope.g.dart';
 
 @JsonSerializable()
 class VerificationRequiredResultEnvelope {
-  const VerificationRequiredResultEnvelope({required this.success, required this.data, required this.error});
-
-  factory VerificationRequiredResultEnvelope.fromJson(Map<String, Object?> json) =>
-      _$VerificationRequiredResultEnvelopeFromJson(json);
-
+  const VerificationRequiredResultEnvelope({
+    required this.success,
+    required this.data,
+    required this.error,
+  });
+  
+  factory VerificationRequiredResultEnvelope.fromJson(Map<String, Object?> json) => _$VerificationRequiredResultEnvelopeFromJson(json);
+  
   final bool success;
   final VerificationRequiredResult data;
   final dynamic error;

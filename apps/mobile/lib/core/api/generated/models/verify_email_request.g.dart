@@ -7,9 +7,10 @@ part of 'verify_email_request.dart';
 // **************************************************************************
 
 VerifyEmailRequest _$VerifyEmailRequestFromJson(Map<String, dynamic> json) =>
-    VerifyEmailRequest(email: json['email'] as String, otp: json['otp'] as String);
+    VerifyEmailRequest(
+      email: json['email'] as String,
+      otp: json['otp'] as String,
+    );
 
-Map<String, dynamic> _$VerifyEmailRequestToJson(VerifyEmailRequest instance) => <String, dynamic>{
-  'email': instance.email,
-  'otp': instance.otp,
-};
+Map<String, dynamic> _$VerifyEmailRequestToJson(VerifyEmailRequest instance) =>
+    <String, dynamic>{'email': instance.email, 'otp': instance.otp};

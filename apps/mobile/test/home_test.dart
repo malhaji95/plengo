@@ -107,12 +107,12 @@ void main() {
           unread: 3,
           countdown: const ExamCountdown(titleAr: 'امتحان الشهادة الثانوية', examDate: '2027-06-01', daysLeft: 87),
           banners: [banner('b1', 'عرض الصيف', BannerAction.none), banner('b2', 'جديد', BannerAction.none)],
-          today: const Today(dueCards: 12, goal: 20, done: 8, goalMet: false, streak: 4),
+          today: const Today(dueCards: 12, goal: 20, done: 8, goalMet: false, streak: 4, week: noWeek),
           myAccess: [
             entitlement('e1', physicsScope, MyEntitlementState.active),
             entitlement('e2', trackScope, MyEntitlementState.active),
           ],
-          freeSubjects: const [FreeSubject(subjectId: 'c', nameAr: 'الكيمياء', freeCount: 14)],
+          freeSubjects: const [FreeSubject(subjectId: 'c', nameAr: 'الكيمياء', freeCount: 14, coverUrl: null)],
           followedTeachers: const [teacher],
           activeMistakes: 6,
         ),
@@ -172,7 +172,8 @@ void main() {
       signedInAs: testMe,
       arrangeHome: (h) {
         when(() => h.home()).thenAnswer(
-          (_) async => testHome(today: const Today(dueCards: 0, goal: 20, done: 20, goalMet: true, streak: 1)),
+          (_) async =>
+              testHome(today: const Today(dueCards: 0, goal: 20, done: 20, goalMet: true, streak: 1, week: noWeek)),
         );
         when(() => h.setGoal(any())).thenAnswer((i) async => i.positionalArguments.first as int);
       },
@@ -276,7 +277,12 @@ void main() {
       signedInAs: testMe,
       arrangeHome: (h) {
         when(() => h.preferences()).thenAnswer(
-          (_) async => const NotificationPreferences(learning: true, promotions: false, reminderTime: '18:00'),
+          (_) async => const NotificationPreferences(
+            learning: true,
+            promotions: false,
+            reminderTime: '18:00',
+            reviewReminder: true,
+          ),
         );
         when(() => h.goal()).thenAnswer((_) async => 20);
         when(
@@ -286,7 +292,12 @@ void main() {
             reminderTime: any(named: 'reminderTime'),
           ),
         ).thenAnswer(
-          (_) async => const NotificationPreferences(learning: true, promotions: true, reminderTime: '18:00'),
+          (_) async => const NotificationPreferences(
+            learning: true,
+            promotions: true,
+            reminderTime: '18:00',
+            reviewReminder: true,
+          ),
         );
       },
     );

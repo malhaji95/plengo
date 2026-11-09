@@ -14,10 +14,11 @@ SavedAnswer _$SavedAnswerFromJson(Map<String, dynamic> json) => SavedAnswer(
   answeredAt: json['answeredAt'] as String?,
 );
 
-Map<String, dynamic> _$SavedAnswerToJson(SavedAnswer instance) => <String, dynamic>{
-  'questionId': instance.questionId,
-  'selectedOptionId': instance.selectedOptionId,
-  'writtenAnswer': instance.writtenAnswer,
-  'flagged': instance.flagged,
-  'answeredAt': instance.answeredAt,
-};
+Map<String, dynamic> _$SavedAnswerToJson(SavedAnswer instance) =>
+    <String, dynamic>{
+      'questionId': instance.questionId,
+      'selectedOptionId': instance.selectedOptionId,
+      'writtenAnswer': instance.writtenAnswer,
+      'flagged': instance.flagged,
+      'answeredAt': instance.answeredAt,
+    };

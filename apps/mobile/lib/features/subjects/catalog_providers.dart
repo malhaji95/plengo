@@ -20,7 +20,7 @@ final academicYearsProvider = FutureProvider.autoDispose.family<List<AcademicYea
   (ref, facultyId) => ref.watch(catalogRepositoryProvider).academicYears(facultyId),
 );
 
-final subjectsProvider = FutureProvider.autoDispose.family<List<Subject>, SubjectQuery>(
+final subjectsProvider = FutureProvider.autoDispose.family<List<CatalogSubject>, SubjectQuery>(
   (ref, query) => ref.watch(catalogRepositoryProvider).subjects(query),
 );
 

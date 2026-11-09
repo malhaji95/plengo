@@ -8,10 +8,12 @@ part 'password_confirm_request.g.dart';
 
 @JsonSerializable()
 class PasswordConfirmRequest {
-  const PasswordConfirmRequest({required this.password});
-
+  const PasswordConfirmRequest({
+    required this.password,
+  });
+  
   factory PasswordConfirmRequest.fromJson(Map<String, Object?> json) => _$PasswordConfirmRequestFromJson(json);
-
+  
   final String password;
 
   Map<String, Object?> toJson() => _$PasswordConfirmRequestToJson(this);

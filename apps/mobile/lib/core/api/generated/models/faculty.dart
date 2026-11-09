@@ -16,9 +16,9 @@ class Faculty {
     required this.isActive,
     required this.universityId,
   });
-
+  
   factory Faculty.fromJson(Map<String, Object?> json) => _$FacultyFromJson(json);
-
+  
   final String id;
   final String code;
   final String nameAr;

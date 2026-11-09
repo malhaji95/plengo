@@ -10,10 +10,14 @@ part 'remote_config_envelope.g.dart';
 
 @JsonSerializable()
 class RemoteConfigEnvelope {
-  const RemoteConfigEnvelope({required this.success, required this.data, required this.error});
-
+  const RemoteConfigEnvelope({
+    required this.success,
+    required this.data,
+    required this.error,
+  });
+  
   factory RemoteConfigEnvelope.fromJson(Map<String, Object?> json) => _$RemoteConfigEnvelopeFromJson(json);
-
+  
   final bool success;
   final RemoteConfig data;
   final dynamic error;

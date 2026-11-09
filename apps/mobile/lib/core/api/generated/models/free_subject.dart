@@ -8,13 +8,20 @@ part 'free_subject.g.dart';
 
 @JsonSerializable()
 class FreeSubject {
-  const FreeSubject({required this.subjectId, required this.nameAr, required this.freeCount});
-
+  const FreeSubject({
+    required this.subjectId,
+    required this.nameAr,
+    required this.freeCount,
+    required this.coverUrl,
+  });
+  
   factory FreeSubject.fromJson(Map<String, Object?> json) => _$FreeSubjectFromJson(json);
-
+  
   final String subjectId;
   final String nameAr;
   final int freeCount;
+  @JsonKey(includeIfNull: true)
+  final String? coverUrl;
 
   Map<String, Object?> toJson() => _$FreeSubjectToJson(this);
 }

@@ -51,6 +51,9 @@ export 'models/bookmark_list.dart';
 export 'models/bookmark_list_envelope.dart';
 export 'models/bookmark_request.dart';
 export 'models/card_image.dart';
+export 'models/catalog_subject.dart';
+export 'models/catalog_subject_list.dart';
+export 'models/catalog_subject_list_envelope.dart';
 export 'models/check_answer_request.dart';
 export 'models/check_attempt_answer_request.dart';
 export 'models/check_result.dart';
@@ -222,8 +225,6 @@ export 'models/student_quiz_list.dart';
 export 'models/student_quiz_list_envelope.dart';
 export 'models/subject.dart';
 export 'models/subject_accuracy.dart';
-export 'models/subject_list.dart';
-export 'models/subject_list_envelope.dart';
 export 'models/subject_outline.dart';
 export 'models/subject_outline_envelope.dart';
 export 'models/subject_stats.dart';
@@ -324,3 +325,4 @@ export 'models/sync_rejection_code.dart';
 export 'models/type_accuracy_type.dart';
 // Root client
 export 'plengo_api.dart';
+

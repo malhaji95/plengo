@@ -14,10 +14,11 @@ University _$UniversityFromJson(Map<String, dynamic> json) => University(
   isActive: json['isActive'] as bool,
 );
 
-Map<String, dynamic> _$UniversityToJson(University instance) => <String, dynamic>{
-  'id': instance.id,
-  'code': instance.code,
-  'nameAr': instance.nameAr,
-  'sortOrder': instance.sortOrder,
-  'isActive': instance.isActive,
-};
+Map<String, dynamic> _$UniversityToJson(University instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'code': instance.code,
+      'nameAr': instance.nameAr,
+      'sortOrder': instance.sortOrder,
+      'isActive': instance.isActive,
+    };

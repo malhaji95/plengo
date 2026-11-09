@@ -8,10 +8,12 @@ part 'verified_result.g.dart';
 
 @JsonSerializable()
 class VerifiedResult {
-  const VerifiedResult({required this.verified});
-
+  const VerifiedResult({
+    required this.verified,
+  });
+  
   factory VerifiedResult.fromJson(Map<String, Object?> json) => _$VerifiedResultFromJson(json);
-
+  
   final bool verified;
 
   Map<String, Object?> toJson() => _$VerifiedResultToJson(this);

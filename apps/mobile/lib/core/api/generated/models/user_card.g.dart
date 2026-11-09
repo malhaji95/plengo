@@ -34,4 +34,7 @@ Map<String, dynamic> _$UserCardToJson(UserCard instance) => <String, dynamic>{
   'deletedAt': instance.deletedAt,
 };
 
-const _$UserCardKindEnumMap = {UserCardKind.custom: 'custom', UserCardKind.officialRef: 'official_ref'};
+const _$UserCardKindEnumMap = {
+  UserCardKind.custom: 'custom',
+  UserCardKind.officialRef: 'official_ref',
+};

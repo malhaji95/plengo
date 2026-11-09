@@ -16,12 +16,13 @@ UnitAccuracy _$UnitAccuracyFromJson(Map<String, dynamic> json) => UnitAccuracy(
   subjectNameAr: json['subjectNameAr'] as String,
 );
 
-Map<String, dynamic> _$UnitAccuracyToJson(UnitAccuracy instance) => <String, dynamic>{
-  'answered': instance.answered,
-  'correct': instance.correct,
-  'accuracyPercent': instance.accuracyPercent,
-  'unitId': instance.unitId,
-  'unitNameAr': instance.unitNameAr,
-  'subjectId': instance.subjectId,
-  'subjectNameAr': instance.subjectNameAr,
-};
+Map<String, dynamic> _$UnitAccuracyToJson(UnitAccuracy instance) =>
+    <String, dynamic>{
+      'answered': instance.answered,
+      'correct': instance.correct,
+      'accuracyPercent': instance.accuracyPercent,
+      'unitId': instance.unitId,
+      'unitNameAr': instance.unitNameAr,
+      'subjectId': instance.subjectId,
+      'subjectNameAr': instance.subjectNameAr,
+    };

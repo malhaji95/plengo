@@ -10,10 +10,14 @@ part 'teacher_profile_envelope.g.dart';
 
 @JsonSerializable()
 class TeacherProfileEnvelope {
-  const TeacherProfileEnvelope({required this.success, required this.data, required this.error});
-
+  const TeacherProfileEnvelope({
+    required this.success,
+    required this.data,
+    required this.error,
+  });
+  
   factory TeacherProfileEnvelope.fromJson(Map<String, Object?> json) => _$TeacherProfileEnvelopeFromJson(json);
-
+  
   final bool success;
   final TeacherProfile data;
   final dynamic error;

@@ -38,9 +38,9 @@ class AttemptSummary {
     required this.passed,
     required this.timeSpentMs,
   });
-
+  
   factory AttemptSummary.fromJson(Map<String, Object?> json) => _$AttemptSummaryFromJson(json);
-
+  
   final String id;
   final String clientAttemptId;
   @JsonKey(includeIfNull: true)

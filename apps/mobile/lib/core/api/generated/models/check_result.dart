@@ -14,9 +14,9 @@ class CheckResult {
     required this.correctAnswer,
     required this.explanation,
   });
-
+  
   factory CheckResult.fromJson(Map<String, Object?> json) => _$CheckResultFromJson(json);
-
+  
   final bool isCorrect;
   @JsonKey(includeIfNull: true)
   final String? correctOptionId;

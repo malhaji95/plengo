@@ -24,8 +24,12 @@ abstract class FlashcardsClient {
   });
 
   @GET('/api/v1/decks/{id}')
-  Future<StudentDeckEnvelope> getDeck({@Path('id') required String id});
+  Future<StudentDeckEnvelope> getDeck({
+    @Path('id') required String id,
+  });
 
   @GET('/api/v1/decks/{id}/cards')
-  Future<DeckCardsEnvelope> getDeckCards({@Path('id') required String id});
+  Future<DeckCardsEnvelope> getDeckCards({
+    @Path('id') required String id,
+  });
 }

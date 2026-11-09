@@ -9,4 +9,5 @@ part of 'goal_settings.dart';
 GoalSettings _$GoalSettingsFromJson(Map<String, dynamic> json) =>
     GoalSettings(dailyGoal: (json['dailyGoal'] as num).toInt());
 
-Map<String, dynamic> _$GoalSettingsToJson(GoalSettings instance) => <String, dynamic>{'dailyGoal': instance.dailyGoal};
+Map<String, dynamic> _$GoalSettingsToJson(GoalSettings instance) =>
+    <String, dynamic>{'dailyGoal': instance.dailyGoal};

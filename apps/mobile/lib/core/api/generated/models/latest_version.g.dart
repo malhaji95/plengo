@@ -7,10 +7,15 @@ part of 'latest_version.dart';
 // **************************************************************************
 
 LatestVersion _$LatestVersionFromJson(Map<String, dynamic> json) =>
-    LatestVersion(android: json['android'] as String, ios: json['ios'] as String, web: json['web'] as String);
+    LatestVersion(
+      android: json['android'] as String,
+      ios: json['ios'] as String,
+      web: json['web'] as String,
+    );
 
-Map<String, dynamic> _$LatestVersionToJson(LatestVersion instance) => <String, dynamic>{
-  'android': instance.android,
-  'ios': instance.ios,
-  'web': instance.web,
-};
+Map<String, dynamic> _$LatestVersionToJson(LatestVersion instance) =>
+    <String, dynamic>{
+      'android': instance.android,
+      'ios': instance.ios,
+      'web': instance.web,
+    };

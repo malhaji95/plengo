@@ -22,5 +22,7 @@ abstract class HomeClient {
   Future<GoalSettingsEnvelope> getGoalSettings();
 
   @PUT('/api/v1/me/settings')
-  Future<GoalSettingsEnvelope> updateGoalSettings({@Body() required GoalSettings body});
+  Future<GoalSettingsEnvelope> updateGoalSettings({
+    @Body() required GoalSettings body,
+  });
 }

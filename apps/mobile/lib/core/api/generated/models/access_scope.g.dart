@@ -16,15 +16,16 @@ AccessScope _$AccessScopeFromJson(Map<String, dynamic> json) => AccessScope(
   educationLevelId: json['educationLevelId'] as String,
 );
 
-Map<String, dynamic> _$AccessScopeToJson(AccessScope instance) => <String, dynamic>{
-  'scopeType': instance.scopeType,
-  'subjectId': instance.subjectId,
-  'teacherTrackId': instance.teacherTrackId,
-  'subjectNameAr': instance.subjectNameAr,
-  'trackTitleAr': instance.trackTitleAr,
-  'teacherNameAr': instance.teacherNameAr,
-  'educationLevelId': instance.educationLevelId,
-};
+Map<String, dynamic> _$AccessScopeToJson(AccessScope instance) =>
+    <String, dynamic>{
+      'scopeType': instance.scopeType,
+      'subjectId': instance.subjectId,
+      'teacherTrackId': instance.teacherTrackId,
+      'subjectNameAr': instance.subjectNameAr,
+      'trackTitleAr': instance.trackTitleAr,
+      'teacherNameAr': instance.teacherNameAr,
+      'educationLevelId': instance.educationLevelId,
+    };
 
 const _$AccessScopeScopeTypeEnumMap = {
   AccessScopeScopeType.subject: 'subject',

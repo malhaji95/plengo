@@ -9,6 +9,5 @@ part of 'signed_out_result.dart';
 SignedOutResult _$SignedOutResultFromJson(Map<String, dynamic> json) =>
     SignedOutResult(signedOut: json['signedOut'] as bool);
 
-Map<String, dynamic> _$SignedOutResultToJson(SignedOutResult instance) => <String, dynamic>{
-  'signedOut': instance.signedOut,
-};
+Map<String, dynamic> _$SignedOutResultToJson(SignedOutResult instance) =>
+    <String, dynamic>{'signedOut': instance.signedOut};

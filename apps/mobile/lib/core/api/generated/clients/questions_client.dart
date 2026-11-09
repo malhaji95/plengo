@@ -27,7 +27,9 @@ abstract class QuestionsClient {
   });
 
   @GET('/api/v1/questions/{id}')
-  Future<StudentQuestionEnvelope> getQuestion({@Path('id') required String id});
+  Future<StudentQuestionEnvelope> getQuestion({
+    @Path('id') required String id,
+  });
 
   @POST('/api/v1/questions/{id}/check')
   Future<CheckResultEnvelope> checkQuestionAnswer({

@@ -10,10 +10,14 @@ part 'srs_sync_result_envelope.g.dart';
 
 @JsonSerializable()
 class SrsSyncResultEnvelope {
-  const SrsSyncResultEnvelope({required this.success, required this.data, required this.error});
-
+  const SrsSyncResultEnvelope({
+    required this.success,
+    required this.data,
+    required this.error,
+  });
+  
   factory SrsSyncResultEnvelope.fromJson(Map<String, Object?> json) => _$SrsSyncResultEnvelopeFromJson(json);
-
+  
   final bool success;
   final SrsSyncResult data;
   final dynamic error;

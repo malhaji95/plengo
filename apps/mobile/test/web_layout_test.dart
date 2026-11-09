@@ -30,9 +30,13 @@ void main() {
     await pumpApp(
       tester,
       signedInAs: testMe,
-      arrangeCatalog: (c) => when(
-        () => c.subjects(any()),
-      ).thenAnswer((_) async => [subject('p', 'الفيزياء'), subject('m', 'الرياضيات'), subject('c', 'الكيمياء')]),
+      arrangeCatalog: (c) => when(() => c.subjects(any())).thenAnswer(
+        (_) async => [
+          catalogSubject('p', 'الفيزياء'),
+          catalogSubject('m', 'الرياضيات'),
+          catalogSubject('c', 'الكيمياء'),
+        ],
+      ),
     );
     expect(find.byType(NavigationRail), findsOneWidget);
     expect(find.byType(NavigationBar), findsNothing);
@@ -53,8 +57,9 @@ void main() {
     await pumpApp(
       tester,
       signedInAs: testMe,
-      arrangeCatalog: (c) =>
-          when(() => c.subjects(any())).thenAnswer((_) async => [subject('p', 'الفيزياء'), subject('m', 'الرياضيات')]),
+      arrangeCatalog: (c) => when(
+        () => c.subjects(any()),
+      ).thenAnswer((_) async => [catalogSubject('p', 'الفيزياء'), catalogSubject('m', 'الرياضيات')]),
     );
     expect(find.byType(NavigationBar), findsOneWidget);
     await tester.tap(find.text('المواد').last);

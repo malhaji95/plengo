@@ -55,7 +55,8 @@ class MockReportRepository extends Mock implements ReportRepository {}
 
 class MockHomeRepository extends Mock implements HomeRepository {}
 
-const noToday = Today(dueCards: 0, goal: 20, done: 0, goalMet: false, streak: 0);
+const noWeek = [false, false, false, false, false, false, false];
+const noToday = Today(dueCards: 0, goal: 20, done: 0, goalMet: false, streak: 0, week: noWeek);
 
 Home testHome({
   List<ResumeItem> resume = const [],
@@ -137,6 +138,29 @@ Subject subject(String id, String name, {String levelId = 'l12', String? descrip
   coverUrl: null,
   sortOrder: 0,
   isActive: true,
+);
+
+/// A subject as the catalog list returns it.
+CatalogSubject catalogSubject(
+  String id,
+  String name, {
+  String levelId = 'l12',
+  String? description,
+  bool hasAccess = false,
+}) => CatalogSubject(
+  id: id,
+  educationLevelId: levelId,
+  universityId: null,
+  facultyId: null,
+  academicYearId: null,
+  code: id,
+  nameAr: name,
+  description: description,
+  coverMediaId: null,
+  coverUrl: null,
+  sortOrder: 0,
+  isActive: true,
+  hasAccess: hasAccess,
 );
 
 typedef PumpedApp = ({

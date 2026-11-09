@@ -7,7 +7,10 @@ part of 'stats_trend.dart';
 // **************************************************************************
 
 StatsTrend _$StatsTrendFromJson(Map<String, dynamic> json) => StatsTrend(
-  weeks: (json['weeks'] as List<dynamic>).map((e) => TrendWeek.fromJson(e as Map<String, dynamic>)).toList(),
+  weeks: (json['weeks'] as List<dynamic>)
+      .map((e) => TrendWeek.fromJson(e as Map<String, dynamic>))
+      .toList(),
 );
 
-Map<String, dynamic> _$StatsTrendToJson(StatsTrend instance) => <String, dynamic>{'weeks': instance.weeks};
+Map<String, dynamic> _$StatsTrendToJson(StatsTrend instance) =>
+    <String, dynamic>{'weeks': instance.weeks};

@@ -10,10 +10,14 @@ part 'follow_result_envelope.g.dart';
 
 @JsonSerializable()
 class FollowResultEnvelope {
-  const FollowResultEnvelope({required this.success, required this.data, required this.error});
-
+  const FollowResultEnvelope({
+    required this.success,
+    required this.data,
+    required this.error,
+  });
+  
   factory FollowResultEnvelope.fromJson(Map<String, Object?> json) => _$FollowResultEnvelopeFromJson(json);
-
+  
   final bool success;
   final FollowResult data;
   final dynamic error;

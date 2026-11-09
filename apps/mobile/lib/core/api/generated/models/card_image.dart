@@ -16,9 +16,9 @@ class CardImage {
     required this.width,
     required this.height,
   });
-
+  
   factory CardImage.fromJson(Map<String, Object?> json) => _$CardImageFromJson(json);
-
+  
   final String mediaId;
   final String cacheKey;
   final String fullUrl;
