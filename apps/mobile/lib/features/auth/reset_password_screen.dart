@@ -5,7 +5,9 @@ import 'package:go_router/go_router.dart';
 import '../../app/providers.dart';
 import '../../app/router.dart';
 import '../../core/api/api_exception.dart';
+import '../../shared/ui/ui.dart';
 import '../../shared/widgets/form_widgets.dart';
+import 'auth_widgets.dart';
 
 class ResetPasswordScreen extends ConsumerStatefulWidget {
   const ResetPasswordScreen({super.key, required this.email});
@@ -58,42 +60,59 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return AuthScaffold(
-      title: 'إعادة تعيين كلمة المرور',
-      subtitle: 'أدخل الرمز الذي وصلك عبر البريد الإلكتروني ثم كلمة المرور الجديدة.',
-      child: Form(
-        key: _form,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            LtrTextField(controller: _email, label: 'البريد الإلكتروني', validator: Validators.email),
-            const SizedBox(height: 16),
-            LtrTextField(
-              controller: _otp,
-              label: 'رمز التحقق',
-              keyboardType: TextInputType.number,
-              maxLength: 6,
-              validator: Validators.otp,
-            ),
-            const SizedBox(height: 16),
-            LtrTextField(
-              controller: _password,
-              label: 'كلمة المرور الجديدة',
-              obscureText: true,
-              validator: Validators.password,
-            ),
-            const SizedBox(height: 16),
-            LtrTextField(
-              controller: _confirm,
-              label: 'تأكيد كلمة المرور',
-              obscureText: true,
-              validator: (v) => v != _password.text ? 'كلمتا المرور غير متطابقتين' : null,
-            ),
-            const SizedBox(height: 16),
-            ErrorBanner(_error),
-            const SizedBox(height: 16),
-            SubmitButton(label: 'حفظ كلمة المرور', busy: _busy, onPressed: _submit),
-          ],
+    return AuthPageScaffold(
+      child: AutofillGroup(
+        child: Form(
+          key: _form,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const AuthHeading(
+                title: 'إعادة تعيين كلمة المرور',
+                subtitle: 'أدخل الرمز الذي وصلك عبر البريد الإلكتروني ثم كلمة المرور الجديدة.',
+              ),
+              const SizedBox(height: 18),
+              AuthField(
+                controller: _email,
+                label: 'البريد الإلكتروني',
+                ltr: true,
+                keyboardType: TextInputType.emailAddress,
+                autofillHints: const [AutofillHints.email],
+                validator: Validators.email,
+              ),
+              const SizedBox(height: 14),
+              AuthField(
+                controller: _otp,
+                label: 'رمز التحقق',
+                ltr: true,
+                keyboardType: TextInputType.number,
+                autofillHints: const [AutofillHints.oneTimeCode],
+                maxLength: 6,
+                validator: Validators.otp,
+              ),
+              const SizedBox(height: 14),
+              AuthField(
+                controller: _password,
+                label: 'كلمة المرور الجديدة',
+                ltr: true,
+                obscureText: true,
+                hint: '8 أحرف على الأقل',
+                autofillHints: const [AutofillHints.newPassword],
+                validator: Validators.password,
+              ),
+              const SizedBox(height: 14),
+              AuthField(
+                controller: _confirm,
+                label: 'تأكيد كلمة المرور',
+                ltr: true,
+                obscureText: true,
+                validator: (v) => v != _password.text ? 'كلمتا المرور غير متطابقتين' : null,
+              ),
+              if (_error != null) ...[const SizedBox(height: 12), AuthErrorBanner(_error)],
+              const SizedBox(height: 16),
+              PlengoButton(label: 'حفظ كلمة المرور', busy: _busy, onPressed: _submit),
+            ],
+          ),
         ),
       ),
     );
