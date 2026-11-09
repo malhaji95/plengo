@@ -258,11 +258,15 @@ void main() {
       expect(fill(0), PlengoColors.blue.base); // answered
       expect(fill(1), PlengoColors.orange.soft); // flagged
       expect(fill(2), PlengoColors.yellow.base); // current
-      expect(find.text('2⚑'), findsOneWidget);
+      expect(find.descendant(of: find.byKey(const Key('grid-cell-1')), matching: find.text('2')), findsOneWidget);
+      expect(
+        find.descendant(of: find.byKey(const Key('grid-cell-1')), matching: find.byIcon(Icons.flag_rounded)),
+        findsOneWidget,
+      );
       expect(find.bySemanticsLabel('السؤال 1، مُجاب'), findsOneWidget);
       expect(find.bySemanticsLabel('السؤال 2، غير مُجاب، معلّم'), findsOneWidget);
       expect(find.bySemanticsLabel('السؤال 3، غير مُجاب، الحالي'), findsOneWidget);
-      for (final legend in ['مُجاب', 'غير مُجاب', '⚑ معلّم', 'الحالي']) {
+      for (final legend in ['مُجاب', 'غير مُجاب', 'معلّم', 'الحالي']) {
         expect(find.text(legend), findsOneWidget);
       }
 
@@ -374,10 +378,12 @@ void main() {
       expect(find.bySemanticsLabel('صحيحة: 1'), findsOneWidget);
       expect(find.bySemanticsLabel('خاطئة: 1'), findsOneWidget);
       expect(find.bySemanticsLabel('متروكة: 1'), findsOneWidget);
-      expect(find.text('✓ صحيحة'), findsOneWidget);
-      expect(find.text('✗ خاطئة'), findsOneWidget);
+      expect(find.widgetWithIcon(PlengoChip, Icons.check_rounded), findsOneWidget);
+      expect(find.widgetWithText(PlengoChip, 'صحيحة'), findsOneWidget);
+      expect(find.widgetWithIcon(PlengoChip, Icons.close_rounded), findsOneWidget);
+      expect(find.widgetWithText(PlengoChip, 'خاطئة'), findsOneWidget);
       expect(find.text('متروكة'), findsWidgets);
-      expect(find.text('⚑ معلّمة'), findsOneWidget);
+      expect(find.widgetWithText(PlengoChip, 'معلّمة'), findsOneWidget);
 
       await tester.tap(find.text('المتروكة'));
       await tester.pumpAndSettle();

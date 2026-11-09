@@ -248,7 +248,7 @@ Future<void> offerDownloadAfterRedemption(BuildContext context, WidgetRef ref, S
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          'تم تفعيل المادة ✓ هل تريد تحميلها لاستخدامها دون اتصال؟',
+          'تم تفعيل المادة. هل تريد تحميلها لاستخدامها دون اتصال؟',
           style: PlengoType.section.copyWith(color: sheet.surface.ink),
         ),
         const SizedBox(height: 8),

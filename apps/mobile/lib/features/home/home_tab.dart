@@ -416,7 +416,7 @@ class _TodayCard extends ConsumerWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      t.goalMet ? 'أنجزت هدف اليوم ✓' : 'هدف اليوم: ${t.done} من ${t.goal}',
+                      t.goalMet ? 'أنجزت هدف اليوم' : 'هدف اليوم: ${t.done} من ${t.goal}',
                       style: PlengoType.rowTitle.copyWith(color: s.ink),
                     ),
                     Text('بطاقات وإجابات', style: PlengoType.caption.copyWith(color: s.mute)),

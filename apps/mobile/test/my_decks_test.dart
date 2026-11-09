@@ -141,7 +141,7 @@ void main() {
     );
     app.container.read(routerProvider).go('${Routes.decks}/d1/browse');
     await tester.pumpAndSettle();
-    await tester.tap(find.text('+ أضف إلى بطاقاتي'));
+    await tester.tap(find.text('أضف إلى بطاقاتي'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('مجموعة جديدة'));
     await tester.pumpAndSettle();
@@ -149,10 +149,12 @@ void main() {
     await tester.pump();
     await tester.tap(find.text('إنشاء المجموعة'));
     await tester.pumpAndSettle();
-    expect(find.text('أُضيفت البطاقة إلى مجموعتك'), findsOneWidget);
-    // The button now says the card is in the collection.
-    expect(find.text('✓ أُضيفت البطاقة إلى مجموعتك'), findsOneWidget);
-    expect(find.text('+ أضف إلى بطاقاتي'), findsNothing);
+    expect(find.widgetWithText(SnackBar, 'أُضيفت البطاقة إلى مجموعتك'), findsOneWidget);
+    // The button now says the card is in the collection, with a ✓ icon.
+    final added = find.byKey(const Key('add-to-my-decks'));
+    expect(find.descendant(of: added, matching: find.text('أُضيفت البطاقة إلى مجموعتك')), findsOneWidget);
+    expect(find.descendant(of: added, matching: find.byIcon(Icons.check_rounded)), findsOneWidget);
+    expect(find.text('أضف إلى بطاقاتي'), findsNothing);
     final row = (await app.db.select(app.db.localCards).get()).single;
     expect(row.kind, 'official_ref');
     expect(row.officialFlashcardId, card(0).id);
@@ -240,7 +242,7 @@ void main() {
     );
     app.container.read(routerProvider).go('${Routes.decks}/d1/browse');
     await tester.pumpAndSettle();
-    expect(find.text('+ أضف إلى بطاقاتي'), findsNothing);
+    expect(find.text('أضف إلى بطاقاتي'), findsNothing);
     expect(find.byTooltip('إبلاغ عن مشكلة'), findsNothing);
     app.container.read(routerProvider).go(Routes.review);
     await tester.pumpAndSettle();

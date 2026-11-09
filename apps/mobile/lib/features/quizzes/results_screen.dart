@@ -490,11 +490,11 @@ class _ResultCard extends StatelessWidget {
     final q = question;
     final r = q.result;
     final answered = _answered(q);
-    final (String status, PlengoHue hue) = !answered
-        ? ('متروكة', PlengoColors.orange)
+    final (String status, PlengoHue hue, IconData? icon) = !answered
+        ? ('متروكة', PlengoColors.orange, null)
         : r?.isCorrect == true
-        ? ('✓ صحيحة', PlengoColors.green)
-        : ('✗ خاطئة', PlengoColors.red);
+        ? ('صحيحة', PlengoColors.green, Icons.check_rounded)
+        : ('خاطئة', PlengoColors.red, Icons.close_rounded);
     final String mine;
     final String? right;
     if (q.type == AttemptQuestionType.written) {
@@ -517,8 +517,9 @@ class _ResultCard extends StatelessWidget {
                   runSpacing: 6,
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    PlengoChip(label: status, hue: hue),
-                    if (q.flagged) const PlengoChip(label: '⚑ معلّمة', hue: PlengoColors.yellow),
+                    PlengoChip(label: status, hue: hue, icon: icon),
+                    if (q.flagged)
+                      const PlengoChip(label: 'معلّمة', hue: PlengoColors.yellow, icon: Icons.flag_rounded),
                     Text('السؤال $index', style: PlengoType.chip.copyWith(color: s.mute)),
                   ],
                 ),

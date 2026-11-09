@@ -477,9 +477,12 @@ class ExamQuestionGrid extends StatelessWidget {
               child: Center(
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
-                  child: Text(
-                    a.flagged ? '${i + 1}⚑' : '${i + 1}',
-                    style: PlengoType.chip.copyWith(fontSize: 14, color: fg),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('${i + 1}', style: PlengoType.chip.copyWith(fontSize: 14, color: fg)),
+                      if (a.flagged) Icon(Icons.flag_rounded, size: 14, color: fg),
+                    ],
                   ),
                 ),
               ),
@@ -498,7 +501,7 @@ class ExamGridLegend extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = context.surface;
-    Widget item(Color fill, Color border, String label) => Row(
+    Widget item(Color fill, Color border, String label, {IconData? icon}) => Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
@@ -511,6 +514,7 @@ class ExamGridLegend extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 6),
+        if (icon != null) Icon(icon, size: 14, color: s.mute),
         Text(label, style: PlengoType.caption.copyWith(color: s.mute)),
       ],
     );
@@ -520,7 +524,7 @@ class ExamGridLegend extends StatelessWidget {
       children: [
         item(PlengoColors.blue.base, PlengoColors.blue.base, 'مُجاب'),
         item(s.card, const Color(0xFF9A958B), 'غير مُجاب'),
-        item(PlengoColors.orange.soft, PlengoColors.orange.base, '⚑ معلّم'),
+        item(PlengoColors.orange.soft, PlengoColors.orange.base, 'معلّم', icon: Icons.flag_rounded),
         item(PlengoColors.yellow.base, PlengoColors.ink, 'الحالي'),
       ],
     );

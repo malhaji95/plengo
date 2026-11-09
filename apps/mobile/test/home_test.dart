@@ -191,7 +191,7 @@ void main() {
         when(() => h.setGoal(any())).thenAnswer((i) async => i.positionalArguments.first as int);
       },
     );
-    expect(find.text('أنجزت هدف اليوم ✓'), findsOneWidget);
+    expect(find.text('أنجزت هدف اليوم'), findsOneWidget);
     expect(find.text('يوم واحد متتالٍ'), findsOneWidget);
     expect(find.text('لا بطاقات مستحقة الآن'), findsOneWidget);
     await tester.tap(find.text('تعديل الهدف'));

@@ -38,8 +38,10 @@ class AnswerOption extends StatelessWidget {
 
   static String letterFor(int index) => index < letters.length ? letters[index] : '${index + 1}';
 
-  static const correctTag = '✓ صحيحة';
-  static const wrongTag = '✗ إجابتك';
+  /// Tag words; drawn after a ✓ / ✗ icon (the bundled font has no such glyphs, and web builds
+  /// load no fallback font).
+  static const correctTag = 'صحيحة';
+  static const wrongTag = 'إجابتك';
 
   /// Position, for the letter badge (0 = أ).
   final int index;
@@ -144,6 +146,12 @@ class AnswerOption extends StatelessWidget {
                   ),
                   if (tag != null) ...[
                     const SizedBox(width: 8),
+                    Icon(
+                      state == AnswerState.correct ? Icons.check_rounded : Icons.close_rounded,
+                      size: 14,
+                      color: tagColor,
+                    ),
+                    const SizedBox(width: 2),
                     Text(
                       tag,
                       style: TextStyle(

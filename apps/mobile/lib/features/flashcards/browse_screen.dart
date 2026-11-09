@@ -264,7 +264,8 @@ class _CardBrowserState extends ConsumerState<CardBrowser> {
                           toggled: added,
                           child: PlengoButton(
                             key: const Key('add-to-my-decks'),
-                            label: added ? '✓ أُضيفت البطاقة إلى مجموعتك' : '+ أضف إلى بطاقاتي',
+                            label: added ? 'أُضيفت البطاقة إلى مجموعتك' : 'أضف إلى بطاقاتي',
+                            icon: added ? Icons.check_rounded : Icons.add_rounded,
                             semanticsLabel: added ? 'أُضيفت البطاقة إلى مجموعتك' : 'أضف إلى بطاقاتي',
                             variant: PlengoButtonVariant.ghost,
                             onPressed: () async {

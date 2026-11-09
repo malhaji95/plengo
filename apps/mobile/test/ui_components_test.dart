@@ -165,8 +165,10 @@ void main() {
     testWidgets('after checking: correct and wrong carry ✓/✗ tags, the rest is dimmed', (tester) async {
       final semantics = tester.ensureSemantics();
       await pump(tester, options([AnswerState.correct, AnswerState.wrong, AnswerState.dimmed, AnswerState.dimmed]));
-      expect(find.text('✓ صحيحة'), findsOneWidget);
-      expect(find.text('✗ إجابتك'), findsOneWidget);
+      expect(find.text('صحيحة'), findsOneWidget);
+      expect(find.byIcon(Icons.check_rounded), findsOneWidget);
+      expect(find.text('إجابتك'), findsOneWidget);
+      expect(find.byIcon(Icons.close_rounded), findsOneWidget);
       expect(decorationOf(tester, 0).color, PlengoColors.green.soft);
       expect(decorationOf(tester, 1).color, PlengoColors.red.soft);
       final opacities = tester.widgetList<AnimatedOpacity>(find.byType(AnimatedOpacity)).map((o) => o.opacity);
