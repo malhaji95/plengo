@@ -4,6 +4,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:plengo/app/router.dart';
 import 'package:plengo/core/api/api_exception.dart';
 import 'package:plengo/core/api/generated/export.dart';
+import 'package:plengo/features/access/access_banner.dart';
 import 'package:plengo/features/access/my_access_screen.dart';
 import 'package:plengo/features/access/redeem_screen.dart';
 import 'package:plengo/features/subjects/subject_screen.dart';
@@ -212,5 +213,18 @@ void main() {
     expect(find.text('منتهي'), findsOneWidget);
     expect(find.textContaining('حتى 2026/6/30'), findsOneWidget);
     expect(find.text('إدخال كود التفعيل'), findsOneWidget);
+  });
+
+  testWidgets('the locked notice pairs a lock icon with its text; access shows as a chip', (tester) async {
+    final app = await pumpApp(
+      tester,
+      signedInAs: testMe,
+      arrangeCatalog: (c) => when(() => c.outline('p')).thenAnswer((_) async => outline(noAccess)),
+    );
+    await openSubject(app, tester);
+    final notice = find.byType(LockedNotice);
+    expect(notice, findsOneWidget);
+    expect(find.descendant(of: notice, matching: find.byIcon(Icons.lock_rounded)), findsOneWidget);
+    expect(find.descendant(of: notice, matching: find.text('هذا المحتوى يحتاج إلى تفعيل')), findsOneWidget);
   });
 }
