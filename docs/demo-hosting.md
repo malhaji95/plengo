@@ -168,6 +168,7 @@ _Skipping R2? Jump to step 4 and use the "without R2" values there._
    | `EMAIL_PROVIDER`              | `console`                   |
 
 | `ADMIN_2FA_REQUIRED` | `false` |
+| `MIGRATE_ON_START` | `true` (applies database migrations when the API starts; Render free has no release step) |
 
 **With R2 (step 3) add:**
 

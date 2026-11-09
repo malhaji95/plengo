@@ -26,5 +26,6 @@ COPY --from=build /out ./
 USER node
 EXPOSE 4000
 HEALTHCHECK --interval=30s --timeout=5s CMD node -e "fetch('http://127.0.0.1:'+(process.env.PORT||4000)+'/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
-# Run `node dist/scripts/migrate.js` as a release step before starting new containers.
-CMD ["node", "dist/main.js"]
+# Run `node dist/scripts/migrate.js` as a release step before starting new containers. Hosts
+# without a release step (the free demo on Render) set MIGRATE_ON_START=true instead.
+CMD ["sh", "-c", "if [ \"$MIGRATE_ON_START\" = true ]; then node dist/scripts/migrate.js || exit 1; fi; exec node dist/main.js"]
