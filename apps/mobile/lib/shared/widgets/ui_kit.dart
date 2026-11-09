@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
 
 import '../../app/theme.dart';
+import '../ui/tokens.dart';
 
-/// An icon on a pale rounded square: the leading mark of cards and list rows.
+// The redesign's section header and progress ring replace the older ones under the same names.
+export '../ui/progress.dart' show ProgressRing;
+export '../ui/surfaces.dart' show SectionHeader;
+
+/// An icon on a soft rounded square: the leading mark of cards and list rows. New code uses
+/// `SubjectIconTile` from `shared/ui`.
 class IconBadge extends StatelessWidget {
   const IconBadge(this.icon, {super.key, this.tint, this.color, this.size = 44});
 
   final IconData icon;
 
-  /// Background; defaults to the pale brand blue.
+  /// Background; defaults to the soft brand blue.
   final Color? tint;
 
   /// Icon colour; defaults to ink on light tints.
@@ -24,14 +30,14 @@ class IconBadge extends StatelessWidget {
       height: size,
       decoration: BoxDecoration(
         color: dark ? bg.withValues(alpha: 0.18) : bg,
-        borderRadius: BorderRadius.circular(size * 0.3),
+        borderRadius: BorderRadius.circular(PlengoRadius.iconTile),
       ),
       child: Icon(icon, size: size * 0.5, color: color ?? (dark ? bg : BrandColors.ink)),
     );
   }
 }
 
-/// A tappable card row: badge, title, optional subtitle, and a forward chevron (left in RTL).
+/// A tappable card row: badge, title, optional subtitle, and a forward chevron (pointing left in RTL).
 class NavCard extends StatelessWidget {
   const NavCard({
     super.key,
@@ -54,80 +60,17 @@ class NavCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = context.surface;
     return Card(
       margin: margin,
       clipBehavior: Clip.antiAlias,
       child: ListTile(
         leading: IconBadge(icon, tint: tint),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
+        title: Text(title, style: PlengoType.rowTitle.copyWith(color: s.ink)),
         subtitle: subtitle == null ? null : Text(subtitle!),
-        trailing: trailing ?? (onTap == null ? null : const Icon(Icons.chevron_left)),
+        // chevron_right follows the text direction: it points left (forward) in RTL.
+        trailing: trailing ?? (onTap == null ? null : Icon(Icons.chevron_right_rounded, color: s.mute)),
         onTap: onTap,
-      ),
-    );
-  }
-}
-
-/// A section title with an optional action on the far side.
-class SectionHeader extends StatelessWidget {
-  const SectionHeader(this.title, {super.key, this.action, this.onAction, this.top = 20});
-
-  final String title;
-  final String? action;
-  final VoidCallback? onAction;
-  final double top;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(top: top, bottom: 8),
-      child: Row(
-        children: [
-          Expanded(
-            child: Semantics(header: true, child: Text(title, style: Theme.of(context).textTheme.titleMedium)),
-          ),
-          if (action != null) TextButton(onPressed: onAction, child: Text(action!)),
-        ],
-      ),
-    );
-  }
-}
-
-/// A circular percentage, used for completion and the daily goal.
-class ProgressRing extends StatelessWidget {
-  const ProgressRing({super.key, required this.value, required this.label, this.size = 64, this.color});
-
-  /// 0–1.
-  final double value;
-  final String label;
-  final double size;
-  final Color? color;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return SizedBox.square(
-      dimension: size,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          SizedBox.square(
-            dimension: size,
-            child: CircularProgressIndicator(
-              value: value.clamp(0, 1).toDouble(),
-              strokeWidth: size / 10,
-              strokeCap: StrokeCap.round,
-              color: color ?? BrandColors.success(Theme.of(context).brightness),
-              backgroundColor: scheme.surfaceContainerHighest,
-            ),
-          ),
-          FittedBox(
-            child: Padding(
-              padding: EdgeInsets.all(size / 6),
-              child: Text(label, style: const TextStyle(fontWeight: FontWeight.w700)),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -165,7 +108,7 @@ class BrandTile extends StatelessWidget {
       width: width,
       child: Material(
         color: fill,
-        borderRadius: BorderRadius.circular(AppTheme.radius),
+        borderRadius: BorderRadius.circular(22),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: onTap,
@@ -178,10 +121,11 @@ class BrandTile extends StatelessWidget {
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(8),
+                      width: 40,
+                      height: 40,
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.55),
-                        borderRadius: BorderRadius.circular(12),
+                        color: Colors.white.withValues(alpha: 0.6),
+                        borderRadius: BorderRadius.circular(PlengoRadius.iconTile),
                       ),
                       child: Icon(icon, color: ink, size: 22),
                     ),
@@ -189,19 +133,19 @@ class BrandTile extends StatelessWidget {
                     ?badge,
                   ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
                 Text(
                   title,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: ink, fontWeight: FontWeight.w700, fontSize: 16),
+                  style: PlengoType.rowTitle.copyWith(color: ink),
                 ),
                 if (subtitle != null)
                   Text(
                     subtitle!,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: ink, fontSize: 13),
+                    style: PlengoType.caption.copyWith(color: ink),
                   ),
               ],
             ),

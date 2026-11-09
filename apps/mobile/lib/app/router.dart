@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -19,11 +19,14 @@ import '../features/flashcards/decks_screen.dart';
 import '../features/flashcards/review_tab.dart';
 import '../features/flashcards/study_screen.dart';
 import '../features/bookmarks/saved_tab.dart';
+import '../features/debug/widget_catalog_screen.dart';
 import '../features/home/home_tab.dart';
 import '../features/home/notification_screens.dart';
+import '../features/home/streak_screen.dart';
 import '../features/learning/mistakes_screen.dart';
 import '../features/legal/legal_screen.dart';
 import '../features/learning/stats_screen.dart';
+import '../features/onboarding/goal_step_screen.dart';
 import '../features/my_decks/card_editor_screen.dart';
 import '../features/my_decks/my_deck_screen.dart';
 import '../features/my_decks/my_decks_screen.dart';
@@ -78,6 +81,13 @@ abstract final class Routes {
   static const quizzes = '/quizzes';
   static const attempts = '/attempts';
   static const randomPractice = '/practice/random';
+
+  /// Redesign v2 screens (placeholders until they are built; nothing links to them yet).
+  static const onboardingGoal = '/onboarding/goal';
+  static const streak = '/streak';
+
+  /// Debug builds only: the redesign component catalogue.
+  static const debugCatalog = '/debug/catalog';
 
   static const public = {login, register, verifyEmail, forgotPassword, resetPassword};
 
@@ -353,6 +363,9 @@ GoRouter buildRouter(Ref ref, {required bool couponRedemption}) {
         ),
       ),
       if (couponRedemption) GoRoute(path: Routes.redeem, builder: (_, _) => const RedeemScreen()),
+      GoRoute(path: Routes.onboardingGoal, builder: (_, _) => const GoalStepScreen()),
+      GoRoute(path: Routes.streak, builder: (_, _) => const StreakScreen()),
+      if (kDebugMode) GoRoute(path: Routes.debugCatalog, builder: (_, _) => const WidgetCatalogScreen()),
     ],
   );
 }

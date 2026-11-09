@@ -159,7 +159,8 @@ class AppearanceSettings {
   /// 0 = small, 1 = normal, 2 = large
   final int fontStep;
 
-  static const fontScales = [0.9, 1.0, 1.15];
+  /// Small / normal / large (docs/redesign DECISIONS #16).
+  static const fontScales = [0.88, 1.0, 1.16];
   double get textScale => fontScales[fontStep];
 
   AppearanceSettings copyWith({ThemeMode? themeMode, int? fontStep}) =>
