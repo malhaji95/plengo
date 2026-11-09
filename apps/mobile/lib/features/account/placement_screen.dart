@@ -4,9 +4,11 @@ import 'package:go_router/go_router.dart';
 
 import '../../app/providers.dart';
 import '../../core/api/api_exception.dart';
-import '../../shared/widgets/form_widgets.dart';
+import '../../shared/ui/ui.dart';
+import '../auth/auth_widgets.dart';
+import '../auth/stage_picker.dart';
 import '../subjects/catalog_providers.dart';
-import '../subjects/placement_picker.dart';
+import '../subjects/placement_picker.dart' show PlacementDraft;
 
 /// Change the profile level and college placement at any time (spec §8.9). It only sets the
 /// defaults of the Subjects tab; every level stays browsable.
@@ -61,11 +63,17 @@ class _PlacementScreenState extends ConsumerState<PlacementScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final s = context.surface;
     return Scaffold(
-      appBar: AppBar(title: const Text('المرحلة التعليمية')),
-      body: Center(
+      appBar: AppBar(
+        leading: const PlengoBackButton(),
+        leadingWidth: kPlengoLeadingWidth,
+        title: const Text('المرحلة التعليمية'),
+      ),
+      body: Align(
+        alignment: Alignment.topCenter,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsetsDirectional.fromSTEB(PlengoSpace.screen, 8, PlengoSpace.screen, 28),
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 480),
             child: Form(
@@ -73,13 +81,17 @@ class _PlacementScreenState extends ConsumerState<PlacementScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text('تحدد مرحلتك ما يظهر أولاً في تبويب المواد، ويمكنك تصفح كل المراحل في أي وقت.'),
+                  Text(
+                    'تحدد مرحلتك ما يظهر أولاً في تبويب المواد، ويمكنك تصفح كل المراحل في أي وقت.',
+                    style: PlengoType.sub.copyWith(color: s.mute),
+                  ),
                   const SizedBox(height: 16),
-                  PlacementPicker(value: _draft, onChanged: (v) => setState(() => _draft = v)),
+                  PlengoCard(
+                    child: StagePicker(value: _draft, onChanged: (v) => setState(() => _draft = v)),
+                  ),
+                  if (_error != null) ...[const SizedBox(height: 12), AuthErrorBanner(_error)],
                   const SizedBox(height: 16),
-                  ErrorBanner(_error),
-                  const SizedBox(height: 16),
-                  SubmitButton(key: const Key('placement.save'), label: 'حفظ', busy: _busy, onPressed: _save),
+                  PlengoButton(key: const Key('placement.save'), label: 'حفظ', busy: _busy, onPressed: _save),
                 ],
               ),
             ),

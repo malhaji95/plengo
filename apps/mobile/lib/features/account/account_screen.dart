@@ -7,14 +7,17 @@ import '../../app/router.dart';
 import '../../core/api/api_exception.dart';
 import '../../core/api/generated/export.dart';
 import '../../core/content/media_uploader.dart';
+import '../../shared/ui/ui.dart';
 import '../../shared/widgets/network_avatar.dart';
+import '../../shared/widgets/responsive.dart';
 import '../access/access_providers.dart';
+import '../auth/auth_widgets.dart';
 import '../my_decks/card_editor_screen.dart';
+import '../offline/offline_providers.dart';
 import '../subjects/catalog_providers.dart';
 import '../teachers/teacher_providers.dart';
-import '../offline/offline_providers.dart';
-import '../../shared/widgets/responsive.dart';
 
+/// V-Account: profile header, appearance, grouped settings, legal links and the sign-out / delete card.
 class AccountScreen extends ConsumerWidget {
   const AccountScreen({super.key});
 
@@ -23,121 +26,137 @@ class AccountScreen extends ConsumerWidget {
     final me = ref.watch(authControllerProvider).value;
     final appearance = ref.watch(appearanceProvider);
     final appearanceCtl = ref.read(appearanceProvider.notifier);
+    final levelName = me == null
+        ? null
+        : ref.watch(levelsProvider).value?.where((l) => l.id == me.educationLevelId).firstOrNull?.nameAr;
+
+    final settings = <_Item>[
+      _Item(Icons.key_rounded, PlengoColors.green, 'صلاحيات الوصول', onTap: () => context.go(Routes.myAccess)),
+      if (ref.watch(couponRedemptionProvider))
+        _Item(
+          Icons.vpn_key_rounded,
+          PlengoColors.yellow,
+          'إدخال كود التفعيل',
+          onTap: () => context.push(Routes.redeem),
+        ),
+      if (ref.watch(offlinePacksAvailableProvider))
+        _Item(
+          Icons.download_for_offline_rounded,
+          PlengoColors.blue,
+          'المحتوى المحمّل',
+          caption: 'التحميل دون اتصال والمساحة المستخدمة',
+          onTap: () => context.go(Routes.offlineStorage),
+        ),
+      _Item(
+        Icons.notifications_rounded,
+        PlengoColors.orange,
+        'الإشعارات والهدف اليومي',
+        onTap: () => context.go(Routes.notificationSettings),
+      ),
+      _Item(
+        Icons.school_rounded,
+        PlengoColors.pink,
+        'المرحلة التعليمية',
+        caption: levelName,
+        onTap: () => context.go(Routes.placement),
+      ),
+      if (ref.watch(teacherFollowingEnabledProvider))
+        _Item(
+          Icons.groups_rounded,
+          PlengoColors.pink,
+          'المدرسون الذين أتابعهم',
+          onTap: () => context.go(Routes.following),
+        ),
+      _Item(Icons.devices_rounded, PlengoColors.blue, 'الأجهزة المتصلة', onTap: () => context.go(Routes.sessions)),
+    ];
+    final legal = <_Item>[
+      _Item(Icons.privacy_tip_rounded, PlengoColors.blue, 'سياسة الخصوصية', onTap: () => context.push(Routes.privacy)),
+      _Item(Icons.gavel_rounded, PlengoColors.blue, 'شروط الاستخدام', onTap: () => context.push(Routes.terms)),
+      _Item(
+        Icons.description_rounded,
+        PlengoColors.blue,
+        'تراخيص البرمجيات والخطوط',
+        onTap: () => showLicensePage(context: context, applicationName: 'Plengo'),
+      ),
+    ];
+    final danger = <_Item>[
+      _Item(
+        Icons.logout_rounded,
+        PlengoColors.red,
+        'تسجيل الخروج',
+        danger: true,
+        onTap: () => ref.read(authControllerProvider.notifier).logout(),
+      ),
+      _Item(
+        Icons.delete_forever_rounded,
+        PlengoColors.red,
+        'حذف الحساب',
+        caption: 'يطلب كلمة المرور ويشرح ما سيُحذف',
+        danger: true,
+        onTap: () => showDeleteAccountSheet(context),
+      ),
+    ];
 
     return Scaffold(
       appBar: AppBar(title: const Text('حسابي')),
       body: ContentWidth(
         child: ListView(
-          padding: const EdgeInsets.symmetric(vertical: 8),
+          padding: const EdgeInsetsDirectional.fromSTEB(PlengoSpace.screen, 4, PlengoSpace.screen, 28),
           children: [
-            if (me != null)
-              ListTile(
-                leading: _AvatarButton(me: me),
-                title: Text(me.fullName),
-                subtitle: Text(me.email, textDirection: TextDirection.ltr, textAlign: TextAlign.right),
-              ),
-            const Divider(),
-            const _SectionTitle('المظهر'),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: SegmentedButton<ThemeMode>(
-                segments: const [
-                  ButtonSegment(value: ThemeMode.system, label: Text('تلقائي')),
-                  ButtonSegment(value: ThemeMode.light, label: Text('فاتح')),
-                  ButtonSegment(value: ThemeMode.dark, label: Text('داكن')),
+            if (me != null) ...[_ProfileCard(me: me), const SizedBox(height: PlengoSpace.section)],
+            PlengoCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Semantics(
+                    header: true,
+                    child: Text('المظهر', style: PlengoType.rowTitle.copyWith(color: context.surface.ink)),
+                  ),
+                  const SizedBox(height: 10),
+                  SegmentedControl<ThemeMode>(
+                    segments: const [
+                      PlengoOption(ThemeMode.system, 'تلقائي', semanticsLabel: 'المظهر: تلقائي'),
+                      PlengoOption(ThemeMode.light, 'فاتح', semanticsLabel: 'المظهر: فاتح'),
+                      PlengoOption(ThemeMode.dark, 'داكن', semanticsLabel: 'المظهر: داكن'),
+                    ],
+                    selected: appearance.themeMode,
+                    onChanged: appearanceCtl.setThemeMode,
+                  ),
+                  const SizedBox(height: 10),
+                  // Each label is drawn at the size it selects.
+                  SegmentedControl<int>(
+                    segments: const [
+                      PlengoOption(
+                        0,
+                        'خط صغير',
+                        semanticsLabel: 'حجم الخط: صغير',
+                        child: Text('خط صغير', style: TextStyle(fontSize: 12)),
+                      ),
+                      PlengoOption(
+                        1,
+                        'عادي',
+                        semanticsLabel: 'حجم الخط: عادي',
+                        child: Text('عادي', style: TextStyle(fontSize: 14)),
+                      ),
+                      PlengoOption(
+                        2,
+                        'كبير',
+                        semanticsLabel: 'حجم الخط: كبير',
+                        child: Text('كبير', style: TextStyle(fontSize: 17)),
+                      ),
+                    ],
+                    selected: appearance.fontStep,
+                    onChanged: appearanceCtl.setFontStep,
+                  ),
                 ],
-                selected: {appearance.themeMode},
-                onSelectionChanged: (s) => appearanceCtl.setThemeMode(s.first),
               ),
             ),
-            const SizedBox(height: 12),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: SegmentedButton<int>(
-                segments: const [
-                  ButtonSegment(value: 0, label: Text('خط صغير')),
-                  ButtonSegment(value: 1, label: Text('عادي')),
-                  ButtonSegment(value: 2, label: Text('كبير')),
-                ],
-                selected: {appearance.fontStep},
-                onSelectionChanged: (s) => appearanceCtl.setFontStep(s.first),
-              ),
-            ),
-            const Divider(height: 32),
-            ListTile(
-              leading: const Icon(Icons.key_outlined),
-              title: const Text('صلاحيات الوصول'),
-              trailing: const Icon(Icons.chevron_left),
-              onTap: () => context.go(Routes.myAccess),
-            ),
-            if (ref.watch(couponRedemptionProvider))
-              ListTile(
-                leading: const Icon(Icons.vpn_key_outlined),
-                title: const Text('إدخال كود التفعيل'),
-                trailing: const Icon(Icons.chevron_left),
-                onTap: () => context.push(Routes.redeem),
-              ),
-            if (ref.watch(offlinePacksAvailableProvider))
-              ListTile(
-                leading: const Icon(Icons.download_for_offline_outlined),
-                title: const Text('المحتوى المحمّل'),
-                subtitle: const Text('التحميل دون اتصال والمساحة المستخدمة'),
-                trailing: const Icon(Icons.chevron_left),
-                onTap: () => context.go(Routes.offlineStorage),
-              ),
-            ListTile(
-              leading: const Icon(Icons.notifications_outlined),
-              title: const Text('الإشعارات والهدف اليومي'),
-              trailing: const Icon(Icons.chevron_left),
-              onTap: () => context.go(Routes.notificationSettings),
-            ),
-            ListTile(
-              leading: const Icon(Icons.school_outlined),
-              title: const Text('المرحلة التعليمية'),
-              trailing: const Icon(Icons.chevron_left),
-              onTap: () => context.go(Routes.placement),
-            ),
-            if (ref.watch(teacherFollowingEnabledProvider))
-              ListTile(
-                leading: const Icon(Icons.groups_outlined),
-                title: const Text('المدرسون الذين أتابعهم'),
-                trailing: const Icon(Icons.chevron_left),
-                onTap: () => context.go(Routes.following),
-              ),
-            ListTile(
-              leading: const Icon(Icons.devices_outlined),
-              title: const Text('الأجهزة المتصلة'),
-              trailing: const Icon(Icons.chevron_left),
-              onTap: () => context.go(Routes.sessions),
-            ),
-            ListTile(
-              leading: const Icon(Icons.privacy_tip_outlined),
-              title: const Text('سياسة الخصوصية'),
-              trailing: const Icon(Icons.chevron_left),
-              onTap: () => context.push(Routes.privacy),
-            ),
-            ListTile(
-              leading: const Icon(Icons.gavel_outlined),
-              title: const Text('شروط الاستخدام'),
-              trailing: const Icon(Icons.chevron_left),
-              onTap: () => context.push(Routes.terms),
-            ),
-            ListTile(
-              leading: const Icon(Icons.description_outlined),
-              title: const Text('تراخيص البرمجيات والخطوط'),
-              trailing: const Icon(Icons.chevron_left),
-              onTap: () => showLicensePage(context: context, applicationName: 'Plengo'),
-            ),
-            ListTile(
-              leading: Icon(Icons.logout, color: Theme.of(context).colorScheme.error),
-              title: Text('تسجيل الخروج', style: TextStyle(color: Theme.of(context).colorScheme.error)),
-              onTap: () => ref.read(authControllerProvider.notifier).logout(),
-            ),
-            ListTile(
-              leading: Icon(Icons.delete_forever_outlined, color: Theme.of(context).colorScheme.error),
-              title: Text('حذف الحساب', style: TextStyle(color: Theme.of(context).colorScheme.error)),
-              onTap: () => showDialog<void>(context: context, builder: (_) => const DeleteAccountDialog()),
-            ),
+            const SizedBox(height: PlengoSpace.section),
+            _Group(items: settings),
+            const SizedBox(height: PlengoSpace.section),
+            _Group(items: legal),
+            const SizedBox(height: PlengoSpace.section),
+            _Group(items: danger),
           ],
         ),
       ),
@@ -145,21 +164,84 @@ class AccountScreen extends ConsumerWidget {
   }
 }
 
-class _SectionTitle extends StatelessWidget {
-  const _SectionTitle(this.text);
+class _Item {
+  const _Item(this.icon, this.hue, this.title, {required this.onTap, this.caption, this.danger = false});
 
-  final String text;
+  final IconData icon;
+  final PlengoHue hue;
+  final String title;
+  final String? caption;
+  final VoidCallback onTap;
+
+  /// Red title and no chevron (sign out, delete).
+  final bool danger;
+}
+
+/// A card of flat rows with soft icon tiles and dividers between them.
+class _Group extends StatelessWidget {
+  const _Group({required this.items});
+
+  final List<_Item> items;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-      child: Text(text, style: Theme.of(context).textTheme.titleSmall),
+    final red = fieldErrorColor(context.surface);
+    return PlengoCard(
+      padding: const EdgeInsetsDirectional.symmetric(horizontal: 14, vertical: 4),
+      child: Column(
+        children: [
+          for (final (i, item) in items.indexed)
+            ListRow(
+              flat: true,
+              showDivider: i < items.length - 1,
+              title: item.title,
+              caption: item.caption,
+              titleColor: item.danger ? red : null,
+              leading: SubjectIconTile(icon: item.icon, hue: item.hue, size: 40, soft: true),
+              trailing: item.danger ? const SizedBox.shrink() : null,
+              onTap: item.onTap,
+            ),
+        ],
+      ),
     );
   }
 }
 
-/// Profile photo: tap to choose a new one (uploaded, processed to 400 px, then attached).
+/// Yellow-soft header: avatar with a camera button, name and the email (LTR).
+class _ProfileCard extends StatelessWidget {
+  const _ProfileCard({required this.me});
+
+  final Me me;
+
+  @override
+  Widget build(BuildContext context) {
+    return PlengoCard(
+      color: PlengoColors.yellow.soft,
+      child: Row(
+        children: [
+          _AvatarButton(me: me),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(me.fullName, style: PlengoType.section.copyWith(color: PlengoColors.ink)),
+                Text(
+                  me.email,
+                  textDirection: TextDirection.ltr,
+                  textAlign: TextAlign.right,
+                  style: PlengoType.caption.copyWith(color: PlengoColors.yellow.ink, fontWeight: FontWeight.w600),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Profile photo with a camera button: choose a new one (uploaded, processed to 400 px, then attached).
 class _AvatarButton extends ConsumerStatefulWidget {
   const _AvatarButton({required this.me});
 
@@ -194,24 +276,61 @@ class _AvatarButtonState extends ConsumerState<_AvatarButton> {
   }
 
   @override
-  Widget build(BuildContext context) => Semantics(
-    button: true,
-    label: 'تغيير الصورة الشخصية',
-    child: InkWell(
-      customBorder: const CircleBorder(),
-      onTap: _busy ? null : _change,
-      child: _busy
-          ? const SizedBox(
-              width: 48,
-              height: 48,
-              child: Padding(padding: EdgeInsets.all(12), child: CircularProgressIndicator()),
-            )
-          : NetworkAvatar(url: widget.me.avatarUrl, name: widget.me.fullName),
-    ),
-  );
+  Widget build(BuildContext context) {
+    final onTap = _busy ? null : _change;
+    return SizedBox(
+      width: 84,
+      height: 76,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          PositionedDirectional(
+            top: 0,
+            start: 0,
+            child: SizedBox.square(
+              dimension: 68,
+              child: Center(
+                child: _busy
+                    ? const SizedBox.square(dimension: 28, child: CircularProgressIndicator(strokeWidth: 3))
+                    : NetworkAvatar(url: widget.me.avatarUrl, name: widget.me.fullName, radius: 34),
+              ),
+            ),
+          ),
+          PositionedDirectional(
+            bottom: -8,
+            end: -4,
+            child: Semantics(
+              container: true,
+              button: true,
+              label: 'تغيير الصورة الشخصية',
+              excludeSemantics: true,
+              onTap: onTap,
+              child: Material(
+                color: Colors.white,
+                shape: const CircleBorder(),
+                elevation: 1,
+                child: InkWell(
+                  customBorder: const CircleBorder(),
+                  onTap: onTap,
+                  child: const SizedBox.square(
+                    dimension: 48,
+                    child: Icon(Icons.photo_camera_rounded, size: 22, color: PlengoColors.ink),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
-/// Account deletion (spec §33): explains what is removed and asks for the password.
+/// Opens the account-deletion sheet (spec §33).
+Future<void> showDeleteAccountSheet(BuildContext context) =>
+    showPlengoSheet<void>(context: context, useRootNavigator: true, builder: (_) => const DeleteAccountDialog());
+
+/// Account deletion (spec §33): explains what is removed and asks for the password. Shown in a sheet.
 class DeleteAccountDialog extends ConsumerStatefulWidget {
   const DeleteAccountDialog({super.key});
 
@@ -247,39 +366,75 @@ class _DeleteAccountDialogState extends ConsumerState<DeleteAccountDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final error = Theme.of(context).colorScheme.error;
-    return AlertDialog(
-      title: const Text('حذف الحساب نهائياً'),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Text(
-              'سيُحذف اسمك وبريدك وصورتك ومجموعات بطاقاتك الخاصة ومحفوظاتك، وتُلغى صلاحيات الوصول '
-              'بما فيها المفعّلة بالكوبونات، ويُسجَّل خروجك من كل الأجهزة. تبقى إحصاءات الإجابات '
-              'دون أي بيانات تعرّف بك. لا يمكن التراجع عن هذه الخطوة.',
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              key: const Key('delete.password'),
-              controller: _password,
-              obscureText: true,
-              enabled: !_busy,
-              textDirection: TextDirection.ltr,
-              decoration: const InputDecoration(labelText: 'أدخل كلمة المرور للتأكيد'),
-              onChanged: (_) => setState(() {}),
-            ),
-            if (_error != null) ...[const SizedBox(height: 8), Text(_error!, style: TextStyle(color: error))],
-          ],
+    final s = context.surface;
+    final bad = _error != null;
+    OutlineInputBorder border(Color c) => OutlineInputBorder(
+      borderRadius: BorderRadius.circular(PlengoRadius.input),
+      borderSide: BorderSide(color: c, width: 2),
+    );
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Center(
+          child: StateIllustration(icon: Icons.delete_forever_rounded, hue: PlengoColors.red, size: 88),
         ),
-      ),
-      actions: [
-        TextButton(onPressed: _busy ? null : () => Navigator.of(context).pop(), child: const Text('إلغاء')),
-        FilledButton(
-          style: FilledButton.styleFrom(backgroundColor: error),
+        const SizedBox(height: 12),
+        Semantics(
+          header: true,
+          child: Text(
+            'حذف الحساب نهائياً',
+            textAlign: TextAlign.center,
+            style: PlengoType.section.copyWith(color: s.ink),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'سيُحذف اسمك وبريدك وصورتك ومجموعات بطاقاتك الخاصة ومحفوظاتك، وتُلغى صلاحيات الوصول '
+          'بما فيها المفعّلة بالكوبونات، ويُسجَّل خروجك من كل الأجهزة. تبقى إحصاءات الإجابات '
+          'دون أي بيانات تعرّف بك. لا يمكن التراجع عن هذه الخطوة.',
+          style: PlengoType.sub.copyWith(color: s.mute),
+        ),
+        const SizedBox(height: 16),
+        MergeSemantics(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text('أدخل كلمة المرور للتأكيد', style: PlengoType.rowTitle.copyWith(fontSize: 14, color: s.ink)),
+              const SizedBox(height: 6),
+              TextField(
+                key: const Key('delete.password'),
+                controller: _password,
+                obscureText: true,
+                enabled: !_busy,
+                textDirection: TextDirection.ltr,
+                autofillHints: const [AutofillHints.password],
+                style: PlengoType.body.copyWith(color: bad ? PlengoColors.ink : s.ink, height: 1.3),
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: bad ? PlengoColors.red.soft : s.card,
+                  enabledBorder: border(bad ? PlengoColors.redStrong : s.line),
+                  focusedBorder: border(bad ? PlengoColors.redStrong : s.action),
+                  disabledBorder: border(s.line),
+                ),
+                onChanged: (_) => setState(() {}),
+              ),
+            ],
+          ),
+        ),
+        if (_error != null) FieldErrorText(message: _error!),
+        const SizedBox(height: 16),
+        PlengoButton(
+          label: _busy ? 'جارٍ الحذف…' : 'حذف الحساب',
+          variant: PlengoButtonVariant.danger,
+          icon: Icons.delete_forever_rounded,
           onPressed: _busy || _password.text.isEmpty ? null : _delete,
-          child: Text(_busy ? 'جارٍ الحذف…' : 'حذف الحساب'),
+        ),
+        const SizedBox(height: 4),
+        PlengoButton(
+          label: 'إلغاء',
+          variant: PlengoButtonVariant.ghost,
+          onPressed: _busy ? null : () => Navigator.of(context).pop(),
         ),
       ],
     );

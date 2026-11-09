@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../shared/ui/ui.dart';
 import '../../shared/widgets/async_view.dart';
 import '../../shared/widgets/responsive.dart';
 
@@ -64,37 +65,56 @@ class LegalScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final text = ref.watch(legalTextProvider(document));
-    final theme = Theme.of(context).textTheme;
+    final s = context.surface;
+    final body = PlengoType.sub.copyWith(fontSize: 15, color: s.ink);
     return Scaffold(
-      appBar: AppBar(title: Text(document.title)),
+      appBar: AppBar(
+        // Opened directly (store listing link) there is nothing to go back to.
+        leading: Navigator.canPop(context) ? const PlengoBackButton() : null,
+        leadingWidth: kPlengoLeadingWidth,
+        automaticallyImplyLeading: false,
+        title: Text(document.title),
+      ),
       body: ContentWidth(
         child: AsyncView(
           value: text,
           onRetry: () => ref.invalidate(legalTextProvider(document)),
           data: (source) => ListView(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+            padding: const EdgeInsetsDirectional.fromSTEB(PlengoSpace.screen, 8, PlengoSpace.screen, 32),
             children: [
               for (final b in parseLegal(source))
                 switch (b) {
                   // The page title is already in the app bar.
                   LegalHeading(level: 1) => const SizedBox.shrink(),
                   LegalHeading() => Padding(
-                    padding: const EdgeInsets.only(top: 20, bottom: 8),
-                    child: Text(b.text, style: theme.titleMedium),
+                    padding: const EdgeInsetsDirectional.only(top: 20, bottom: 8),
+                    child: Semantics(
+                      header: true,
+                      child: Text(b.text, style: PlengoType.section.copyWith(color: s.ink)),
+                    ),
                   ),
                   LegalItem() => Padding(
-                    padding: const EdgeInsetsDirectional.only(start: 8, bottom: 6),
+                    padding: const EdgeInsetsDirectional.only(start: 4, bottom: 6),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('•  '),
-                        Expanded(child: Text(b.text, style: theme.bodyMedium)),
+                        Padding(
+                          padding: const EdgeInsetsDirectional.only(top: 10, end: 10),
+                          child: ExcludeSemantics(
+                            child: Container(
+                              width: 7,
+                              height: 7,
+                              decoration: BoxDecoration(color: s.action, shape: BoxShape.circle),
+                            ),
+                          ),
+                        ),
+                        Expanded(child: Text(b.text, style: body)),
                       ],
                     ),
                   ),
                   LegalParagraph() => Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: Text(b.text, style: theme.bodyMedium),
+                    padding: const EdgeInsetsDirectional.only(bottom: 10),
+                    child: Text(b.text, style: body),
                   ),
                 },
             ],
@@ -105,7 +125,7 @@ class LegalScreen extends ConsumerWidget {
   }
 }
 
-/// "بإنشاء الحساب فإنك توافق على الشروط وسياسة الخصوصية" with both links.
+/// "بإنشاء الحساب فإنك توافق على الشروط وسياسة الخصوصية" with both links (48 dp targets).
 class LegalConsentText extends StatelessWidget {
   const LegalConsentText({super.key, required this.onOpen});
 
@@ -113,21 +133,34 @@ class LegalConsentText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final link = TextStyle(color: Theme.of(context).colorScheme.primary, decoration: TextDecoration.underline);
+    final s = context.surface;
+    final plain = PlengoType.caption.copyWith(color: s.mute);
+    Widget link(String label, LegalDocument doc) => Semantics(
+      container: true,
+      link: true,
+      child: InkWell(
+        onTap: () => onOpen(doc),
+        borderRadius: BorderRadius.circular(8),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 48),
+          child: Center(
+            widthFactor: 1,
+            child: Text(
+              label,
+              style: plain.copyWith(color: s.action, fontWeight: FontWeight.w700, decoration: TextDecoration.underline),
+            ),
+          ),
+        ),
+      ),
+    );
     return Wrap(
       alignment: WrapAlignment.center,
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
-        const Text('بإنشاء الحساب فإنك توافق على '),
-        InkWell(
-          onTap: () => onOpen(LegalDocument.terms),
-          child: Text('شروط الاستخدام', style: link),
-        ),
-        const Text(' و'),
-        InkWell(
-          onTap: () => onOpen(LegalDocument.privacy),
-          child: Text('سياسة الخصوصية', style: link),
-        ),
+        Text('بإنشاء الحساب فإنك توافق على ', style: plain),
+        link('شروط الاستخدام', LegalDocument.terms),
+        Text(' و', style: plain),
+        link('سياسة الخصوصية', LegalDocument.privacy),
       ],
     );
   }

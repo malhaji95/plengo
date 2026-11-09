@@ -6,7 +6,11 @@ import 'package:go_router/go_router.dart';
 import '../../app/router.dart';
 import '../../core/api/api_exception.dart';
 import '../../core/api/generated/export.dart';
-import '../../shared/widgets/form_widgets.dart';
+import '../../shared/ui/ui.dart';
+import '../../shared/widgets/brand_logo.dart';
+import '../auth/auth_widgets.dart';
+import '../subjects/catalog_providers.dart';
+import '../teachers/teacher_providers.dart';
 import 'access_format.dart';
 import 'access_providers.dart';
 import '../offline/download_widgets.dart';
@@ -48,7 +52,28 @@ class CouponCodeFormatter extends TextInputFormatter {
   }
 }
 
-/// spec §23.2 #27. Registered only in builds with COUPON_REDEMPTION=true.
+/// Where the student came from, read without changing the route: `?subjectId=` / `?teacherTrackId=`
+/// on the URL, or the same keys in a `Map` passed as `extra`. Both null when opened from the account.
+typedef RedeemOrigin = ({String? subjectId, String? teacherTrackId});
+
+RedeemOrigin redeemOriginOf(BuildContext context) {
+  try {
+    final state = GoRouterState.of(context);
+    final extra = state.extra;
+    String? read(String key) {
+      final fromQuery = state.uri.queryParameters[key];
+      if (fromQuery != null && fromQuery.isNotEmpty) return fromQuery;
+      final fromExtra = extra is Map ? extra[key] : null;
+      return fromExtra is String && fromExtra.isNotEmpty ? fromExtra : null;
+    }
+
+    return (subjectId: read('subjectId'), teacherTrackId: read('teacherTrackId'));
+  } on Object {
+    return (subjectId: null, teacherTrackId: null);
+  }
+}
+
+/// V-Redeem / V-RedeemSuccess (spec §23.2 #27). Registered only in builds with COUPON_REDEMPTION=true.
 class RedeemScreen extends ConsumerStatefulWidget {
   const RedeemScreen({super.key});
 
@@ -94,19 +119,36 @@ class _RedeemScreenState extends ConsumerState<RedeemScreen> {
     }
   }
 
+  /// DECISIONS #15: back to the subject (or track) the student came from, whose free items are open;
+  /// otherwise the Subjects tab.
+  void _tryFree(RedeemOrigin origin) {
+    if (origin.subjectId != null) {
+      context.go('${Routes.subjects}/${origin.subjectId}');
+    } else if (origin.teacherTrackId != null) {
+      context.go('${Routes.tracks}/${origin.teacherTrackId}');
+    } else {
+      context.go(Routes.subjects);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
     final result = _result;
     return Scaffold(
-      appBar: AppBar(title: const Text('إدخال كود التفعيل')),
+      appBar: AppBar(
+        leading: const PlengoBackButton(),
+        leadingWidth: kPlengoLeadingWidth,
+        title: result == null ? const Text('إدخال كود التفعيل') : null,
+      ),
       body: SafeArea(
-        child: Center(
+        top: false,
+        child: Align(
+          alignment: Alignment.topCenter,
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsetsDirectional.fromSTEB(PlengoSpace.screen, 8, PlengoSpace.screen, 28),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 420),
-              child: result != null ? _Success(result: result) : _form(text),
+              child: result != null ? RedeemSuccessView(result: result) : _form(),
             ),
           ),
         ),
@@ -114,72 +156,247 @@ class _RedeemScreenState extends ConsumerState<RedeemScreen> {
     );
   }
 
-  Widget _form(TextTheme text) {
+  Widget _form() {
+    final s = context.surface;
+    final origin = redeemOriginOf(context);
+    final fromLocked = origin.subjectId != null || origin.teacherTrackId != null;
+    final enabled = _complete && !_busy;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text('أدخل الكود المطبوع على بطاقة التفعيل', style: text.bodyLarge),
-        const SizedBox(height: 16),
-        TextField(
-          key: const Key('coupon-code'),
-          controller: _code,
-          autofocus: true,
-          textDirection: TextDirection.ltr,
-          textAlign: TextAlign.center,
-          textCapitalization: TextCapitalization.characters,
-          autocorrect: false,
-          enableSuggestions: false,
-          keyboardType: TextInputType.visiblePassword,
-          inputFormatters: [CouponCodeFormatter()],
-          style: text.headlineSmall?.copyWith(fontFamily: 'monospace', letterSpacing: 2),
-          decoration: const InputDecoration(hintText: 'XXXX-XXXX-XX', hintTextDirection: TextDirection.ltr),
-          onChanged: (_) => setState(() => _error = null),
-          onSubmitted: (_) => _submit(),
+        if (fromLocked) ...[_LockedNotice(origin: origin), const SizedBox(height: 18)],
+        const _ActivationCard(),
+        const SizedBox(height: 18),
+        MergeSemantics(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'أدخل الكود المطبوع على بطاقة التفعيل',
+                style: PlengoType.rowTitle.copyWith(fontSize: 14, color: s.ink),
+              ),
+              const SizedBox(height: 6),
+              TextField(
+                key: const Key('coupon-code'),
+                controller: _code,
+                autofocus: true,
+                textDirection: TextDirection.ltr,
+                textAlign: TextAlign.center,
+                textCapitalization: TextCapitalization.characters,
+                autocorrect: false,
+                enableSuggestions: false,
+                keyboardType: TextInputType.visiblePassword,
+                inputFormatters: [CouponCodeFormatter()],
+                style: PlengoType.section.copyWith(
+                  fontSize: 22,
+                  letterSpacing: 3,
+                  color: _error != null ? PlengoColors.ink : s.ink,
+                ),
+                decoration: InputDecoration(
+                  hintText: 'XXXX-XXXX-XX',
+                  hintTextDirection: TextDirection.ltr,
+                  hintStyle: PlengoType.section.copyWith(fontSize: 22, letterSpacing: 3, color: s.mute),
+                  filled: true,
+                  fillColor: _error != null ? PlengoColors.red.soft : s.card,
+                  constraints: const BoxConstraints(minHeight: 64),
+                  contentPadding: const EdgeInsetsDirectional.symmetric(horizontal: 16, vertical: 18),
+                  enabledBorder: _border(_error != null ? PlengoColors.redStrong : s.line),
+                  focusedBorder: _border(_error != null ? PlengoColors.redStrong : s.action),
+                ),
+                onChanged: (_) => setState(() => _error = null),
+                onSubmitted: (_) => _submit(),
+              ),
+            ],
+          ),
         ),
-        const SizedBox(height: 16),
-        ErrorBanner(_error),
-        if (_error != null) const SizedBox(height: 16),
-        SubmitButton(label: 'تفعيل', busy: _busy, onPressed: _complete ? _submit : null),
+        if (_error != null) FieldErrorText(message: _error!),
+        const SizedBox(height: 18),
+        // A FilledButton in the primary style (with the 3D shadow when enabled).
+        AnimatedContainer(
+          duration: PlengoMotion.of(context, PlengoMotion.press),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(PlengoRadius.button),
+            boxShadow: enabled ? [BoxShadow(color: s.actionShadow, offset: const Offset(0, 4))] : const [],
+          ),
+          child: FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: s.action,
+              foregroundColor: s.onAction,
+              minimumSize: const Size.fromHeight(PlengoSpace.button),
+              textStyle: PlengoType.button,
+            ),
+            onPressed: _complete && !_busy ? _submit : null,
+            child: _busy
+                ? SizedBox.square(dimension: 22, child: CircularProgressIndicator(strokeWidth: 2.5, color: s.mute))
+                : const Text('تفعيل'),
+          ),
+        ),
+        const SizedBox(height: 8),
+        PlengoButton(
+          label: 'جرّب الدروس المجانية أولاً',
+          variant: PlengoButtonVariant.ghost,
+          onPressed: () => _tryFree(origin),
+        ),
       ],
+    );
+  }
+
+  static OutlineInputBorder _border(Color c) => OutlineInputBorder(
+    borderRadius: BorderRadius.circular(PlengoRadius.input),
+    borderSide: BorderSide(color: c, width: 2),
+  );
+}
+
+/// «هذا المحتوى يحتاج إلى تفعيل» with the subject or track name when it is already loaded.
+class _LockedNotice extends ConsumerWidget {
+  const _LockedNotice({required this.origin});
+
+  final RedeemOrigin origin;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final name = origin.subjectId != null
+        ? ref.watch(subjectOutlineProvider(origin.subjectId!)).value?.subject.nameAr
+        : ref.watch(trackProvider(origin.teacherTrackId!)).value?.track.titleAr;
+    return PlengoCard(
+      color: PlengoColors.red.soft,
+      child: Row(
+        children: [
+          const SubjectIconTile(icon: Icons.lock_rounded, hue: PlengoColors.red),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('هذا المحتوى يحتاج إلى تفعيل', style: PlengoType.rowTitle.copyWith(color: PlengoColors.ink)),
+                if (name != null) Text(name, style: PlengoType.caption.copyWith(color: PlengoColors.red.ink)),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
 
-class _Success extends StatelessWidget {
-  const _Success({required this.result});
+/// Illustration of the yellow activation card with the code pattern. Decorative.
+class _ActivationCard extends StatelessWidget {
+  const _ActivationCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return ExcludeSemantics(
+      child: Center(
+        child: ConfettiDots(
+          spread: 18,
+          child: Container(
+            width: 220,
+            height: 136,
+            padding: const EdgeInsetsDirectional.all(16),
+            decoration: BoxDecoration(
+              color: PlengoColors.yellow.base,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [BoxShadow(color: PlengoColors.yellow.shadow, offset: const Offset(0, 6))],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const BrandLogo(height: 24, onBrand: true),
+                Align(
+                  alignment: AlignmentDirectional.centerEnd,
+                  child: Text(
+                    'XXXX-XXXX-XX',
+                    textDirection: TextDirection.ltr,
+                    style: PlengoType.rowTitle.copyWith(letterSpacing: 2, color: PlengoColors.yellow.ink),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// V-RedeemSuccess: green check with confetti, the activated scope and its access date, then
+/// «الذهاب إلى المحتوى». The offline download offer opens as a sheet on mobile.
+class RedeemSuccessView extends StatelessWidget {
+  const RedeemSuccessView({super.key, required this.result});
 
   final RedeemResult result;
 
   @override
   Widget build(BuildContext context) {
+    final s = context.surface;
     final e = result.entitlement;
-    final text = Theme.of(context).textTheme;
     final isTrack = e.scope.scopeType == AccessScopeScopeType.teacherTrack;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Icon(Icons.check_circle_outline, size: 64, color: Theme.of(context).colorScheme.primary),
+        const SizedBox(height: 24),
+        Center(
+          child: ConfettiDots(
+            spread: 22,
+            child: Container(
+              width: 130,
+              height: 130,
+              margin: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: PlengoColors.green.base,
+                shape: BoxShape.circle,
+                boxShadow: [BoxShadow(color: PlengoColors.green.soft, spreadRadius: 12)],
+              ),
+              child: const ExcludeSemantics(child: Icon(Icons.check_rounded, size: 72, color: PlengoColors.ink)),
+            ),
+          ),
+        ),
         const SizedBox(height: 16),
-        Text('تم التفعيل بنجاح', textAlign: TextAlign.center, style: text.headlineSmall),
-        const SizedBox(height: 8),
-        Text(scopeTitle(e.scope), textAlign: TextAlign.center, style: text.titleMedium),
-        Text(scopeSubtitle(e.scope), textAlign: TextAlign.center, style: text.bodyMedium),
+        Semantics(
+          header: true,
+          liveRegion: true,
+          child: Text(
+            'تم التفعيل بنجاح',
+            textAlign: TextAlign.center,
+            style: PlengoType.title.copyWith(color: s.ink),
+          ),
+        ),
         const SizedBox(height: 8),
         Text(
-          result.upgraded
-              ? 'تمت ترقية وصولك إلى وصول دائم'
-              : termLabel(isPermanent: e.isPermanent, expiresAt: e.expiresAt),
+          scopeTitle(e.scope),
           textAlign: TextAlign.center,
+          style: PlengoType.section.copyWith(color: s.ink),
         ),
-        const SizedBox(height: 24),
-        FilledButton(
+        Text(
+          scopeSubtitle(e.scope),
+          textAlign: TextAlign.center,
+          style: PlengoType.sub.copyWith(color: s.mute),
+        ),
+        const SizedBox(height: 12),
+        Center(
+          child: PlengoChip(
+            label: result.upgraded
+                ? 'تمت ترقية وصولك إلى وصول دائم'
+                : termLabel(isPermanent: e.isPermanent, expiresAt: e.expiresAt),
+            hue: PlengoColors.green,
+            icon: Icons.event_available_rounded,
+          ),
+        ),
+        const SizedBox(height: 28),
+        PlengoButton(
+          label: 'الذهاب إلى المحتوى',
+          variant: PlengoButtonVariant.brand,
           onPressed: () => context.go(
             isTrack ? '${Routes.tracks}/${e.scope.teacherTrackId}' : '${Routes.subjects}/${e.scope.subjectId}',
           ),
-          child: const Text('الذهاب إلى المحتوى'),
         ),
         const SizedBox(height: 8),
-        OutlinedButton(onPressed: () => context.go(Routes.myAccess), child: const Text('صلاحيات الوصول')),
+        PlengoButton(
+          label: 'صلاحيات الوصول',
+          variant: PlengoButtonVariant.ghost,
+          onPressed: () => context.go(Routes.myAccess),
+        ),
       ],
     );
   }

@@ -2,11 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../app/providers.dart';
-import '../../app/theme.dart';
+import '../../app/router.dart';
 import '../../shared/widgets/brand_logo.dart';
-import '../../shared/widgets/ui_kit.dart';
+import '../../shared/ui/ui.dart';
 
 /// Whether this device has seen the intro (spec §23.2 screen 2). Stored locally, so it shows once
 /// per installation and never again after the first skip or start.
@@ -24,30 +25,31 @@ class OnboardingController extends AsyncNotifier<bool> {
 
 final onboardingSeenProvider = AsyncNotifierProvider<OnboardingController, bool>(OnboardingController.new);
 
-typedef _Page = ({IconData icon, Color tint, String title, String body});
+typedef _Page = ({IconData icon, PlengoHue hue, String title, String body});
 
 const _pages = <_Page>[
   (
     icon: Icons.school_rounded,
-    tint: BrandColors.tintYellow,
+    hue: PlengoColors.blue,
     title: 'رحلتك التعليمية أسهل مع Plengo',
     body: 'أسئلة واختبارات وبطاقات مراجعة لكل مادة، في مكان واحد.',
   ),
   (
     icon: Icons.style_rounded,
-    tint: BrandColors.tintBlue,
+    hue: PlengoColors.pink,
     title: 'تعلّم بطريقتك',
     body: 'تدرّب على الأسئلة، وراجع بالبطاقات الذكية، واختبر نفسك قبل الامتحان.',
   ),
   (
     icon: Icons.emoji_events_rounded,
-    tint: BrandColors.tintGreen,
+    hue: PlengoColors.green,
     title: 'حقّق أهدافك',
     body: 'هدف يومي وسلسلة أيام متتالية وتقدّم واضح في كل مادة.',
   ),
 ];
 
-/// Three short intro pages before the first sign-in; skip or start marks them seen.
+/// V-Onboarding: three short intro pages before the first sign-in. «تخطي» and «لدي حساب — تسجيل الدخول»
+/// mark them seen and show login; «ابدأ الآن» marks them seen and opens registration.
 class OnboardingView extends ConsumerStatefulWidget {
   const OnboardingView({super.key});
 
@@ -67,10 +69,16 @@ class _OnboardingViewState extends ConsumerState<OnboardingView> {
 
   void _finish() => unawaited(ref.read(onboardingSeenProvider.notifier).finish());
 
+  void _start() {
+    // Read the router first: finishing rebuilds the login screen and unmounts this view.
+    final router = GoRouter.of(context);
+    _finish();
+    unawaited(router.push(Routes.register));
+  }
+
   void _next() {
     if (_page == _pages.length - 1) return _finish();
-    final reduce = MediaQuery.of(context).disableAnimations;
-    if (reduce) {
+    if (PlengoMotion.reduced(context)) {
       _controller.jumpToPage(_page + 1);
     } else {
       unawaited(_controller.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeOutCubic));
@@ -79,9 +87,10 @@ class _OnboardingViewState extends ConsumerState<OnboardingView> {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    final s = context.surface;
     final last = _page == _pages.length - 1;
     return Scaffold(
+      backgroundColor: s.background,
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
@@ -89,12 +98,18 @@ class _OnboardingViewState extends ConsumerState<OnboardingView> {
             child: Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 8, 0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(20, 8, 8, 0),
                   child: Row(
                     children: [
-                      const BrandLogo(height: 36),
+                      // 30 high, as in the design.
+                      const BrandLogo(height: 30),
                       const Spacer(),
-                      if (!last) TextButton(onPressed: _finish, child: const Text('تخطي')),
+                      PlengoButton(
+                        label: 'تخطي',
+                        variant: PlengoButtonVariant.ghost,
+                        size: PlengoButtonSize.small,
+                        onPressed: _finish,
+                      ),
                     ],
                   ),
                 ),
@@ -103,28 +118,25 @@ class _OnboardingViewState extends ConsumerState<OnboardingView> {
                     controller: _controller,
                     itemCount: _pages.length,
                     onPageChanged: (i) => setState(() => _page = i),
-                    itemBuilder: (context, i) => _PageBody(page: _pages[i], index: i),
+                    itemBuilder: (context, i) => _PageBody(page: _pages[i]),
                   ),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    for (var i = 0; i < _pages.length; i++)
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        width: i == _page ? 24 : 8,
-                        height: 8,
-                        margin: const EdgeInsets.symmetric(horizontal: 3),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(4),
-                          color: i == _page ? scheme.primary : scheme.outlineVariant,
-                        ),
-                      ),
-                  ],
-                ),
+                _Dots(count: _pages.length, index: _page),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
-                  child: FilledButton(onPressed: _next, child: Text(last ? 'ابدأ الآن' : 'التالي')),
+                  padding: const EdgeInsetsDirectional.fromSTEB(20, 20, 20, 16),
+                  child: last
+                      ? Column(
+                          children: [
+                            PlengoButton(label: 'ابدأ الآن', variant: PlengoButtonVariant.brand, onPressed: _start),
+                            const SizedBox(height: 8),
+                            PlengoButton(
+                              label: 'لدي حساب — تسجيل الدخول',
+                              variant: PlengoButtonVariant.ghost,
+                              onPressed: _finish,
+                            ),
+                          ],
+                        )
+                      : PlengoButton(label: 'التالي', onPressed: _next),
                 ),
               ],
             ),
@@ -135,72 +147,104 @@ class _OnboardingViewState extends ConsumerState<OnboardingView> {
   }
 }
 
-class _PageBody extends StatelessWidget {
-  const _PageBody({required this.page, required this.index});
+/// Page position: the active dot is a 28-wide blue pill.
+class _Dots extends StatelessWidget {
+  const _Dots({required this.count, required this.index});
 
-  final _Page page;
+  final int count;
   final int index;
 
   @override
   Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-      child: Column(
-        children: [
-          const SizedBox(height: 16),
-          _Illustration(page: page, index: index),
-          const SizedBox(height: 32),
-          Text(page.title, textAlign: TextAlign.center, style: text.headlineSmall),
-          const SizedBox(height: 12),
-          Text(
-            page.body,
-            textAlign: TextAlign.center,
-            style: text.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
-          ),
-        ],
+    final s = context.surface;
+    final idle = s.isDark ? const Color(0xFF4A4741) : const Color(0xFFD9D3C7);
+    return Semantics(
+      label: 'الصفحة ${index + 1} من $count',
+      child: ExcludeSemantics(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            for (var i = 0; i < count; i++)
+              AnimatedContainer(
+                duration: PlengoMotion.of(context, const Duration(milliseconds: 200)),
+                width: i == index ? 28 : 10,
+                height: 10,
+                margin: const EdgeInsets.symmetric(horizontal: 4),
+                decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: i == index ? s.action : idle),
+              ),
+          ],
+        ),
       ),
     );
   }
 }
 
-/// A big icon in a soft circle with a few confetti dots in the logo colours around it.
-class _Illustration extends StatelessWidget {
-  const _Illustration({required this.page, required this.index});
+class _PageBody extends StatelessWidget {
+  const _PageBody({required this.page});
 
   final _Page page;
-  final int index;
 
   @override
   Widget build(BuildContext context) {
-    const dots = [
-      (Alignment(-0.9, -0.7), 14.0),
-      (Alignment(0.85, -0.85), 10.0),
-      (Alignment(0.95, 0.55), 16.0),
-      (Alignment(-0.75, 0.8), 10.0),
-      (Alignment(0.1, -1.0), 8.0),
-    ];
-    return ExcludeSemantics(
-      child: SizedBox(
-        width: 240,
-        height: 220,
-        child: Stack(
-          children: [
-            for (final (i, (align, size)) in dots.indexed)
-              Align(
-                alignment: align,
-                child: Container(
-                  width: size,
-                  height: size,
-                  decoration: BoxDecoration(
-                    color: BrandColors.accents[(i + index * 2) % BrandColors.accents.length],
-                    shape: i.isEven ? BoxShape.circle : BoxShape.rectangle,
-                    borderRadius: i.isEven ? null : BorderRadius.circular(3),
-                  ),
+    final s = context.surface;
+    return LayoutBuilder(
+      builder: (context, box) => SingleChildScrollView(
+        padding: const EdgeInsetsDirectional.symmetric(horizontal: 28, vertical: 8),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: box.maxHeight - 16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _Illustration(page: page),
+              const SizedBox(height: 24),
+              Semantics(
+                header: true,
+                child: Text(
+                  page.title,
+                  textAlign: TextAlign.center,
+                  style: PlengoType.title.copyWith(color: s.ink),
                 ),
               ),
-            Center(child: SpotIcon(page.icon, tint: page.tint, size: 170)),
-          ],
+              const SizedBox(height: 8),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 300),
+                child: Text(
+                  page.body,
+                  textAlign: TextAlign.center,
+                  style: PlengoType.sub.copyWith(fontSize: 16, color: s.mute),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A big icon in a coloured circle with a soft 16 dp ring and confetti dots. Decorative only; swap
+/// the icon for an illustration later.
+class _Illustration extends StatelessWidget {
+  const _Illustration({required this.page});
+
+  final _Page page;
+
+  @override
+  Widget build(BuildContext context) {
+    final hue = page.hue;
+    return ExcludeSemantics(
+      child: ConfettiDots(
+        spread: 30,
+        child: Container(
+          width: 180,
+          height: 180,
+          margin: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: hue.base,
+            shape: BoxShape.circle,
+            boxShadow: [BoxShadow(color: hue.soft, spreadRadius: 16)],
+          ),
+          child: Icon(page.icon, size: 84, color: hue.onFill),
         ),
       ),
     );

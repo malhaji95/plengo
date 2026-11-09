@@ -4,12 +4,16 @@ import 'package:mocktail/mocktail.dart';
 import 'package:plengo/app/providers.dart';
 import 'package:plengo/app/router.dart';
 import 'package:plengo/core/api/generated/export.dart';
+import 'package:plengo/features/auth/auth_widgets.dart';
 import 'package:plengo/features/update/force_update_screen.dart';
 
 import 'helpers.dart';
 
 Future<void> typeInto(WidgetTester tester, String label, String text) async {
-  await tester.enterText(find.widgetWithText(TextFormField, label), text);
+  // Labels sit above the fields (V-Login): find the field inside the labelled AuthField.
+  final field = find.descendant(of: find.widgetWithText(AuthField, label), matching: find.byType(TextField));
+  await tester.ensureVisible(field);
+  await tester.enterText(field, text);
 }
 
 RemoteConfig config({String android = ''}) => RemoteConfig(
@@ -136,4 +140,112 @@ void main() {
     expect(find.byType(ForceUpdateScreen), findsOneWidget);
     expect(find.text('تحديث من المتجر'), findsNothing);
   });
+
+  testWidgets('V-Account: grouped rows, red sign-out card, and the delete sheet keeps the warning', (tester) async {
+    final semantics = tester.ensureSemantics();
+    final app = await pumpApp(tester, signedInAs: testMe);
+    app.container.read(routerProvider).go(Routes.account);
+    await tester.pumpAndSettle();
+    expect(find.text('student@example.com'), findsOneWidget);
+    expect(tester.widget<Text>(find.text('student@example.com')).textDirection, TextDirection.ltr);
+    expect(find.bySemanticsLabel('تغيير الصورة الشخصية'), findsOneWidget);
+    // The stage row shows the student's level.
+    expect(find.text('البكالوريا'), findsOneWidget);
+    for (final row in [
+      'صلاحيات الوصول',
+      'إدخال كود التفعيل',
+      'الإشعارات والهدف اليومي',
+      'المرحلة التعليمية',
+      'المدرسون الذين أتابعهم',
+      'الأجهزة المتصلة',
+      'سياسة الخصوصية',
+      'شروط الاستخدام',
+      'تراخيص البرمجيات والخطوط',
+      'تسجيل الخروج',
+      'حذف الحساب',
+    ]) {
+      await tester.scrollUntilVisible(find.text(row), 100);
+      expect(find.text(row), findsOneWidget, reason: row);
+    }
+    await tester.tap(find.text('حذف الحساب'));
+    await tester.pumpAndSettle();
+    expect(find.text('حذف الحساب نهائياً'), findsOneWidget);
+    expect(find.textContaining('لا يمكن التراجع عن هذه الخطوة.'), findsOneWidget);
+    expect(find.text('أدخل كلمة المرور للتأكيد'), findsOneWidget);
+    semantics.dispose();
+  });
+
+  for (final dark in [false, true]) {
+    testWidgets('entry and account screens fit 360 wide with large text (${dark ? 'dark' : 'light'})', (tester) async {
+      tester.view.physicalSize = const Size(360, 720);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      // Starts signed out; the session is restored later straight onto /account so Home (another
+      // screen group) is never built.
+      Me? session;
+      final app = await pumpApp(
+        tester,
+        arrange: (r) {
+          when(() => r.restoreSession()).thenAnswer((_) async => session);
+          when(() => r.sessions()).thenAnswer(
+            (_) async => [
+              SessionSummary(
+                id: 's1',
+                platform: SessionPlatform.android,
+                appVersion: '1.0.0',
+                userAgent: null,
+                createdAt: DateTime.utc(2026, 9, 20, 9),
+                lastSeenAt: DateTime.utc(2026, 9, 27, 9),
+                current: true,
+              ),
+              SessionSummary(
+                id: 's2',
+                platform: SessionPlatform.web,
+                appVersion: '1.0.0',
+                userAgent: null,
+                createdAt: DateTime.utc(2026, 9, 20, 9),
+                lastSeenAt: DateTime.utc(2026, 9, 27, 9),
+                current: false,
+              ),
+            ],
+          );
+        },
+      );
+      final appearance = app.container.read(appearanceProvider.notifier);
+      await appearance.setFontStep(2);
+      await appearance.setThemeMode(dark ? ThemeMode.dark : ThemeMode.light);
+      final router = app.container.read(routerProvider);
+      for (final path in [
+        Routes.login,
+        Routes.register,
+        Uri(path: Routes.verifyEmail, queryParameters: {'email': 'a.very.long.address@example.com'}).toString(),
+        Routes.forgotPassword,
+        Routes.resetPassword,
+      ]) {
+        router.go(path);
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull, reason: path);
+      }
+      // The college box of the register form.
+      router.go(Routes.register);
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('الجامعة'));
+      await tester.tap(find.text('الجامعة'));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+
+      session = testMe;
+      app.container.invalidate(authControllerProvider);
+      router.go(Routes.account);
+      await tester.pumpAndSettle();
+      expect(router.state.uri.path, Routes.account);
+      for (final path in [Routes.account, Routes.redeem, Routes.myAccess, Routes.placement, Routes.sessions]) {
+        router.go(path);
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull, reason: path);
+      }
+      await tester.scrollUntilVisible(find.text('إنهاء'), 100);
+      expect(find.text('هذا الجهاز'), findsOneWidget);
+    });
+  }
 }
