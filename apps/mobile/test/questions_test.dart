@@ -5,6 +5,7 @@ import 'package:plengo/app/router.dart';
 import 'package:plengo/core/api/generated/export.dart';
 import 'package:plengo/features/questions/question_providers.dart';
 import 'package:plengo/features/questions/questions_screen.dart';
+import 'package:plengo/shared/ui/ui.dart';
 
 import 'helpers.dart';
 
@@ -102,23 +103,28 @@ void main() {
     await tester.tap(find.text('ابدأ التدريب'));
     await tester.pumpAndSettle();
     expect(find.byType(PracticeScreen), findsOneWidget);
-    expect(tester.widget<FilledButton>(find.widgetWithText(FilledButton, 'تحقق')).onPressed, isNull);
+    // Nothing chosen yet: «اختر إجابة» is disabled.
+    expect(tester.widget<PlengoButton>(find.widgetWithText(PlengoButton, 'اختر إجابة')).onPressed, isNull);
     await tester.tap(find.text('الجول'));
     await tester.pump();
     await tester.tap(find.text('تحقق'));
     await tester.pumpAndSettle();
     verify(() => app.questions.check('q1', selectedOptionId: 'o2')).called(1);
-    expect(find.text('إجابة خاطئة'), findsOneWidget);
+    expect(find.text('ليست الإجابة الصحيحة'), findsOneWidget);
     expect(find.text('النيوتن وحدة القوة'), findsOneWidget);
-    expect(find.byIcon(Icons.check_circle), findsOneWidget); // the correct option is shown
+    expect(find.text(AnswerOption.correctTag), findsOneWidget); // the correct option is shown
+    expect(find.text(AnswerOption.wrongTag), findsOneWidget);
+    expect(find.text('النيوتن'), findsNWidgets(2)); // the option and the correct-answer line
+    // Question-bank checks do not reach the mistake bank, so the panel does not claim it.
+    expect(find.text(FeedbackPanel.mistakesNote), findsNothing);
 
-    await tester.tap(find.text('التالي'));
+    await tester.tap(find.text('فهمت، متابعة'));
     await tester.pumpAndSettle();
     await tester.enterText(find.byKey(const Key('written-answer')), 'دمشق');
     await tester.pump();
     await tester.tap(find.text('تحقق'));
     await tester.pumpAndSettle();
-    expect(find.text('إجابة صحيحة'), findsOneWidget);
+    expect(find.text('أحسنت!'), findsOneWidget);
     expect(find.textContaining('صحيحة 1 من 2'), findsOneWidget);
     await tester.tap(find.text('إنهاء'));
     await tester.pumpAndSettle();

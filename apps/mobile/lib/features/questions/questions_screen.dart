@@ -6,12 +6,12 @@ import '../../core/content/question_repository.dart';
 import '../../shared/text/bidi.dart';
 import '../../shared/widgets/async_view.dart';
 import '../access/access_banner.dart';
-import '../bookmarks/bookmark_button.dart';
-import '../reports/report_sheet.dart';
 import '../subjects/catalog_providers.dart';
 import '../teachers/teacher_providers.dart';
 import 'question_providers.dart';
 import 'question_view.dart';
+
+export 'question_view.dart' show PracticeScreen;
 
 const _typeLabels = {
   StudentQuestionType.mcq: 'اختيار من متعدد',
@@ -114,77 +114,6 @@ class _QuestionTile extends StatelessWidget {
             ? Icon(Icons.lock_outline, color: scheme.outline, semanticLabel: 'مقفل')
             : const Icon(Icons.chevron_left),
         onTap: onTap,
-      ),
-    );
-  }
-}
-
-/// Answer the accessible questions one by one: تحقق, then التالي.
-class PracticeScreen extends StatefulWidget {
-  const PracticeScreen({super.key, required this.title, required this.questions, this.initialIndex = 0});
-
-  final String title;
-  final List<StudentQuestion> questions;
-  final int initialIndex;
-
-  @override
-  State<PracticeScreen> createState() => _PracticeScreenState();
-}
-
-class _PracticeScreenState extends State<PracticeScreen> {
-  late int _index = widget.initialIndex;
-  bool _checked = false;
-  int _correct = 0;
-  int _answered = 0;
-
-  @override
-  Widget build(BuildContext context) {
-    final q = widget.questions[_index];
-    final last = _index == widget.questions.length - 1;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-        actions: [
-          ReportButton(type: ReportItemType.question, id: q.id),
-          BookmarkButton(type: BookmarkItemType.question, id: q.id),
-        ],
-      ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 720),
-          child: ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              LinearProgressIndicator(value: (_index + 1) / widget.questions.length),
-              const SizedBox(height: 8),
-              Text(
-                'السؤال ${_index + 1} من ${widget.questions.length} · صحيحة $_correct من $_answered',
-                style: Theme.of(context).textTheme.labelMedium,
-              ),
-              const SizedBox(height: 16),
-              QuestionView(
-                key: ValueKey(q.id),
-                question: q,
-                onChecked: (r) => setState(() {
-                  _checked = true;
-                  _answered++;
-                  if (r.isCorrect) _correct++;
-                }),
-              ),
-              const SizedBox(height: 16),
-              if (_checked)
-                last
-                    ? OutlinedButton(onPressed: () => Navigator.of(context).pop(), child: const Text('إنهاء'))
-                    : FilledButton(
-                        onPressed: () => setState(() {
-                          _index++;
-                          _checked = false;
-                        }),
-                        child: const Text('التالي'),
-                      ),
-            ],
-          ),
-        ),
       ),
     );
   }

@@ -6,6 +6,7 @@ import 'package:plengo/core/api/api_exception.dart';
 import 'package:plengo/core/api/generated/export.dart';
 import 'package:plengo/core/learning/exam_store.dart';
 import 'package:plengo/features/quizzes/quiz_providers.dart';
+import 'package:plengo/shared/ui/ui.dart';
 
 import 'helpers.dart';
 
@@ -210,16 +211,20 @@ void main() {
     await tester.pump();
     await tester.tap(find.text('تحقق'));
     await tester.pumpAndSettle();
-    expect(find.text('إجابة صحيحة'), findsOneWidget);
+    expect(find.text('أحسنت!'), findsOneWidget);
     expect(find.text('لأن'), findsOneWidget);
+    expect(find.text('السؤال 1 من 2 · صحيحة 1 من 1'), findsOneWidget);
 
-    await tester.tap(find.text('التالي'));
+    await tester.tap(find.text('متابعة'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('خيار ب الثاني'));
     await tester.pump();
     await tester.tap(find.text('تحقق'));
     await tester.pumpAndSettle();
-    expect(find.text('إجابة خاطئة'), findsOneWidget);
+    expect(find.text('ليست الإجابة الصحيحة'), findsOneWidget);
+    // Attempt answers are graded on the server, which adds wrong ones to the mistake bank.
+    expect(find.text(FeedbackPanel.mistakesNote), findsOneWidget);
+    expect(find.text('خيار أ الثاني'), findsNWidgets(2)); // the option and the correct-answer line
     final body =
         verify(() => app.learning.check('a1', 'q2', captureAny())).captured.single as CheckAttemptAnswerRequest;
     expect(body.selectedOptionId, 'q2-b');
@@ -227,7 +232,7 @@ void main() {
     await tester.tap(find.text('عرض النتيجة'));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('score')), findsOneWidget);
-    expect(find.text('أعد الأخطاء فقط'), findsOneWidget);
+    expect(find.text('أعد الأخطاء فقط (1)'), findsOneWidget);
     // Filters (§15.6).
     await tester.tap(find.text('الخاطئة'));
     await tester.pumpAndSettle();
@@ -247,7 +252,7 @@ void main() {
         when(() => l.start(any())).thenAnswer((_) async => attempt(mode: AttemptSummaryMode.practice));
       },
     );
-    await tester.tap(find.text('أعد الأخطاء فقط'));
+    await tester.tap(find.text('أعد الأخطاء فقط (1)'));
     await tester.pumpAndSettle();
     final req = verify(() => app.learning.start(captureAny())).captured.single as StartAttemptRequest;
     expect(req.source, StartAttemptRequestSource.mistakes);
@@ -281,9 +286,9 @@ void main() {
     await tester.tap(find.text('إنهاء الامتحان'));
     await tester.pumpAndSettle();
     // Review before submitting: q2 has no answer, q1 is flagged.
-    expect(find.text('بلا إجابة (1):'), findsOneWidget);
-    expect(find.text('المعلّمة للمراجعة (1):'), findsOneWidget);
-    await tester.tap(find.widgetWithText(FilledButton, 'إنهاء الامتحان').last);
+    expect(find.text('سؤال واحد بلا إجابة'), findsOneWidget);
+    expect(find.text('1 معلّم للمراجعة'), findsOneWidget);
+    await tester.tap(find.text('إنهاء الامتحان الآن'));
     await tester.pumpAndSettle();
     expect(find.text('تم حفظ إجاباتك على الجهاز. سيُرسل الامتحان تلقائياً عند عودة الاتصال.'), findsOneWidget);
 
@@ -329,7 +334,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('إنهاء الامتحان'));
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(FilledButton, 'إنهاء الامتحان').last);
+    await tester.tap(find.text('إنهاء الامتحان الآن'));
     await tester.pumpAndSettle();
     online = true;
     await tester.tap(find.text('إرسال الآن'));
@@ -360,9 +365,9 @@ void main() {
       },
     );
     expect(find.byKey(const Key('exam-timer')), findsOneWidget);
-    await tester.tap(find.byTooltip('شبكة الأسئلة'));
+    await tester.tap(find.text('شبكة الأسئلة'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('2'));
+    await tester.tap(find.byKey(const Key('grid-cell-1')));
     await tester.pumpAndSettle();
     expect(find.text('سؤال الثاني'), findsOneWidget);
   });
@@ -585,13 +590,12 @@ void main() {
     expect(find.text('لا يوجد اتصال. تُحفظ إجاباتك على الجهاز وتُرسل لاحقاً.'), findsOneWidget);
     // Resumes at the first unanswered question, keeping the stored answer and flag.
     expect(find.text('السؤال 2 من 2 · أجبت عن 1'), findsOneWidget);
-    await tester.tap(find.byTooltip('شبكة الأسئلة'));
+    await tester.tap(find.text('شبكة الأسئلة'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('1'));
+    await tester.tap(find.byKey(const Key('grid-cell-0')));
     await tester.pumpAndSettle();
     expect(find.text('سؤال الأول'), findsOneWidget);
-    final flag = tester.widget<FilterChip>(find.byKey(const Key('flag')));
-    expect(flag.selected, isTrue);
+    expect(find.descendant(of: find.byKey(const Key('flag')), matching: find.text('معلّم للمراجعة')), findsOneWidget);
   });
 
   testWidgets('mistake bank filters by type and links to the related unit (§16.1)', (tester) async {

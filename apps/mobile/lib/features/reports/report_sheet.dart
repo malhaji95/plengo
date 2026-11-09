@@ -7,6 +7,7 @@ import '../../app/providers.dart';
 import '../../core/api/api_exception.dart';
 import '../../core/api/generated/export.dart';
 import '../../core/db/app_database.dart';
+import '../../shared/ui/ui.dart';
 
 /// Whether content reports are on (remote flag, §10.2); on when the config is unknown.
 final contentReportsEnabledProvider = Provider<bool>(
@@ -71,9 +72,9 @@ const reportReasons = {
 
 /// "إبلاغ عن مشكلة" (spec §21) on a question or an official card.
 Future<void> showReportSheet(BuildContext context, WidgetRef ref, ReportItemType type, String itemId) async {
-  final sent = await showModalBottomSheet<bool>(
+  final sent = await showPlengoSheet<bool>(
     context: context,
-    isScrollControlled: true,
+    title: 'إبلاغ عن مشكلة',
     builder: (_) => _ReportSheet(type: type, itemId: itemId),
   );
   if (sent != null && context.mounted) {
@@ -126,52 +127,84 @@ class _ReportSheetState extends ConsumerState<_ReportSheet> {
           ? e.key != ReportReason.imageProblem
           : e.key != ReportReason.wrongAnswer,
     );
-    return SafeArea(
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + MediaQuery.viewInsetsOf(context).bottom),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text('إبلاغ عن مشكلة', style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: 8),
-            RadioGroup<ReportReason>(
-              groupValue: _reason,
-              onChanged: (v) => setState(() => _reason = v),
-              child: Column(
-                children: [for (final e in reasons) RadioListTile<ReportReason>(value: e.key, title: Text(e.value))],
-              ),
-            ),
-            TextField(
-              key: const Key('report-note'),
-              controller: _note,
-              maxLength: 500,
-              maxLines: 3,
-              decoration: const InputDecoration(labelText: 'ملاحظة (اختياري)'),
-            ),
-            if (_error != null) Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
-            const SizedBox(height: 8),
-            FilledButton(onPressed: _reason == null || _sending ? null : _send, child: const Text('إرسال البلاغ')),
-          ],
+    final s = context.surface;
+    OutlineInputBorder border(Color c) => OutlineInputBorder(
+      borderRadius: BorderRadius.circular(PlengoRadius.input),
+      borderSide: BorderSide(color: c, width: 2),
+    );
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Semantics(
+          container: true,
+          label: 'سبب البلاغ',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              for (final (i, e) in reasons.indexed) ...[
+                if (i > 0) const SizedBox(height: 6),
+                RadioRow(
+                  title: e.value,
+                  minHeight: 50,
+                  selected: _reason == e.key,
+                  onTap: _sending ? null : () => setState(() => _reason = e.key),
+                ),
+              ],
+            ],
+          ),
         ),
-      ),
+        const SizedBox(height: 14),
+        TextField(
+          key: const Key('report-note'),
+          controller: _note,
+          maxLength: 500,
+          minLines: 1,
+          maxLines: 3,
+          style: PlengoType.body.copyWith(color: s.ink),
+          decoration: InputDecoration(
+            labelText: 'ملاحظة (اختياري)',
+            hintText: 'اكتب التفاصيل إن أردت',
+            floatingLabelBehavior: FloatingLabelBehavior.always,
+            filled: true,
+            fillColor: s.card,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            enabledBorder: border(s.line),
+            focusedBorder: border(s.action),
+          ),
+        ),
+        if (_error != null) ...[
+          const SizedBox(height: 4),
+          Text(
+            _error!,
+            style: PlengoType.sub.copyWith(color: PlengoColors.red.ink, fontWeight: FontWeight.w700),
+          ),
+        ],
+        const SizedBox(height: 8),
+        PlengoButton(label: 'إرسال البلاغ', busy: _sending, onPressed: _reason == null || _sending ? null : _send),
+      ],
     );
   }
 }
 
-/// Flag icon that opens [showReportSheet]; hidden when reports are off.
+/// Flag icon that opens [showReportSheet]; hidden when reports are off. [soft] draws the app-bar
+/// square; inside the feedback panel it is a plain icon in the panel's ink.
 class ReportButton extends ConsumerWidget {
-  const ReportButton({super.key, required this.type, required this.id});
+  const ReportButton({super.key, required this.type, required this.id, this.soft = true, this.color});
 
   final ReportItemType type;
   final String id;
+  final bool soft;
+  final Color? color;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (!ref.watch(contentReportsEnabledProvider)) return const SizedBox.shrink();
-    return IconButton(
+    return PlengoIconButton(
       tooltip: 'إبلاغ عن مشكلة',
-      icon: const Icon(Icons.outlined_flag),
+      icon: Icons.flag_outlined,
+      soft: soft,
+      color: color,
       onPressed: () => showReportSheet(context, ref, type, id),
     );
   }

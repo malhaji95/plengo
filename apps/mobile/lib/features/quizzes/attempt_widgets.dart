@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../../core/api/generated/export.dart';
-import '../../shared/text/bidi.dart';
+import '../../shared/ui/ui.dart';
 import '../questions/question_view.dart';
 
-/// Question text plus its options or a text field. Options show correctness only when [result]
-/// is set (after grading); before that nothing reveals the answer (spec §14.3).
+/// Question type chip, question text, then its options or the «إجابتك» field. Options show
+/// correctness only when [result] is set (after grading); before that nothing reveals the answer
+/// (spec §14.3).
 class AttemptQuestionBody extends StatefulWidget {
   const AttemptQuestionBody({
     super.key,
@@ -44,45 +45,33 @@ class _AttemptQuestionBodyState extends State<AttemptQuestionBody> {
   @override
   Widget build(BuildContext context) {
     final q = widget.question;
+    final result = widget.result;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Card(
-          margin: EdgeInsets.zero,
-          child: Padding(
-            padding: const EdgeInsets.all(18),
-            child: Text(
-              isolateLtr(q.questionText),
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(height: 1.7),
-            ),
-          ),
-        ),
+        QuestionTypeChip(typeName: q.type.name),
+        const SizedBox(height: 12),
+        QuestionPrompt(q.questionText),
         const SizedBox(height: 16),
         if (q.type == AttemptQuestionType.written)
-          TextField(
-            key: const Key('written-answer'),
+          WrittenAnswerField(
             controller: _written,
             enabled: widget.enabled,
-            decoration: const InputDecoration(labelText: 'إجابتك'),
             onChanged: widget.onWrite,
-            onSubmitted: (_) => widget.onSubmitWritten?.call(),
+            onSubmitted: widget.onSubmitWritten,
           )
         else
-          for (final option in q.options) _option(option),
+          QuestionOptions(
+            options: [for (final o in q.options) (id: o.id, text: o.text)],
+            selectedId: widget.selectedOptionId,
+            graded: result != null,
+            isCorrect: (id) {
+              final o = q.options.firstWhere((o) => o.id == id);
+              return o.isCorrect ?? id == result?.correctOptionId;
+            },
+            onSelect: widget.enabled ? widget.onSelect : null,
+          ),
       ],
-    );
-  }
-
-  Widget _option(AttemptOption option) {
-    final graded = widget.result != null;
-    return AnswerOptionTile(
-      text: option.text,
-      state: OptionState.of(
-        graded: graded,
-        selected: widget.selectedOptionId == option.id,
-        correct: graded && (option.isCorrect ?? option.id == widget.result!.correctOptionId),
-      ),
-      onTap: widget.enabled ? () => widget.onSelect?.call(option.id) : null,
     );
   }
 }
@@ -106,7 +95,8 @@ String humanDuration(int ms) {
   return '${m ~/ 60} س ${m % 60} د';
 }
 
-/// Shown while the device cannot reach the server; work continues locally.
+/// Shown while the device cannot reach the server; work continues locally. An orange-soft note with
+/// a cloud icon and «إعادة المحاولة».
 class OfflineBanner extends StatelessWidget {
   const OfflineBanner({super.key, required this.text, this.onRetry});
 
@@ -115,12 +105,41 @@ class OfflineBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return MaterialBanner(
-      backgroundColor: scheme.secondaryContainer,
-      leading: const Icon(Icons.cloud_off_outlined),
-      content: Text(text),
-      actions: [if (onRetry != null) TextButton(onPressed: onRetry, child: const Text('إعادة المحاولة'))],
+    final hue = PlengoColors.orange;
+    return Semantics(
+      container: true,
+      liveRegion: true,
+      child: Container(
+        width: double.infinity,
+        margin: const EdgeInsetsDirectional.fromSTEB(20, 4, 20, 4),
+        padding: const EdgeInsetsDirectional.fromSTEB(14, 6, 6, 6),
+        decoration: BoxDecoration(color: hue.soft, borderRadius: BorderRadius.circular(PlengoRadius.row)),
+        child: Row(
+          children: [
+            Icon(Icons.cloud_off_rounded, size: 22, color: hue.ink),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                child: Text(
+                  text,
+                  style: PlengoType.sub.copyWith(color: hue.ink, fontWeight: FontWeight.w600),
+                ),
+              ),
+            ),
+            if (onRetry != null)
+              TextButton(
+                onPressed: onRetry,
+                style: TextButton.styleFrom(
+                  foregroundColor: hue.ink,
+                  minimumSize: const Size(48, 48),
+                  textStyle: PlengoType.buttonSmall,
+                ),
+                child: const Text('إعادة المحاولة'),
+              ),
+          ],
+        ),
+      ),
     );
   }
 }

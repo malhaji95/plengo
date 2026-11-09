@@ -9,6 +9,7 @@ import 'package:plengo/core/api/generated/export.dart';
 import 'package:plengo/core/db/app_database.dart';
 import 'package:plengo/core/srs/srs_key.dart';
 import 'package:plengo/features/flashcards/study_screen.dart';
+import 'package:plengo/shared/ui/ui.dart' show PlengoButton;
 
 import 'flashcards_test.dart' show card, deck;
 import 'helpers.dart';
@@ -208,7 +209,7 @@ void main() {
     await tester.pumpAndSettle();
     // Cards have no answer to be wrong.
     expect(find.text('الإجابة خاطئة'), findsNothing);
-    expect(tester.widget<FilledButton>(find.widgetWithText(FilledButton, 'إرسال البلاغ')).onPressed, isNull);
+    expect(tester.widget<PlengoButton>(find.widgetWithText(PlengoButton, 'إرسال البلاغ')).onPressed, isNull);
     await tester.tap(find.text('مشكلة في الصورة'));
     await tester.enterText(fieldByKey('report-note'), '  الصورة مقلوبة ');
     await tester.pump();

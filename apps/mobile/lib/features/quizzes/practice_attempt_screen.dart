@@ -4,19 +4,20 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/api/api_exception.dart';
 import '../../core/api/generated/export.dart';
-import '../../shared/widgets/form_widgets.dart';
-import '../bookmarks/bookmark_button.dart';
-import '../reports/report_sheet.dart';
+import '../../shared/ui/ui.dart';
 import '../questions/question_view.dart';
 import 'attempt_widgets.dart';
 import 'quiz_providers.dart';
 
-/// Practice mode (spec §15.2): answer → تحقق → the server grades and explains → التالي. An answer
+/// Practice mode (spec §15.2): answer → تحقق → the server grades and explains → متابعة. An answer
 /// cannot change after checking. Resuming continues at the first unchecked question.
 class PracticeAttemptScreen extends ConsumerStatefulWidget {
   const PracticeAttemptScreen({super.key, required this.attempt});
 
   final Attempt attempt;
+
+  /// Exit sheet title: a practice attempt is resumable (DECISIONS #13).
+  static const exitTitle = 'تقدّمك محفوظ';
 
   @override
   ConsumerState<PracticeAttemptScreen> createState() => _PracticeAttemptScreenState();
@@ -40,6 +41,9 @@ class _PracticeAttemptScreenState extends ConsumerState<PracticeAttemptScreen> {
   bool _busy = false;
   String? _error;
   final _shownAt = Stopwatch()..start();
+
+  /// Correct answers in a row checked in this session (DECISIONS #10).
+  int _run = 0;
 
   String get _id => widget.attempt.attempt.id;
   AttemptQuestion get _q => _questions[_index];
@@ -65,7 +69,12 @@ class _PracticeAttemptScreenState extends ConsumerState<PracticeAttemptScreen> {
               timeSpentMs: _shownAt.elapsedMilliseconds,
             ),
           );
-      if (mounted) setState(() => _results[_q.questionId] = result);
+      if (mounted) {
+        setState(() {
+          _results[_q.questionId] = result;
+          _run = result.isCorrect ? _run + 1 : 0;
+        });
+      }
     } on ApiException catch (e) {
       if (mounted) {
         setState(() => _error = e.code == 'NETWORK_ERROR' ? 'التحقق يحتاج إلى اتصال بالإنترنت' : e.message);
@@ -89,62 +98,105 @@ class _PracticeAttemptScreenState extends ConsumerState<PracticeAttemptScreen> {
     }
   }
 
+  Future<void> _exit() async {
+    final next = _questions.indexWhere((q) => !_results.containsKey(q.questionId));
+    final leave = await confirmLeavePractice(
+      context,
+      title: PracticeAttemptScreen.exitTitle,
+      message: next < 0 ? null : 'يمكنك المتابعة من السؤال ${next + 1} في أي وقت.',
+    );
+    if (leave && mounted) leaveFlow(context);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final s = context.surface;
     final result = _results[_q.questionId];
     final last = _index == _questions.length - 1;
+    final correctText = result == null
+        ? null
+        : _q.options.where((o) => o.id == result.correctOptionId).firstOrNull?.text ?? result.correctAnswer;
+    // Early finish (spec §15.2): submit now and see the results.
+    final finishEarly = PlengoButton(
+      label: 'إنهاء التدريب',
+      variant: PlengoButtonVariant.ghost,
+      size: PlengoButtonSize.small,
+      expand: true,
+      onPressed: _busy ? null : _finish,
+    );
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.attempt.attempt.titleAr),
-        actions: [
-          ReportButton(type: ReportItemType.question, id: _q.questionId),
-          BookmarkButton(type: BookmarkItemType.question, id: _q.questionId),
-          TextButton(onPressed: _busy ? null : _finish, child: const Text('إنهاء')),
-        ],
-      ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 720),
-          child: ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              LinearProgressIndicator(value: (_index + 1) / _questions.length),
-              const SizedBox(height: 8),
-              Text(
-                'السؤال ${_index + 1} من ${_questions.length} · صحيحة $_correct من ${_results.length}',
-                style: Theme.of(context).textTheme.labelMedium,
-              ),
-              const SizedBox(height: 16),
-              AttemptQuestionBody(
-                key: ValueKey(_q.questionId),
-                question: _q,
-                selectedOptionId: _selected[_q.questionId],
-                writtenAnswer: _written[_q.questionId],
-                enabled: result == null && !_busy,
-                result: result,
-                onSelect: (id) => setState(() => _selected[_q.questionId] = id),
-                onWrite: (text) => setState(() => _written[_q.questionId] = text),
-                onSubmitWritten: _hasAnswer && result == null ? _check : null,
-              ),
-              const SizedBox(height: 16),
-              ErrorBanner(_error),
-              if (result == null)
-                SubmitButton(label: 'تحقق', busy: _busy, onPressed: _hasAnswer ? _check : null)
-              else ...[
-                AnswerFeedback(result: result, written: _isWritten),
-                const SizedBox(height: 16),
-                last
-                    ? FilledButton(onPressed: _busy ? null : _finish, child: const Text('عرض النتيجة'))
-                    : FilledButton(
-                        onPressed: () => setState(() {
-                          _index++;
-                          _shownAt.reset();
-                        }),
-                        child: const Text('التالي'),
+      body: SafeArea(
+        bottom: false,
+        child: Column(
+          children: [
+            PracticeHeader(
+              position: _index + 1,
+              total: _questions.length,
+              correct: _correct,
+              checked: _results.length,
+              progress: (_index + (result == null ? 0 : 1)) / _questions.length,
+              onExit: _exit,
+              questionId: _q.questionId,
+            ),
+            Expanded(
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: PlengoSpace.contentMaxWide),
+                  child: ListView(
+                    key: ValueKey(_q.questionId),
+                    padding: const EdgeInsetsDirectional.fromSTEB(20, 12, 20, 24),
+                    children: [
+                      if (result != null && result.isCorrect && _run >= 3) ...[
+                        CorrectStreakChip(count: _run),
+                        const SizedBox(height: 12),
+                      ],
+                      Text(widget.attempt.attempt.titleAr, style: PlengoType.caption.copyWith(color: s.mute)),
+                      const SizedBox(height: 6),
+                      AttemptQuestionBody(
+                        key: ValueKey(_q.questionId),
+                        question: _q,
+                        selectedOptionId: _selected[_q.questionId],
+                        writtenAnswer: _written[_q.questionId],
+                        enabled: result == null && !_busy,
+                        result: result,
+                        onSelect: (id) => setState(() => _selected[_q.questionId] = id),
+                        onWrite: (text) => setState(() => _written[_q.questionId] = text),
+                        onSubmitWritten: _hasAnswer && result == null ? _check : null,
                       ),
-              ],
-            ],
-          ),
+                      if (result != null && _error != null) ...[const SizedBox(height: 12), InlineError(_error)],
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            if (result == null)
+              CheckBar(
+                hasAnswer: _hasAnswer,
+                busy: _busy,
+                written: _isWritten,
+                error: _error,
+                onCheck: _check,
+                extra: finishEarly,
+              )
+            else
+              AnswerFeedbackPanel(
+                result: result,
+                questionId: _q.questionId,
+                correctAnswerText: correctText,
+                // Attempt answers are graded on the server, which records wrong ones in the mistake bank.
+                addedToMistakes: true,
+                actionLabel: last ? 'عرض النتيجة' : null,
+                onContinue: _busy
+                    ? null
+                    : last
+                    ? _finish
+                    : () => setState(() {
+                        _index++;
+                        _error = null;
+                        _shownAt.reset();
+                      }),
+              ),
+          ],
         ),
       ),
     );
