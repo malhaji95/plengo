@@ -5,6 +5,7 @@ import 'package:plengo/app/router.dart';
 import 'package:plengo/core/api/api_exception.dart';
 import 'package:plengo/features/auth/login_screen.dart';
 import 'package:plengo/features/legal/legal_screen.dart';
+import 'package:plengo/shared/ui/ui.dart';
 
 import 'helpers.dart';
 
@@ -48,8 +49,8 @@ void main() {
     await app.db.setValue('probe', 'kept-until-deletion');
     await openDeleteDialog(tester);
     expect(find.text('حذف الحساب نهائياً'), findsOneWidget);
-    final confirm = find.widgetWithText(FilledButton, 'حذف الحساب');
-    expect(tester.widget<FilledButton>(confirm).onPressed, isNull);
+    final confirm = find.widgetWithText(PlengoButton, 'حذف الحساب');
+    expect(tester.widget<PlengoButton>(confirm).onPressed, isNull);
 
     await tester.enterText(find.byKey(const Key('delete.password')), 'wrong');
     await tester.pump();
@@ -94,8 +95,8 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('البيانات'), findsOneWidget);
     expect(find.text('البريد'), findsOneWidget);
-    expect(find.byType(BackButton), findsOneWidget);
-    await tester.tap(find.byType(BackButton));
+    expect(find.byType(PlengoBackButton), findsOneWidget);
+    await tester.tap(find.byType(PlengoBackButton));
     await tester.pumpAndSettle();
     await tester.ensureVisible(find.text('شروط الاستخدام'));
     await tester.pumpAndSettle();

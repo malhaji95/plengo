@@ -3,8 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../app/providers.dart';
-import '../../core/api/api_exception.dart';
 import '../../core/api/generated/export.dart';
+import '../../shared/ui/ui.dart';
+import '../../shared/widgets/async_view.dart';
 import '../../shared/widgets/responsive.dart';
 
 final sessionsProvider = FutureProvider.autoDispose<List<SessionSummary>>(
@@ -27,33 +28,37 @@ class SessionsScreen extends ConsumerWidget {
     final sessions = ref.watch(sessionsProvider);
     final format = DateFormat('yyyy/MM/dd – HH:mm', 'ar');
     return Scaffold(
-      appBar: AppBar(title: const Text('الأجهزة المتصلة')),
+      appBar: AppBar(
+        leading: const PlengoBackButton(),
+        leadingWidth: kPlengoLeadingWidth,
+        title: const Text('الأجهزة المتصلة'),
+      ),
       body: ContentWidth(
-        child: sessions.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, _) => Center(
-            child: TextButton(
-              onPressed: () => ref.invalidate(sessionsProvider),
-              child: Text(e is ApiException ? e.message : ApiException.genericMessage),
-            ),
-          ),
+        child: AsyncView(
+          value: sessions,
+          onRetry: () => ref.invalidate(sessionsProvider),
           data: (items) => ListView.separated(
+            padding: const EdgeInsetsDirectional.fromSTEB(PlengoSpace.screen, 8, PlengoSpace.screen, 28),
             itemCount: items.length,
-            separatorBuilder: (_, _) => const Divider(height: 1),
+            separatorBuilder: (_, _) => const SizedBox(height: PlengoSpace.listGap),
             itemBuilder: (context, i) {
               final s = items[i];
-              return ListTile(
-                leading: Icon(s.platform == SessionPlatform.web ? Icons.language : Icons.phone_android),
-                title: Text(_platformLabels[s.platform] ?? s.platform.name),
-                subtitle: Text('آخر نشاط: ${format.format(s.lastSeenAt.toLocal())}'),
+              return ListRow(
+                icon: s.platform == SessionPlatform.web ? Icons.language_rounded : Icons.phone_android_rounded,
+                hue: s.current ? PlengoColors.blue : PlengoColors.yellow,
+                title: _platformLabels[s.platform] ?? s.platform.name,
+                caption: 'آخر نشاط: ${format.format(s.lastSeenAt.toLocal())}',
                 trailing: s.current
-                    ? const Chip(label: Text('هذا الجهاز'))
-                    : TextButton(
+                    ? const PlengoChip(label: 'هذا الجهاز', icon: Icons.check_rounded)
+                    : PlengoButton(
+                        label: 'إنهاء',
+                        variant: PlengoButtonVariant.secondary,
+                        size: PlengoButtonSize.small,
+                        semanticsLabel: 'إنهاء الجلسة على ${_platformLabels[s.platform] ?? s.platform.name}',
                         onPressed: () async {
                           await ref.read(authRepositoryProvider).revokeSession(s.id);
                           ref.invalidate(sessionsProvider);
                         },
-                        child: const Text('إنهاء'),
                       ),
               );
             },
