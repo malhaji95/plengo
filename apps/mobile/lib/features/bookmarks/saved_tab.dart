@@ -6,8 +6,10 @@ import '../../app/router.dart';
 import '../../core/api/generated/export.dart';
 import '../../core/content/study_card.dart';
 import '../../shared/text/bidi.dart';
+import '../../shared/ui/ui.dart';
 import '../../shared/widgets/async_view.dart';
 import '../flashcards/card_face.dart';
+import '../flashcards/flashcard_ui.dart';
 import '../questions/questions_screen.dart';
 import 'bookmark_button.dart';
 import 'bookmark_providers.dart';
@@ -21,6 +23,7 @@ const _filters = <BookmarkItemType?, String>{
 };
 
 /// The Saved tab (المحفوظات, spec §17). Items the student can no longer open show as locked.
+/// Redesign: V-Saved.
 class SavedTab extends ConsumerStatefulWidget {
   const SavedTab({super.key});
 
@@ -37,7 +40,11 @@ class _SavedTabState extends ConsumerState<SavedTab> {
     // Toggling elsewhere refreshes the list.
     ref.listen(bookmarkKeysProvider, (_, _) => ref.invalidate(bookmarksProvider));
     return Scaffold(
-      appBar: AppBar(title: const Text('المحفوظات')),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        titleSpacing: PlengoSpace.screen,
+        title: const Text('المحفوظات'),
+      ),
       body: AsyncView(
         value: list,
         onRetry: () => ref.invalidate(bookmarksProvider),
@@ -49,23 +56,33 @@ class _SavedTabState extends ConsumerState<SavedTab> {
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 720),
                 child: ListView(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsetsDirectional.fromSTEB(0, 4, 0, 28),
                   children: [
-                    Wrap(
-                      spacing: 8,
-                      children: [
-                        for (final MapEntry(key: t, value: label) in _filters.entries)
-                          ChoiceChip(
-                            label: Text(label),
-                            selected: _type == t,
-                            onSelected: (_) => setState(() => _type = t),
-                          ),
-                      ],
+                    PillSelector<BookmarkItemType?>(
+                      options: [for (final MapEntry(key: t, value: label) in _filters.entries) PlengoOption(t, label)],
+                      selected: _type,
+                      onSelected: (t) => setState(() => _type = t),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 16),
                     if (items.isEmpty)
-                      const EmptyState('احفظ الأسئلة والبطاقات لتعود إليها هنا', icon: Icons.bookmark_border),
-                    for (final b in items) _BookmarkTile(bookmark: b),
+                      PlengoEmptyState(
+                        title: 'لا شيء محفوظ هنا بعد',
+                        message: 'احفظ الأسئلة والبطاقات لتعود إليها هنا',
+                        icon: Icons.bookmark_border_rounded,
+                        hue: PlengoColors.pink,
+                        actionLabel: 'تصفّح المواد',
+                        onAction: () => context.go(Routes.subjects),
+                      ),
+                    for (final b in items)
+                      Padding(
+                        padding: const EdgeInsetsDirectional.fromSTEB(
+                          PlengoSpace.screen,
+                          0,
+                          PlengoSpace.screen,
+                          PlengoSpace.listGap,
+                        ),
+                        child: _BookmarkTile(bookmark: b),
+                      ),
                   ],
                 ),
               ),
@@ -85,12 +102,11 @@ class _BookmarkTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final b = bookmark;
-    final scheme = Theme.of(context).colorScheme;
-    final (IconData icon, String kind) = switch (b.itemType) {
-      BookmarkItemType.question => (Icons.quiz_outlined, 'سؤال'),
-      BookmarkItemType.deck => (Icons.style_outlined, 'مجموعة بطاقات'),
-      BookmarkItemType.userCard => (Icons.collections_bookmark_outlined, 'من بطاقاتي'),
-      _ => (Icons.crop_portrait, 'بطاقة'),
+    final (IconData icon, String kind, PlengoHue hue) = switch (b.itemType) {
+      BookmarkItemType.question => (Icons.quiz_rounded, 'سؤال', PlengoColors.blue),
+      BookmarkItemType.deck => (Icons.style_rounded, 'مجموعة بطاقات', PlengoColors.orange),
+      BookmarkItemType.userCard => (Icons.collections_bookmark_rounded, 'من بطاقاتي', PlengoColors.pink),
+      _ => (Icons.crop_portrait_rounded, 'بطاقة', PlengoColors.green),
     };
     final title = !b.available
         ? 'لم يعد هذا العنصر متاحاً'
@@ -106,37 +122,39 @@ class _BookmarkTile extends StatelessWidget {
           ),
         ),
         BookmarkItemType.deck => () => context.go('${Routes.decks}/${b.itemId}'),
-        BookmarkItemType.flashcard when b.card != null => () => showDialog<void>(
-          context: context,
-          builder: (_) => Dialog(child: _CardPreview(card: StudyCard.official(b.card!))),
-        ),
-        BookmarkItemType.userCard when b.userCard != null => () => showDialog<void>(
-          context: context,
-          builder: (_) => Dialog(child: _CardPreview(card: _ownCard(b.userCard!))),
-        ),
+        BookmarkItemType.flashcard when b.card != null => () => _preview(context, StudyCard.official(b.card!)),
+        BookmarkItemType.userCard when b.userCard != null => () => _preview(context, _ownCard(b.userCard!)),
         _ => null,
       };
     } else if (b.available && b.locked && b.itemType == BookmarkItemType.deck) {
       onTap = () => context.go('${Routes.decks}/${b.itemId}');
     }
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        leading: Icon(icon),
-        title: Text(isolateLtr(title), maxLines: 2, overflow: TextOverflow.ellipsis),
-        subtitle: Text([kind, if (b.subjectNameAr != null) b.subjectNameAr!].join(' · ')),
-        onTap: onTap,
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (b.locked) Icon(Icons.lock_outline, color: scheme.outline, semanticLabel: 'مقفل'),
-            BookmarkButton(type: b.itemType, id: b.itemId),
-          ],
-        ),
-      ),
+    return ActionRow(
+      title: isolateLtr(title),
+      caption: [kind, if (b.subjectNameAr != null) b.subjectNameAr!].join(' · '),
+      leading: SubjectIconTile(icon: icon, hue: hue, soft: true),
+      onTap: onTap,
+      trailing: [
+        if (b.locked)
+          const Padding(
+            padding: EdgeInsetsDirectional.only(start: 4),
+            child: PlengoChip(label: 'مقفل', hue: PlengoColors.red, icon: Icons.lock_outline),
+          ),
+        BookmarkButton(type: b.itemType, id: b.itemId),
+      ],
     );
   }
 }
+
+Future<void> _preview(BuildContext context, StudyCard card) => showDialog<void>(
+  context: context,
+  barrierColor: PlengoColors.scrim,
+  builder: (_) => Dialog(
+    backgroundColor: context.surface.background,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(PlengoRadius.hero)),
+    child: _CardPreview(card: card),
+  ),
+);
 
 class _CardPreview extends StatefulWidget {
   const _CardPreview({required this.card});
@@ -152,15 +170,30 @@ class _CardPreviewState extends State<_CardPreview> {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.all(12),
+    padding: const EdgeInsets.all(16),
     child: Column(
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        ConstrainedBox(
-          constraints: const BoxConstraints(maxHeight: 420),
-          child: FlashcardView(card: widget.card, flipped: _back, onTap: () => setState(() => _back = !_back)),
+        Align(
+          alignment: AlignmentDirectional.centerStart,
+          child: PlengoIconButton(icon: Icons.close_rounded, tooltip: 'إغلاق', onPressed: () => Navigator.pop(context)),
         ),
-        TextButton(onPressed: () => setState(() => _back = !_back), child: Text(_back ? 'الوجه' : 'اقلب')),
+        const SizedBox(height: 8),
+        Center(
+          child: FlashcardView(
+            card: widget.card,
+            flipped: _back,
+            onTap: () => setState(() => _back = !_back),
+            maxHeight: 420,
+          ),
+        ),
+        const SizedBox(height: 12),
+        PlengoButton(
+          label: _back ? 'الوجه' : 'اقلب',
+          variant: PlengoButtonVariant.secondary,
+          onPressed: () => setState(() => _back = !_back),
+        ),
       ],
     ),
   );
