@@ -6,9 +6,11 @@ import '../../app/router.dart';
 import '../../core/api/api_exception.dart';
 import '../../core/api/generated/export.dart';
 import '../../shared/text/bidi.dart';
+import '../../shared/ui/ui.dart';
 import '../../shared/widgets/async_view.dart';
-import '../quizzes/quiz_providers.dart';
 import '../../shared/widgets/responsive.dart';
+import '../flashcards/flashcard_ui.dart';
+import '../quizzes/quiz_providers.dart';
 
 final mistakesProvider = FutureProvider.autoDispose.family<MistakeList, MistakeFilterStatus>(
   (ref, status) => ref.watch(learningRepositoryProvider).mistakes(status: status),
@@ -38,40 +40,35 @@ class _MistakesScreenState extends ConsumerState<MistakesScreen> {
   Future<void> _test(MistakeList list) async {
     var count = list.activeCount.clamp(1, 20).toDouble();
     var mode = StartAttemptRequestMode.practice;
-    final go = await showModalBottomSheet<bool>(
+    final go = await showPlengoSheet<bool>(
       context: context,
-      showDragHandle: true,
+      title: 'اختبر أخطائي',
       builder: (context) => StatefulBuilder(
-        builder: (context, setSheet) => SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text('اختبر أخطائي', style: Theme.of(context).textTheme.titleMedium),
-                const SizedBox(height: 12),
-                Text('عدد الأسئلة: ${count.round()}'),
-                if (list.activeCount > 1)
-                  Slider(
-                    value: count,
-                    min: 1,
-                    max: list.activeCount.clamp(1, 100).toDouble(),
-                    onChanged: (v) => setSheet(() => count = v),
-                  ),
-                SegmentedButton<StartAttemptRequestMode>(
-                  segments: const [
-                    ButtonSegment(value: StartAttemptRequestMode.practice, label: Text('تدريب')),
-                    ButtonSegment(value: StartAttemptRequestMode.exam, label: Text('امتحان')),
-                  ],
-                  selected: {mode},
-                  onSelectionChanged: (s) => setSheet(() => mode = s.first),
-                ),
-                const SizedBox(height: 16),
-                FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('ابدأ')),
+        builder: (context, setSheet) => Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text('عدد الأسئلة: ${count.round()}', style: PlengoType.rowTitle.copyWith(color: context.surface.ink)),
+            if (list.activeCount > 1)
+              Slider(
+                value: count,
+                min: 1,
+                max: list.activeCount.clamp(1, 100).toDouble(),
+                label: '${count.round()}',
+                onChanged: (v) => setSheet(() => count = v),
+              ),
+            const SizedBox(height: 8),
+            SegmentedControl<StartAttemptRequestMode>(
+              segments: const [
+                PlengoOption(StartAttemptRequestMode.practice, 'تدريب'),
+                PlengoOption(StartAttemptRequestMode.exam, 'امتحان'),
               ],
+              selected: mode,
+              onChanged: (m) => setSheet(() => mode = m),
             ),
-          ),
+            const SizedBox(height: 16),
+            PlengoButton(label: 'ابدأ', onPressed: () => Navigator.pop(context, true)),
+          ],
         ),
       ),
     );
@@ -99,8 +96,9 @@ class _MistakesScreenState extends ConsumerState<MistakesScreen> {
   @override
   Widget build(BuildContext context) {
     final mistakes = ref.watch(mistakesProvider(_status));
+    final s = context.surface;
     return Scaffold(
-      appBar: AppBar(title: const Text('مراجعة الأخطاء')),
+      appBar: plengoAppBar(context, title: 'مراجعة الأخطاء'),
       body: ContentWidth(
         child: AsyncView(
           value: mistakes,
@@ -126,102 +124,107 @@ class _MistakesScreenState extends ConsumerState<MistakesScreen> {
               ].join(' · ');
               (groups[key] ??= []).add(m);
             }
-            return ListView(
-              padding: const EdgeInsets.all(16),
+            final canTest = _status == MistakeFilterStatus.active && shown.isNotEmpty;
+            return Column(
               children: [
-                SegmentedButton<MistakeFilterStatus>(
-                  segments: [
-                    ButtonSegment(value: MistakeFilterStatus.active, label: Text('نشطة (${list.activeCount})')),
-                    ButtonSegment(value: MistakeFilterStatus.mastered, label: Text('متقنة (${list.masteredCount})')),
-                  ],
-                  selected: {_status},
-                  onSelectionChanged: (s) => setState(() => _status = s.first),
-                ),
-                const SizedBox(height: 12),
-                if (subjects.length > 1)
-                  Wrap(
-                    spacing: 8,
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsetsDirectional.fromSTEB(0, 4, 0, 24),
                     children: [
-                      ChoiceChip(
-                        label: const Text('كل المواد'),
-                        selected: _subjectId == null,
-                        onSelected: (_) => setState(() {
-                          _subjectId = null;
-                          _unitId = null;
-                        }),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: PlengoSpace.screen),
+                        child: SegmentedControl<MistakeFilterStatus>(
+                          segments: [
+                            PlengoOption(MistakeFilterStatus.active, 'نشطة (${list.activeCount})'),
+                            PlengoOption(MistakeFilterStatus.mastered, 'متقنة (${list.masteredCount})'),
+                          ],
+                          selected: _status,
+                          onChanged: (v) => setState(() => _status = v),
+                        ),
                       ),
-                      for (final MapEntry(key: id, value: name) in subjects.entries)
-                        ChoiceChip(
-                          label: Text(name),
-                          selected: _subjectId == id,
-                          onSelected: (_) => setState(() {
+                      if (subjects.length > 1) ...[
+                        const SizedBox(height: 12),
+                        PillSelector<String?>(
+                          options: [
+                            const PlengoOption(null, 'كل المواد', icon: Icons.filter_list_rounded),
+                            for (final MapEntry(key: id, value: name) in subjects.entries) PlengoOption(id, name),
+                          ],
+                          selected: _subjectId,
+                          onSelected: (id) => setState(() {
                             _subjectId = id;
                             _unitId = null;
                           }),
                         ),
-                    ],
-                  ),
-                // Units once a subject is chosen (or when there is only one subject).
-                if ((_subjectId != null || subjects.length == 1) && units.length > 1) ...[
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    children: [
-                      ChoiceChip(
-                        label: const Text('كل الوحدات'),
-                        selected: _unitId == null,
-                        onSelected: (_) => setState(() => _unitId = null),
+                      ],
+                      // Units once a subject is chosen (or when there is only one subject).
+                      if ((_subjectId != null || subjects.length == 1) && units.length > 1) ...[
+                        const SizedBox(height: 8),
+                        PillSelector<String?>(
+                          options: [
+                            const PlengoOption(null, 'كل الوحدات'),
+                            for (final MapEntry(key: id, value: name) in units.entries) PlengoOption(id, name),
+                          ],
+                          selected: _unitId,
+                          onSelected: (id) => setState(() => _unitId = id),
+                        ),
+                      ],
+                      if (types.length > 1) ...[
+                        const SizedBox(height: 8),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsets.symmetric(horizontal: PlengoSpace.screen),
+                          child: Row(
+                            spacing: 8,
+                            children: [
+                              for (final t in MistakeType.values.where(types.contains))
+                                // A toggle: tap again to show every type.
+                                PlengoPill(
+                                  label: _typeLabels[t]!,
+                                  selected: _type == t,
+                                  icon: _type == t ? Icons.check_rounded : null,
+                                  onTap: () => setState(() => _type = _type == t ? null : t),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ],
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: PlengoSpace.screen),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            if (_status == MistakeFilterStatus.active) ...[
+                              const SizedBox(height: 12),
+                              Text(
+                                'يُتقن السؤال بعد ${list.masteryStreak} إجابات صحيحة متتالية',
+                                style: PlengoType.caption.copyWith(color: s.mute),
+                              ),
+                            ],
+                            const SizedBox(height: 4),
+                            if (shown.isEmpty)
+                              EmptyState(
+                                _status == MistakeFilterStatus.active ? 'لا أخطاء لمراجعتها' : 'لا أسئلة متقنة بعد',
+                                icon: Icons.task_alt_rounded,
+                              ),
+                            for (final MapEntry(key: title, value: items) in groups.entries) ...[
+                              SectionHeader(title, top: 14),
+                              for (final m in items) ...[
+                                _MistakeCard(mistake: m, typeLabel: _typeLabels[m.type]),
+                                const SizedBox(height: PlengoSpace.listGap),
+                              ],
+                            ],
+                          ],
+                        ),
                       ),
-                      for (final MapEntry(key: id, value: name) in units.entries)
-                        ChoiceChip(
-                          label: Text(name),
-                          selected: _unitId == id,
-                          onSelected: (_) => setState(() => _unitId = id),
-                        ),
                     ],
                   ),
-                ],
-                if (types.length > 1) ...[
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
+                ),
+                if (canTest)
+                  BottomPanel(
                     children: [
-                      for (final t in MistakeType.values.where(types.contains))
-                        FilterChip(
-                          label: Text(_typeLabels[t]!),
-                          selected: _type == t,
-                          onSelected: (on) => setState(() => _type = on ? t : null),
-                        ),
+                      PlengoButton(label: 'اختبر أخطائي', icon: Icons.play_arrow_rounded, onPressed: () => _test(list)),
                     ],
                   ),
-                ],
-                if (_status == MistakeFilterStatus.active && shown.isNotEmpty) ...[
-                  const SizedBox(height: 12),
-                  FilledButton.icon(
-                    onPressed: () => _test(list),
-                    icon: const Icon(Icons.play_arrow),
-                    label: const Text('اختبر أخطائي'),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'يُتقن السؤال بعد ${list.masteryStreak} إجابات صحيحة متتالية',
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                ],
-                const SizedBox(height: 12),
-                if (shown.isEmpty)
-                  EmptyState(
-                    _status == MistakeFilterStatus.active ? 'لا أخطاء لمراجعتها 🎉' : 'لا أسئلة متقنة بعد',
-                    icon: Icons.task_alt,
-                  ),
-                for (final MapEntry(key: title, value: items) in groups.entries) ...[
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8, bottom: 4),
-                    child: Text(title, style: Theme.of(context).textTheme.titleSmall),
-                  ),
-                  for (final m in items) _MistakeTile(mistake: m),
-                ],
               ],
             );
           },
@@ -231,50 +234,107 @@ class _MistakesScreenState extends ConsumerState<MistakesScreen> {
   }
 }
 
-class _MistakeTile extends ConsumerWidget {
-  const _MistakeTile({required this.mistake});
+/// «أخطأت مرة» / «مرتين» / «3 مرات».
+String _wrongLabel(int n) => 'أخطأت ${arabicCount(n, one: 'مرة', two: 'مرتين', few: 'مرات', many: 'مرة')}';
+
+/// One mistake: subject and type chips, the question, «أخطأت N مرات · صحيحة متتالية: k» and «تدرّب»
+/// (the related lesson or unit, §16.1).
+class _MistakeCard extends ConsumerWidget {
+  const _MistakeCard({required this.mistake, required this.typeLabel});
 
   final Mistake mistake;
+  final String? typeLabel;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final m = mistake;
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        title: Text(isolateLtr(m.questionText), maxLines: 3, overflow: TextOverflow.ellipsis),
-        subtitle: Text(
-          [
-            'أخطأت ${m.wrongCount} ${m.wrongCount == 1 ? 'مرة' : 'مرات'}',
-            if (m.correctStreak > 0) 'صحيحة متتالية: ${m.correctStreak}',
-          ].join(' · '),
-        ),
-        // The related lesson or unit (§16.1).
-        onTap: () => context.go(
-          m.lessonId != null
-              ? '${Routes.subjects}/${m.subjectId}/questions?lessonId=${m.lessonId}'
-              : m.unitId != null
-              ? '${Routes.subjects}/${m.subjectId}/questions?unitId=${m.unitId}'
-              : m.teacherTrackId != null
-              ? '${Routes.tracks}/${m.teacherTrackId}/questions'
-              : '${Routes.subjects}/${m.subjectId}/questions',
-        ),
-        trailing: m.status == MistakeStatus.active
-            ? IconButton(
-                tooltip: 'إزالة من الأخطاء',
-                icon: const Icon(Icons.delete_outline),
-                onPressed: () async {
-                  try {
-                    await ref.read(learningRepositoryProvider).removeMistake(m.questionId);
-                    ref.invalidate(mistakesProvider);
-                  } on ApiException catch (e) {
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
+    final s = context.surface;
+    final hue = subjectHue(m.subjectId);
+    void practise() => context.go(
+      m.lessonId != null
+          ? '${Routes.subjects}/${m.subjectId}/questions?lessonId=${m.lessonId}'
+          : m.unitId != null
+          ? '${Routes.subjects}/${m.subjectId}/questions?unitId=${m.unitId}'
+          : m.teacherTrackId != null
+          ? '${Routes.tracks}/${m.teacherTrackId}/questions'
+          : '${Routes.subjects}/${m.subjectId}/questions',
+    );
+    return PlengoCard(
+      onTap: practise,
+      padding: const EdgeInsetsDirectional.fromSTEB(16, 12, 8, 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: [
+                    PlengoChip(label: m.subjectNameAr, hue: hue),
+                    if (typeLabel != null) PlengoChip(label: typeLabel!, hue: PlengoColors.blue),
+                  ],
+                ),
+              ),
+              if (m.status == MistakeStatus.active)
+                IconButton(
+                  tooltip: 'إزالة من الأخطاء',
+                  color: s.mute,
+                  icon: const Icon(Icons.delete_outline_rounded),
+                  onPressed: () async {
+                    try {
+                      await ref.read(learningRepositoryProvider).removeMistake(m.questionId);
+                      ref.invalidate(mistakesProvider);
+                    } on ApiException catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
+                      }
                     }
-                  }
-                },
-              )
-            : null,
+                  },
+                )
+              else
+                const SizedBox(height: 48),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Padding(
+            padding: const EdgeInsetsDirectional.only(end: 8),
+            child: Text(
+              isolateLtr(m.questionText),
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              style: PlengoType.rowTitle.copyWith(color: s.ink),
+            ),
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: Text.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(
+                        text: _wrongLabel(m.wrongCount),
+                        style: TextStyle(color: hueText(context, PlengoColors.red), fontWeight: FontWeight.w700),
+                      ),
+                      TextSpan(text: ' · صحيحة متتالية: ${m.correctStreak}'),
+                    ],
+                  ),
+                  style: PlengoType.caption.copyWith(color: s.mute),
+                ),
+              ),
+              TextButton(
+                onPressed: practise,
+                style: TextButton.styleFrom(
+                  foregroundColor: s.action,
+                  minimumSize: const Size(48, 48),
+                  textStyle: PlengoType.buttonSmall.copyWith(fontSize: 13),
+                ),
+                child: const Text('تدرّب'),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

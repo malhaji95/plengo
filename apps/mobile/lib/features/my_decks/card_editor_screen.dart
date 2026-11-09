@@ -9,9 +9,11 @@ import '../../core/content/media_uploader.dart';
 import '../../core/content/my_decks_store.dart';
 import '../../core/content/study_card.dart';
 import '../../core/db/app_database.dart';
+import '../../shared/ui/ui.dart';
 import '../../shared/util/uuid.dart';
 import '../../shared/widgets/async_view.dart';
 import '../flashcards/card_face.dart';
+import '../flashcards/flashcard_ui.dart';
 import 'my_decks_providers.dart';
 
 /// Picks an image already scaled on the device: at most [maxSide] pixels on the long side, JPEG
@@ -32,24 +34,28 @@ final imagePickProvider = Provider<ImagePick>(
 
 /// Asks gallery or camera (camera only where available), then picks.
 Future<Uint8List?> pickImage(BuildContext context, WidgetRef ref, {double maxSide = 1080}) async {
-  final camera = await showModalBottomSheet<bool>(
+  final camera = await showPlengoSheet<bool>(
     context: context,
-    builder: (_) => SafeArea(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ListTile(
-            leading: const Icon(Icons.photo_library_outlined),
-            title: const Text('من المعرض'),
-            onTap: () => Navigator.pop(context, false),
-          ),
-          ListTile(
-            leading: const Icon(Icons.photo_camera_outlined),
-            title: const Text('التقاط صورة'),
-            onTap: () => Navigator.pop(context, true),
-          ),
-        ],
-      ),
+    title: 'إضافة صورة',
+    builder: (context) => Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        ListRow(
+          flat: true,
+          icon: Icons.photo_library_outlined,
+          hue: PlengoColors.blue,
+          title: 'من المعرض',
+          onTap: () => Navigator.pop(context, false),
+        ),
+        ListRow(
+          flat: true,
+          showDivider: false,
+          icon: Icons.photo_camera_outlined,
+          hue: PlengoColors.pink,
+          title: 'التقاط صورة',
+          onTap: () => Navigator.pop(context, true),
+        ),
+      ],
     ),
   );
   if (camera == null) return null;
@@ -153,39 +159,60 @@ class _CardEditorScreenState extends ConsumerState<CardEditorScreen> {
   @override
   Widget build(BuildContext context) {
     final canSave = !_saving && _filled(_front) && _filled(_back);
+    final s = context.surface;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.cardId == null ? 'بطاقة جديدة' : 'تعديل البطاقة'),
-        actions: [TextButton(onPressed: canSave ? _save : null, child: const Text('حفظ'))],
+      appBar: plengoAppBar(
+        context,
+        title: widget.cardId == null ? 'بطاقة جديدة' : 'تعديل البطاقة',
+        actions: [
+          TextButton(
+            onPressed: canSave ? _save : null,
+            style: TextButton.styleFrom(
+              foregroundColor: s.action,
+              minimumSize: const Size(48, 48),
+              textStyle: PlengoType.buttonSmall,
+            ),
+            child: const Text('حفظ'),
+          ),
+        ],
       ),
       body: FutureBuilder(
         future: _loading,
         builder: (context, snap) {
-          if (snap.connectionState != ConnectionState.done) return const Center(child: CircularProgressIndicator());
+          if (snap.connectionState != ConnectionState.done) {
+            return const Align(alignment: Alignment.topCenter, child: PlengoLoadingSkeleton(hero: false));
+          }
           if (widget.cardId != null && snap.data == null) return const EmptyState('لم تعد هذه البطاقة موجودة');
           return Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 720),
               child: ListView(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsetsDirectional.fromSTEB(20, 0, 20, 28),
                 children: [
                   _FaceEditor(
                     label: 'الوجه الأمامي',
+                    hue: PlengoColors.blue,
                     draft: _front,
                     fieldKey: 'front',
                     onChanged: () => setState(() {}),
                   ),
-                  const SizedBox(height: 24),
-                  _FaceEditor(label: 'الوجه الخلفي', draft: _back, fieldKey: 'back', onChanged: () => setState(() {})),
-                  const SizedBox(height: 24),
-                  FilledButton(onPressed: canSave ? _save : null, child: const Text('حفظ البطاقة')),
+                  const SizedBox(height: 16),
+                  _FaceEditor(
+                    label: 'الوجه الخلفي',
+                    hue: PlengoColors.pink,
+                    draft: _back,
+                    fieldKey: 'back',
+                    onChanged: () => setState(() {}),
+                  ),
+                  const SizedBox(height: 20),
+                  PlengoButton(label: 'حفظ البطاقة', busy: _saving, onPressed: canSave ? _save : null),
                   if (!canSave && !_saving)
                     Padding(
                       padding: const EdgeInsets.only(top: 8),
                       child: Text(
                         'اكتب نصاً أو أضف صورة على كل وجه',
                         textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.bodySmall,
+                        style: PlengoType.caption.copyWith(color: s.mute),
                       ),
                     ),
                 ],
@@ -198,60 +225,87 @@ class _CardEditorScreenState extends ConsumerState<CardEditorScreen> {
   }
 }
 
+/// One face of the card: its text and/or image (from the gallery or the camera).
 class _FaceEditor extends ConsumerWidget {
-  const _FaceEditor({required this.label, required this.draft, required this.fieldKey, required this.onChanged});
+  const _FaceEditor({
+    required this.label,
+    required this.hue,
+    required this.draft,
+    required this.fieldKey,
+    required this.onChanged,
+  });
 
   final String label;
+  final PlengoHue hue;
   final _FaceDraft draft;
   final String fieldKey;
   final VoidCallback onChanged;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(label, style: Theme.of(context).textTheme.titleMedium),
-        const SizedBox(height: 8),
-        TextField(
-          key: Key('$fieldKey-text'),
-          controller: draft.text,
-          maxLines: null,
-          minLines: 2,
-          maxLength: userCardTextMax,
-          decoration: const InputDecoration(hintText: 'النص (اختياري إذا أضفت صورة)'),
-          onChanged: (_) => onChanged(),
-        ),
-        if (draft.hasImage) ...[
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxHeight: 200),
-            child: CardFace(
-              face: CardFaceView(image: draft.view().image, localImage: draft.view().localImage),
+    final s = context.surface;
+    return PlengoCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [PlengoChip(label: label, hue: hue)],
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            key: Key('$fieldKey-text'),
+            controller: draft.text,
+            maxLines: null,
+            minLines: 2,
+            maxLength: userCardTextMax,
+            decoration: const InputDecoration(hintText: 'النص (اختياري إذا أضفت صورة)'),
+            onChanged: (_) => onChanged(),
+          ),
+          const SizedBox(height: 4),
+          if (draft.hasImage) ...[
+            ClipRRect(
+              borderRadius: BorderRadius.circular(PlengoRadius.option),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxHeight: 200),
+                child: ColoredBox(
+                  color: s.track,
+                  child: CardFace(
+                    face: CardFaceView(image: draft.view().image, localImage: draft.view().localImage),
+                  ),
+                ),
+              ),
             ),
-          ),
-          TextButton.icon(
-            onPressed: () {
-              draft
-                ..picked = null
-                ..removed = true;
-              onChanged();
-            },
-            icon: const Icon(Icons.delete_outline),
-            label: const Text('إزالة الصورة'),
-          ),
-        ] else
-          OutlinedButton.icon(
-            key: Key('$fieldKey-image'),
-            onPressed: () async {
-              final bytes = await pickImage(context, ref);
-              if (bytes == null) return;
-              draft.picked = bytes;
-              onChanged();
-            },
-            icon: const Icon(Icons.add_photo_alternate_outlined),
-            label: const Text('إضافة صورة'),
-          ),
-      ],
+            const SizedBox(height: 8),
+            PlengoButton(
+              label: 'إزالة الصورة',
+              icon: Icons.delete_outline_rounded,
+              variant: PlengoButtonVariant.ghost,
+              size: PlengoButtonSize.small,
+              expand: true,
+              onPressed: () {
+                draft
+                  ..picked = null
+                  ..removed = true;
+                onChanged();
+              },
+            ),
+          ] else
+            PlengoButton(
+              key: Key('$fieldKey-image'),
+              label: 'إضافة صورة',
+              icon: Icons.add_photo_alternate_outlined,
+              variant: PlengoButtonVariant.secondary,
+              size: PlengoButtonSize.small,
+              expand: true,
+              onPressed: () async {
+                final bytes = await pickImage(context, ref);
+                if (bytes == null) return;
+                draft.picked = bytes;
+                onChanged();
+              },
+            ),
+        ],
+      ),
     );
   }
 }

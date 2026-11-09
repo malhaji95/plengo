@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:plengo/app/providers.dart';
 import 'package:plengo/app/router.dart';
 import 'package:plengo/core/api/api_exception.dart';
 import 'package:plengo/core/api/generated/export.dart';
@@ -418,6 +419,8 @@ void main() {
     expect(find.text('خطأ رقم'), findsOneWidget);
     expect(find.text('متقنة (3)'), findsOneWidget);
     expect(find.text('يُتقن السؤال بعد 2 إجابات صحيحة متتالية'), findsOneWidget);
+    expect(find.text('أخطأت مرتين · صحيحة متتالية: 1', findRichText: true), findsOneWidget);
+    expect(find.text('تدرّب'), findsOneWidget);
     await tester.tap(find.byTooltip('إزالة من الأخطاء'));
     await tester.pumpAndSettle();
     verify(() => app.learning.removeMistake('m1')).called(1);
@@ -455,6 +458,25 @@ void main() {
     );
     expect(find.text('سؤال مقفل'), findsOneWidget);
     expect(find.byIcon(Icons.lock_outline), findsOneWidget);
+    expect(find.text('مقفل'), findsOneWidget);
+    expect(find.text('سؤال · الفيزياء'), findsOneWidget);
+  });
+
+  testWidgets('saved tab: the empty state of a filter leads to the subjects', (tester) async {
+    await open(
+      tester,
+      '/saved',
+      arrange: (l) => when(
+        () => l.bookmarks(),
+      ).thenAnswer((_) async => const BookmarkList(items: [], nextCursor: null, urlsExpireAt: '')),
+    );
+    await tester.tap(find.text('البطاقات'));
+    await tester.pumpAndSettle();
+    expect(find.text('لا شيء محفوظ هنا بعد'), findsOneWidget);
+    expect(find.text('احفظ الأسئلة والبطاقات لتعود إليها هنا'), findsOneWidget);
+    await tester.tap(find.text('تصفّح المواد'));
+    await tester.pumpAndSettle();
+    expect(find.text('لا شيء محفوظ هنا بعد'), findsNothing);
   });
 
   testWidgets('home: continue learning resumes an unfinished exam', (tester) async {
@@ -546,6 +568,10 @@ void main() {
     expect(find.text('الفيزياء'), findsOneWidget);
     expect(find.text('مستحقة اليوم'), findsOneWidget);
     expect(find.text('7'), findsOneWidget);
+    // Every chart has a text summary (the current week is the last bar).
+    expect(find.text('هذا الأسبوع \u206675%\u2069 · قبل 11 أسبوعاً \u206675%\u2069'), findsOneWidget);
+    expect(find.text('اليوم 2 · غداً 2 · ثم 2، 2، 2، 2، 2'), findsOneWidget);
+    expect(find.text('المجموع: 30 مراجعة في 30 يوماً'), findsOneWidget);
   });
 
   testWidgets('random practice sends the chosen filters', (tester) async {
@@ -658,12 +684,13 @@ void main() {
     );
     expect(find.text('خطأ الميكانيك'), findsOneWidget);
     expect(find.text('خطأ الكهرباء'), findsOneWidget);
-    await tester.tap(find.text('إجابة مكتوبة'));
+    // The first match is the filter pill; each card also shows its type as a chip.
+    await tester.tap(find.text('إجابة مكتوبة').first);
     await tester.pumpAndSettle();
     expect(find.text('خطأ الميكانيك'), findsNothing);
     expect(find.text('خطأ الكهرباء'), findsOneWidget);
     // Units of the (only) subject filter too.
-    await tester.tap(find.text('إجابة مكتوبة'));
+    await tester.tap(find.text('إجابة مكتوبة').first);
     await tester.pumpAndSettle();
     await tester.tap(find.text('الميكانيك').first);
     await tester.pumpAndSettle();
@@ -676,5 +703,141 @@ void main() {
     final req = verify(() => app.learning.start(captureAny())).captured.single as StartAttemptRequest;
     expect(req.source, StartAttemptRequestSource.mistakes);
     expect(req.filters?.unitId, 'u1');
+  });
+
+  testWidgets('360 wide, large text, dark: mistakes, statistics and saved lay out without overflow', (tester) async {
+    tester.view.physicalSize = const Size(360, 740);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    const acc = Accuracy(answered: 1240, correct: 967, accuracyPercent: 78);
+    final app = await pumpApp(
+      tester,
+      signedInAs: testMe,
+      arrangeLearning: (l) {
+        when(() => l.mistakes(status: any(named: 'status'))).thenAnswer(
+          (_) async => const MistakeList(
+            items: [
+              Mistake(
+                questionId: 'm1',
+                type: MistakeType.trueFalse,
+                questionText: 'وحدة قياس الشغل في النظام الدولي هي الجول أم النيوتن أم الواط؟',
+                subjectId: 'p',
+                subjectNameAr: 'الفيزياء والكيمياء',
+                teacherTrackId: null,
+                trackTitleAr: null,
+                unitId: 'u',
+                unitNameAr: 'الوحدة الأولى: الميكانيك',
+                lessonId: null,
+                lessonNameAr: null,
+                status: MistakeStatus.active,
+                wrongCount: 12,
+                correctStreak: 2,
+                firstWrongAt: '2026-09-20T00:00:00Z',
+                lastWrongAt: '2026-09-21T00:00:00Z',
+              ),
+            ],
+            activeCount: 23,
+            masteredCount: 140,
+            masteryStreak: 3,
+            nextCursor: null,
+          ),
+        );
+        when(() => l.overview()).thenAnswer(
+          (_) async => const StatsOverview(
+            totals: acc,
+            quizzesCompleted: 14,
+            studyDays: 32,
+            currentStreak: 5,
+            averageTimeMs: 42000,
+            mistakes: Mistakes(active: 23, mastered: 140),
+            subjects: [
+              SubjectAccuracy(
+                answered: 1240,
+                correct: 967,
+                accuracyPercent: 78,
+                subjectId: 'p',
+                subjectNameAr: 'الفيزياء والكيمياء',
+                teacherTrackId: 't',
+                trackTitleAr: 'مسار الأستاذ أحمد',
+              ),
+            ],
+            byType: [TypeAccuracy(answered: 10, correct: 5, accuracyPercent: 50, type: TypeAccuracyType.written)],
+            weakestUnits: [
+              UnitAccuracy(
+                answered: 20,
+                correct: 11,
+                accuracyPercent: 54,
+                unitId: 'u',
+                unitNameAr: 'الوحدة الثانية: النهايات والاستمرار',
+                subjectId: 'p',
+                subjectNameAr: 'الرياضيات',
+              ),
+            ],
+            mostMissed: [
+              MissedQuestion(
+                questionId: 'q',
+                questionText: 'سؤال طويل جداً عن الدوال',
+                subjectNameAr: 'الرياضيات',
+                wrongCount: 9,
+              ),
+            ],
+          ),
+        );
+        when(() => l.trend()).thenAnswer(
+          (_) async => StatsTrend(
+            weeks: [
+              for (var i = 0; i < 12; i++)
+                TrendWeek(answered: 4, correct: 3, accuracyPercent: 55 + 2 * i, weekStart: '2026-07-01'),
+            ],
+          ),
+        );
+        when(() => l.flashcardStats()).thenAnswer(
+          (_) async => FlashcardStats(
+            dueToday: 12,
+            forecast: [for (var i = 0; i < 7; i++) DayCount(date: '2026-09-27', count: 12 - i)],
+            reviewsPerDay: [for (var i = 0; i < 30; i++) const DayCount(date: '2026-09-01', count: 4)],
+            retentionPercent: 90,
+            byState: const ByState(newValue: 100, learning: 20, review: 300, relearning: 4),
+          ),
+        );
+        when(() => l.bookmarks()).thenAnswer(
+          (_) async => const BookmarkList(
+            items: [
+              Bookmark(
+                id: 'b1',
+                itemType: BookmarkItemType.question,
+                itemId: 'q9',
+                createdAt: '2026-09-20T00:00:00Z',
+                locked: true,
+                available: true,
+                titleAr: null,
+                subjectId: 'p',
+                subjectNameAr: 'الفيزياء والكيمياء',
+                question: null,
+                deck: null,
+                card: null,
+                userCard: null,
+              ),
+            ],
+            nextCursor: null,
+            urlsExpireAt: '',
+          ),
+        );
+      },
+    );
+    final appearance = app.container.read(appearanceProvider.notifier);
+    await appearance.setFontStep(2);
+    await appearance.setThemeMode(ThemeMode.dark);
+    final router = app.container.read(routerProvider);
+    for (final path in ['/review/mistakes', '/review/stats', '/saved']) {
+      router.go(path);
+      await tester.pumpAndSettle();
+    }
+    router.go('/review/mistakes');
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('اختبر أخطائي'));
+    await tester.pumpAndSettle();
+    expect(find.text('ابدأ'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 }

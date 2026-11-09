@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/api/generated/export.dart';
 import '../../core/content/study_card.dart';
+import '../../shared/ui/ui.dart';
 
 typedef CardImageBuilder = Widget Function(BuildContext context, CardImage image);
 
@@ -38,46 +39,132 @@ final cardImagePrefetchProvider = Provider<void Function(BuildContext, Iterable<
   },
 );
 
-/// A flashcard that flips between its two faces. Official cards are images; the student's own
-/// cards can have text, an image or both on each face (spec §13.9).
+/// Whether [face] shows an image (the zoom button of Browse).
+bool faceHasImage(CardFaceView face) => face.image != null || face.localImage != null;
+
+/// A flashcard that flips between its two faces (V-FcBrowse / V-Flashcards): a 3D turn around the
+/// vertical axis (≈500 ms, ease-out), or a crossfade when the system asks for reduced motion. Official
+/// cards are images shown as they are (DECISIONS #14: no extra frame or logo); the student's own cards
+/// can have text, an image or both on each face (spec §13.9). With [maxHeight], an image card is
+/// narrowed so it fits that height.
 class FlashcardView extends ConsumerWidget {
-  const FlashcardView({super.key, required this.card, required this.flipped, required this.onTap});
+  const FlashcardView({super.key, required this.card, required this.flipped, required this.onTap, this.maxHeight});
 
   final StudyCard card;
   final bool flipped;
   final VoidCallback onTap;
+  final double? maxHeight;
+
+  static double? _aspect(CardFaceView f) {
+    final text = f.text?.trim();
+    if (text != null && text.isNotEmpty) return null;
+    final w = f.image?.width, h = f.image?.height;
+    if (w != null && h != null && w > 0 && h > 0) return w / h;
+    return null;
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final face = flipped ? card.back : card.front;
+    Widget face(bool back) => _FaceSurface(key: ValueKey('${card.key}:$back'), face: back ? card.back : card.front);
+    final Widget body;
+    if (PlengoMotion.reduced(context)) {
+      body = AnimatedSwitcher(duration: const Duration(milliseconds: 200), child: face(flipped));
+    } else {
+      body = TweenAnimationBuilder<double>(
+        key: ValueKey(card.key),
+        tween: Tween(end: flipped ? 1 : 0),
+        duration: PlengoMotion.flip,
+        curve: Curves.easeOut,
+        builder: (context, t, _) {
+          final back = t >= 0.5;
+          return Transform(
+            alignment: Alignment.center,
+            transform: Matrix4.identity()
+              ..setEntry(3, 2, 0.0012)
+              ..rotateY(back ? (t - 1) * math.pi : t * math.pi),
+            child: face(back),
+          );
+        },
+      );
+    }
+    final aspect = _aspect(flipped ? card.back : card.front);
+    final h = maxHeight;
     return Semantics(
       button: true,
       label: flipped ? 'الوجه الخلفي للبطاقة' : 'الوجه الأمامي للبطاقة',
+      onTapHint: 'اقلب البطاقة',
       child: GestureDetector(
         onTap: onTap,
-        child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 300),
-          transitionBuilder: (child, animation) => AnimatedBuilder(
-            animation: animation,
-            child: child,
-            builder: (context, child) => Transform(
-              alignment: Alignment.center,
-              transform: Matrix4.identity()
-                ..setEntry(3, 2, 0.001)
-                ..rotateY((1 - animation.value) * math.pi / 2),
-              child: child,
-            ),
-          ),
-          child: Card(
-            key: ValueKey('${card.key}:$flipped'),
-            clipBehavior: Clip.antiAlias,
-            child: CardFace(face: face),
-          ),
-        ),
+        child: h != null && aspect != null
+            ? ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: h * aspect),
+                child: body,
+              )
+            : body,
       ),
     );
   }
 }
+
+/// The card surface: radius 26, card colour, a soft drop shadow (a line border in dark mode).
+class _FaceSurface extends StatelessWidget {
+  const _FaceSurface({super.key, required this.face});
+
+  final CardFaceView face;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = context.surface;
+    final r = BorderRadius.circular(PlengoRadius.flashcard);
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: s.card,
+        borderRadius: r,
+        border: s.isDark ? Border.all(color: s.line) : null,
+        boxShadow: s.isDark
+            ? null
+            : const [
+                BoxShadow(color: Color(0x14000000), offset: Offset(0, 8)),
+                BoxShadow(color: Color(0x1A3C2D0A), offset: Offset(0, 10), blurRadius: 24),
+              ],
+      ),
+      child: ClipRRect(
+        borderRadius: r,
+        child: CardFace(face: face),
+      ),
+    );
+  }
+}
+
+/// Opens [face] full screen with pinch-to-zoom (the zoom button of image cards).
+Future<void> showCardZoom(BuildContext context, CardFaceView face) => Navigator.of(context).push(
+  MaterialPageRoute<void>(
+    fullscreenDialog: true,
+    builder: (context) => Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
+        automaticallyImplyLeading: false,
+        leading: IconButton(
+          tooltip: 'إغلاق',
+          icon: const Icon(Icons.close_rounded),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: InteractiveViewer(
+        maxScale: 5,
+        child: Center(
+          child: Semantics(
+            label: 'البطاقة مكبّرة',
+            hint: 'باعد بإصبعين للتكبير',
+            child: CardFace(face: face),
+          ),
+        ),
+      ),
+    ),
+  ),
+);
 
 /// One face: an image-only face keeps the image's aspect ratio; text is centred below any image.
 class CardFace extends ConsumerWidget {
@@ -109,7 +196,11 @@ class CardFace extends ConsumerWidget {
               ConstrainedBox(constraints: const BoxConstraints(maxHeight: 280), child: image),
               const SizedBox(height: 16),
             ],
-            Text(text, textAlign: TextAlign.center, style: Theme.of(context).textTheme.titleLarge),
+            Text(
+              text,
+              textAlign: TextAlign.center,
+              style: PlengoType.question.copyWith(color: context.surface.ink),
+            ),
           ],
         ),
       ),

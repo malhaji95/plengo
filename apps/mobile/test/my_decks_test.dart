@@ -9,7 +9,7 @@ import 'package:plengo/core/api/generated/export.dart';
 import 'package:plengo/core/db/app_database.dart';
 import 'package:plengo/core/srs/srs_key.dart';
 import 'package:plengo/features/flashcards/study_screen.dart';
-import 'package:plengo/shared/ui/ui.dart' show PlengoButton;
+import 'package:plengo/shared/ui/ui.dart';
 
 import 'flashcards_test.dart' show card, deck;
 import 'helpers.dart';
@@ -36,7 +36,7 @@ Future<void> createDeckNamed(WidgetTester tester, String name) async {
   await tester.pumpAndSettle();
   await tester.enterText(fieldByKey('deck-name'), name);
   await tester.pump();
-  await tester.tap(find.text('حفظ'));
+  await tester.tap(find.text('إنشاء المجموعة'));
   await tester.pumpAndSettle();
 }
 
@@ -58,12 +58,12 @@ void main() {
     expect(find.text('مصطلحات الكيمياء'), findsOneWidget);
     await tester.tap(find.text('مصطلحات الكيمياء'));
     await tester.pumpAndSettle();
-    expect(tester.widget<FilledButton>(find.widgetWithText(FilledButton, 'مراجعة')).onPressed, isNull);
+    expect(tester.widget<PlengoButton>(find.widgetWithText(PlengoButton, 'مراجعة')).onPressed, isNull);
 
     await tester.tap(find.text('بطاقة جديدة'));
     await tester.pumpAndSettle();
     // Both faces need text or an image.
-    expect(tester.widget<FilledButton>(find.widgetWithText(FilledButton, 'حفظ البطاقة')).onPressed, isNull);
+    expect(tester.widget<PlengoButton>(find.widgetWithText(PlengoButton, 'حفظ البطاقة')).onPressed, isNull);
     await tester.enterText(fieldByKey('front-text'), 'الذرة');
     await tester.enterText(fieldByKey('back-text'), 'أصغر وحدة في العنصر');
     await tester.pump();
@@ -141,15 +141,18 @@ void main() {
     );
     app.container.read(routerProvider).go('${Routes.decks}/d1/browse');
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('أضف إلى بطاقاتي'));
+    await tester.tap(find.text('+ أضف إلى بطاقاتي'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('مجموعة جديدة'));
     await tester.pumpAndSettle();
     await tester.enterText(fieldByKey('deck-name'), 'للمراجعة');
     await tester.pump();
-    await tester.tap(find.text('حفظ'));
+    await tester.tap(find.text('إنشاء المجموعة'));
     await tester.pumpAndSettle();
     expect(find.text('أُضيفت البطاقة إلى مجموعتك'), findsOneWidget);
+    // The button now says the card is in the collection.
+    expect(find.text('✓ أُضيفت البطاقة إلى مجموعتك'), findsOneWidget);
+    expect(find.text('+ أضف إلى بطاقاتي'), findsNothing);
     final row = (await app.db.select(app.db.localCards).get()).single;
     expect(row.kind, 'official_ref');
     expect(row.officialFlashcardId, card(0).id);
@@ -180,7 +183,7 @@ void main() {
     app.container.read(routerProvider).go('${Routes.myDecks}/d1');
     await tester.pumpAndSettle();
     expect(find.text('غير متاحة على حسابك حالياً'), findsOneWidget);
-    expect(tester.widget<FilledButton>(find.widgetWithText(FilledButton, 'مراجعة')).onPressed, isNull);
+    expect(tester.widget<PlengoButton>(find.widgetWithText(PlengoButton, 'مراجعة')).onPressed, isNull);
   });
 
   testWidgets('reports a problem on an official card (§21)', (tester) async {
@@ -237,7 +240,7 @@ void main() {
     );
     app.container.read(routerProvider).go('${Routes.decks}/d1/browse');
     await tester.pumpAndSettle();
-    expect(find.byTooltip('أضف إلى بطاقاتي'), findsNothing);
+    expect(find.text('+ أضف إلى بطاقاتي'), findsNothing);
     expect(find.byTooltip('إبلاغ عن مشكلة'), findsNothing);
     app.container.read(routerProvider).go(Routes.review);
     await tester.pumpAndSettle();
