@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:plengo/app/providers.dart';
@@ -8,6 +7,7 @@ import 'package:plengo/core/api/api_exception.dart';
 import 'package:plengo/core/api/generated/export.dart';
 import 'package:plengo/core/auth/token_store.dart';
 import 'package:plengo/features/offline/offline_providers.dart';
+import 'package:plengo/shared/ui/ui.dart';
 
 import 'flashcards_test.dart' show deck;
 import 'helpers.dart';
@@ -63,7 +63,7 @@ void main() {
     expect(find.text('تحميل البطاقات'), findsOneWidget);
     expect(find.text('الحجم التقريبي: 3 كيلوبايت'), findsOneWidget);
 
-    await tester.tap(find.widgetWithText(FilledButton, 'تحميل'));
+    await tester.tap(find.widgetWithText(PlengoButton, 'تحميل'));
     // The download runs in the background of the app; give it time.
     for (var i = 0; i < 30; i++) {
       await tester.pump(const Duration(milliseconds: 100));

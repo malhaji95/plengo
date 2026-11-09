@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app/providers.dart';
+import '../../shared/ui/ui.dart';
 import '../home/home_providers.dart';
 import '../quizzes/quiz_providers.dart';
 import '../offline/offline_providers.dart';
@@ -27,11 +28,11 @@ class _HomeShellState extends ConsumerState<HomeShell> {
   StatefulNavigationShell get shell => widget.shell;
 
   static const _destinations = [
-    (icon: Icons.home_outlined, selected: Icons.home, label: 'الرئيسية'),
-    (icon: Icons.menu_book_outlined, selected: Icons.menu_book, label: 'المواد'),
-    (icon: Icons.style_outlined, selected: Icons.style, label: 'المراجعة'),
-    (icon: Icons.bookmark_border, selected: Icons.bookmark, label: 'المحفوظات'),
-    (icon: Icons.person_outline, selected: Icons.person, label: 'حسابي'),
+    PlengoNavDestination(icon: Icons.home_outlined, selectedIcon: Icons.home_rounded, label: 'الرئيسية'),
+    PlengoNavDestination(icon: Icons.menu_book_outlined, selectedIcon: Icons.menu_book_rounded, label: 'المواد'),
+    PlengoNavDestination(icon: Icons.style_outlined, selectedIcon: Icons.style_rounded, label: 'المراجعة'),
+    PlengoNavDestination(icon: Icons.bookmark_border_rounded, selectedIcon: Icons.bookmark_rounded, label: 'المحفوظات'),
+    PlengoNavDestination(icon: Icons.person_outline_rounded, selectedIcon: Icons.person_rounded, label: 'حسابي'),
   ];
 
   @override
@@ -72,14 +73,15 @@ class _HomeShellState extends ConsumerState<HomeShell> {
           ? Column(
               children: [
                 Material(
-                  color: Theme.of(context).colorScheme.tertiaryContainer,
+                  color: PlengoColors.orange.soft,
+                  textStyle: TextStyle(fontFamily: PlengoType.family, color: PlengoColors.orange.ink),
                   child: const SafeArea(
                     bottom: false,
                     child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       child: Row(
                         children: [
-                          Icon(Icons.storage_outlined, size: 20),
+                          Icon(Icons.storage_outlined, size: 20, color: Color(0xFF9A5205)),
                           SizedBox(width: 8),
                           Expanded(
                             child: Text(
@@ -98,33 +100,30 @@ class _HomeShellState extends ConsumerState<HomeShell> {
       child: shell,
     );
     if (wide) {
+      // Rail at the start edge (right in RTL); content centred and capped at 720 (V-Web).
       return Scaffold(
         body: Row(
           children: [
-            NavigationRail(
-              selectedIndex: shell.currentIndex,
-              onDestinationSelected: _go,
-              labelType: NavigationRailLabelType.all,
-              destinations: [
-                for (final d in _destinations)
-                  NavigationRailDestination(icon: Icon(d.icon), selectedIcon: Icon(d.selected), label: Text(d.label)),
-              ],
+            PlengoSideRail(destinations: _destinations, selectedIndex: shell.currentIndex, onSelected: _go),
+            Expanded(
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: PlengoSpace.contentMaxWide),
+                  child: content,
+                ),
+              ),
             ),
-            const VerticalDivider(width: 1),
-            Expanded(child: content),
           ],
         ),
       );
     }
     return Scaffold(
       body: content,
-      bottomNavigationBar: NavigationBar(
+      bottomNavigationBar: PlengoNavBar(
+        destinations: _destinations,
         selectedIndex: shell.currentIndex,
-        onDestinationSelected: _go,
-        destinations: [
-          for (final d in _destinations)
-            NavigationDestination(icon: Icon(d.icon), selectedIcon: Icon(d.selected), label: d.label),
-        ],
+        onSelected: _go,
       ),
     );
   }

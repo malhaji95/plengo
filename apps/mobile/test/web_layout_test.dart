@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:plengo/app/providers.dart';
+import 'package:plengo/shared/ui/ui.dart';
 import 'package:plengo/shared/widgets/responsive.dart';
 
 import 'helpers.dart';
@@ -34,8 +35,8 @@ void main() {
         () => c.subjects(any()),
       ).thenAnswer((_) async => [subject('p', 'الفيزياء'), subject('m', 'الرياضيات'), subject('c', 'الكيمياء')]),
     );
-    expect(find.byType(NavigationRail), findsOneWidget);
-    expect(find.byType(NavigationBar), findsNothing);
+    expect(find.byType(PlengoSideRail), findsOneWidget);
+    expect(find.byType(PlengoNavBar), findsNothing);
     // Home content is at most 720 px wide.
     expect(tester.getSize(find.byType(ListView).first).width, lessThanOrEqualTo(kContentMaxWidth));
 
@@ -56,7 +57,7 @@ void main() {
       arrangeCatalog: (c) =>
           when(() => c.subjects(any())).thenAnswer((_) async => [subject('p', 'الفيزياء'), subject('m', 'الرياضيات')]),
     );
-    expect(find.byType(NavigationBar), findsOneWidget);
+    expect(find.byType(PlengoNavBar), findsOneWidget);
     await tester.tap(find.text('المواد').last);
     await tester.pumpAndSettle();
     expect(tester.getRect(find.text('الفيزياء')).top, lessThan(tester.getRect(find.text('الرياضيات')).top));

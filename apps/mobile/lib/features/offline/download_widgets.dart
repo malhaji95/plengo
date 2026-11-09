@@ -3,14 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/api/generated/export.dart';
 import '../../core/db/app_database.dart';
+import '../../shared/text/bidi.dart';
+import '../../shared/ui/ui.dart';
 import 'offline_providers.dart';
-
-/// The app theme makes buttons full width; in a tile's trailing slot they must stay compact.
-const _compact = ButtonStyle(minimumSize: WidgetStatePropertyAll(Size(0, 40)));
 
 /// Download control for a deck ("تحميل البطاقات"), a unit ("تحميل الوحدة") or a whole subject or
 /// track ("تحميل الكل") (spec §22.1–§22.2): shows the size first, then progress with pause and
-/// cancel, "تحديث متاح" when the server has a newer version, and "محمّل" when done.
+/// cancel, "تحديث متاح" when the server has a newer version, and "محمّل" when done. Styled per
+/// docs/redesign DESIGN_SPEC §7.
 class OfflineDownloadTile extends ConsumerWidget {
   const OfflineDownloadTile({
     super.key,
@@ -73,98 +73,158 @@ class OfflineDownloadTile extends ConsumerWidget {
     Future<void> start(List<OfflinePack> packs, {bool mobileData = false}) =>
         ctl.download(packs, scope: catalog!.scope, scopeTitle: catalog.titleAr, mobileData: mobileData);
 
+    final done = allReady && stale.isEmpty;
     Widget subtitle;
-    Widget? trailing;
+    Widget? below;
+    final actions = <Widget>[];
+    var hue = PlengoColors.blue;
     if (active.isNotEmpty) {
-      final done = local.fold(0, (s, r) => s + r.downloadedBytes);
+      final got = local.fold(0, (s, r) => s + r.downloadedBytes);
       final total = local.fold(0, (s, r) => s + r.sizeBytes);
-      subtitle = Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 4),
-          LinearProgressIndicator(value: total == 0 ? null : (done / total).clamp(0, 1)),
-          const SizedBox(height: 4),
-          Text('جارٍ التحميل · ${formatBytes(done)} من ${formatBytes(total)}'),
-        ],
+      final fraction = total == 0 ? 0.0 : (got / total).clamp(0.0, 1.0);
+      below = PlengoProgressBar(
+        value: fraction,
+        label: '${percent((fraction * 100).round())} · ${formatBytes(got)} من ${formatBytes(total)}',
       );
-      trailing = Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          IconButton(
+      subtitle = const Text('جارٍ التحميل');
+      actions
+        ..add(
+          PlengoIconButton(
             tooltip: 'إيقاف مؤقت',
-            icon: const Icon(Icons.pause),
+            icon: Icons.pause_rounded,
             onPressed: () {
               for (final r in active) {
                 ctl.pause(r.packKey);
               }
             },
           ),
-          IconButton(
+        )
+        ..add(
+          PlengoIconButton(
             tooltip: 'إلغاء التحميل',
-            icon: const Icon(Icons.close),
+            icon: Icons.close_rounded,
             onPressed: () async {
               for (final r in local) {
                 await ctl.cancel(r.packKey);
               }
             },
           ),
-        ],
-      );
+        );
     } else if (waiting) {
+      hue = PlengoColors.orange;
       subtitle = const Text('بانتظار الاتصال بشبكة Wi-Fi');
-      trailing = TextButton(
-        style: _compact,
-        onPressed: () async {
-          for (final r in local.where((r) => r.status == 'waiting_wifi')) {
-            await ctl.resume(r.packKey, mobileData: true);
-          }
-        },
-        child: const Text('تحميل عبر البيانات'),
+      actions.add(
+        PlengoButton(
+          label: 'تحميل عبر البيانات',
+          variant: PlengoButtonVariant.secondary,
+          size: PlengoButtonSize.small,
+          onPressed: () async {
+            for (final r in local.where((r) => r.status == 'waiting_wifi')) {
+              await ctl.resume(r.packKey, mobileData: true);
+            }
+          },
+        ),
       );
     } else if (stopped.isNotEmpty) {
-      subtitle = Text(stopped.any((r) => r.status == 'failed') ? 'تعذّر إكمال التحميل' : 'متوقف مؤقتاً');
-      trailing = TextButton(
-        style: _compact,
-        onPressed: () async {
-          for (final r in stopped) {
-            await ctl.resume(r.packKey);
-          }
-        },
-        child: const Text('متابعة'),
+      final failed = stopped.any((r) => r.status == 'failed');
+      hue = failed ? PlengoColors.red : PlengoColors.orange;
+      subtitle = Text(failed ? 'تعذّر إكمال التحميل' : 'متوقف مؤقتاً');
+      actions.add(
+        PlengoButton(
+          label: 'متابعة',
+          icon: Icons.play_arrow_rounded,
+          size: PlengoButtonSize.small,
+          onPressed: () async {
+            for (final r in stopped) {
+              await ctl.resume(r.packKey);
+            }
+          },
+        ),
       );
     } else if (stale.isNotEmpty) {
+      hue = PlengoColors.yellow;
       subtitle = Text('تحديث متاح · ${formatBytes(stale.fold(0, (s, p) => s + p.sizeBytes))}');
-      trailing = TextButton(
-        style: _compact,
-        onPressed: catalog == null ? null : () => start(stale),
-        child: const Text('تحديث'),
+      actions.add(
+        PlengoButton(
+          label: 'تحديث',
+          icon: Icons.sync_rounded,
+          size: PlengoButtonSize.small,
+          onPressed: catalog == null ? null : () => start(stale),
+        ),
       );
     } else if (allReady) {
-      subtitle = Text('متاح دون اتصال · ${formatBytes(size)}');
-      trailing = IconButton(
-        tooltip: 'حذف التحميل',
-        icon: const Icon(Icons.delete_outline),
-        onPressed: () async {
-          for (final r in local) {
-            await ctl.remove(r.packKey);
-          }
-        },
+      subtitle = Align(
+        alignment: AlignmentDirectional.centerStart,
+        child: Wrap(
+          spacing: 8,
+          runSpacing: 4,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            const PlengoChip(label: 'متاح دون اتصال', icon: Icons.download_done_rounded),
+            Text(formatBytes(size)),
+          ],
+        ),
+      );
+      actions.add(
+        PlengoIconButton(
+          tooltip: 'حذف التحميل',
+          icon: Icons.delete_outline_rounded,
+          soft: false,
+          onPressed: () async {
+            for (final r in local) {
+              await ctl.remove(r.packKey);
+            }
+          },
+        ),
       );
     } else {
       subtitle = Text('الحجم التقريبي: ${formatBytes(size)}');
-      trailing = FilledButton.tonal(
-        style: _compact,
-        onPressed: catalog == null ? null : () => start(missing.isEmpty ? remote : missing),
-        child: const Text('تحميل'),
+      actions.add(
+        PlengoButton(
+          label: 'تحميل',
+          icon: Icons.download_rounded,
+          size: PlengoButtonSize.small,
+          onPressed: catalog == null ? null : () => start(missing.isEmpty ? remote : missing),
+        ),
       );
     }
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        leading: Icon(allReady && stale.isEmpty ? Icons.offline_pin : Icons.download_for_offline_outlined),
-        title: Text(allReady && stale.isEmpty ? doneLabel : label),
-        subtitle: subtitle,
-        trailing: trailing,
+    final surface = context.surface;
+    return PlengoCard(
+      margin: const EdgeInsetsDirectional.only(bottom: 8),
+      padding: const EdgeInsetsDirectional.fromSTEB(14, 12, 14, 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              SubjectIconTile(
+                icon: done ? Icons.offline_pin_rounded : Icons.download_for_offline_outlined,
+                hue: done ? PlengoColors.green : hue,
+                size: 40,
+                soft: true,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(done ? doneLabel : label, style: PlengoType.rowTitle.copyWith(color: surface.ink)),
+                    DefaultTextStyle.merge(
+                      style: PlengoType.caption.copyWith(color: surface.mute),
+                      child: subtitle,
+                    ),
+                  ],
+                ),
+              ),
+              if (actions.isNotEmpty) ...[
+                const SizedBox(width: 8),
+                Row(mainAxisSize: MainAxisSize.min, children: actions),
+              ],
+            ],
+          ),
+          if (below != null) ...[const SizedBox(height: 10), below],
+        ],
       ),
     );
   }
@@ -181,29 +241,32 @@ Future<void> offerDownloadAfterRedemption(BuildContext context, WidgetRef ref, S
   }
   final packs = catalog.packs.where((p) => p.kind != OfflinePackKind.deck).toList();
   if (packs.isEmpty || !context.mounted) return;
-  final choice = await showModalBottomSheet<String>(
+  final choice = await showPlengoSheet<String>(
     context: context,
-    builder: (_) => SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Text(
-              'تم تفعيل المادة ✓ هل تريد تحميلها لاستخدامها دون اتصال؟',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Text('الحجم التقريبي: ${formatBytes(catalog.sizeBytes)}'),
-            const SizedBox(height: 16),
-            FilledButton(onPressed: () => Navigator.pop(context, 'now'), child: const Text('تحميل الآن')),
-            const SizedBox(height: 8),
-            OutlinedButton(onPressed: () => Navigator.pop(context, 'wifi'), child: const Text('عبر Wi-Fi فقط')),
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text('لاحقاً')),
-          ],
+    builder: (sheet) => Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          'تم تفعيل المادة ✓ هل تريد تحميلها لاستخدامها دون اتصال؟',
+          style: PlengoType.section.copyWith(color: sheet.surface.ink),
         ),
-      ),
+        const SizedBox(height: 8),
+        Text(
+          'الحجم التقريبي: ${formatBytes(catalog.sizeBytes)}',
+          style: PlengoType.sub.copyWith(color: sheet.surface.mute),
+        ),
+        const SizedBox(height: 16),
+        PlengoButton(label: 'تحميل الآن', icon: Icons.download_rounded, onPressed: () => Navigator.pop(sheet, 'now')),
+        const SizedBox(height: 10),
+        PlengoButton(
+          label: 'عبر Wi-Fi فقط',
+          variant: PlengoButtonVariant.secondary,
+          onPressed: () => Navigator.pop(sheet, 'wifi'),
+        ),
+        const SizedBox(height: 4),
+        PlengoButton(label: 'لاحقاً', variant: PlengoButtonVariant.ghost, onPressed: () => Navigator.pop(sheet)),
+      ],
     ),
   );
   if (choice == null) return;
