@@ -54,7 +54,8 @@ class QuestionsScreen extends ConsumerWidget {
                         style: PlengoType.rowTitle.copyWith(color: s.ink, fontSize: 14),
                       ),
                       const SizedBox(height: 12),
-                      if (state.accessibleCount < state.totalCount) const LockedNotice(),
+                      if (state.accessibleCount < state.totalCount)
+                        LockedNotice(subjectId: query.subjectId, teacherTrackId: query.teacherTrackId),
                       if (state.accessible.isNotEmpty) ...[
                         PlengoButton(
                           label: 'ابدأ التدريب',

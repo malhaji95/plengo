@@ -57,7 +57,7 @@ class _TrackScreenState extends ConsumerState<TrackScreen> {
             : null,
       ),
       children: [
-        ScopeAccessBanner(access: d.access),
+        ScopeAccessBanner(access: d.access, subjectId: d.subject.id, teacherTrackId: d.track.id),
         ListRow(
           leading: TeacherAvatar(url: d.teacher.photoUrl, name: d.teacher.nameAr, radius: 20),
           title: d.teacher.nameAr,

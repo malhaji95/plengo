@@ -11,13 +11,17 @@ import 'access_providers.dart';
 /// A scope's access state at the top of a subject or track page (spec §8.6, §8.7): a green chip
 /// («لديك وصول دائم…» / «حتى …» / «متاح مجاناً ضمن …»), or the [LockedNotice].
 class ScopeAccessBanner extends StatelessWidget {
-  const ScopeAccessBanner({super.key, required this.access});
+  const ScopeAccessBanner({super.key, required this.access, this.subjectId, this.teacherTrackId});
 
   final ScopeAccess access;
 
+  /// The page's scope, handed to [LockedNotice] so the code screen knows where the student came from.
+  final String? subjectId;
+  final String? teacherTrackId;
+
   @override
   Widget build(BuildContext context) {
-    if (!access.hasAccess) return const LockedNotice();
+    if (!access.hasAccess) return LockedNotice(subjectId: subjectId, teacherTrackId: teacherTrackId);
     final promotion = access.reason == ScopeAccessReason.promotion;
     final text = promotion
         ? 'متاح مجاناً ضمن «${access.promotionTitleAr ?? 'عرض'}» حتى ${damascusDate(access.promotionEndsAt!)}'
@@ -41,8 +45,25 @@ class ScopeAccessBanner extends StatelessWidget {
 /// spec §8.7: with COUPON_REDEMPTION the student is offered the code screen; without it the app only
 /// says the content is unavailable, with no button and no route to reach redemption. A red-soft box
 /// with a lock icon and text, never colour alone.
+///
+/// [subjectId] / [teacherTrackId] are the locked content's scope. «إدخال كود التفعيل» opens the code
+/// screen with them as `?subjectId=` / `?teacherTrackId=` so it can name the content and offer its
+/// free lessons. Track content passes its track; the narrowest scope given wins.
 class LockedNotice extends ConsumerWidget {
-  const LockedNotice({super.key});
+  const LockedNotice({super.key, this.subjectId, this.teacherTrackId});
+
+  final String? subjectId;
+  final String? teacherTrackId;
+
+  /// The redeem route for this scope: the track when there is one, else the subject, else bare.
+  String get redeemLocation {
+    final query = teacherTrackId != null
+        ? {'teacherTrackId': teacherTrackId!}
+        : subjectId != null
+        ? {'subjectId': subjectId!}
+        : null;
+    return Uri(path: Routes.redeem, queryParameters: query).toString();
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -88,7 +109,7 @@ class LockedNotice extends ConsumerWidget {
                 icon: Icons.vpn_key_rounded,
                 size: PlengoButtonSize.small,
                 expand: true,
-                onPressed: () => context.push(Routes.redeem),
+                onPressed: () => context.push(redeemLocation),
               ),
             ],
           ],

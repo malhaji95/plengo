@@ -227,4 +227,31 @@ void main() {
     expect(find.descendant(of: notice, matching: find.byIcon(Icons.lock_rounded)), findsOneWidget);
     expect(find.descendant(of: notice, matching: find.text('هذا المحتوى يحتاج إلى تفعيل')), findsOneWidget);
   });
+
+  testWidgets('«إدخال كود التفعيل» opens the code screen with the locked scope', (tester) async {
+    final app = await pumpApp(
+      tester,
+      signedInAs: testMe,
+      arrangeCatalog: (c) => when(() => c.outline('p')).thenAnswer((_) async => outline(noAccess)),
+    );
+    await openSubject(app, tester);
+    await tester.tap(find.text('إدخال كود التفعيل'));
+    await tester.pumpAndSettle();
+    final redeem = find.byType(RedeemScreen);
+    expect(redeem, findsOneWidget);
+    // The code screen read `?subjectId=p`: it names the subject the student came from.
+    final origin = redeemOriginOf(tester.element(redeem));
+    expect(origin.subjectId, 'p');
+    expect(origin.teacherTrackId, isNull);
+    expect(find.descendant(of: redeem, matching: find.text('الفيزياء')), findsOneWidget);
+  });
+
+  test('the locked notice sends the narrowest scope to the code screen', () {
+    expect(const LockedNotice().redeemLocation, Routes.redeem);
+    expect(const LockedNotice(subjectId: 's1').redeemLocation, '${Routes.redeem}?subjectId=s1');
+    expect(
+      const LockedNotice(subjectId: 's1', teacherTrackId: 't1').redeemLocation,
+      '${Routes.redeem}?teacherTrackId=t1',
+    );
+  });
 }

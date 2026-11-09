@@ -82,7 +82,7 @@ class _OutlineViewState extends ConsumerState<_OutlineView> {
         onDownload: canDownload ? _showDownload : null,
       ),
       children: [
-        ScopeAccessBanner(access: outline.access),
+        ScopeAccessBanner(access: outline.access, subjectId: outline.subject.id),
         ScopeShortcuts(
           subjectId: id,
           quizCount: outline.quizCount,

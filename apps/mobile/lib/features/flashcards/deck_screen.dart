@@ -65,7 +65,7 @@ class DeckScreen extends ConsumerWidget {
                 ],
                 const SizedBox(height: 16),
                 if (d.locked)
-                  const LockedNotice()
+                  LockedNotice(subjectId: d.subjectId, teacherTrackId: d.teacherTrackId)
                 else ...[
                   _TodayCard(deckId: deckId),
                   const SizedBox(height: 16),

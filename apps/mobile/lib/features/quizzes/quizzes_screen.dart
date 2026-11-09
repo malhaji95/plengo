@@ -182,7 +182,8 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
                   ),
                   const SizedBox(height: PlengoSpace.section),
                 ],
-                if (q.locked || q.lockedCount > 0) const LockedNotice(),
+                if (q.locked || q.lockedCount > 0)
+                  LockedNotice(subjectId: q.subjectId, teacherTrackId: q.teacherTrackId),
                 if (q.inProgressAttemptId != null) ...[
                   ListRow(
                     key: const Key('quiz.resume'),
