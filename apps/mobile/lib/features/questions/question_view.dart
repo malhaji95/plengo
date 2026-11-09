@@ -531,71 +531,78 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
     final correctText = result == null
         ? null
         : options.where((o) => o.id == result.correctOptionId).firstOrNull?.text ?? result.correctAnswer;
-    return Scaffold(
-      body: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            PracticeHeader(
-              position: _index + 1,
-              total: total,
-              correct: _correct,
-              checked: _answered,
-              progress: (_index + (result == null ? 0 : 1)) / total,
-              onExit: _exit,
-              questionId: q.id,
-            ),
-            Expanded(
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: PlengoSpace.contentMaxWide),
-                  child: ListView(
-                    key: ValueKey(q.id),
-                    padding: const EdgeInsetsDirectional.fromSTEB(20, 12, 20, 24),
-                    children: [
-                      if (result != null && result.isCorrect && _run >= 3) ...[
-                        CorrectStreakChip(count: _run),
+    // Android back / iOS swipe open the same exit sheet as ✕: leaving never discards silently (§5).
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _exit();
+      },
+      child: Scaffold(
+        body: SafeArea(
+          bottom: false,
+          child: Column(
+            children: [
+              PracticeHeader(
+                position: _index + 1,
+                total: total,
+                correct: _correct,
+                checked: _answered,
+                progress: (_index + (result == null ? 0 : 1)) / total,
+                onExit: _exit,
+                questionId: q.id,
+              ),
+              Expanded(
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: PlengoSpace.contentMaxWide),
+                    child: ListView(
+                      key: ValueKey(q.id),
+                      padding: const EdgeInsetsDirectional.fromSTEB(20, 12, 20, 24),
+                      children: [
+                        if (result != null && result.isCorrect && _run >= 3) ...[
+                          CorrectStreakChip(count: _run),
+                          const SizedBox(height: 12),
+                        ],
+                        Text(widget.title, style: PlengoType.caption.copyWith(color: context.surface.mute)),
+                        const SizedBox(height: 6),
+                        QuestionTypeChip(typeName: q.type.name),
                         const SizedBox(height: 12),
+                        QuestionPrompt(q.questionText ?? ''),
+                        const SizedBox(height: 16),
+                        if (_isWritten)
+                          WrittenAnswerField(
+                            controller: _written,
+                            enabled: result == null && !_busy,
+                            onChanged: (_) => setState(() {}),
+                            onSubmitted: _hasAnswer && result == null && !_busy ? _check : null,
+                          )
+                        else
+                          QuestionOptions(
+                            options: [for (final o in options) (id: o.id, text: o.text)],
+                            selectedId: _selected,
+                            graded: result != null,
+                            isCorrect: (id) => id == result?.correctOptionId,
+                            onSelect: result == null && !_busy ? (id) => setState(() => _selected = id) : null,
+                          ),
                       ],
-                      Text(widget.title, style: PlengoType.caption.copyWith(color: context.surface.mute)),
-                      const SizedBox(height: 6),
-                      QuestionTypeChip(typeName: q.type.name),
-                      const SizedBox(height: 12),
-                      QuestionPrompt(q.questionText ?? ''),
-                      const SizedBox(height: 16),
-                      if (_isWritten)
-                        WrittenAnswerField(
-                          controller: _written,
-                          enabled: result == null && !_busy,
-                          onChanged: (_) => setState(() {}),
-                          onSubmitted: _hasAnswer && result == null && !_busy ? _check : null,
-                        )
-                      else
-                        QuestionOptions(
-                          options: [for (final o in options) (id: o.id, text: o.text)],
-                          selectedId: _selected,
-                          graded: result != null,
-                          isCorrect: (id) => id == result?.correctOptionId,
-                          onSelect: result == null && !_busy ? (id) => setState(() => _selected = id) : null,
-                        ),
-                    ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            if (result == null)
-              CheckBar(hasAnswer: _hasAnswer, busy: _busy, written: _isWritten, error: _error, onCheck: _check)
-            else
-              AnswerFeedbackPanel(
-                result: result,
-                questionId: q.id,
-                correctAnswerText: correctText,
-                // Question-bank checks are not recorded in the mistake bank (only attempt answers are).
-                addedToMistakes: false,
-                actionLabel: _last ? 'إنهاء' : null,
-                onContinue: _next,
-              ),
-          ],
+              if (result == null)
+                CheckBar(hasAnswer: _hasAnswer, busy: _busy, written: _isWritten, error: _error, onCheck: _check)
+              else
+                AnswerFeedbackPanel(
+                  result: result,
+                  questionId: q.id,
+                  correctAnswerText: correctText,
+                  // Question-bank checks are not recorded in the mistake bank (only attempt answers are).
+                  addedToMistakes: false,
+                  actionLabel: _last ? 'إنهاء' : null,
+                  onContinue: _next,
+                ),
+            ],
+          ),
         ),
       ),
     );

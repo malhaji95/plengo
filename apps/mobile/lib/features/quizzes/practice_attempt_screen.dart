@@ -124,79 +124,86 @@ class _PracticeAttemptScreenState extends ConsumerState<PracticeAttemptScreen> {
       expand: true,
       onPressed: _busy ? null : _finish,
     );
-    return Scaffold(
-      body: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            PracticeHeader(
-              position: _index + 1,
-              total: _questions.length,
-              correct: _correct,
-              checked: _results.length,
-              progress: (_index + (result == null ? 0 : 1)) / _questions.length,
-              onExit: _exit,
-              questionId: _q.questionId,
-            ),
-            Expanded(
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: PlengoSpace.contentMaxWide),
-                  child: ListView(
-                    key: ValueKey(_q.questionId),
-                    padding: const EdgeInsetsDirectional.fromSTEB(20, 12, 20, 24),
-                    children: [
-                      if (result != null && result.isCorrect && _run >= 3) ...[
-                        CorrectStreakChip(count: _run),
-                        const SizedBox(height: 12),
+    // Android back / iOS swipe open the same exit sheet as ✕: leaving never discards silently (§5).
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _exit();
+      },
+      child: Scaffold(
+        body: SafeArea(
+          bottom: false,
+          child: Column(
+            children: [
+              PracticeHeader(
+                position: _index + 1,
+                total: _questions.length,
+                correct: _correct,
+                checked: _results.length,
+                progress: (_index + (result == null ? 0 : 1)) / _questions.length,
+                onExit: _exit,
+                questionId: _q.questionId,
+              ),
+              Expanded(
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: PlengoSpace.contentMaxWide),
+                    child: ListView(
+                      key: ValueKey(_q.questionId),
+                      padding: const EdgeInsetsDirectional.fromSTEB(20, 12, 20, 24),
+                      children: [
+                        if (result != null && result.isCorrect && _run >= 3) ...[
+                          CorrectStreakChip(count: _run),
+                          const SizedBox(height: 12),
+                        ],
+                        Text(widget.attempt.attempt.titleAr, style: PlengoType.caption.copyWith(color: s.mute)),
+                        const SizedBox(height: 6),
+                        AttemptQuestionBody(
+                          key: ValueKey(_q.questionId),
+                          question: _q,
+                          selectedOptionId: _selected[_q.questionId],
+                          writtenAnswer: _written[_q.questionId],
+                          enabled: result == null && !_busy,
+                          result: result,
+                          onSelect: (id) => setState(() => _selected[_q.questionId] = id),
+                          onWrite: (text) => setState(() => _written[_q.questionId] = text),
+                          onSubmitWritten: _hasAnswer && result == null ? _check : null,
+                        ),
+                        if (result != null && _error != null) ...[const SizedBox(height: 12), InlineError(_error)],
                       ],
-                      Text(widget.attempt.attempt.titleAr, style: PlengoType.caption.copyWith(color: s.mute)),
-                      const SizedBox(height: 6),
-                      AttemptQuestionBody(
-                        key: ValueKey(_q.questionId),
-                        question: _q,
-                        selectedOptionId: _selected[_q.questionId],
-                        writtenAnswer: _written[_q.questionId],
-                        enabled: result == null && !_busy,
-                        result: result,
-                        onSelect: (id) => setState(() => _selected[_q.questionId] = id),
-                        onWrite: (text) => setState(() => _written[_q.questionId] = text),
-                        onSubmitWritten: _hasAnswer && result == null ? _check : null,
-                      ),
-                      if (result != null && _error != null) ...[const SizedBox(height: 12), InlineError(_error)],
-                    ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            if (result == null)
-              CheckBar(
-                hasAnswer: _hasAnswer,
-                busy: _busy,
-                written: _isWritten,
-                error: _error,
-                onCheck: _check,
-                extra: finishEarly,
-              )
-            else
-              AnswerFeedbackPanel(
-                result: result,
-                questionId: _q.questionId,
-                correctAnswerText: correctText,
-                // Attempt answers are graded on the server, which records wrong ones in the mistake bank.
-                addedToMistakes: true,
-                actionLabel: last ? 'عرض النتيجة' : null,
-                onContinue: _busy
-                    ? null
-                    : last
-                    ? _finish
-                    : () => setState(() {
-                        _index++;
-                        _error = null;
-                        _shownAt.reset();
-                      }),
-              ),
-          ],
+              if (result == null)
+                CheckBar(
+                  hasAnswer: _hasAnswer,
+                  busy: _busy,
+                  written: _isWritten,
+                  error: _error,
+                  onCheck: _check,
+                  extra: finishEarly,
+                )
+              else
+                AnswerFeedbackPanel(
+                  result: result,
+                  questionId: _q.questionId,
+                  correctAnswerText: correctText,
+                  // Attempt answers are graded on the server, which records wrong ones in the mistake bank.
+                  addedToMistakes: true,
+                  actionLabel: last ? 'عرض النتيجة' : null,
+                  onContinue: _busy
+                      ? null
+                      : last
+                      ? _finish
+                      : () => setState(() {
+                          _index++;
+                          _error = null;
+                          _shownAt.reset();
+                        }),
+                ),
+            ],
+          ),
         ),
       ),
     );

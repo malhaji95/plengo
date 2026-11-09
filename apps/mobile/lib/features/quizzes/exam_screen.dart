@@ -111,37 +111,45 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
     final exam = ref.watch(examControllerProvider(widget.attemptId));
     final s = exam.value;
     final left = s == null ? null : _controller.remainingMs(s);
-    return Scaffold(
-      body: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsetsDirectional.fromSTEB(8, 8, 12, 4),
-              child: Row(
-                children: [
-                  PlengoIconButton(icon: Icons.close_rounded, tooltip: 'خروج', onPressed: () => _exit(s)),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: s == null || s.submitPending
-                        ? const SizedBox.shrink()
-                        : Text(
-                            'السؤال ${s.index + 1} من ${s.questions.length} · أجبت عن ${s.answeredCount}',
-                            style: PlengoType.rowTitle.copyWith(fontSize: 14, color: context.surface.ink),
-                          ),
-                  ),
-                  if (left != null) ...[const SizedBox(width: 8), ExamTimerChip(remainingMs: left)],
-                ],
+    // Android back / iOS swipe open the same exit sheet as ✕ (§5); once the exam waits to be sent
+    // (or before it loads) there is nothing to lose, so back just leaves, as ✕ does.
+    return PopScope(
+      canPop: s == null || s.submitPending,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _exit(s);
+      },
+      child: Scaffold(
+        body: SafeArea(
+          bottom: false,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(8, 8, 12, 4),
+                child: Row(
+                  children: [
+                    PlengoIconButton(icon: Icons.close_rounded, tooltip: 'خروج', onPressed: () => _exit(s)),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: s == null || s.submitPending
+                          ? const SizedBox.shrink()
+                          : Text(
+                              'السؤال ${s.index + 1} من ${s.questions.length} · أجبت عن ${s.answeredCount}',
+                              style: PlengoType.rowTitle.copyWith(fontSize: 14, color: context.surface.ink),
+                            ),
+                    ),
+                    if (left != null) ...[const SizedBox(width: 8), ExamTimerChip(remainingMs: left)],
+                  ],
+                ),
               ),
-            ),
-            Expanded(
-              child: AsyncView(
-                value: exam,
-                onRetry: () => ref.invalidate(examControllerProvider(widget.attemptId)),
-                data: (s) => s.submitPending ? _pending(s) : _question(s),
+              Expanded(
+                child: AsyncView(
+                  value: exam,
+                  onRetry: () => ref.invalidate(examControllerProvider(widget.attemptId)),
+                  data: (s) => s.submitPending ? _pending(s) : _question(s),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

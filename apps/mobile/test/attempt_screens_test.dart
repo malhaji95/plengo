@@ -6,6 +6,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:plengo/app/providers.dart';
 import 'package:plengo/app/router.dart';
 import 'package:plengo/core/api/generated/export.dart';
+import 'package:plengo/core/learning/exam_store.dart';
 import 'package:plengo/features/home/streak_screen.dart';
 import 'package:plengo/features/questions/questions_screen.dart';
 import 'package:plengo/features/quizzes/exam_screen.dart';
@@ -463,6 +464,101 @@ void main() {
       await narrow(tester);
       expect(find.text('متابعة'), findsOneWidget);
       expect(tester.takeException(), isNull);
+    });
+  });
+
+  group('system back (DESIGN_SPEC §5: leaving never discards silently)', () {
+    /// Android back button / iOS back swipe, as the platform sends it.
+    Future<void> systemBack(WidgetTester tester) async {
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('practice attempt: back opens the exit sheet; «واصل التدريب» stays, «خروج» leaves', (tester) async {
+      final app = await open(
+        tester,
+        arrange: (l) => when(() => l.attempt('a1')).thenAnswer((_) async => attempt(mode: AttemptSummaryMode.practice)),
+      );
+      await push(app, tester, '/attempts/a1');
+      expect(find.byType(PracticeAttemptScreen), findsOneWidget);
+
+      await systemBack(tester);
+      expect(find.text(PracticeAttemptScreen.exitTitle), findsOneWidget);
+      expect(find.byType(PracticeAttemptScreen), findsOneWidget);
+      await tester.tap(find.text('واصل التدريب'));
+      await tester.pumpAndSettle();
+      expect(find.text(PracticeAttemptScreen.exitTitle), findsNothing);
+      expect(find.byType(PracticeAttemptScreen), findsOneWidget);
+
+      // Back while the sheet is open only closes the sheet.
+      await systemBack(tester);
+      expect(find.text(PracticeAttemptScreen.exitTitle), findsOneWidget);
+      await systemBack(tester);
+      expect(find.text(PracticeAttemptScreen.exitTitle), findsNothing);
+      expect(find.byType(PracticeAttemptScreen), findsOneWidget);
+
+      await systemBack(tester);
+      await tester.tap(find.widgetWithText(PlengoButton, 'خروج'));
+      await tester.pumpAndSettle();
+      expect(find.byType(PracticeAttemptScreen), findsNothing);
+      expect(app.container.read(routerProvider).routeInformationProvider.value.uri.path, Routes.home);
+    });
+
+    testWidgets('question-bank practice: back opens the same exit sheet as ✕', (tester) async {
+      final app = await open(
+        tester,
+        arrangeCatalog: (c) => when(() => c.outline('p')).thenAnswer((_) async => outline()),
+        arrangeQuestions: (q) => bank(q, [mcq('الأول'), mcq('الثاني')]),
+      );
+      app.container.read(routerProvider).go('/subjects/p/questions');
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('ابدأ التدريب'));
+      await tester.pumpAndSettle();
+      expect(find.byType(PracticeScreen), findsOneWidget);
+
+      await systemBack(tester);
+      expect(find.text(PracticeScreen.exitTitle), findsOneWidget);
+      expect(find.text(PracticeScreen.exitMessage), findsOneWidget);
+      await tester.tap(find.text('واصل التدريب'));
+      await tester.pumpAndSettle();
+      expect(find.byType(PracticeScreen), findsOneWidget);
+
+      await systemBack(tester);
+      await tester.tap(find.widgetWithText(PlengoButton, 'خروج'));
+      await tester.pumpAndSettle();
+      expect(find.byType(PracticeScreen), findsNothing);
+      expect(find.byType(QuestionsScreen), findsOneWidget);
+    });
+
+    testWidgets('exam: back opens the timer exit sheet; «واصل الامتحان» stays, «خروج» leaves', (tester) async {
+      final app = await open(tester, arrange: (l) => when(() => l.attempt('a1')).thenAnswer((_) async => attempt()));
+      await push(app, tester, '/attempts/a1');
+      expect(find.byType(ExamScreen), findsOneWidget);
+
+      await systemBack(tester);
+      expect(find.text(ExamScreen.exitTitle), findsOneWidget);
+      expect(find.text(ExamScreen.exitMessage), findsOneWidget);
+      await tester.tap(find.text('واصل الامتحان'));
+      await tester.pumpAndSettle();
+      expect(find.byType(ExamScreen), findsOneWidget);
+
+      await systemBack(tester);
+      await tester.tap(find.widgetWithText(PlengoButton, 'خروج'));
+      await tester.pumpAndSettle();
+      expect(find.byType(ExamScreen), findsNothing);
+      expect(app.container.read(routerProvider).routeInformationProvider.value.uri.path, Routes.home);
+    });
+
+    testWidgets('exam waiting to be sent: back just leaves, with no sheet', (tester) async {
+      final app = await open(tester, arrange: (l) => when(() => l.attempt('a1')).thenAnswer((_) async => attempt()));
+      await ExamStore(app.db).saveAttempt(attempt(), submitPending: true, timeSpentMs: 0);
+      await push(app, tester, '/attempts/a1');
+      expect(find.text('إرسال الآن'), findsOneWidget);
+
+      await systemBack(tester);
+      expect(find.text(ExamScreen.exitTitle), findsNothing);
+      expect(find.byType(ExamScreen), findsNothing);
+      expect(app.container.read(routerProvider).routeInformationProvider.value.uri.path, Routes.home);
     });
   });
 }
