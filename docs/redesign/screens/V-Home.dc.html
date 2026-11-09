@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>الرئيسية</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+@font-face{font-family:'Montserrat Arabic';src:url(/_blob/357f39cb62cd40ff76de5a0f5ba49e50) format('opentype');font-weight:400;font-display:swap}
+@font-face{font-family:'Montserrat Arabic';src:url(/_blob/4b29ce96eaf6762241ea27a51c7cab99) format('opentype');font-weight:500;font-display:swap}
+@font-face{font-family:'Montserrat Arabic';src:url(/_blob/a4fdd1af3ed03688c9c5188e6974f03a) format('opentype');font-weight:600;font-display:swap}
+@font-face{font-family:'Montserrat Arabic';src:url(/_blob/438a5a34dea0f44d6918646212cdca67) format('opentype');font-weight:700;font-display:swap}
+body{margin:0;background:transparent}
+*{box-sizing:border-box}
+a{color:#0074B4}a:hover{color:#005E92}
+.ph{--bg:#FAF8F3;--card:#FFFFFF;--ink:#1B1B1B;--mute:#5E5A52;--line:#ECE7DC;--act:#0074B4;--actInk:#FFFFFF;--actSoft:#E3F1FA;--navbg:#FFFFFF;--sk:#EFEAE0;
+ width:390px;height:844px;display:flex;flex-direction:column;font-family:'Montserrat Arabic',sans-serif;color:var(--ink);background:var(--bg);overflow:hidden;position:relative}
+.ph.dark{--bg:#151515;--card:#1F1F1F;--ink:#F2F2F2;--mute:#B5B0A6;--line:#2E2E2E;--act:#5CB8EE;--actInk:#1B1B1B;--actSoft:#16303F;--navbg:#1B1B1B;--sk:#2A2A2A}
+.ph a{color:var(--act)}
+.bar{display:flex;align-items:center;gap:4px;min-height:56px;padding:30px 8px 4px;flex:none;position:relative;z-index:1}
+.bar .ttl{flex:1;font-size:20px;font-weight:700;margin:0;padding-inline-start:8px}
+.ib{width:48px;height:48px;display:inline-flex;align-items:center;justify-content:center;border-radius:16px;border:0;background:transparent;color:var(--ink);text-decoration:none;cursor:pointer;flex:none;position:relative}
+.ph a.ib{color:var(--ink)}
+.ib.soft{background:var(--card);box-shadow:0 1px 0 var(--line)}
+.dot{position:absolute;top:6px;inset-inline-end:6px;min-width:18px;height:18px;border-radius:9px;background:#C63B3B;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px;border:2px solid var(--bg)}
+.scroll{flex:1;overflow-y:auto;padding:8px 20px 28px;display:flex;flex-direction:column;gap:16px;position:relative;z-index:1}
+.t{font-size:26px;font-weight:700;margin:0;line-height:1.45}
+.h2{font-size:18px;font-weight:700;margin:0;line-height:1.5}
+.sub{font-size:14px;color:var(--mute);line-height:1.8;margin:0}
+.cap{font-size:12px;color:var(--mute);line-height:1.6}
+.b{font-weight:700}
+.card{border-radius:24px;padding:16px;background:var(--card);display:flex;flex-direction:column;gap:10px;box-shadow:0 1px 0 var(--line),0 6px 18px rgba(60,45,10,.05)}
+.dark .card{box-shadow:none;border:1px solid var(--line)}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;min-height:54px;border-radius:18px;font:700 16px 'Montserrat Arabic',sans-serif;text-decoration:none;padding:0 20px;cursor:pointer;width:100%;text-align:center;border:0}
+.ph a.btn-p,.btn-p{background:var(--act);color:var(--actInk);box-shadow:0 4px 0 #005E92}
+.dark .btn-p{box-shadow:0 4px 0 #2B7FAF}
+.ph a.btn-s,.btn-s{background:var(--card);color:var(--act);border:2px solid var(--act)}
+.ph a.btn-y,.btn-y{background:#FFD62C;color:#1B1B1B;box-shadow:0 4px 0 #D9AF00}
+.ph a.btn-g,.btn-g{background:transparent;color:var(--act);min-height:48px;text-decoration:none}
+.btn-dis{background:var(--sk);color:var(--mute);cursor:not-allowed;box-shadow:none}
+.btn-sm{min-height:48px;width:auto;font-size:14px;padding:0 16px;border-radius:14px;box-shadow:none}
+.ph a.btn-sm.btn-p,.btn-sm.btn-p{box-shadow:none}
+.row{display:flex;align-items:center;gap:12px;min-height:64px;padding:12px 14px;border-radius:20px;text-decoration:none;color:var(--ink);background:var(--card);box-shadow:0 1px 0 var(--line)}
+.ph a.row{color:var(--ink)}
+.row.flat{background:transparent;box-shadow:none;border-bottom:1px solid var(--line);border-radius:0;padding:12px 2px;min-height:56px}
+.list{display:flex;flex-direction:column;gap:10px}
+.ico{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex:none}
+.grow{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.rt{font-size:15px;font-weight:700;line-height:1.5}
+.pb{height:10px;border-radius:99px;background:var(--sk);overflow:hidden;flex:1}
+.pb i{display:block;height:100%;border-radius:99px}
+.pbw{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:700}
+.chip{display:inline-flex;align-items:center;gap:6px;min-height:28px;padding:2px 10px;border-radius:99px;font-size:12px;font-weight:700;white-space:nowrap}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px}
+.pillbtn{min-height:44px;padding:0 16px;border-radius:99px;border:1.5px solid var(--line);background:var(--card);font:600 14px 'Montserrat Arabic',sans-serif;color:var(--ink);cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
+.pillbtn.on{background:#1B1B1B;color:#fff;border-color:#1B1B1B}
+.dark .pillbtn.on{background:#FFD62C;color:#1B1B1B;border-color:#FFD62C}
+.seg{display:flex;background:var(--sk);border-radius:16px;padding:4px;gap:4px}
+.seg button{flex:1;min-height:44px;border:0;border-radius:12px;background:transparent;font:600 13px 'Montserrat Arabic',sans-serif;color:var(--mute);cursor:pointer}
+.seg button.on{background:var(--card);font-weight:700;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.nav{display:flex;padding:8px 6px 20px;background:var(--navbg);flex:none;border-top:1px solid var(--line);position:relative;z-index:2}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;min-height:56px;justify-content:center;text-decoration:none;font-size:11px;font-weight:600}
+.ph a.tab{color:var(--mute)}
+.pill{width:58px;height:32px;border-radius:99px;display:flex;align-items:center;justify-content:center}
+.ph a.tab.on{color:var(--ink);font-weight:700}
+.tab.on .pill{background:#FFD62C;color:#1B1B1B}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:14px;font-weight:700}
+.inp{width:100%;min-height:54px;border:2px solid var(--line);border-radius:16px;padding:0 16px;font:500 16px 'Montserrat Arabic',sans-serif;background:var(--card);color:var(--ink)}
+.inp:focus{outline:none;border-color:var(--act)}
+.inp.err{border-color:#C63B3B;background:#FDE8E8}
+.hint{font-size:12px;color:var(--mute)}
+.errmsg{display:flex;gap:6px;align-items:flex-start;font-size:13px;font-weight:700;line-height:1.6;color:#B42323}
+.opt{display:flex;align-items:center;gap:12px;min-height:62px;padding:12px 14px;border:2px solid var(--line);border-radius:18px;background:var(--card);font:600 16px 'Montserrat Arabic',sans-serif;color:var(--ink);text-align:start;width:100%;cursor:pointer;box-shadow:0 3px 0 var(--line)}
+.opt .k{width:34px;height:34px;border-radius:11px;background:var(--sk);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex:none}
+.opt.sel{border-color:#0074B4;background:#E3F1FA;box-shadow:0 3px 0 #0074B4}
+.opt.sel .k{background:#0074B4;color:#fff}
+.opt.right{border-color:#1FCD33;background:#E3F8E6;box-shadow:0 3px 0 #1FCD33;color:#1B1B1B}
+.opt.right .k{background:#1FCD33;color:#1B1B1B}
+.opt.wrong{border-color:#E54E4E;background:#FDE8E8;box-shadow:0 3px 0 #E54E4E;color:#1B1B1B}
+.opt.wrong .k{background:#C63B3B;color:#fff}
+.opt.dim{opacity:.6}
+.opt .tag{margin-inline-start:auto;font-size:12px;font-weight:700;display:flex;align-items:center;gap:4px}
+.opt.right .tag{color:#157A22}.opt.wrong .tag{color:#B42323}
+.sheet{padding:14px 20px 24px;background:var(--card);display:flex;flex-direction:column;gap:10px;flex:none;border-radius:28px 28px 0 0;box-shadow:0 -6px 20px rgba(60,45,10,.06);position:relative;z-index:2}
+.fbok{background:#E3F8E6;color:#1B1B1B}.fbno{background:#FDE8E8;color:#1B1B1B}
+.ltr{direction:ltr;unicode-bidi:isolate}
+.radio{display:flex;align-items:center;gap:12px;min-height:60px;padding:12px 14px;border:2px solid var(--line);border-radius:18px;background:var(--card);font:600 15px 'Montserrat Arabic',sans-serif;color:var(--ink);text-align:start;width:100%;cursor:pointer}
+.radio .rd{width:24px;height:24px;border-radius:50%;border:2px solid #9A958B;flex:none;display:flex;align-items:center;justify-content:center}
+.radio.on{border-color:#0074B4;background:#E3F1FA}
+.radio.on .rd{border-color:#0074B4}
+.radio.on .rd i{width:12px;height:12px;border-radius:50%;background:#0074B4;display:block}
+.sk{background:var(--sk);border-radius:14px}
+.tile{flex:1;border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:4px;text-decoration:none;color:#1B1B1B}
+.big{font-size:30px;font-weight:700;line-height:1.2}
+.otp{width:46px;height:58px;border:2px solid var(--line);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;background:var(--card)}
+.otp.on{border-color:#0074B4}
+.blob{position:absolute;border-radius:50%;z-index:0;pointer-events:none}
+.sec{font-size:13px;font-weight:700;color:var(--mute);margin:6px 0 -6px}
+.sw{width:9px;height:9px;border-radius:50%;display:inline-block}
+</style>
+</helmet>
+<div class="ph" dir="rtl" style="width:390px;height:844px;">
+
+<header class="bar" style="padding-inline:20px 12px;gap:12px">
+  <span style="width:46px;height:46px;border-radius:50%;background:#E3A4E8;color:#1B1B1B;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;flex:none" aria-hidden="true">س</span>
+  <div class="grow"><span class="rt" style="font-size:17px">مرحباً، سارة</span><span class="cap">واصل رحلتك التعليمية</span></div>
+  <a class="ib soft" href="V-Notifications.dc.html" aria-label="الإشعارات، 3 غير مقروءة"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 21h4"/></svg><span class="dot">3</span></a>
+</header>
+<div class="scroll" style="">
+  
+  <section style="background:#0074B4;color:#fff;border-radius:28px;padding:20px;display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden" aria-labelledby="cl">
+    <span class="blob" aria-hidden="true" style="width:150px;height:150px;background:#1A86C2;top:-50px;left:-50px"></span><span class="blob" aria-hidden="true" style="width:26px;height:26px;background:#FFD62C;top:22px;left:30px"></span><span class="blob" aria-hidden="true" style="width:14px;height:14px;background:#E3A4E8;top:58px;left:64px"></span>
+    <span style="position:relative;font-size:12px;font-weight:700;opacity:.95">تابع من حيث توقفت</span>
+    <h2 id="cl" class="h2" style="position:relative;font-size:20px">الوحدة 3: المشتقات</h2>
+    <span style="position:relative;font-size:13px">الرياضيات · أسئلة الدرس 2</span>
+    <div style="position:relative;display:flex;align-items:center;gap:10px;font-size:12px;font-weight:700"><div style="flex:1;height:10px;border-radius:99px;background:rgba(255,255,255,.3)"><i style="display:block;width:35%;height:100%;border-radius:99px;background:#FFD62C"></i></div>السؤال 7 من 20</div>
+    <a class="btn btn-y" href="V-Question.dc.html" style="position:relative"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4l12 8-12 8z"/></svg> تابع</a>
+  </section>
+  <section class="card" aria-labelledby="td" style="gap:14px">
+    <div style="display:flex;align-items:center;justify-content:space-between"><h2 id="td" class="h2">اليوم</h2><span class="chip" style="background:#FEEEDB;color:#9A5205"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c1 4 5 5 5 10a5 5 0 0 1-10 0c0-3 2-4 2-7 1 1 2 2 3-3z"/></svg>5 أيام متتالية</span></div>
+    <div style="display:flex;align-items:center;gap:14px"><div style="position:relative;width:76px;height:76px;flex:none" role="img" aria-label="60%"><svg width="76" height="76" viewBox="0 0 76 76" aria-hidden="true" style="transform:rotate(-90deg)"><circle cx="38.0" cy="38.0" r="33.5" fill="none" style="stroke:var(--sk)" stroke-width="9"/><circle cx="38.0" cy="38.0" r="33.5" fill="none" stroke="#1FCD33" stroke-width="9" stroke-linecap="round" stroke-dasharray="210.5" stroke-dashoffset="84.2"/></svg><span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:700">12/20</span></div>
+      <div class="grow"><span class="rt">هدف اليوم: 12 من 20</span><span class="cap">بطاقات وإجابات</span>
+      <button class="btn btn-g btn-sm" onClick="{{openGoal}}" style="padding:0;justify-content:flex-start;min-height:40px">تعديل الهدف</button></div></div>
+    <a class="btn btn-p" href="V-Flashcards.dc.html"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="13" height="14" rx="2"/><path d="M8 3h11a2 2 0 0 1 2 2v12"/></svg> مراجعة البطاقات المستحقة (12)</a>
+    <a class="row" href="V-Mistakes.dc.html" style="background:#FDE8E8;box-shadow:none;color:#1B1B1B;min-height:56px"><span class="ico" style="background:#C63B3B;color:#FFFFFF;width:36px;height:36px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></svg></span><span class="grow"><span class="rt" style="font-size:14px">لديك 9 أخطاء للمراجعة</span></span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></a>
+  </section>
+  <div style="background:#FFD62C;color:#1B1B1B;border-radius:22px;padding:14px 16px;display:flex;align-items:center;gap:12px"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span class="grow"><span class="cap" style="color:#3D3000">العدّ التنازلي</span><span class="rt">باقي 120 يوماً على امتحانات الشهادة الثانوية</span></span></div>
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <a href="V-Quiz.dc.html" style="height:132px;border-radius:24px;background:#F7E6F9;display:flex;align-items:center;gap:12px;padding:18px;text-decoration:none;color:#1B1B1B;position:relative;overflow:hidden">
+      <span class="blob" aria-hidden="true" style="width:120px;height:120px;background:#E3A4E8;left:-30px;bottom:-40px"></span><span class="blob" aria-hidden="true" style="width:30px;height:30px;background:#F99A2C;left:70px;top:18px"></span>
+      <span class="grow" style="position:relative"><span class="cap b" style="color:#7B2F83">إعلان · مساحة صورة البانر</span><span class="rt" style="font-size:17px">امتحان تجريبي شامل للبكالوريا</span><span class="cap" style="color:#7B2F83">ابدأ الآن ←</span></span></a>
+    <div style="display:flex;gap:6px;justify-content:center" aria-label="البانر 1 من 3"><span class="sw" style="width:20px;border-radius:5px;background:#0074B4"></span><span class="sw" style="background:#D9D3C7"></span><span class="sw" style="background:#D9D3C7"></span></div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center"><h2 class="h2">موادّي ومساراتي</h2><a href="V-Subjects.dc.html" style="font-size:13px;font-weight:700;text-decoration:none">الكل</a></div>
+  <div style="display:flex;gap:10px;overflow-x:auto;margin-inline:-20px;padding-inline:20px"><a href="V-Subject.dc.html" style="min-width:150px;border-radius:22px;padding:14px;background:#E3F1FA;color:#1B1B1B;text-decoration:none;display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start"><span class="ico" style="background:#0074B4;color:#FFFFFF;width:40px;height:40px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V11M10 20V5M16 20v-6M2 21h20"/></svg></span><div style="position:relative;width:46px;height:46px;flex:none" role="img" aria-label="42%"><svg width="46" height="46" viewBox="0 0 46 46" aria-hidden="true" style="transform:rotate(-90deg)"><circle cx="23.0" cy="23.0" r="20.0" fill="none" style="stroke:#FFFFFF" stroke-width="6"/><circle cx="23.0" cy="23.0" r="20.0" fill="none" stroke="#0074B4" stroke-width="6" stroke-linecap="round" stroke-dasharray="125.7" stroke-dashoffset="72.9"/></svg><span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">42%</span></div></div>
+      <span class="rt">الرياضيات</span><span class="cap" style="color:#005E92">الوحدة 3 من 6</span></a><a href="V-Subject.dc.html" style="min-width:150px;border-radius:22px;padding:14px;background:#FEEEDB;color:#1B1B1B;text-decoration:none;display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start"><span class="ico" style="background:#F99A2C;color:#1B1B1B;width:40px;height:40px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/></svg></span><div style="position:relative;width:46px;height:46px;flex:none" role="img" aria-label="18%"><svg width="46" height="46" viewBox="0 0 46 46" aria-hidden="true" style="transform:rotate(-90deg)"><circle cx="23.0" cy="23.0" r="20.0" fill="none" style="stroke:#FFFFFF" stroke-width="6"/><circle cx="23.0" cy="23.0" r="20.0" fill="none" stroke="#F99A2C" stroke-width="6" stroke-linecap="round" stroke-dasharray="125.7" stroke-dashoffset="103.0"/></svg><span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">18%</span></div></div>
+      <span class="rt">الفيزياء</span><span class="cap" style="color:#9A5205">الوحدة 1 من 5</span></a><a href="V-Subject.dc.html" style="min-width:150px;border-radius:22px;padding:14px;background:#F7E6F9;color:#1B1B1B;text-decoration:none;display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start"><span class="ico" style="background:#E3A4E8;color:#1B1B1B;width:40px;height:40px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 4 6"/></svg></span><div style="position:relative;width:46px;height:46px;flex:none" role="img" aria-label="60%"><svg width="46" height="46" viewBox="0 0 46 46" aria-hidden="true" style="transform:rotate(-90deg)"><circle cx="23.0" cy="23.0" r="20.0" fill="none" style="stroke:#FFFFFF" stroke-width="6"/><circle cx="23.0" cy="23.0" r="20.0" fill="none" stroke="#E3A4E8" stroke-width="6" stroke-linecap="round" stroke-dasharray="125.7" stroke-dashoffset="50.3"/></svg><span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">60%</span></div></div>
+      <span class="rt">مسار أ. ريم</span><span class="cap" style="color:#7B2F83">الكيمياء</span></a></div>
+  <h2 class="h2">محتوى مجاني</h2>
+  <div style="display:flex;gap:10px;overflow-x:auto;margin-inline:-20px;padding-inline:20px"><a href="V-Subject.dc.html" style="min-width:140px;border-radius:20px;padding:12px;background:var(--card);box-shadow:0 1px 0 var(--line);text-decoration:none;color:var(--ink);display:flex;flex-direction:column;gap:8px">
+      <div style="height:64px;border-radius:14px;background:#E3F8E6;display:flex;align-items:center;justify-content:center;color:#157A22"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/></svg></div>
+      <span class="rt" style="font-size:14px">اختبار تجريبي</span><span class="chip" style="background:#E3F8E6;color:#157A22">مجاني</span></a><a href="V-Subject.dc.html" style="min-width:140px;border-radius:20px;padding:12px;background:var(--card);box-shadow:0 1px 0 var(--line);text-decoration:none;color:var(--ink);display:flex;flex-direction:column;gap:8px">
+      <div style="height:64px;border-radius:14px;background:#FFF4C2;display:flex;align-items:center;justify-content:center;color:#6B5200"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="13" height="14" rx="2"/><path d="M8 3h11a2 2 0 0 1 2 2v12"/></svg></div>
+      <span class="rt" style="font-size:14px">بطاقات الكيمياء</span><span class="chip" style="background:#E3F8E6;color:#157A22">مجاني</span></a><a href="V-Subject.dc.html" style="min-width:140px;border-radius:20px;padding:12px;background:var(--card);box-shadow:0 1px 0 var(--line);text-decoration:none;color:var(--ink);display:flex;flex-direction:column;gap:8px">
+      <div style="height:64px;border-radius:14px;background:#FDE8E8;display:flex;align-items:center;justify-content:center;color:#B42323"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16v13H4z"/><path d="M8 10h8M8 14h5"/></svg></div>
+      <span class="rt" style="font-size:14px">أسئلة اللغة</span><span class="chip" style="background:#E3F8E6;color:#157A22">مجاني</span></a></div>
+  <h2 class="h2">مدرسون أتابعهم</h2>
+  <div style="display:flex;gap:14px"><a href="V-Subjects.dc.html" style="display:flex;flex-direction:column;align-items:center;gap:6px;text-decoration:none;color:var(--ink);min-width:72px">
+      <span style="width:64px;height:64px;border-radius:50%;background:#F7E6F9;color:#7B2F83;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;box-shadow:0 0 0 3px #E3A4E8">ر</span><span style="font-size:12px;font-weight:600">أ. ريم</span></a><a href="V-Subjects.dc.html" style="display:flex;flex-direction:column;align-items:center;gap:6px;text-decoration:none;color:var(--ink);min-width:72px">
+      <span style="width:64px;height:64px;border-radius:50%;background:#E3F1FA;color:#005E92;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;box-shadow:0 0 0 3px #0074B4">م</span><span style="font-size:12px;font-weight:600">أ. محمد</span></a><a href="V-Subjects.dc.html" style="display:flex;flex-direction:column;align-items:center;gap:6px;text-decoration:none;color:var(--ink);min-width:72px">
+      <span style="width:64px;height:64px;border-radius:50%;background:#FEEEDB;color:#9A5205;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;box-shadow:0 0 0 3px #F99A2C">س</span><span style="font-size:12px;font-weight:600">أ. سامر</span></a></div>
+</div>
+<sc-if value="{{goalOpen}}" hint-placeholder-val="{{false}}">
+  <div style="position:absolute;inset:0;background:rgba(20,20,20,.45);z-index:5;display:flex;flex-direction:column;justify-content:flex-end">
+    <div class="sheet" role="dialog" aria-label="الهدف اليومي" style="gap:14px">
+      <div style="width:40px;height:5px;border-radius:3px;background:var(--line);align-self:center"></div>
+      <h2 class="h2">الهدف اليومي</h2><p class="sub">عدد البطاقات والإجابات التي تريد إنجازها كل يوم</p>
+      <div class="list" role="radiogroup" style="gap:6px">
+        <sc-for list="{{goals}}" as="g" hint-placeholder-count="5"><button class="{{g.cls}}" role="radio" aria-checked="{{g.aria}}" onClick="{{g.pick}}" style="min-height:52px"><span class="rd"><i></i></span><span class="grow"><span class="rt" style="font-size:14px">{{g.label}}</span></span><span class="cap b">{{g.n}} عنصراً · {{g.mins}}</span></button></sc-for>
+      </div>
+      <button class="btn btn-p" onClick="{{closeGoal}}">حفظ</button>
+    </div>
+  </div>
+</sc-if>
+<nav class="nav" aria-label="التنقل الرئيسي"><a class="tab on" href="V-Home.dc.html" aria-current="page"><span class="pill"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></span><span>الرئيسية</span></a><a class="tab" href="V-Subjects.dc.html"><span class="pill"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5V5a2 2 0 0 1 2-2h14v15H6.5A2.5 2.5 0 0 0 4 20.5 2.5 2.5 0 0 0 6.5 23H20"/></svg></span><span>المواد</span></a><a class="tab" href="V-Review.dc.html"><span class="pill"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="13" height="14" rx="2"/><path d="M8 3h11a2 2 0 0 1 2 2v12"/></svg></span><span>المراجعة</span></a><a class="tab" href="V-Saved.dc.html"><span class="pill"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg></span><span>المحفوظات</span></a><a class="tab" href="V-Account.dc.html"><span class="pill"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span><span>حسابي</span></a></nav>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { open: false, g: 20 }; }
+  renderVals() {
+    const { open, g } = this.state;
+    return {
+      goalOpen: open,
+      openGoal: () => this.setState({ open: true }),
+      closeGoal: () => this.setState({ open: false }),
+      goals: [[10,'خفيف','~5 د'],[20,'عادي','~10 د'],[30,'جاد','~15 د'],[50,'مكثّف','~25 د'],[100,'تحدٍّ','~50 د']].map(([n, label, mins]) => ({ n: String(n), label, mins, cls: n === g ? 'radio on' : 'radio', aria: n === g ? 'true' : 'false', pick: () => this.setState({ g: n }) }))
+    };
+  }
+}
+</script>
+</body>
+</html>

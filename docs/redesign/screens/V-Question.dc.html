@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>سؤال — وضع التدريب</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+@font-face{font-family:'Montserrat Arabic';src:url(/_blob/357f39cb62cd40ff76de5a0f5ba49e50) format('opentype');font-weight:400;font-display:swap}
+@font-face{font-family:'Montserrat Arabic';src:url(/_blob/4b29ce96eaf6762241ea27a51c7cab99) format('opentype');font-weight:500;font-display:swap}
+@font-face{font-family:'Montserrat Arabic';src:url(/_blob/a4fdd1af3ed03688c9c5188e6974f03a) format('opentype');font-weight:600;font-display:swap}
+@font-face{font-family:'Montserrat Arabic';src:url(/_blob/438a5a34dea0f44d6918646212cdca67) format('opentype');font-weight:700;font-display:swap}
+body{margin:0;background:transparent}
+*{box-sizing:border-box}
+a{color:#0074B4}a:hover{color:#005E92}
+.ph{--bg:#FAF8F3;--card:#FFFFFF;--ink:#1B1B1B;--mute:#5E5A52;--line:#ECE7DC;--act:#0074B4;--actInk:#FFFFFF;--actSoft:#E3F1FA;--navbg:#FFFFFF;--sk:#EFEAE0;
+ width:390px;height:844px;display:flex;flex-direction:column;font-family:'Montserrat Arabic',sans-serif;color:var(--ink);background:var(--bg);overflow:hidden;position:relative}
+.ph.dark{--bg:#151515;--card:#1F1F1F;--ink:#F2F2F2;--mute:#B5B0A6;--line:#2E2E2E;--act:#5CB8EE;--actInk:#1B1B1B;--actSoft:#16303F;--navbg:#1B1B1B;--sk:#2A2A2A}
+.ph a{color:var(--act)}
+.bar{display:flex;align-items:center;gap:4px;min-height:56px;padding:30px 8px 4px;flex:none;position:relative;z-index:1}
+.bar .ttl{flex:1;font-size:20px;font-weight:700;margin:0;padding-inline-start:8px}
+.ib{width:48px;height:48px;display:inline-flex;align-items:center;justify-content:center;border-radius:16px;border:0;background:transparent;color:var(--ink);text-decoration:none;cursor:pointer;flex:none;position:relative}
+.ph a.ib{color:var(--ink)}
+.ib.soft{background:var(--card);box-shadow:0 1px 0 var(--line)}
+.dot{position:absolute;top:6px;inset-inline-end:6px;min-width:18px;height:18px;border-radius:9px;background:#C63B3B;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px;border:2px solid var(--bg)}
+.scroll{flex:1;overflow-y:auto;padding:8px 20px 28px;display:flex;flex-direction:column;gap:16px;position:relative;z-index:1}
+.t{font-size:26px;font-weight:700;margin:0;line-height:1.45}
+.h2{font-size:18px;font-weight:700;margin:0;line-height:1.5}
+.sub{font-size:14px;color:var(--mute);line-height:1.8;margin:0}
+.cap{font-size:12px;color:var(--mute);line-height:1.6}
+.b{font-weight:700}
+.card{border-radius:24px;padding:16px;background:var(--card);display:flex;flex-direction:column;gap:10px;box-shadow:0 1px 0 var(--line),0 6px 18px rgba(60,45,10,.05)}
+.dark .card{box-shadow:none;border:1px solid var(--line)}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;min-height:54px;border-radius:18px;font:700 16px 'Montserrat Arabic',sans-serif;text-decoration:none;padding:0 20px;cursor:pointer;width:100%;text-align:center;border:0}
+.ph a.btn-p,.btn-p{background:var(--act);color:var(--actInk);box-shadow:0 4px 0 #005E92}
+.dark .btn-p{box-shadow:0 4px 0 #2B7FAF}
+.ph a.btn-s,.btn-s{background:var(--card);color:var(--act);border:2px solid var(--act)}
+.ph a.btn-y,.btn-y{background:#FFD62C;color:#1B1B1B;box-shadow:0 4px 0 #D9AF00}
+.ph a.btn-g,.btn-g{background:transparent;color:var(--act);min-height:48px;text-decoration:none}
+.btn-dis{background:var(--sk);color:var(--mute);cursor:not-allowed;box-shadow:none}
+.btn-sm{min-height:48px;width:auto;font-size:14px;padding:0 16px;border-radius:14px;box-shadow:none}
+.ph a.btn-sm.btn-p,.btn-sm.btn-p{box-shadow:none}
+.row{display:flex;align-items:center;gap:12px;min-height:64px;padding:12px 14px;border-radius:20px;text-decoration:none;color:var(--ink);background:var(--card);box-shadow:0 1px 0 var(--line)}
+.ph a.row{color:var(--ink)}
+.row.flat{background:transparent;box-shadow:none;border-bottom:1px solid var(--line);border-radius:0;padding:12px 2px;min-height:56px}
+.list{display:flex;flex-direction:column;gap:10px}
+.ico{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex:none}
+.grow{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.rt{font-size:15px;font-weight:700;line-height:1.5}
+.pb{height:10px;border-radius:99px;background:var(--sk);overflow:hidden;flex:1}
+.pb i{display:block;height:100%;border-radius:99px}
+.pbw{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:700}
+.chip{display:inline-flex;align-items:center;gap:6px;min-height:28px;padding:2px 10px;border-radius:99px;font-size:12px;font-weight:700;white-space:nowrap}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px}
+.pillbtn{min-height:44px;padding:0 16px;border-radius:99px;border:1.5px solid var(--line);background:var(--card);font:600 14px 'Montserrat Arabic',sans-serif;color:var(--ink);cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
+.pillbtn.on{background:#1B1B1B;color:#fff;border-color:#1B1B1B}
+.dark .pillbtn.on{background:#FFD62C;color:#1B1B1B;border-color:#FFD62C}
+.seg{display:flex;background:var(--sk);border-radius:16px;padding:4px;gap:4px}
+.seg button{flex:1;min-height:44px;border:0;border-radius:12px;background:transparent;font:600 13px 'Montserrat Arabic',sans-serif;color:var(--mute);cursor:pointer}
+.seg button.on{background:var(--card);font-weight:700;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.nav{display:flex;padding:8px 6px 20px;background:var(--navbg);flex:none;border-top:1px solid var(--line);position:relative;z-index:2}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;min-height:56px;justify-content:center;text-decoration:none;font-size:11px;font-weight:600}
+.ph a.tab{color:var(--mute)}
+.pill{width:58px;height:32px;border-radius:99px;display:flex;align-items:center;justify-content:center}
+.ph a.tab.on{color:var(--ink);font-weight:700}
+.tab.on .pill{background:#FFD62C;color:#1B1B1B}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:14px;font-weight:700}
+.inp{width:100%;min-height:54px;border:2px solid var(--line);border-radius:16px;padding:0 16px;font:500 16px 'Montserrat Arabic',sans-serif;background:var(--card);color:var(--ink)}
+.inp:focus{outline:none;border-color:var(--act)}
+.inp.err{border-color:#C63B3B;background:#FDE8E8}
+.hint{font-size:12px;color:var(--mute)}
+.errmsg{display:flex;gap:6px;align-items:flex-start;font-size:13px;font-weight:700;line-height:1.6;color:#B42323}
+.opt{display:flex;align-items:center;gap:12px;min-height:62px;padding:12px 14px;border:2px solid var(--line);border-radius:18px;background:var(--card);font:600 16px 'Montserrat Arabic',sans-serif;color:var(--ink);text-align:start;width:100%;cursor:pointer;box-shadow:0 3px 0 var(--line)}
+.opt .k{width:34px;height:34px;border-radius:11px;background:var(--sk);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex:none}
+.opt.sel{border-color:#0074B4;background:#E3F1FA;box-shadow:0 3px 0 #0074B4}
+.opt.sel .k{background:#0074B4;color:#fff}
+.opt.right{border-color:#1FCD33;background:#E3F8E6;box-shadow:0 3px 0 #1FCD33;color:#1B1B1B}
+.opt.right .k{background:#1FCD33;color:#1B1B1B}
+.opt.wrong{border-color:#E54E4E;background:#FDE8E8;box-shadow:0 3px 0 #E54E4E;color:#1B1B1B}
+.opt.wrong .k{background:#C63B3B;color:#fff}
+.opt.dim{opacity:.6}
+.opt .tag{margin-inline-start:auto;font-size:12px;font-weight:700;display:flex;align-items:center;gap:4px}
+.opt.right .tag{color:#157A22}.opt.wrong .tag{color:#B42323}
+.sheet{padding:14px 20px 24px;background:var(--card);display:flex;flex-direction:column;gap:10px;flex:none;border-radius:28px 28px 0 0;box-shadow:0 -6px 20px rgba(60,45,10,.06);position:relative;z-index:2}
+.fbok{background:#E3F8E6;color:#1B1B1B}.fbno{background:#FDE8E8;color:#1B1B1B}
+.ltr{direction:ltr;unicode-bidi:isolate}
+.radio{display:flex;align-items:center;gap:12px;min-height:60px;padding:12px 14px;border:2px solid var(--line);border-radius:18px;background:var(--card);font:600 15px 'Montserrat Arabic',sans-serif;color:var(--ink);text-align:start;width:100%;cursor:pointer}
+.radio .rd{width:24px;height:24px;border-radius:50%;border:2px solid #9A958B;flex:none;display:flex;align-items:center;justify-content:center}
+.radio.on{border-color:#0074B4;background:#E3F1FA}
+.radio.on .rd{border-color:#0074B4}
+.radio.on .rd i{width:12px;height:12px;border-radius:50%;background:#0074B4;display:block}
+.sk{background:var(--sk);border-radius:14px}
+.tile{flex:1;border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:4px;text-decoration:none;color:#1B1B1B}
+.big{font-size:30px;font-weight:700;line-height:1.2}
+.otp{width:46px;height:58px;border:2px solid var(--line);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;background:var(--card)}
+.otp.on{border-color:#0074B4}
+.blob{position:absolute;border-radius:50%;z-index:0;pointer-events:none}
+.sec{font-size:13px;font-weight:700;color:var(--mute);margin:6px 0 -6px}
+.sw{width:9px;height:9px;border-radius:50%;display:inline-block}
+</style>
+</helmet>
+<div class="ph" dir="rtl" style="width:390px;height:844px;">
+
+<header class="bar" style="gap:6px;padding-inline:8px">
+  <button class="ib soft" onClick="{{openExit}}" aria-label="خروج"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  <div style="flex:1;display:flex;flex-direction:column;gap:4px;padding-inline:4px">
+    <div class="pb" style="flex:none;height:14px"><i style="{{barStyle}}"></i></div>
+    <span class="cap b">السؤال 3 من 10 · صحيحة {{rightCount}} من 3</span></div>
+  <button class="ib soft" onClick="{{openReport}}" aria-label="إبلاغ عن مشكلة"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg></button>
+  <button class="ib soft" aria-label="حفظ السؤال"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg></button>
+</header>
+<div class="scroll" style="padding-top:14px">
+  <sc-if value="{{combo}}" hint-placeholder-val="{{false}}">
+    <span class="chip" role="status" style="align-self:flex-start;background:#FEEEDB;color:#9A5205;min-height:34px;font-size:13px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c1 4 5 5 5 10a5 5 0 0 1-10 0c0-3 2-4 2-7 1 1 2 2 3-3z"/></svg> 3 إجابات صحيحة متتالية!</span>
+  </sc-if>
+  <div style="display:flex;gap:6px"><span class="chip" style="background:#E3F1FA;color:#005E92">اختيار من متعدد</span></div>
+  <h1 class="h2" style="font-size:21px;line-height:1.7">ما مشتقة الدالة <span class="ltr" dir="ltr">f(x) = 3x²</span> ؟</h1>
+  <div class="list" role="radiogroup" aria-label="الخيارات">
+    <sc-for list="{{opts}}" as="o" hint-placeholder-count="4">
+      <button class="{{o.cls}}" role="radio" aria-checked="{{o.aria}}" onClick="{{o.pick}}"><span class="k">{{o.key}}</span><span class="ltr" dir="ltr">{{o.t}}</span><span class="tag">{{o.tag}}</span></button>
+    </sc-for>
+  </div>
+</div>
+<sc-if value="{{notChecked}}" hint-placeholder-val="{{true}}">
+  <div class="sheet">
+    <sc-if value="{{canCheck}}" hint-placeholder-val="{{false}}"><button class="btn btn-p" onClick="{{check}}">تحقق</button></sc-if>
+    <sc-if value="{{noSel}}" hint-placeholder-val="{{true}}"><button class="btn btn-dis" disabled aria-disabled="true">اختر إجابة</button></sc-if>
+  </div>
+</sc-if>
+<sc-if value="{{showFb}}" hint-placeholder-val="{{false}}">
+  <div role="status" style="{{fbWrap}}">
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="{{fbIcon}}"><sc-if value="{{isRight}}" hint-placeholder-val="{{true}}"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg></sc-if><sc-if value="{{isWrong}}" hint-placeholder-val="{{false}}"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg></sc-if></span>
+      <span class="grow"><span style="font-size:19px;font-weight:700;{{fbInk}}">{{fbTitle}}</span></span>
+      <button class="ib" onClick="{{openReport}}" aria-label="إبلاغ عن مشكلة" style="{{fbInk}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg></button>
+    </div>
+    <sc-if value="{{isWrong}}" hint-placeholder-val="{{false}}"><span style="font-size:15px;font-weight:700;color:#B42323">الإجابة الصحيحة: <span class="ltr" dir="ltr">6x</span></span></sc-if>
+    <span style="font-size:14px;line-height:1.8;color:#1B1B1B">نضرب الأس في المعامل: <span class="ltr" dir="ltr">2 × 3 = 6</span>، ثم ننقص الأس واحداً.</span>
+    <sc-if value="{{isWrong}}" hint-placeholder-val="{{false}}"><span class="cap" style="color:#5E3A3A">أضفناه إلى «مراجعة الأخطاء» لتتدرّب عليه لاحقاً.</span></sc-if>
+    <a class="btn" href="V-Results.dc.html" style="{{fbBtn}}">{{fbBtnLabel}}</a>
+  </div>
+</sc-if>
+<sc-if value="{{reportOpen}}" hint-placeholder-val="{{false}}">
+  <div style="position:absolute;inset:0;background:rgba(20,20,20,.45);z-index:6;display:flex;flex-direction:column;justify-content:flex-end">
+    <div class="sheet" role="dialog" aria-label="إبلاغ عن مشكلة" style="gap:10px">
+      <div style="width:40px;height:5px;border-radius:3px;background:var(--line);align-self:center"></div>
+      <h2 class="h2">إبلاغ عن مشكلة</h2>
+      <div class="list" role="radiogroup" style="gap:6px">
+        <sc-for list="{{reasons}}" as="r" hint-placeholder-count="5"><button class="{{r.cls}}" role="radio" aria-checked="{{r.aria}}" onClick="{{r.pick}}" style="min-height:50px"><span class="rd"><i></i></span>{{r.t}}</button></sc-for>
+      </div>
+      <label for="note" class="b" style="font-size:13px">ملاحظة (اختياري)</label><input id="note" class="inp" placeholder="اكتب التفاصيل إن أردت">
+      <button class="btn btn-p" onClick="{{closeReport}}">إرسال البلاغ</button>
+    </div>
+  </div>
+</sc-if>
+<sc-if value="{{exitOpen}}" hint-placeholder-val="{{false}}">
+  <div style="position:absolute;inset:0;background:rgba(20,20,20,.45);z-index:6;display:flex;flex-direction:column;justify-content:flex-end">
+    <div class="sheet" role="dialog" aria-label="الخروج" style="align-items:center;text-align:center;gap:12px">
+      <div style="width:84px;height:84px;border-radius:50%;background:#E3F1FA;color:#0074B4;display:flex;align-items:center;justify-content:center"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div>
+      <h2 class="h2">تقدّمك محفوظ</h2><p class="sub">يمكنك المتابعة من السؤال 3 في أي وقت من الرئيسية.</p>
+      <button class="btn btn-p" onClick="{{closeExit}}">واصل التدريب</button>
+      <a class="btn btn-g" href="V-Home.dc.html">خروج</a>
+    </div>
+  </div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { sel: null, checked: false, rep: false, reason: 0, exit: false }; }
+  renderVals() {
+    const O = ['6x', '3x', '6x²', 'x³'], K = ['أ', 'ب', 'ج', 'د'], RIGHT = 0;
+    const { sel, checked, rep, reason, exit } = this.state;
+    const opts = O.map((t, i) => {
+      let cls = 'opt', tag = '';
+      if (checked) {
+        if (i === RIGHT) { cls = 'opt right'; tag = '✓ صحيحة'; }
+        else if (i === sel) { cls = 'opt wrong'; tag = '✗ إجابتك'; }
+        else cls = 'opt dim';
+      } else if (i === sel) cls = 'opt sel';
+      return { t, key: K[i], cls, tag, aria: i === sel ? 'true' : 'false', pick: () => { if (!this.state.checked) this.setState({ sel: i }); } };
+    });
+    const right = checked && sel === RIGHT, wrong = checked && sel !== RIGHT;
+    const R = ['الإجابة خاطئة', 'خطأ إملائي', 'غير واضح', 'مشكلة في الصورة', 'سبب آخر'];
+    return {
+      opts, noSel: sel === null, canCheck: sel !== null && !checked, notChecked: !checked, showFb: checked,
+      isRight: right, isWrong: wrong, combo: right,
+      rightCount: right ? '3' : '2',
+      barStyle: 'width:' + (checked ? 30 : 20) + '%;background:#1FCD33;transition:width .3s',
+      fbWrap: 'padding:16px 20px 24px;display:flex;flex-direction:column;gap:8px;flex:none;position:relative;z-index:2;border-radius:28px 28px 0 0;background:' + (right ? '#E3F8E6' : '#FDE8E8'),
+      fbIcon: 'width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none;' + (right ? 'background:#1FCD33;color:#1B1B1B' : 'background:#C63B3B;color:#fff'),
+      fbInk: right ? 'color:#157A22' : 'color:#B42323',
+      fbTitle: right ? 'أحسنت!' : 'ليست الإجابة الصحيحة',
+      fbBtn: right ? 'background:#1FCD33;color:#1B1B1B;box-shadow:0 4px 0 #15A126' : 'background:#C63B3B;color:#fff;box-shadow:0 4px 0 #8E2626',
+      fbBtnLabel: right ? 'متابعة' : 'فهمت، متابعة',
+      check: () => this.setState({ checked: true }),
+      reportOpen: rep, openReport: () => this.setState({ rep: true }), closeReport: () => this.setState({ rep: false }),
+      reasons: R.map((t, i) => ({ t, cls: i === reason ? 'radio on' : 'radio', aria: i === reason ? 'true' : 'false', pick: () => this.setState({ reason: i }) })),
+      exitOpen: exit, openExit: () => this.setState({ exit: true }), closeExit: () => this.setState({ exit: false })
+    };
+  }
+}
+</script>
+</body>
+</html>

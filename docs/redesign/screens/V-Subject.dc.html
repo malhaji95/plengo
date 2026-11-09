@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>الرياضيات — مسار التعلّم</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+@font-face{font-family:'Montserrat Arabic';src:url(/_blob/357f39cb62cd40ff76de5a0f5ba49e50) format('opentype');font-weight:400;font-display:swap}
+@font-face{font-family:'Montserrat Arabic';src:url(/_blob/4b29ce96eaf6762241ea27a51c7cab99) format('opentype');font-weight:500;font-display:swap}
+@font-face{font-family:'Montserrat Arabic';src:url(/_blob/a4fdd1af3ed03688c9c5188e6974f03a) format('opentype');font-weight:600;font-display:swap}
+@font-face{font-family:'Montserrat Arabic';src:url(/_blob/438a5a34dea0f44d6918646212cdca67) format('opentype');font-weight:700;font-display:swap}
+body{margin:0;background:transparent}
+*{box-sizing:border-box}
+a{color:#0074B4}a:hover{color:#005E92}
+.ph{--bg:#FAF8F3;--card:#FFFFFF;--ink:#1B1B1B;--mute:#5E5A52;--line:#ECE7DC;--act:#0074B4;--actInk:#FFFFFF;--actSoft:#E3F1FA;--navbg:#FFFFFF;--sk:#EFEAE0;
+ width:390px;height:844px;display:flex;flex-direction:column;font-family:'Montserrat Arabic',sans-serif;color:var(--ink);background:var(--bg);overflow:hidden;position:relative}
+.ph.dark{--bg:#151515;--card:#1F1F1F;--ink:#F2F2F2;--mute:#B5B0A6;--line:#2E2E2E;--act:#5CB8EE;--actInk:#1B1B1B;--actSoft:#16303F;--navbg:#1B1B1B;--sk:#2A2A2A}
+.ph a{color:var(--act)}
+.bar{display:flex;align-items:center;gap:4px;min-height:56px;padding:30px 8px 4px;flex:none;position:relative;z-index:1}
+.bar .ttl{flex:1;font-size:20px;font-weight:700;margin:0;padding-inline-start:8px}
+.ib{width:48px;height:48px;display:inline-flex;align-items:center;justify-content:center;border-radius:16px;border:0;background:transparent;color:var(--ink);text-decoration:none;cursor:pointer;flex:none;position:relative}
+.ph a.ib{color:var(--ink)}
+.ib.soft{background:var(--card);box-shadow:0 1px 0 var(--line)}
+.dot{position:absolute;top:6px;inset-inline-end:6px;min-width:18px;height:18px;border-radius:9px;background:#C63B3B;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px;border:2px solid var(--bg)}
+.scroll{flex:1;overflow-y:auto;padding:8px 20px 28px;display:flex;flex-direction:column;gap:16px;position:relative;z-index:1}
+.t{font-size:26px;font-weight:700;margin:0;line-height:1.45}
+.h2{font-size:18px;font-weight:700;margin:0;line-height:1.5}
+.sub{font-size:14px;color:var(--mute);line-height:1.8;margin:0}
+.cap{font-size:12px;color:var(--mute);line-height:1.6}
+.b{font-weight:700}
+.card{border-radius:24px;padding:16px;background:var(--card);display:flex;flex-direction:column;gap:10px;box-shadow:0 1px 0 var(--line),0 6px 18px rgba(60,45,10,.05)}
+.dark .card{box-shadow:none;border:1px solid var(--line)}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;min-height:54px;border-radius:18px;font:700 16px 'Montserrat Arabic',sans-serif;text-decoration:none;padding:0 20px;cursor:pointer;width:100%;text-align:center;border:0}
+.ph a.btn-p,.btn-p{background:var(--act);color:var(--actInk);box-shadow:0 4px 0 #005E92}
+.dark .btn-p{box-shadow:0 4px 0 #2B7FAF}
+.ph a.btn-s,.btn-s{background:var(--card);color:var(--act);border:2px solid var(--act)}
+.ph a.btn-y,.btn-y{background:#FFD62C;color:#1B1B1B;box-shadow:0 4px 0 #D9AF00}
+.ph a.btn-g,.btn-g{background:transparent;color:var(--act);min-height:48px;text-decoration:none}
+.btn-dis{background:var(--sk);color:var(--mute);cursor:not-allowed;box-shadow:none}
+.btn-sm{min-height:48px;width:auto;font-size:14px;padding:0 16px;border-radius:14px;box-shadow:none}
+.ph a.btn-sm.btn-p,.btn-sm.btn-p{box-shadow:none}
+.row{display:flex;align-items:center;gap:12px;min-height:64px;padding:12px 14px;border-radius:20px;text-decoration:none;color:var(--ink);background:var(--card);box-shadow:0 1px 0 var(--line)}
+.ph a.row{color:var(--ink)}
+.row.flat{background:transparent;box-shadow:none;border-bottom:1px solid var(--line);border-radius:0;padding:12px 2px;min-height:56px}
+.list{display:flex;flex-direction:column;gap:10px}
+.ico{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex:none}
+.grow{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.rt{font-size:15px;font-weight:700;line-height:1.5}
+.pb{height:10px;border-radius:99px;background:var(--sk);overflow:hidden;flex:1}
+.pb i{display:block;height:100%;border-radius:99px}
+.pbw{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:700}
+.chip{display:inline-flex;align-items:center;gap:6px;min-height:28px;padding:2px 10px;border-radius:99px;font-size:12px;font-weight:700;white-space:nowrap}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px}
+.pillbtn{min-height:44px;padding:0 16px;border-radius:99px;border:1.5px solid var(--line);background:var(--card);font:600 14px 'Montserrat Arabic',sans-serif;color:var(--ink);cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
+.pillbtn.on{background:#1B1B1B;color:#fff;border-color:#1B1B1B}
+.dark .pillbtn.on{background:#FFD62C;color:#1B1B1B;border-color:#FFD62C}
+.seg{display:flex;background:var(--sk);border-radius:16px;padding:4px;gap:4px}
+.seg button{flex:1;min-height:44px;border:0;border-radius:12px;background:transparent;font:600 13px 'Montserrat Arabic',sans-serif;color:var(--mute);cursor:pointer}
+.seg button.on{background:var(--card);font-weight:700;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.nav{display:flex;padding:8px 6px 20px;background:var(--navbg);flex:none;border-top:1px solid var(--line);position:relative;z-index:2}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;min-height:56px;justify-content:center;text-decoration:none;font-size:11px;font-weight:600}
+.ph a.tab{color:var(--mute)}
+.pill{width:58px;height:32px;border-radius:99px;display:flex;align-items:center;justify-content:center}
+.ph a.tab.on{color:var(--ink);font-weight:700}
+.tab.on .pill{background:#FFD62C;color:#1B1B1B}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:14px;font-weight:700}
+.inp{width:100%;min-height:54px;border:2px solid var(--line);border-radius:16px;padding:0 16px;font:500 16px 'Montserrat Arabic',sans-serif;background:var(--card);color:var(--ink)}
+.inp:focus{outline:none;border-color:var(--act)}
+.inp.err{border-color:#C63B3B;background:#FDE8E8}
+.hint{font-size:12px;color:var(--mute)}
+.errmsg{display:flex;gap:6px;align-items:flex-start;font-size:13px;font-weight:700;line-height:1.6;color:#B42323}
+.opt{display:flex;align-items:center;gap:12px;min-height:62px;padding:12px 14px;border:2px solid var(--line);border-radius:18px;background:var(--card);font:600 16px 'Montserrat Arabic',sans-serif;color:var(--ink);text-align:start;width:100%;cursor:pointer;box-shadow:0 3px 0 var(--line)}
+.opt .k{width:34px;height:34px;border-radius:11px;background:var(--sk);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex:none}
+.opt.sel{border-color:#0074B4;background:#E3F1FA;box-shadow:0 3px 0 #0074B4}
+.opt.sel .k{background:#0074B4;color:#fff}
+.opt.right{border-color:#1FCD33;background:#E3F8E6;box-shadow:0 3px 0 #1FCD33;color:#1B1B1B}
+.opt.right .k{background:#1FCD33;color:#1B1B1B}
+.opt.wrong{border-color:#E54E4E;background:#FDE8E8;box-shadow:0 3px 0 #E54E4E;color:#1B1B1B}
+.opt.wrong .k{background:#C63B3B;color:#fff}
+.opt.dim{opacity:.6}
+.opt .tag{margin-inline-start:auto;font-size:12px;font-weight:700;display:flex;align-items:center;gap:4px}
+.opt.right .tag{color:#157A22}.opt.wrong .tag{color:#B42323}
+.sheet{padding:14px 20px 24px;background:var(--card);display:flex;flex-direction:column;gap:10px;flex:none;border-radius:28px 28px 0 0;box-shadow:0 -6px 20px rgba(60,45,10,.06);position:relative;z-index:2}
+.fbok{background:#E3F8E6;color:#1B1B1B}.fbno{background:#FDE8E8;color:#1B1B1B}
+.ltr{direction:ltr;unicode-bidi:isolate}
+.radio{display:flex;align-items:center;gap:12px;min-height:60px;padding:12px 14px;border:2px solid var(--line);border-radius:18px;background:var(--card);font:600 15px 'Montserrat Arabic',sans-serif;color:var(--ink);text-align:start;width:100%;cursor:pointer}
+.radio .rd{width:24px;height:24px;border-radius:50%;border:2px solid #9A958B;flex:none;display:flex;align-items:center;justify-content:center}
+.radio.on{border-color:#0074B4;background:#E3F1FA}
+.radio.on .rd{border-color:#0074B4}
+.radio.on .rd i{width:12px;height:12px;border-radius:50%;background:#0074B4;display:block}
+.sk{background:var(--sk);border-radius:14px}
+.tile{flex:1;border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:4px;text-decoration:none;color:#1B1B1B}
+.big{font-size:30px;font-weight:700;line-height:1.2}
+.otp{width:46px;height:58px;border:2px solid var(--line);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;background:var(--card)}
+.otp.on{border-color:#0074B4}
+.blob{position:absolute;border-radius:50%;z-index:0;pointer-events:none}
+.sec{font-size:13px;font-weight:700;color:var(--mute);margin:6px 0 -6px}
+.sw{width:9px;height:9px;border-radius:50%;display:inline-block}
+</style>
+</helmet>
+<div class="ph" dir="rtl" style="width:390px;height:844px;">
+
+<div style="background:#0074B4;color:#fff;padding:0 0 26px;position:relative;overflow:hidden;flex:none">
+  <span class="blob" aria-hidden="true" style="width:180px;height:180px;background:#1A86C2;top:-60px;left:-60px"></span><span class="blob" aria-hidden="true" style="width:28px;height:28px;background:#FFD62C;top:70px;left:40px"></span><span class="blob" aria-hidden="true" style="width:16px;height:16px;background:#E3A4E8;top:110px;left:90px"></span>
+  <header class="bar" style="padding-inline:8px"><a class="ib" href="V-Subjects.dc.html" aria-label="رجوع" style="color:#fff;background:rgba(255,255,255,.16)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a><span style="flex:1"></span>
+    <button class="ib" aria-label="تحميل المادة للاستخدام دون اتصال" style="color:#fff;background:rgba(255,255,255,.16)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M4 20h16"/></svg></button></header>
+  <div style="display:flex;align-items:center;gap:16px;padding:2px 20px 0;position:relative">
+    <div class="grow"><h1 class="t" style="color:#fff">الرياضيات</h1><span style="font-size:13px;line-height:1.9">الأسئلة 140/480 · الاختبارات 4/12 · البطاقات 60/240</span></div>
+    <div style="position:relative;width:78px;height:78px;flex:none" role="img" aria-label="42%"><svg width="78" height="78" viewBox="0 0 78 78" aria-hidden="true" style="transform:rotate(-90deg)"><circle cx="39.0" cy="39.0" r="34.5" fill="none" style="stroke:rgba(255,255,255,.25)" stroke-width="9"/><circle cx="39.0" cy="39.0" r="34.5" fill="none" stroke="#FFD62C" stroke-width="9" stroke-linecap="round" stroke-dasharray="216.8" stroke-dashoffset="125.7"/></svg><span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:700;color:#fff">42%</span></div>
+  </div>
+</div>
+<div class="scroll" style="margin-top:-18px;background:var(--bg);border-radius:24px 24px 0 0;padding-top:16px;gap:14px">
+  <div><span class="chip" style="background:#E3F8E6;color:#157A22"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg>لديك وصول حتى 30 يونيو 2027</span></div>
+  <div style="display:flex;gap:4px"><a href="V-Quiz.dc.html" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;text-decoration:none;color:var(--ink);min-height:48px">
+  <span style="width:52px;height:52px;border-radius:18px;background:#E3F1FA;color:#005E92;display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/></svg></span>
+  <span style="font-size:12px;font-weight:700;text-align:center;line-height:1.4">الاختبارات</span><span class="cap" style="font-size:11px;margin-top:-4px">12</span></a><a href="V-Question.dc.html" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;text-decoration:none;color:var(--ink);min-height:48px">
+  <span style="width:52px;height:52px;border-radius:18px;background:#FEEEDB;color:#9A5205;display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h4l10 12h4M3 18h4l3-3.6M14 9.6 17 6h4M18 3l3 3-3 3M18 15l3 3-3 3"/></svg></span>
+  <span style="font-size:12px;font-weight:700;text-align:center;line-height:1.4">تدريب عشوائي</span><span class="cap" style="font-size:11px;margin-top:-4px">480</span></a><a href="V-FcDecks.dc.html" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;text-decoration:none;color:var(--ink);min-height:48px">
+  <span style="width:52px;height:52px;border-radius:18px;background:#F7E6F9;color:#7B2F83;display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="13" height="14" rx="2"/><path d="M8 3h11a2 2 0 0 1 2 2v12"/></svg></span>
+  <span style="font-size:12px;font-weight:700;text-align:center;line-height:1.4">البطاقات</span><span class="cap" style="font-size:11px;margin-top:-4px">8</span></a><a href="V-Lesson.dc.html" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;text-decoration:none;color:var(--ink);min-height:48px">
+  <span style="width:52px;height:52px;border-radius:18px;background:#E3F8E6;color:#157A22;display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16v13H4z"/><path d="M8 10h8M8 14h5"/></svg></span>
+  <span style="font-size:12px;font-weight:700;text-align:center;line-height:1.4">بنك الأسئلة</span><span class="cap" style="font-size:11px;margin-top:-4px">480</span></a></div>
+
+  <div style="border-radius:20px;background:#E3F8E6;padding:12px 14px;display:flex;align-items:center;gap:12px"><span class="ico" style="background:#1FCD33;color:#1B1B1B;width:36px;height:36px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span><span class="grow"><span class="rt" style="font-size:14px">الوحدتان 1 و 2 مكتملتان</span><span class="cap" style="color:#157A22">11 درساً · يمكنك العودة لأي درس</span></span><span class="b" style="font-size:13px;color:#157A22">عرض</span></div>
+
+  <div style="border-radius:22px;background:#0074B4;color:#fff;padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 4px 0 #005E92">
+    <span class="grow"><span style="font-size:12px;font-weight:700;opacity:.9">الوحدة 3</span><span class="rt" style="font-size:17px">المشتقات</span><span style="font-size:12px">4 دروس + اختبار الوحدة · أنجزت 40%</span></span>
+    <button class="ib" aria-label="تحميل الوحدة" style="color:#fff;background:rgba(255,255,255,.18)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M4 20h16"/></svg></button></div>
+
+  <div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 0 6px" role="list" aria-label="دروس الوحدة 3">
+    <sc-for list="{{nodes}}" as="n" hint-placeholder-count="5">
+      <div role="listitem" style="{{n.wrap}}">
+        <sc-if value="{{n.isCur}}" hint-placeholder-val="{{false}}"><span style="background:#fff;color:#0074B4;border:2px solid #0074B4;border-radius:12px;padding:4px 12px;font-size:13px;font-weight:700;margin-bottom:6px">ابدأ هنا</span></sc-if>
+        <button onClick="{{n.pick}}" aria-label="{{n.aria}}" aria-expanded="{{n.exp}}" style="{{n.btn}}">
+          <sc-if value="{{n.iDone}}" hint-placeholder-val="{{false}}"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg></sc-if>
+          <sc-if value="{{n.iPlay}}" hint-placeholder-val="{{true}}"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4l12 8-12 8z"/></svg></sc-if>
+          <sc-if value="{{n.iBook}}" hint-placeholder-val="{{false}}"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5V5a2 2 0 0 1 2-2h14v15H6.5A2.5 2.5 0 0 0 4 20.5 2.5 2.5 0 0 0 6.5 23H20"/></svg></sc-if>
+          <sc-if value="{{n.iQuiz}}" hint-placeholder-val="{{false}}"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/></svg></sc-if>
+        </button>
+        <span style="font-size:12px;font-weight:700;margin-top:6px;max-width:150px;text-align:center;line-height:1.5">{{n.t}}</span>
+        <sc-if value="{{n.open}}" hint-placeholder-val="{{false}}">
+          <div role="dialog" aria-label="{{n.t}}" style="{{n.pop}}">
+            <span class="rt" style="font-size:16px">{{n.t}}</span><span style="font-size:12px;opacity:.95">{{n.meta}}</span>
+            <a class="btn" href="{{n.href}}" style="{{n.cta}}">{{n.ctaLabel}}</a>
+            <a href="V-Lesson.dc.html" style="{{n.link}}">عرض الدرس بالتفصيل</a>
+          </div>
+        </sc-if>
+      </div>
+    </sc-for>
+  </div>
+
+  <a class="row" href="V-Redeem.dc.html" style="background:var(--sk);box-shadow:none"><span class="ico" style="background:#FDE8E8;color:#B42323;width:40px;height:40px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><span class="grow"><span class="rt" style="font-size:14px">الوحدة 4: التكامل</span><span class="cap">مقفلة — تُفتح بكود التفعيل</span></span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></a>
+  <h2 class="h2">دروس عامة</h2>
+  <a class="row" href="V-Lesson.dc.html"><span class="ico" style="background:#FFD62C;color:#1B1B1B;width:44px;height:44px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5V5a2 2 0 0 1 2-2h14v15H6.5A2.5 2.5 0 0 0 4 20.5 2.5 2.5 0 0 0 6.5 23H20"/></svg></span><span class="grow"><span class="rt">مراجعة شاملة للمنهاج</span><span class="cap">6 دروس خارج الوحدات</span></span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></a>
+  <h2 class="h2">مسارات المدرسين</h2>
+  <a class="row" href="V-Subjects.dc.html"><span style="width:44px;height:44px;border-radius:50%;background:#F7E6F9;color:#7B2F83;display:flex;align-items:center;justify-content:center;font-weight:700">م</span><span class="grow"><span class="rt">مسار التحليل المكثّف</span><span class="cap">أ. محمد الخطيب</span></span><span class="chip" style="background:#E3F8E6;color:#157A22"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg>متاح</span></a>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { open: 1 }; }
+  renderVals() {
+    const N = [
+      ['الدرس 1: تعريف المشتقة', 'done', 0, '20 سؤالاً · أنجزته بنسبة 90%'],
+      ['الدرس 2: قواعد الاشتقاق', 'cur', 56, 'السؤال 7 من 20 · 15 بطاقة'],
+      ['الدرس 3: تطبيقات المشتقة', 'next', 84, '18 سؤالاً · 12 بطاقة'],
+      ['الدرس 4: دراسة الدوال', 'next', 40, '22 سؤالاً · 10 بطاقات'],
+      ['اختبار الوحدة 3', 'quiz', -30, '20 سؤالاً · 30 دقيقة · النجاح 60%']];
+    const open = this.state.open;
+    return { nodes: N.map(([t, st, off, meta], i) => {
+      const isOpen = open === i;
+      const base = 'width:76px;height:72px;border-radius:50%;border:0;cursor:pointer;display:flex;align-items:center;justify-content:center;';
+      const look = st === 'done' ? 'background:#FFD62C;color:#1B1B1B;box-shadow:0 6px 0 #D9AF00;'
+        : st === 'cur' ? 'background:#0074B4;color:#fff;box-shadow:0 6px 0 #005E92,0 0 0 8px #E3F1FA;width:84px;height:80px;'
+        : st === 'quiz' ? 'background:#FEEEDB;color:#9A5205;box-shadow:0 6px 0 #F0C796;border:3px solid #F99A2C;'
+        : 'background:#EFEAE0;color:#7A756B;box-shadow:0 6px 0 #D9D3C7;';
+      const popBg = st === 'done' ? '#FFD62C' : st === 'quiz' ? '#F99A2C' : st === 'cur' ? '#0074B4' : '#5E5A52';
+      const popInk = st === 'done' || st === 'quiz' ? '#1B1B1B' : '#FFFFFF';
+      return {
+        t, meta, open: isOpen, exp: isOpen ? 'true' : 'false', isCur: st === 'cur',
+        iDone: st === 'done', iPlay: st === 'cur', iBook: st === 'next', iQuiz: st === 'quiz',
+        aria: t + (st === 'done' ? '، مكتمل' : st === 'cur' ? '، الحالي' : st === 'quiz' ? '، اختبار' : '، لم يبدأ'),
+        wrap: 'display:flex;flex-direction:column;align-items:center;transform:translateX(' + off + 'px);margin-bottom:10px;position:relative;z-index:' + (isOpen ? 3 : 1),
+        btn: base + look,
+        pop: 'margin-top:10px;width:260px;border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:8px;text-align:center;background:' + popBg + ';color:' + popInk + ';transform:translateX(' + (-off) + 'px);box-shadow:0 8px 20px rgba(0,0,0,.15)',
+        cta: 'min-height:48px;font-size:15px;background:#fff;color:' + (st === 'done' ? '#1B1B1B' : popBg === '#5E5A52' ? '#1B1B1B' : popBg) + ';box-shadow:0 4px 0 rgba(0,0,0,.18)',
+        ctaLabel: st === 'done' ? 'تدرّب مجدداً' : st === 'cur' ? 'تابع الدرس' : st === 'quiz' ? 'ابدأ اختبار الوحدة' : 'ابدأ الدرس',
+        href: st === 'quiz' ? 'V-Quiz.dc.html' : 'V-Question.dc.html',
+        link: 'font-size:12px;font-weight:700;color:' + popInk + ';min-height:32px;display:flex;align-items:center;justify-content:center',
+        pick: () => this.setState({ open: isOpen ? -1 : i })
+      };
+    }) };
+  }
+}
+</script>
+</body>
+</html>
