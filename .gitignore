@@ -15,3 +15,6 @@ apps/mobile/.flutter-plugins-dependencies
 apps/mobile/**/*.g.dart.bak
 next-env.d.ts
 .dev-storage/
+
+# Temporary agent worktrees
+.claude/worktrees/
