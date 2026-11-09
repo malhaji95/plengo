@@ -74,8 +74,16 @@ type Home = {
   unreadNotifications: number;
   countdown: { titleAr: string; daysLeft: number } | null;
   banners: { id: string; titleAr: string; imageUrl: string; action: string; actionTarget: string | null }[];
-  today: { dueCards: number; goal: number; done: number; goalMet: boolean; streak: number };
+  today: {
+    dueCards: number;
+    goal: number;
+    done: number;
+    goalMet: boolean;
+    streak: number;
+    week: boolean[];
+  };
   myAccess: unknown[];
+  freeSubjects: { subjectId: string; nameAr: string; freeCount: number; coverUrl: string | null }[];
 };
 const home = async (s: Student) => (await call<Home>(s, 'GET', '/home')).data;
 
@@ -112,6 +120,7 @@ describe('daily goal and streak (§19.4)', () => {
     const w = await deckWorld();
     const today = await home(s);
     expect(today.today).toMatchObject({ goal: 20, done: 0, goalMet: false, streak: 0 });
+    expect(today.today.week).toEqual([false, false, false, false, false, false, false]);
 
     // Two ratings: 03:59 Damascus (00:59 UTC) belongs to the previous day, 04:01 to this one.
     const at = new Date(t.clock.now());
@@ -152,8 +161,14 @@ describe('daily goal and streak (§19.4)', () => {
       { userId: s.id, day: day(-1), itemsDone: 5, goal: 5, goalMet: true },
       { userId: s.id, day: day(-2), itemsDone: 9, goal: 5, goalMet: true },
       { userId: s.id, day: day(-3), itemsDone: 1, goal: 5, goalMet: false },
+      // The oldest day of the week row, and one just outside it.
+      { userId: s.id, day: day(-6), itemsDone: 5, goal: 5, goalMet: true },
+      { userId: s.id, day: day(-7), itemsDone: 5, goal: 5, goalMet: true },
     ]);
-    expect((await home(s)).today).toMatchObject({ goal: 2, done: 0, goalMet: false, streak: 2 });
+    const before = (await home(s)).today;
+    expect(before).toMatchObject({ goal: 2, done: 0, goalMet: false, streak: 2 });
+    // Oldest first, today last.
+    expect(before.week).toEqual([true, false, false, false, true, true, false]);
 
     const w = await deckWorld();
     await t.c.learning.addBookmark(s.id, 'deck', w.deckId).catch(() => undefined);
@@ -162,10 +177,14 @@ describe('daily goal and streak (§19.4)', () => {
       const res = await call(s, 'POST', `/questions/${w.questionId}/check`, { selectedOptionId: w.optionId });
       expect(res.status).toBe(200);
     }
-    expect((await home(s)).today).toMatchObject({ done: 2, goalMet: true, streak: 3 });
+    const met = (await home(s)).today;
+    expect(met).toMatchObject({ done: 2, goalMet: true, streak: 3 });
+    expect(met.week).toEqual([true, false, false, false, true, true, true]);
     // Raising the goal today applies to today; past days keep theirs.
     await call(s, 'PUT', '/me/settings', { dailyGoal: 10 });
-    expect((await home(s)).today).toMatchObject({ goal: 10, goalMet: false, streak: 2 });
+    const raised = (await home(s)).today;
+    expect(raised).toMatchObject({ goal: 10, goalMet: false, streak: 2 });
+    expect(raised.week).toEqual([true, false, false, false, true, true, false]);
   });
 
   it('computes streaks from met days', () => {
@@ -228,6 +247,43 @@ async function deckWorld() {
     optionId: q.options.find((o) => o.isCorrect)!.id,
   };
 }
+
+describe('free subjects (§19.1)', () => {
+  it('lists subjects with free content and their cover URL', async () => {
+    const s = await student();
+    const plain = await deckWorld();
+    const covered = await deckWorld();
+    const coverId = randomUUID();
+    const key = `test/cover/${coverId}/full.webp`;
+    await t.c.db.insert(mediaFiles).values({
+      id: coverId,
+      bucket: 'public',
+      storageKey: `test/cover/${coverId}/original`,
+      kind: 'cover',
+      mimeType: 'image/png',
+      originalSize: 100,
+      variants: { full: { key, width: 800, height: 450, size: 1000 } },
+      status: 'ready',
+    });
+    expect(
+      (await adminCall('PATCH', `/subjects/${covered.subjectId}`, { coverMediaId: coverId })).status,
+    ).toBe(200);
+    const free = (await home(s)).freeSubjects;
+    const byId = new Map(free.map((f) => [f.subjectId, f]));
+    expect(byId.get(plain.subjectId)).toMatchObject({ freeCount: 1, coverUrl: null });
+    expect(byId.get(covered.subjectId)).toMatchObject({
+      freeCount: 1,
+      coverUrl: t.storage.getPublicUrl(key),
+    });
+    // The same URL the catalog gives the subject.
+    const outline = await call<{ subject: { coverUrl: string | null } }>(
+      s,
+      'GET',
+      `/subjects/${covered.subjectId}`,
+    );
+    expect(outline.data.subject.coverUrl).toBe(byId.get(covered.subjectId)!.coverUrl);
+  });
+});
 
 describe('banners and exam countdown (§19.2, §19.3)', () => {
   it('shows live, level-targeted banners in order and validates click actions', async () => {
@@ -511,6 +567,56 @@ describe('notifications (§20)', () => {
     expect(dueReminderText(35)).toBe('لديك 35 بطاقة للمراجعة اليوم');
     expect(dueReminderText(2)).toBe('لديك بطاقتان للمراجعة اليوم');
     expect(dueReminderText(5)).toBe('لديك 5 بطاقات للمراجعة اليوم');
+  });
+
+  it('has a review-reminder switch, on by default, that the due-card reminder honours', async () => {
+    const s = await student();
+    const off = await student();
+    const learningOff = await student();
+    type Prefs = { learning: boolean; promotions: boolean; reminderTime: string; reviewReminder: boolean };
+    expect((await call<Prefs>(s, 'GET', '/notifications/preferences')).data).toEqual({
+      learning: true,
+      promotions: false,
+      reminderTime: '18:00',
+      reviewReminder: true,
+    });
+    // Partial update: the other preferences stay as they were.
+    const updated = await call<Prefs>(off, 'PUT', '/notifications/preferences', { reviewReminder: false });
+    expect(updated.status).toBe(200);
+    expect(updated.data).toEqual({
+      learning: true,
+      promotions: false,
+      reminderTime: '18:00',
+      reviewReminder: false,
+    });
+    expect((await call<Prefs>(off, 'GET', '/notifications/preferences')).data.reviewReminder).toBe(false);
+    expect((await call(off, 'PUT', '/notifications/preferences', { reviewReminder: 'no' })).status).toBe(400);
+
+    const w = await deckWorld();
+    const hour = String(new Date(t.clock.now().getTime() + 3 * 3600_000).getUTCHours()).padStart(2, '0');
+    const due = new Date(t.clock.now().getTime() - 3600_000);
+    for (const u of [s, off, learningOff]) {
+      await t.c.db.insert(cardStates).values({
+        userId: u.id,
+        flashcardId: w.cardId,
+        state: 'review',
+        dueAt: due,
+        ease: 2.5,
+        lastReviewedAt: new Date(due.getTime() - DAY),
+      });
+      await call(u, 'PUT', '/notifications/preferences', { reminderTime: `${hour}:15` });
+    }
+    // Learning off silences the reminder even with the review switch on.
+    await call(learningOff, 'PUT', '/notifications/preferences', { learning: false, reviewReminder: true });
+    await t.c.notifications.dueReminders();
+    await t.queue.drain(t.c.jobHandlers);
+    const inbox = async (u: Student) =>
+      (await call<{ items: { bodyAr: string }[] }>(u, 'GET', '/notifications')).data.items.map(
+        (i) => i.bodyAr,
+      );
+    expect(await inbox(s)).toContain('لديك بطاقة واحدة للمراجعة اليوم');
+    expect(await inbox(off)).toEqual([]);
+    expect(await inbox(learningOff)).toEqual([]);
   });
 
   it('tells a student their report was handled, when the admin asks (§21)', async () => {

@@ -43,9 +43,17 @@ export const todaySchema = z.object({
   goalMet: z.boolean(),
   /** Consecutive days with the goal met, ending today (or yesterday while today is open). */
   streak: int(),
+  /** The last seven business days, oldest first and today last: whether the goal was met each day. */
+  week: z.array(z.boolean()).length(7),
 });
 
-export const freeSubjectSchema = z.object({ subjectId: z.string(), nameAr: z.string(), freeCount: int() });
+export const freeSubjectSchema = z.object({
+  subjectId: z.string(),
+  nameAr: z.string(),
+  freeCount: int(),
+  /** The subject cover's public URL; null without a cover. */
+  coverUrl: z.string().nullable(),
+});
 
 export const homeSchema = z.object({
   greetingName: z.string(),
@@ -70,6 +78,8 @@ export const notificationPreferencesSchema = z.object({
   promotions: z.boolean(),
   /** Due-card reminder time, HH:MM Asia/Damascus. */
   reminderTime: hhmm,
+  /** The daily due-card review reminder (on by default); only sent while `learning` is on. */
+  reviewReminder: z.boolean(),
 });
 export const updateNotificationPreferencesSchema = notificationPreferencesSchema.partial();
 

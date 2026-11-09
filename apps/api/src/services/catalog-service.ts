@@ -1,5 +1,6 @@
 import type {
   AcademicYear,
+  CatalogSubject,
   EducationLevel,
   Faculty,
   Lesson,
@@ -81,6 +82,21 @@ export function createCatalogService(deps: {
 
     async subjects(filter: SubjectFilter): Promise<Subject[]> {
       return (await repo.listSubjects(filter, { studentVisible: true })).map((r) => toSubject(r, storage));
+    },
+
+    /**
+     * The student catalog list: each subject says whether its general content is open to the student
+     * (§8.6), from one access snapshot for the whole list.
+     */
+    async studentSubjects(userId: string, filter: SubjectFilter): Promise<CatalogSubject[]> {
+      const [rows, ctx] = await Promise.all([
+        repo.listSubjects(filter, { studentVisible: true }),
+        access.context(userId),
+      ]);
+      return rows.map((r) => ({
+        ...toSubject(r, storage),
+        hasAccess: ctx.scopeAccess(subjectScope(r.id)).hasAccess,
+      }));
     },
 
     async outline(userId: string, subjectId: string): Promise<SubjectOutline> {

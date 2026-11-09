@@ -3349,6 +3349,111 @@
         ],
         "additionalProperties": false
       },
+      "CatalogSubject": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "educationLevelId": {
+            "type": "string"
+          },
+          "universityId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "facultyId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "academicYearId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "code": {
+            "type": "string"
+          },
+          "nameAr": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "coverMediaId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "coverUrl": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "sortOrder": {
+            "type": "number"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "hasAccess": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "educationLevelId",
+          "universityId",
+          "facultyId",
+          "academicYearId",
+          "code",
+          "nameAr",
+          "description",
+          "coverMediaId",
+          "coverUrl",
+          "sortOrder",
+          "isActive",
+          "hasAccess"
+        ],
+        "additionalProperties": false
+      },
+      "CatalogSubjectList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/CatalogSubject"
+        }
+      },
+      "CatalogSubjectListEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/CatalogSubjectList"
+          },
+          "error": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "error"
+        ],
+        "additionalProperties": false
+      },
       "CheckAnswerRequest": {
         "type": "object",
         "properties": {
@@ -5711,12 +5816,19 @@
             "type": "integer",
             "minimum": -9007199254740991,
             "maximum": 9007199254740991
+          },
+          "coverUrl": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "required": [
           "subjectId",
           "nameAr",
-          "freeCount"
+          "freeCount",
+          "coverUrl"
         ],
         "additionalProperties": false
       },
@@ -7242,12 +7354,16 @@
           "reminderTime": {
             "type": "string",
             "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$"
+          },
+          "reviewReminder": {
+            "type": "boolean"
           }
         },
         "required": [
           "learning",
           "promotions",
-          "reminderTime"
+          "reminderTime",
+          "reviewReminder"
         ],
         "additionalProperties": false
       },
@@ -12286,6 +12402,14 @@
             "type": "integer",
             "minimum": -9007199254740991,
             "maximum": 9007199254740991
+          },
+          "week": {
+            "minItems": 7,
+            "maxItems": 7,
+            "type": "array",
+            "items": {
+              "type": "boolean"
+            }
           }
         },
         "required": [
@@ -12293,7 +12417,8 @@
           "goal",
           "done",
           "goalMet",
-          "streak"
+          "streak",
+          "week"
         ],
         "additionalProperties": false
       },
@@ -13160,6 +13285,9 @@
           "reminderTime": {
             "type": "string",
             "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$"
+          },
+          "reviewReminder": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -14967,7 +15095,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SubjectListEnvelope"
+                  "$ref": "#/components/schemas/CatalogSubjectListEnvelope"
                 }
               }
             }

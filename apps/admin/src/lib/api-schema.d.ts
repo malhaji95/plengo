@@ -3668,6 +3668,28 @@ export interface components {
             width: number | null;
             height: number | null;
         };
+        CatalogSubject: {
+            id: string;
+            educationLevelId: string;
+            universityId: string | null;
+            facultyId: string | null;
+            academicYearId: string | null;
+            code: string;
+            nameAr: string;
+            description: string | null;
+            coverMediaId: string | null;
+            coverUrl: string | null;
+            sortOrder: number;
+            isActive: boolean;
+            hasAccess: boolean;
+        };
+        CatalogSubjectList: components["schemas"]["CatalogSubject"][];
+        CatalogSubjectListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["CatalogSubjectList"];
+            error: null;
+        };
         CheckAnswerRequest: {
             /** Format: uuid */
             selectedOptionId?: string;
@@ -4155,6 +4177,7 @@ export interface components {
             subjectId: string;
             nameAr: string;
             freeCount: number;
+            coverUrl: string | null;
         };
         GoalSettings: {
             dailyGoal: number;
@@ -4468,6 +4491,7 @@ export interface components {
             learning: boolean;
             promotions: boolean;
             reminderTime: string;
+            reviewReminder: boolean;
         };
         NotificationPreferencesEnvelope: {
             /** @constant */
@@ -5531,6 +5555,7 @@ export interface components {
             done: number;
             goalMet: boolean;
             streak: number;
+            week: boolean[];
         };
         TokenPair: {
             accessToken: string;
@@ -5726,6 +5751,7 @@ export interface components {
             learning?: boolean;
             promotions?: boolean;
             reminderTime?: string;
+            reviewReminder?: boolean;
         };
         UpdateProfileRequest: {
             fullName?: string;
@@ -6486,7 +6512,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["SubjectListEnvelope"];
+                    "application/json": components["schemas"]["CatalogSubjectListEnvelope"];
                 };
             };
         };

@@ -2,11 +2,11 @@ import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
 import {
   academicYearListSchema,
+  catalogSubjectListSchema,
   facultyIdQuerySchema,
   facultyListSchema,
   lessonSchema,
   subjectListQuerySchema,
-  subjectListSchema,
   subjectOutlineSchema,
   successEnvelope,
   universityIdQuerySchema,
@@ -82,10 +82,10 @@ export function catalogRoutes(c: Container): FastifyPluginAsyncZod {
           operationId: 'listSubjects',
           tags,
           querystring: subjectListQuerySchema,
-          response: { 200: successEnvelope(subjectListSchema) },
+          response: { 200: successEnvelope(catalogSubjectListSchema) },
         },
       },
-      async (request) => ok(await c.catalog.subjects(request.query)),
+      async (request) => ok(await c.catalog.studentSubjects(authOf(request).userId, request.query)),
     );
 
     app.get(

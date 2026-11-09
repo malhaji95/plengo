@@ -101,6 +101,12 @@ export const universityListSchema = z.array(universitySchema);
 export const facultyListSchema = z.array(facultySchema);
 export const academicYearListSchema = z.array(academicYearSchema);
 export const subjectListSchema = z.array(subjectSchema);
+/** A subject in the student catalog list. */
+export const catalogSubjectSchema = subjectSchema.extend({
+  /** Whether the student can open the subject's general premium content (entitlement or promotion). */
+  hasAccess: z.boolean(),
+});
+export const catalogSubjectListSchema = z.array(catalogSubjectSchema);
 export const unitListSchema = z.array(unitSchema);
 export const lessonListSchema = z.array(lessonSchema);
 
@@ -171,6 +177,7 @@ export type University = z.infer<typeof universitySchema>;
 export type Faculty = z.infer<typeof facultySchema>;
 export type AcademicYear = z.infer<typeof academicYearSchema>;
 export type Subject = z.infer<typeof subjectSchema>;
+export type CatalogSubject = z.infer<typeof catalogSubjectSchema>;
 export type Unit = z.infer<typeof unitSchema>;
 export type Lesson = z.infer<typeof lessonSchema>;
 export type SubjectOutline = z.infer<typeof subjectOutlineSchema>;
@@ -189,6 +196,8 @@ const named: [z.ZodType, string][] = [
   [facultyListSchema, 'FacultyList'],
   [academicYearListSchema, 'AcademicYearList'],
   [subjectListSchema, 'SubjectList'],
+  [catalogSubjectSchema, 'CatalogSubject'],
+  [catalogSubjectListSchema, 'CatalogSubjectList'],
   [unitListSchema, 'UnitList'],
   [lessonListSchema, 'LessonList'],
   [updateLevelBodySchema, 'UpdateLevelRequest'],

@@ -302,7 +302,7 @@ export function createHomeRepository(db: Db) {
 
     // ---- reminders ----
 
-    /** Students whose reminder time is in this hour ("HH"), with learning notifications on. */
+    /** Students whose reminder time is in this hour ("HH"), with learning and review reminders on. */
     reminderCandidates: (hour: string) =>
       db
         .select({ userId: profiles.userId })
@@ -312,6 +312,7 @@ export function createHomeRepository(db: Db) {
           and(
             activeStudents,
             eq(profiles.notifyLearning, true),
+            eq(profiles.notifyReviewReminder, true),
             sql`substr(${profiles.reminderTime}, 1, 2) = ${hour}`,
           ),
         ),

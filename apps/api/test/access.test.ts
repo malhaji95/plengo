@@ -758,6 +758,62 @@ describe('canAccessItem matrix (§8.6, §37.1)', () => {
   });
 });
 
+describe('student subject list access (§8.6)', () => {
+  it('flags each subject by entitlement or running promotion on its general scope', async () => {
+    const owned = await subjectWithTrack();
+    const promoted = await subjectWithTrack();
+    const locked = await subjectWithTrack();
+    const trackOnly = await subjectWithTrack();
+    const s = await student();
+    const other = await student();
+    await adminCall('POST', `/students/${s.id}/entitlements`, {
+      scopeType: 'subject',
+      subjectId: owned.subjectId,
+      permanentAccess: true,
+    });
+    // A track entitlement does not open the subject's general content.
+    await adminCall('POST', `/students/${s.id}/entitlements`, {
+      scopeType: 'teacher_track',
+      teacherTrackId: trackOnly.trackId,
+      permanentAccess: true,
+    });
+    const now = Date.now();
+    await adminCall('POST', '/promotions', {
+      scopeType: 'subject',
+      subjectId: promoted.subjectId,
+      titleAr: 'عرض',
+      startsAt: new Date(now - DAY).toISOString(),
+      endsAt: new Date(now + DAY).toISOString(),
+    });
+    const level = await levelId(t, 'grade-12');
+    const list = async (u: Student) => {
+      const res = await studentCall<{ id: string; hasAccess: boolean }[]>(
+        u,
+        'GET',
+        `/subjects?levelId=${level}`,
+      );
+      expect(res.status).toBe(200);
+      return new Map(res.data.map((x) => [x.id, x.hasAccess]));
+    };
+    const mine = await list(s);
+    expect(mine.get(owned.subjectId)).toBe(true);
+    expect(mine.get(promoted.subjectId)).toBe(true);
+    expect(mine.get(locked.subjectId)).toBe(false);
+    expect(mine.get(trackOnly.subjectId)).toBe(false);
+    const theirs = await list(other);
+    expect(theirs.get(owned.subjectId)).toBe(false);
+    expect(theirs.get(promoted.subjectId)).toBe(true);
+    // Same rule as the subject outline's access banner.
+    for (const id of [owned.subjectId, promoted.subjectId, locked.subjectId, trackOnly.subjectId]) {
+      const outline = await studentCall<{ access: { hasAccess: boolean } }>(s, 'GET', `/subjects/${id}`);
+      expect(outline.data.access.hasAccess).toBe(mine.get(id));
+    }
+    // Content is behind sign-in: no anonymous list.
+    const anon = await t.app.inject({ method: 'GET', url: `/api/v1/subjects?levelId=${level}` });
+    expect(anon.statusCode).toBe(401);
+  });
+});
+
 describe('promotions (§8.5)', () => {
   it('opens a scope to every student while running, without entitlement rows', async () => {
     const { subjectId, trackId } = await subjectWithTrack();

@@ -20,6 +20,8 @@ export const profiles = pgTable('profiles', {
   notifyPromotions: boolean('notify_promotions').notNull().default(false),
   /** Due-card reminder time, HH:MM Asia/Damascus (§20.3). */
   reminderTime: text('reminder_time').notNull().default('18:00'),
+  /** The due-card review reminder (§20.3); sent only while `notifyLearning` is on too. */
+  notifyReviewReminder: boolean('notify_review_reminder').notNull().default(true),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });

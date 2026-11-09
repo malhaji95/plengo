@@ -1,0 +1,1 @@
+ALTER TABLE "profiles" ADD COLUMN "notify_review_reminder" boolean DEFAULT true NOT NULL;

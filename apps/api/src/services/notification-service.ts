@@ -319,7 +319,12 @@ export function createNotificationService(deps: {
         (() => {
           throw new AppError('NOT_FOUND');
         })();
-      return { learning: p.notifyLearning, promotions: p.notifyPromotions, reminderTime: p.reminderTime };
+      return {
+        learning: p.notifyLearning,
+        promotions: p.notifyPromotions,
+        reminderTime: p.reminderTime,
+        reviewReminder: p.notifyReviewReminder,
+      };
     },
 
     async setPreferences(
@@ -328,12 +333,14 @@ export function createNotificationService(deps: {
         learning?: boolean | undefined;
         promotions?: boolean | undefined;
         reminderTime?: string | undefined;
+        reviewReminder?: boolean | undefined;
       },
     ) {
       await repo.updateProfile(userId, {
         ...(input.learning !== undefined ? { notifyLearning: input.learning } : {}),
         ...(input.promotions !== undefined ? { notifyPromotions: input.promotions } : {}),
         ...(input.reminderTime !== undefined ? { reminderTime: input.reminderTime } : {}),
+        ...(input.reviewReminder !== undefined ? { notifyReviewReminder: input.reviewReminder } : {}),
       });
       return service.preferences(userId);
     },

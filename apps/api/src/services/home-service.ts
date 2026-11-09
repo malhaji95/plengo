@@ -148,6 +148,7 @@ export function createHomeService(deps: {
       done,
       goalMet: done >= dayGoal,
       streak: goalStreak(met, todayNum),
+      week: Array.from({ length: 7 }, (_, i) => met.has(todayNum - 6 + i)),
     };
   }
 
@@ -158,7 +159,7 @@ export function createHomeService(deps: {
       list.map(async (s) => {
         const scope = { scopeType: 'subject' as const, subjectId: s.id, teacherTrackId: null };
         const free = (await Promise.all(deps.counts.map((c) => c(scope)))).reduce((n, c) => n + c.free, 0);
-        return { subjectId: s.id, nameAr: s.nameAr, freeCount: free };
+        return { subjectId: s.id, nameAr: s.nameAr, freeCount: free, coverUrl: s.coverUrl };
       }),
     );
     return counted.filter((s) => s.freeCount > 0);
