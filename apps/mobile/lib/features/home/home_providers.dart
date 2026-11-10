@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -6,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../app/providers.dart';
 import '../../app/router.dart';
 import '../../core/api/generated/export.dart';
+import '../../shared/ui/ui.dart';
 
 final homeProvider = FutureProvider<Home>((ref) => ref.watch(homeRepositoryProvider).home());
 
@@ -21,13 +23,14 @@ final externalUrlLauncherProvider = Provider<Future<void> Function(Uri)>(
       (uri) async => launchUrl(uri, mode: LaunchMode.externalApplication),
 );
 
-/// Banner images (network, cached); replaced in tests where there is no network.
+/// Banner images through the same cached loader as every other image in the app; replaced in tests
+/// where there is no network.
 final bannerImageBuilderProvider = Provider<Widget Function(BuildContext, HomeBanner)>(
   (ref) =>
-      (_, b) => Image.network(
-        b.imageUrl,
+      (_, b) => CachedNetworkImage(
+        imageUrl: b.imageUrl,
         fit: BoxFit.cover,
-        errorBuilder: (_, _, _) => Center(child: Text(b.titleAr, textAlign: TextAlign.center)),
+        errorWidget: (_, _, _) => BannerFallback(title: b.titleAr),
       ),
 );
 
@@ -83,3 +86,27 @@ String streakText(int n) => switch (n) {
   >= 3 && <= 10 => '$n أيام متتالية',
   _ => '$n يوماً متتالياً',
 };
+
+/// Shown when a banner image cannot load: the title on the brand blue, readable in both themes.
+class BannerFallback extends StatelessWidget {
+  const BannerFallback({super.key, required this.title});
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) => ColoredBox(
+    color: PlengoColors.blue.base,
+    child: Center(
+      child: Padding(
+        padding: const EdgeInsets.all(PlengoSpace.xl),
+        child: Text(
+          title,
+          textAlign: TextAlign.center,
+          maxLines: 3,
+          overflow: TextOverflow.ellipsis,
+          style: PlengoType.section.copyWith(color: Colors.white),
+        ),
+      ),
+    ),
+  );
+}
