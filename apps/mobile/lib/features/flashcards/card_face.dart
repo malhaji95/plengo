@@ -169,7 +169,10 @@ class _FaceSurface extends StatelessWidget {
       child: ClipRRect(
         borderRadius: r,
         child: templateKey != null
-            ? TemplateFrame(templateKey: templateKey!, child: CardFace(face: face, framed: true))
+            ? TemplateFrame(
+                templateKey: templateKey!,
+                child: CardFace(face: face, framed: true),
+              )
             : scrollHeight == null
             ? CardFace(face: face)
             : _LongFace(face: face, height: scrollHeight!),

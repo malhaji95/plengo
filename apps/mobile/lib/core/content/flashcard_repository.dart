@@ -25,10 +25,8 @@ class FlashcardRepository {
 
   /// The Plengo decks as products, grouped by subject (v3 §6); the student's level by default.
   Future<PlengoDeckList> plengoDecks({String? subjectId, String? educationLevelId}) => guardApi(
-    () async => (await client.api.flashcards.listPlengoDecks(
-      subjectId: subjectId,
-      educationLevelId: educationLevelId,
-    )).data,
+    () async =>
+        (await client.api.flashcards.listPlengoDecks(subjectId: subjectId, educationLevelId: educationLevelId)).data,
   );
 
   Future<StudentDeck> deck(String id) => guardApi(() async => (await client.api.flashcards.getDeck(id: id)).data);

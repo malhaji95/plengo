@@ -222,12 +222,15 @@ class _CreateGroupScreenState extends ConsumerState<CreateGroupScreen> {
         Row(
           children: [
             PlengoChip(label: 'البطاقة $number', hue: PlengoColors.blue, icon: Icons.style_outlined),
-            const Spacer(),
+            const SizedBox(width: 8),
             if (_made.isNotEmpty)
-              Text(
-                'أنشأت ${cardCountLabel(_made.length)}',
-                key: const Key('card.madeCount'),
-                style: PlengoType.caption.copyWith(color: s.mute),
+              Expanded(
+                child: Text(
+                  'أنشأت ${cardCountLabel(_made.length)}',
+                  key: const Key('card.madeCount'),
+                  textAlign: TextAlign.end,
+                  style: PlengoType.caption.copyWith(color: s.mute),
+                ),
               ),
           ],
         ),

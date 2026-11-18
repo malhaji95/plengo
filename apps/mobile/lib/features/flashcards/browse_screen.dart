@@ -79,14 +79,7 @@ class MyBrowseScreen extends ConsumerWidget {
 /// the next card. Every card has its star (v3 §8). A single-face card has no flip button. With
 /// [lockedDeck] (a locked deck's preview, v3 §6) the cards end on the locked notice.
 class CardBrowser extends ConsumerStatefulWidget {
-  const CardBrowser({
-    super.key,
-    required this.title,
-    required this.cards,
-    this.onAdd,
-    this.onReport,
-    this.lockedDeck,
-  });
+  const CardBrowser({super.key, required this.title, required this.cards, this.onAdd, this.onReport, this.lockedDeck});
 
   final String title;
   final List<StudyCard> cards;

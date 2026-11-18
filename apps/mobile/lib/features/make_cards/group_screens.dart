@@ -378,13 +378,12 @@ class GroupCardsScreen extends ConsumerWidget {
                       width: 32,
                       height: 32,
                       alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: PlengoColors.blue.soft,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
+                      decoration: BoxDecoration(color: PlengoColors.blue.soft, borderRadius: BorderRadius.circular(10)),
                       child: Text('${i + 1}', style: PlengoType.chip.copyWith(color: PlengoColors.blue.ink)),
                     ),
-                    onTap: c.officialFlashcardId != null ? null : () => context.push(groupLocation(deckId, 'cards/${c.id}')),
+                    onTap: c.officialFlashcardId != null
+                        ? null
+                        : () => context.push(groupLocation(deckId, 'cards/${c.id}')),
                     trailing: [
                       IconButton(
                         key: Key('groupCard.${c.id}.delete'),
@@ -488,7 +487,11 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
             padding: EdgeInsetsDirectional.symmetric(horizontal: PlengoSpace.screen),
             child: SectionHeader('المادة', top: 8),
           ),
-          SubjectCarousel(subjects: subjects, selected: _subjectId, onSelected: (id) => setState(() => _subjectId = id)),
+          SubjectCarousel(
+            subjects: subjects,
+            selected: _subjectId,
+            onSelected: (id) => setState(() => _subjectId = id),
+          ),
         ],
         const Padding(
           padding: EdgeInsetsDirectional.symmetric(horizontal: PlengoSpace.screen),

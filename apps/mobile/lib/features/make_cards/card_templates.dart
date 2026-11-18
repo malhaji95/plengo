@@ -76,9 +76,7 @@ class TemplateFrame extends ConsumerWidget {
       return Stack(
         key: Key('template.${t.key}'),
         children: [
-          Positioned.fill(
-            child: Image.asset(t.assetPath, fit: BoxFit.fill, excludeFromSemantics: true),
-          ),
+          Positioned.fill(child: Image.asset(t.assetPath, fit: BoxFit.fill, excludeFromSemantics: true)),
           Padding(padding: margin, child: child),
         ],
       );

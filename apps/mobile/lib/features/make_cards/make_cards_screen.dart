@@ -18,8 +18,7 @@ import 'make_cards_providers.dart';
 import 'make_cards_widgets.dart';
 
 /// Where a group's pages live: `/make-cards/groups/<id>` and its sub-pages.
-String groupLocation(String deckId, [String? sub]) =>
-    '${Routes.makeCardsGroups}/$deckId${sub == null ? '' : '/$sub'}';
+String groupLocation(String deckId, [String? sub]) => '${Routes.makeCardsGroups}/$deckId${sub == null ? '' : '/$sub'}';
 
 /// اصنع بطاقاتك الخاصة (v3 §7) at [Routes.makeCards]: choose a subject of the student's level, then a
 /// frame, then «ابدأ الإنشاء» opens the creation flow. «مجموعاتي» lists what the student made.
@@ -260,9 +259,8 @@ class _MyGroupsScreenState extends ConsumerState<MyGroupsScreen> {
     );
   }
 
-  void _newGroup(BuildContext context) => context.go(
-    Uri(path: Routes.makeCards, queryParameters: {'subjectId': ?_subjectId}).toString(),
-  );
+  void _newGroup(BuildContext context) =>
+      context.go(Uri(path: Routes.makeCards, queryParameters: {'subjectId': ?_subjectId}).toString());
 }
 
 /// Shows the server's refusals from the last sync once (as on بطاقاتي).

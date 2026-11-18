@@ -352,17 +352,12 @@ class _StarGroupTile extends StatelessWidget {
       title: path.isEmpty ? group.title : path,
       caption: group.group.ownDeck ? 'من بطاقاتي' : 'بطاقات بلينغو',
       leading: SubjectIconTile(icon: Icons.star_rounded, hue: hue, soft: true),
-      onTap: () => Navigator.of(context).push(
-        MaterialPageRoute<void>(builder: (_) => StarredCardsScreen(group: group)),
-      ),
+      onTap: () =>
+          Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => StarredCardsScreen(group: group))),
       trailing: [
         Padding(
           padding: const EdgeInsetsDirectional.only(start: 4, end: 8),
-          child: PlengoChip(
-            label: '$count ★',
-            hue: PlengoColors.yellow,
-            semanticsLabel: '$count بطاقة بنجمة',
-          ),
+          child: PlengoChip(label: '$count ★', hue: PlengoColors.yellow, semanticsLabel: '$count بطاقة بنجمة'),
         ),
       ],
     );

@@ -170,10 +170,7 @@ class PlengoDeckTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(deck.titleAr, style: PlengoType.section.copyWith(color: s.ink)),
-                  Text(
-                    'فلاش كاردز $subjectName',
-                    style: PlengoType.caption.copyWith(color: hueText(context, hue)),
-                  ),
+                  Text('فلاش كاردز $subjectName', style: PlengoType.caption.copyWith(color: hueText(context, hue))),
                   const SizedBox(height: 8),
                   Wrap(
                     spacing: 6,

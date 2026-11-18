@@ -76,7 +76,9 @@ class _Drawn extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          ExcludeSemantics(child: CardStackArt(icon: icon, hue: hue)),
+          ExcludeSemantics(
+            child: CardStackArt(icon: icon, hue: hue),
+          ),
         ],
       ),
     );
@@ -127,10 +129,7 @@ class CardStackArt extends StatelessWidget {
               child: Container(
                 width: 5,
                 height: 14,
-                decoration: BoxDecoration(
-                  color: PlengoColors.yellow.base,
-                  borderRadius: BorderRadius.circular(3),
-                ),
+                decoration: BoxDecoration(color: PlengoColors.yellow.base, borderRadius: BorderRadius.circular(3)),
               ),
             ),
           ),
