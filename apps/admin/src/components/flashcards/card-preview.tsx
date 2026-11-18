@@ -9,7 +9,8 @@ type AdminCard = components['schemas']['AdminCard'];
 
 /**
  * Full-size preview of a deck's cards as a student sees them: tap or Space flips the card, the
- * arrows (or the keyboard arrows) move through the deck, Escape closes.
+ * arrows (or the keyboard arrows) move through the deck, Escape closes. A single-face card (no back,
+ * v3 §6) does not flip.
  */
 export function CardPreview({
   cards,
@@ -48,8 +49,12 @@ export function CardPreview({
   }, [last, onClose]);
 
   if (!card) return null;
-  const face = flipped ? card.back : card.front;
-  const faceLabel = flipped ? 'الوجه الخلفي' : 'الوجه الأمامي';
+  const singleFace = !card.back;
+  const face = flipped && card.back ? card.back : card.front;
+  const faceLabel = singleFace ? 'بطاقة بوجه واحد' : flipped ? 'الوجه الخلفي' : 'الوجه الأمامي';
+  const flip = () => {
+    if (!singleFace) setFlipped((f) => !f);
+  };
 
   return (
     <div
@@ -74,8 +79,8 @@ export function CardPreview({
         <button
           type="button"
           className="flex min-h-0 justify-center rounded-lg bg-surface-muted"
-          aria-label={`اقلب البطاقة (${faceLabel})`}
-          onClick={() => setFlipped((f) => !f)}
+          aria-label={singleFace ? faceLabel : `اقلب البطاقة (${faceLabel})`}
+          onClick={flip}
         >
           <img src={face.fullUrl} alt={faceLabel} className="max-h-[70vh] w-auto rounded-lg object-contain" />
         </button>
@@ -84,9 +89,9 @@ export function CardPreview({
             <ChevronRight className="size-4" aria-hidden />
             السابقة
           </Button>
-          <Button variant="outline" onClick={() => setFlipped((f) => !f)}>
+          <Button variant="outline" disabled={singleFace} onClick={flip}>
             <RotateCcw className="size-4" aria-hidden />
-            {flipped ? 'عرض الأمام' : 'عرض الخلف'}
+            {singleFace ? 'بوجه واحد' : flipped ? 'عرض الأمام' : 'عرض الخلف'}
           </Button>
           <Button variant="outline" disabled={index === last} onClick={() => go(1)}>
             التالية

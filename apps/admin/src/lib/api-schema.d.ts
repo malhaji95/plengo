@@ -549,6 +549,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/question-categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Question categories of a subject (global and its own) with published question counts for the scope, unit or lesson (v3 §3, §5). The lesson page groups its questions with it: pass `lessonId`. */
+        get: operations["listQuestionCategories"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/questions/{id}": {
         parameters: {
             query?: never;
@@ -589,6 +606,23 @@ export interface paths {
             cookie?: never;
         };
         get: operations["listDecks"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/decks/plengo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description «فلاش كاردز بلينغو» (v3 §6): published general decks of the level (the student's own by default), grouped by subject, with cover (product image), card count and locked/free. */
+        get: operations["listPlengoDecks"];
         put?: never;
         post?: never;
         delete?: never;
@@ -767,6 +801,23 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["checkAttemptAnswer"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/attempts/{id}/answers/{questionId}/mark-correct": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description «إجابتي صحيحة لكن بصياغة مختلفة» (v3 §5): practice attempts only, for a graded written answer. Counts it as correct and updates the score, mistakes and statistics. Idempotent. */
+        post: operations["markAttemptAnswerCorrect"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2183,6 +2234,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/question-categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminListQuestionCategories"];
+        put?: never;
+        post: operations["adminCreateQuestionCategory"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/question-categories/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["adminDeleteQuestionCategory"];
+        options?: never;
+        head?: never;
+        patch: operations["adminUpdateQuestionCategory"];
+        trace?: never;
+    };
     "/api/v1/admin/questions": {
         parameters: {
             query?: never;
@@ -2992,6 +3075,7 @@ export interface components {
         };
         AccessSettings: {
             allowTemporaryToPermanentUpgrade: boolean;
+            defaultFreeLessons: number;
         };
         AccessSettingsEnvelope: {
             /** @constant */
@@ -3069,7 +3153,7 @@ export interface components {
             status: "draft" | "published" | "archived";
             contentVersion: number;
             front: components["schemas"]["CardImage"];
-            back: components["schemas"]["CardImage"];
+            back: components["schemas"]["CardImage"] | null;
         };
         AdminCardEnvelope: {
             /** @constant */
@@ -3256,6 +3340,8 @@ export interface components {
             trackTitleAr: string | null;
             unitId: string | null;
             lessonId: string | null;
+            categoryId: string | null;
+            categoryNameAr: string | null;
             questionText: string;
             explanation: string | null;
             difficulty: ("easy" | "medium" | "hard") | null;
@@ -3270,6 +3356,31 @@ export interface components {
             acceptedAnswers: components["schemas"]["AdminAcceptedAnswer"][];
             createdAt: string;
             updatedAt: string;
+        };
+        AdminQuestionCategory: {
+            id: string;
+            subjectId: string | null;
+            subjectNameAr: string | null;
+            parentId: string | null;
+            code: string;
+            nameAr: string;
+            sortOrder: number;
+            questionCount: number;
+            createdAt: string;
+            updatedAt: string;
+        };
+        AdminQuestionCategoryEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AdminQuestionCategory"];
+            error: null;
+        };
+        AdminQuestionCategoryList: components["schemas"]["AdminQuestionCategory"][];
+        AdminQuestionCategoryListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AdminQuestionCategoryList"];
+            error: null;
         };
         AdminQuestionEnvelope: {
             /** @constant */
@@ -3508,8 +3619,11 @@ export interface components {
             teacherTrackId?: string | null;
             unitId?: string | null;
             lessonId?: string | null;
+            lessonIds?: string[];
+            categoryIds?: string[];
             types?: ("mcq" | "true_false" | "written")[];
             count?: number;
+            allQuestions?: boolean;
             questionIds?: string[];
         };
         AttemptOption: {
@@ -3528,6 +3642,7 @@ export interface components {
             selectedOptionId: string | null;
             writtenAnswer: string | null;
             flagged: boolean;
+            markedCorrectByStudent: boolean;
             answeredAt: string | null;
             timeSpentMs: number | null;
             result: components["schemas"]["CheckResult"] | null;
@@ -3616,12 +3731,24 @@ export interface components {
             deck: components["schemas"]["StudentDeck"] | null;
             card: components["schemas"]["StudentCard"] | null;
             userCard: components["schemas"]["UserCard"] | null;
+            group: components["schemas"]["BookmarkGroup"] | null;
         };
         BookmarkEnvelope: {
             /** @constant */
             success: true;
             data: components["schemas"]["Bookmark"];
             error: null;
+        };
+        BookmarkGroup: {
+            subjectId: string | null;
+            subjectNameAr: string | null;
+            unitId: string | null;
+            unitTitleAr: string | null;
+            lessonId: string | null;
+            lessonTitleAr: string | null;
+            deckId: string | null;
+            deckTitle: string | null;
+            ownDeck: boolean;
         };
         /** @enum {string} */
         BookmarkItemType: "question" | "flashcard" | "user_card" | "deck";
@@ -3656,8 +3783,7 @@ export interface components {
             cards: {
                 /** Format: uuid */
                 frontMediaId: string;
-                /** Format: uuid */
-                backMediaId: string;
+                backMediaId?: string | null;
             }[];
         };
         CardImage: {
@@ -3799,8 +3925,7 @@ export interface components {
         CreateCardRequest: {
             /** Format: uuid */
             frontMediaId: string;
-            /** Format: uuid */
-            backMediaId: string;
+            backMediaId?: string | null;
         };
         CreateCountdownRequest: {
             /** Format: uuid */
@@ -3879,6 +4004,13 @@ export interface components {
             endsAt: string;
             isActive?: boolean;
         };
+        CreateQuestionCategoryRequest: {
+            subjectId?: string | null;
+            parentId?: string | null;
+            code: string;
+            nameAr: string;
+            sortOrder?: number;
+        };
         CreateQuestionRequest: {
             /** @enum {string} */
             type: "mcq" | "true_false" | "written";
@@ -3887,6 +4019,7 @@ export interface components {
             teacherTrackId?: string | null;
             unitId?: string | null;
             lessonId?: string | null;
+            categoryId?: string | null;
             questionText: string;
             explanation?: string | null;
             difficulty?: ("easy" | "medium" | "hard") | null;
@@ -3993,6 +4126,8 @@ export interface components {
         DeckCards: {
             deck: components["schemas"]["StudentDeck"];
             cards: components["schemas"]["StudentCard"][];
+            previewOnly: boolean;
+            previewLimit: number | null;
             urlsExpireAt: string;
         };
         DeckCardsEnvelope: {
@@ -4349,6 +4484,17 @@ export interface components {
             completionPercent: number;
             lessonId: string;
         };
+        MarkAnswerCorrectResult: {
+            questionId: string;
+            result: components["schemas"]["CheckResult"];
+            attempt: components["schemas"]["AttemptSummary"];
+        };
+        MarkAnswerCorrectResultEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["MarkAnswerCorrectResult"];
+            error: null;
+        };
         Me: {
             id: string;
             email: string;
@@ -4568,7 +4714,7 @@ export interface components {
             deckId: string;
             sortOrder: number;
             front: components["schemas"]["OfflineImage"];
-            back: components["schemas"]["OfflineImage"];
+            back: components["schemas"]["OfflineImage"] | null;
         };
         OfflineCatalog: {
             scopes: components["schemas"]["OfflineScopeSummary"][];
@@ -4684,6 +4830,7 @@ export interface components {
             teacherTrackId: string | null;
             unitId: string | null;
             lessonId: string | null;
+            categoryId: string | null;
             sortOrder: number;
             difficulty: ("easy" | "medium" | "hard") | null;
             isFree: boolean;
@@ -4765,6 +4912,23 @@ export interface components {
         };
         PasswordConfirmRequest: {
             password: string;
+        };
+        PlengoDeckGroup: {
+            subjectId: string;
+            subjectNameAr: string;
+            subjectCode: string;
+            subjectCoverUrl: string | null;
+            subjectSortOrder: number;
+            decks: components["schemas"]["StudentDeck"][];
+        };
+        PlengoDeckList: {
+            groups: components["schemas"]["PlengoDeckGroup"][];
+        };
+        PlengoDeckListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["PlengoDeckList"];
+            error: null;
         };
         Promotion: {
             id: string;
@@ -5288,7 +5452,7 @@ export interface components {
             sortOrder: number;
             contentVersion: number;
             front: components["schemas"]["CardImage"];
-            back: components["schemas"]["CardImage"];
+            back: components["schemas"]["CardImage"] | null;
         };
         StudentDeck: {
             id: string;
@@ -5340,12 +5504,36 @@ export interface components {
             teacherTrackId: string | null;
             unitId: string | null;
             lessonId: string | null;
+            categoryId: string | null;
             sortOrder: number;
             difficulty: ("easy" | "medium" | "hard") | null;
             isFree: boolean;
             locked: boolean;
             questionText: string | null;
             options: components["schemas"]["StudentOption"][] | null;
+        };
+        StudentQuestionCategory: {
+            id: string;
+            subjectId: string | null;
+            parentId: string | null;
+            code: string;
+            nameAr: string;
+            sortOrder: number;
+            questionCount: number;
+            accessibleCount: number;
+        };
+        StudentQuestionCategoryList: {
+            items: components["schemas"]["StudentQuestionCategory"][];
+            uncategorized: {
+                questionCount: number;
+                accessibleCount: number;
+            };
+        };
+        StudentQuestionCategoryListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["StudentQuestionCategoryList"];
+            error: null;
         };
         StudentQuestionEnvelope: {
             /** @constant */
@@ -5713,8 +5901,7 @@ export interface components {
         UpdateCardRequest: {
             /** Format: uuid */
             frontMediaId?: string;
-            /** Format: uuid */
-            backMediaId?: string;
+            backMediaId?: string | null;
             /** @enum {string} */
             status?: "draft" | "published" | "archived";
         };
@@ -5770,9 +5957,16 @@ export interface components {
             endsAt?: string;
             isActive?: boolean;
         };
+        UpdateQuestionCategoryRequest: {
+            parentId?: string | null;
+            code?: string;
+            nameAr?: string;
+            sortOrder?: number;
+        };
         UpdateQuestionRequest: {
             unitId?: string | null;
             lessonId?: string | null;
+            categoryId?: string | null;
             questionText?: string;
             explanation?: string | null;
             difficulty?: ("easy" | "medium" | "hard") | null;
@@ -5902,6 +6096,7 @@ export interface components {
             name: string;
             subjectId: string | null;
             color: string | null;
+            templateKey: string | null;
             sortOrder: number;
             cardCount: number;
             createdAt: string;
@@ -5932,6 +6127,7 @@ export interface components {
             name: string;
             subjectId?: string | null;
             color?: string | null;
+            templateKey?: string | null;
             sortOrder: number;
             /** Format: date-time */
             createdAt: string;
@@ -6762,6 +6958,7 @@ export interface operations {
                 teacherTrackId?: string;
                 unitId?: string;
                 lessonId?: string;
+                categoryIds?: string;
                 cursor?: string;
                 limit?: number;
             };
@@ -6778,6 +6975,31 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["StudentQuestionPageEnvelope"];
+                };
+            };
+        };
+    };
+    listQuestionCategories: {
+        parameters: {
+            query: {
+                subjectId: string;
+                teacherTrackId?: string;
+                unitId?: string;
+                lessonId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentQuestionCategoryListEnvelope"];
                 };
             };
         };
@@ -6851,6 +7073,29 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["StudentDeckListEnvelope"];
+                };
+            };
+        };
+    };
+    listPlengoDecks: {
+        parameters: {
+            query?: {
+                subjectId?: string;
+                educationLevelId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlengoDeckListEnvelope"];
                 };
             };
         };
@@ -7136,6 +7381,29 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CheckResultEnvelope"];
+                };
+            };
+        };
+    };
+    markAttemptAnswerCorrect: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                questionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MarkAnswerCorrectResultEnvelope"];
                 };
             };
         };
@@ -9827,6 +10095,102 @@ export interface operations {
             };
         };
     };
+    adminListQuestionCategories: {
+        parameters: {
+            query?: {
+                subjectId?: string;
+                globalOnly?: "true" | "false";
+                subjectOnly?: "true" | "false";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminQuestionCategoryListEnvelope"];
+                };
+            };
+        };
+    };
+    adminCreateQuestionCategory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateQuestionCategoryRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminQuestionCategoryEnvelope"];
+                };
+            };
+        };
+    };
+    adminDeleteQuestionCategory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeletedResultEnvelope"];
+                };
+            };
+        };
+    };
+    adminUpdateQuestionCategory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateQuestionCategoryRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminQuestionCategoryEnvelope"];
+                };
+            };
+        };
+    };
     adminListQuestions: {
         parameters: {
             query?: {
@@ -9837,6 +10201,8 @@ export interface operations {
                 lessonId?: string;
                 status?: "draft" | "published" | "archived";
                 type?: "mcq" | "true_false" | "written";
+                categoryId?: string;
+                uncategorized?: "true" | "false";
                 q?: string;
                 cursor?: string;
                 limit?: number;

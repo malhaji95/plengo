@@ -18,6 +18,7 @@ import {
   Route,
   School,
   Settings,
+  Tags,
   ShieldCheck,
   Ticket,
   UserRound,
@@ -61,6 +62,7 @@ export const NAV_GROUPS: NavGroup[] = [
     title: 'المحتوى',
     items: [
       { href: '/questions', label: 'الأسئلة', icon: FileQuestion },
+      { href: '/question-categories', label: 'تصنيفات الأسئلة', icon: Tags },
       { href: '/flashcards', label: 'البطاقات التعليمية', icon: Layers },
       { href: '/quizzes', label: 'الاختبارات', icon: ClipboardList },
       { href: '/import-export', label: 'الاستيراد والتصدير', icon: FolderInput },

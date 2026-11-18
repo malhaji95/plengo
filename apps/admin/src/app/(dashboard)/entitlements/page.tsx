@@ -33,7 +33,12 @@ export default function EntitlementsPage() {
     setSettingsError(null);
     try {
       await unwrap(
-        api.PUT('/api/v1/admin/settings/access', { body: { allowTemporaryToPermanentUpgrade: value } }),
+        api.PUT('/api/v1/admin/settings/access', {
+          body: {
+            allowTemporaryToPermanentUpgrade: value,
+            defaultFreeLessons: settings.data?.defaultFreeLessons ?? 3,
+          },
+        }),
       );
       await settings.reload();
     } catch (err) {

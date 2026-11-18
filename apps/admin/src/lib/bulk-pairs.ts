@@ -43,3 +43,13 @@ export function pairFiles<T extends Named>(files: T[]): { pairs: Pair<T>[]; unma
   const pairs = [...byKey.values()].sort((a, b) => naturalCompare(a.key, b.key));
   return { pairs, unmatched: unmatched.sort((a, b) => naturalCompare(a.name, b.name)) };
 }
+
+/**
+ * Single-face cards (v3 §6): each file becomes its own row with only a front, keyed by its name
+ * without the extension, in natural order.
+ */
+export function singleFaceRows<T extends Named>(files: T[]): { key: string; front: string; back: string }[] {
+  return [...files]
+    .sort((a, b) => naturalCompare(a.name, b.name))
+    .map((f) => ({ key: f.name.split('/').pop()!.replace(IMAGE, ''), front: f.name, back: '' }));
+}

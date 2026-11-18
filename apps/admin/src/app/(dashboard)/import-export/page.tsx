@@ -163,7 +163,8 @@ export default function ImportExportPage() {
         </div>
         <p className="text-sm text-muted">
           تُحدَّد المرحلة والمادة والوحدة والدرس بالرموز (code) والمسار بالمعرّف النصي (slug)، لا بالأسماء.
-          عمود is_free_override فارغ يعني اتباع قاعدة المحتوى المجاني.
+          عمود is_free_override فارغ يعني اتباع قاعدة المحتوى المجاني. عمود category_code اختياري: رمز تصنيف
+          عام أو تصنيف خاص بالمادة، والرمز غير المعروف خطأ في الصف.
         </p>
       </Card>
 

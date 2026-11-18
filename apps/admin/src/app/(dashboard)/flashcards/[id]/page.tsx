@@ -249,7 +249,10 @@ function DeckDetails({ deck, onSaved }: { deck: Deck; onSaved: () => void }) {
 
 const IMAGE_TYPES = 'image/png,image/jpeg,image/webp';
 
-/** Pick the front and back images, upload both, then add the card. */
+/**
+ * Pick the front and back images, upload them, then add the card. Without a back image the card is
+ * single-face (v3 §6): a ready-made card shown without flipping.
+ */
 function NewCard({ deckId, onCreated }: { deckId: string; onCreated: () => void }) {
   const [front, setFront] = useState<File | null>(null);
   const [back, setBack] = useState<File | null>(null);
@@ -257,13 +260,13 @@ function NewCard({ deckId, onCreated }: { deckId: string; onCreated: () => void 
   const [error, setError] = useState<string | null>(null);
 
   async function add() {
-    if (!front || !back) return;
+    if (!front) return;
     setBusy(true);
     setError(null);
     try {
       const [frontMediaId, backMediaId] = await Promise.all([
         uploadImage('flashcard', front),
-        uploadImage('flashcard', back),
+        back ? uploadImage('flashcard', back) : Promise.resolve(null),
       ]);
       await unwrap(
         api.POST('/api/v1/admin/decks/{id}/cards', {
@@ -290,14 +293,20 @@ function NewCard({ deckId, onCreated }: { deckId: string; onCreated: () => void 
         file={front}
         onChange={setFront}
       />
-      <FilePicker id="card-back" label="الوجه الخلفي" accept={IMAGE_TYPES} file={back} onChange={setBack} />
-      <Button disabled={!front || !back || busy} onClick={() => void add()}>
+      <FilePicker
+        id="card-back"
+        label="الوجه الخلفي (اختياري)"
+        accept={IMAGE_TYPES}
+        file={back}
+        onChange={setBack}
+      />
+      <Button disabled={!front || busy} onClick={() => void add()}>
         {busy ? (
           <Loader2 className="size-4 animate-spin" aria-hidden />
         ) : (
           <Plus className="size-4" aria-hidden />
         )}
-        إضافة بطاقة
+        {front && !back ? 'إضافة بطاقة بوجه واحد' : 'إضافة بطاقة'}
       </Button>
       <FormError message={error} />
     </div>
@@ -377,14 +386,28 @@ function CardTile({
             if (frontMediaId) await update({ frontMediaId });
           }}
         />
-        <ImageUpload
-          kind="flashcard"
-          label="الخلف"
-          imageUrl={card.back.thumbUrl}
-          onChange={async (backMediaId) => {
-            if (backMediaId) await update({ backMediaId });
-          }}
-        />
+        <div className="space-y-1">
+          <ImageUpload
+            kind="flashcard"
+            label={card.back ? 'الخلف' : 'الخلف (بطاقة بوجه واحد)'}
+            imageUrl={card.back?.thumbUrl ?? null}
+            onChange={async (backMediaId) => {
+              if (backMediaId) await update({ backMediaId });
+            }}
+          />
+          {card.back ? (
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => {
+                if (window.confirm('إزالة الوجه الخلفي وجعلها بطاقة بوجه واحد؟'))
+                  void update({ backMediaId: null });
+              }}
+            >
+              إزالة الخلف
+            </Button>
+          ) : null}
+        </div>
       </div>
       <Button
         size="sm"

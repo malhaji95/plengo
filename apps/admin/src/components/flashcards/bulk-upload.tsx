@@ -7,7 +7,7 @@ import { FormError } from '@/components/form-error';
 import { uploadImage } from '@/components/image-upload';
 import { Button } from '@/components/ui/button';
 import { api, unwrap } from '@/lib/api';
-import { isImageName, naturalCompare, pairFiles } from '@/lib/bulk-pairs';
+import { isImageName, naturalCompare, pairFiles, singleFaceRows } from '@/lib/bulk-pairs';
 import { errorMessage } from '@/lib/use-load';
 import { unzipImages } from '@/lib/zip';
 
@@ -19,7 +19,8 @@ type Row = { key: string; front: string; back: string };
 /**
  * Flashcard bulk upload (spec §27): pick images or a ZIP; files are paired by prefix
  * (`001-front.png` + `001-back.png`) into a grid the admin can correct, then uploaded through the
- * usual presigned flow and appended to the deck in order.
+ * usual presigned flow and appended to the deck in order. With «بطاقات بوجه واحد» ticked, a file
+ * without a pair becomes a single-face card (v3 §6) and rows may have no back.
  */
 export function BulkUpload({ deckId, onDone }: { deckId: string; onDone: () => void }) {
   const input = useRef<HTMLInputElement>(null);
@@ -27,6 +28,7 @@ export function BulkUpload({ deckId, onDone }: { deckId: string; onDone: () => v
   const [rows, setRows] = useState<Row[]>([]);
   const [progress, setProgress] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [singleFace, setSingleFace] = useState(false);
 
   async function pick(list: FileList | null) {
     if (!list?.length) return;
@@ -40,9 +42,12 @@ export function BulkUpload({ deckId, onDone }: { deckId: string; onDone: () => v
       const tooBig = picked.find((f) => f.size > MAX_BYTES);
       if (tooBig) return setError(`الملف ${tooBig.name} أكبر من 10 ميغابايت`);
       const map = new Map(picked.map((f) => [f.name, f]));
-      const { pairs } = pairFiles(picked);
+      const { pairs, unmatched: loose } = pairFiles(picked);
       setFiles(map);
-      setRows(pairs.map((p) => ({ key: p.key, front: p.front?.name ?? '', back: p.back?.name ?? '' })));
+      setRows([
+        ...pairs.map((p) => ({ key: p.key, front: p.front?.name ?? '', back: p.back?.name ?? '' })),
+        ...(singleFace ? singleFaceRows(loose) : []),
+      ]);
     } catch {
       setError('تعذرت قراءة الملفات');
     } finally {
@@ -69,7 +74,7 @@ export function BulkUpload({ deckId, onDone }: { deckId: string; onDone: () => v
   const used = new Set(rows.flatMap((r) => [r.front, r.back]).filter(Boolean));
   const unmatched = [...files.keys()].filter((n) => !used.has(n)).sort(naturalCompare);
   const names = [...files.keys()].sort(naturalCompare);
-  const complete = rows.filter((r) => r.front && r.back && r.front !== r.back);
+  const complete = rows.filter((r) => r.front && (r.back ? r.back !== r.front : singleFace));
   const ready = rows.length > 0 && complete.length === rows.length && rows.length <= MAX_PAIRS;
   const update = (i: number, patch: Partial<Row>) =>
     setRows((rs) => rs.map((r, j) => (j === i ? { ...r, ...patch } : r)));
@@ -77,12 +82,12 @@ export function BulkUpload({ deckId, onDone }: { deckId: string; onDone: () => v
   async function upload() {
     setError(null);
     try {
-      const cards: { frontMediaId: string; backMediaId: string }[] = [];
+      const cards: { frontMediaId: string; backMediaId: string | null }[] = [];
       for (const [i, r] of rows.entries()) {
         setProgress(`${i + 1} / ${rows.length}`);
         const [frontMediaId, backMediaId] = await Promise.all([
           uploadImage('flashcard', files.get(r.front)!),
-          uploadImage('flashcard', files.get(r.back)!),
+          r.back ? uploadImage('flashcard', files.get(r.back)!) : Promise.resolve(null),
         ]);
         cards.push({ frontMediaId, backMediaId });
       }
@@ -138,6 +143,23 @@ export function BulkUpload({ deckId, onDone }: { deckId: string; onDone: () => v
         aria-label="ملفات الرفع الجماعي"
         onChange={(e) => void pick(e.target.files)}
       />
+      <label className="flex items-center gap-2 text-sm">
+        <input
+          type="checkbox"
+          checked={singleFace}
+          onChange={(e) => {
+            const on = e.target.checked;
+            setSingleFace(on);
+            // Files without a pair become single-face cards; unticking drops those rows again.
+            setRows((rs) =>
+              on
+                ? [...rs, ...singleFaceRows(unmatched.map((name) => ({ name })))]
+                : rs.filter((r) => r.back || !r.front),
+            );
+          }}
+        />
+        بطاقات بوجه واحد (الملف بلا زوج يصبح بطاقة جاهزة بلا وجه خلفي)
+      </label>
       {rows.length ? (
         <>
           <p className="text-sm">
@@ -176,12 +198,12 @@ export function BulkUpload({ deckId, onDone }: { deckId: string; onDone: () => v
                           )}
                           <select
                             aria-label={`${sideName === 'front' ? 'أمامي' : 'خلفي'} ${r.key}`}
-                            className={`${selectClass} ${r[sideName] ? '' : 'border-danger'}`}
+                            className={`${selectClass} ${r[sideName] || (sideName === 'back' && singleFace) ? '' : 'border-danger'}`}
                             dir="ltr"
                             value={r[sideName]}
                             onChange={(e) => update(i, { [sideName]: e.target.value })}
                           >
-                            <option value="">—</option>
+                            <option value="">{sideName === 'back' && singleFace ? 'بلا خلف' : '—'}</option>
                             {names.map((n) => (
                               <option key={n} value={n}>
                                 {n}

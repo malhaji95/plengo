@@ -27,6 +27,7 @@ export default function SettingsPage() {
   const learning = useLoad(() => unwrap(api.GET('/api/v1/admin/settings/learning')), []);
   const [config, setConfig] = useState<RemoteConfig | null>(null);
   const [streak, setStreak] = useState('2');
+  const [freeLessons, setFreeLessons] = useState('3');
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -34,6 +35,9 @@ export default function SettingsPage() {
   useEffect(() => {
     if (learning.data) setStreak(String(learning.data.mistakeMasteryStreak));
   }, [learning.data]);
+  useEffect(() => {
+    if (access.data) setFreeLessons(String(access.data.defaultFreeLessons));
+  }, [access.data]);
 
   async function run(call: () => Promise<unknown>) {
     setError(null);
@@ -178,7 +182,7 @@ export default function SettingsPage() {
                 void run(async () => {
                   await unwrap(
                     api.PUT('/api/v1/admin/settings/access', {
-                      body: { allowTemporaryToPermanentUpgrade: e.target.checked },
+                      body: { ...access.data!, allowTemporaryToPermanentUpgrade: e.target.checked },
                     }),
                   );
                   await access.reload();
@@ -187,6 +191,39 @@ export default function SettingsPage() {
             />
             السماح بترقية الوصول المؤقت إلى دائم بكود دائم
           </label>
+          <div className="flex items-end gap-2">
+            <div className="space-y-1">
+              <Label htmlFor="default-free-lessons">عدد الدروس المجانية افتراضياً لكل مادة</Label>
+              <Input
+                id="default-free-lessons"
+                type="number"
+                min={0}
+                max={20}
+                dir="ltr"
+                className="w-32"
+                value={freeLessons}
+                onChange={(e) => setFreeLessons(e.target.value)}
+              />
+            </div>
+            <Button
+              onClick={() =>
+                void run(async () => {
+                  await unwrap(
+                    api.PUT('/api/v1/admin/settings/access', {
+                      body: { ...access.data!, defaultFreeLessons: Number(freeLessons) },
+                    }),
+                  );
+                  await access.reload();
+                })
+              }
+            >
+              حفظ
+            </Button>
+          </div>
+          <p className="text-xs text-muted">
+            محتوى أول الدروس (حسب ترتيب الوحدات ثم الدروس، ثم الدروس خارج الوحدات) مجاني ما لم يكن للمادة أو
+            للمسار قاعدة مجانية خاصة. القواعد الخاصة والتحديد اليدوي لكل عنصر لها الأولوية. 0 يوقف الميزة.
+          </p>
         </Card>
       ) : null}
       <Card className="space-y-3">

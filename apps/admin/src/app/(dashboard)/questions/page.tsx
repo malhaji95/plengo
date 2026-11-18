@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { selectClass } from '@/components/access/scope-picker';
 import { FormError } from '@/components/form-error';
+import { CategorySelect } from '@/components/questions/category-select';
 import { PlacementPicker, trackIdOf, type Placement } from '@/components/questions/placement-picker';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -29,6 +30,8 @@ export default function QuestionsPage() {
   });
   const [status, setStatus] = useState<Status>('');
   const [type, setType] = useState<Type>('');
+  /** A category id, `none` (uncategorized) or null (any). */
+  const [category, setCategory] = useState<string | null>(null);
   const [q, setQ] = useState('');
   const [search, setSearch] = useState('');
   const [items, setItems] = useState<AdminQuestion[]>([]);
@@ -45,6 +48,7 @@ export default function QuestionsPage() {
     ...(placement.lessonId ? { lessonId: placement.lessonId } : {}),
     ...(status ? { status } : {}),
     ...(type ? { type } : {}),
+    ...(category === 'none' ? { uncategorized: 'true' as const } : category ? { categoryId: category } : {}),
     ...(search ? { q: search } : {}),
   };
   const key = JSON.stringify(query);
@@ -73,7 +77,7 @@ export default function QuestionsPage() {
   }, [key]);
 
   const canReorder =
-    !!placement.lessonId && placement.track !== 'any' && !status && !type && !search && !cursor;
+    !!placement.lessonId && placement.track !== 'any' && !status && !type && !category && !search && !cursor;
 
   async function move(index: number, delta: number) {
     const next = [...items];
@@ -107,7 +111,23 @@ export default function QuestionsPage() {
         </Button>
       </div>
       <Card className="space-y-3">
-        <PlacementPicker value={placement} onChange={setPlacement} allowAnyTrack />
+        <PlacementPicker
+          value={placement}
+          onChange={(p) => {
+            if (p.subjectId !== placement.subjectId) setCategory(null);
+            setPlacement(p);
+          }}
+          allowAnyTrack
+        />
+        <div className="sm:w-80">
+          <CategorySelect
+            id="filter-category"
+            subjectId={placement.subjectId}
+            value={category}
+            onChange={setCategory}
+            filter
+          />
+        </div>
         <div className="grid gap-3 sm:grid-cols-[10rem_12rem_1fr]">
           <select
             aria-label="الحالة"
@@ -162,6 +182,7 @@ export default function QuestionsPage() {
               {canReorder ? <th className="w-20 p-3" /> : null}
               <th className="p-3 text-start font-medium">السؤال</th>
               <th className="p-3 text-start font-medium">النوع</th>
+              <th className="p-3 text-start font-medium">التصنيف</th>
               <th className="p-3 text-start font-medium">النطاق</th>
               <th className="p-3 text-start font-medium">الحالة</th>
               <th className="p-3 text-start font-medium">الوصول</th>
@@ -200,6 +221,7 @@ export default function QuestionsPage() {
                   </Link>
                 </td>
                 <td className="p-3">{TYPE_LABELS[item.type]}</td>
+                <td className="p-3">{item.categoryNameAr ?? '—'}</td>
                 <td className="p-3">
                   {item.subjectNameAr}
                   <div className="text-xs text-muted">{item.trackTitleAr ?? 'المحتوى العام'}</div>
@@ -210,7 +232,7 @@ export default function QuestionsPage() {
             ))}
             {!loading && items.length === 0 ? (
               <tr>
-                <td colSpan={6} className="p-6 text-center text-muted">
+                <td colSpan={7} className="p-6 text-center text-muted">
                   لا توجد أسئلة مطابقة
                 </td>
               </tr>

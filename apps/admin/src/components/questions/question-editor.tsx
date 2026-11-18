@@ -11,6 +11,7 @@ import { Input, Label } from '@/components/ui/input';
 import { api, unwrap } from '@/lib/api';
 import { DIFFICULTY_LABELS, TYPE_LABELS, type AdminQuestion, type QuestionType } from '@/lib/questions';
 import { errorMessage } from '@/lib/use-load';
+import { CategorySelect } from './category-select';
 import { EMPTY_PLACEMENT, PlacementPicker, trackIdOf, type Placement } from './placement-picker';
 
 type Option = { id?: string; text: string; isCorrect: boolean };
@@ -44,6 +45,7 @@ export function QuestionEditor({
       : (initialPlacement ?? EMPTY_PLACEMENT),
   );
   const [text, setText] = useState(question?.questionText ?? '');
+  const [categoryId, setCategoryId] = useState<string | null>(question?.categoryId ?? null);
   const [explanation, setExplanation] = useState(question?.explanation ?? '');
   const [difficulty, setDifficulty] = useState<AdminQuestion['difficulty']>(question?.difficulty ?? null);
   const [options, setOptions] = useState<Option[]>(
@@ -90,6 +92,7 @@ export function QuestionEditor({
   const contentBody = () => ({
     unitId: placement.unitId,
     lessonId: placement.lessonId,
+    categoryId,
     questionText: text,
     explanation: explanation.trim() || null,
     difficulty,
@@ -187,7 +190,18 @@ export function QuestionEditor({
         <p className="text-sm text-muted">{TYPE_LABELS[type]}</p>
       )}
 
-      <PlacementPicker value={placement} onChange={setPlacement} lockScope={!!question} />
+      <PlacementPicker
+        value={placement}
+        onChange={(p) => {
+          // A subject's own category does not apply to another subject.
+          if (p.subjectId !== placement.subjectId) setCategoryId(null);
+          setPlacement(p);
+        }}
+        lockScope={!!question}
+      />
+      <div className="sm:w-80">
+        <CategorySelect subjectId={placement.subjectId} value={categoryId} onChange={setCategoryId} />
+      </div>
 
       <div className="space-y-1">
         <Label htmlFor="q-text">نص السؤال</Label>
