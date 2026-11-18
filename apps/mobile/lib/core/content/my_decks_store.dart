@@ -89,6 +89,7 @@ class MyDecksStore {
     required String name,
     String? subjectId,
     String? color,
+    String? templateKey,
     int? sortOrder,
   }) async {
     final existing = await deck(id);
@@ -101,6 +102,8 @@ class MyDecksStore {
             name: name.trim(),
             subjectId: Value(subjectId),
             color: Value(color),
+            // A rename keeps the frame unless a new one is given.
+            templateKey: Value(templateKey ?? existing?.templateKey),
             sortOrder: sortOrder ?? existing?.sortOrder ?? await liveDeckCount(),
             createdAt: existing?.createdAt ?? at,
             updatedAt: at,
@@ -262,6 +265,7 @@ class MyDecksStore {
               name: d.name,
               subjectId: Value(d.subjectId),
               color: Value(d.color),
+              templateKey: Value(d.templateKey),
               sortOrder: d.sortOrder,
               createdAt: _ms(d.createdAt),
               updatedAt: _ms(d.updatedAt),

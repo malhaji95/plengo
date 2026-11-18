@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/api/generated/export.dart';
 import '../../core/content/study_card.dart';
 import '../../shared/ui/ui.dart';
+import '../make_cards/card_templates.dart';
 
 typedef CardImageBuilder = Widget Function(BuildContext context, CardImage image);
 
@@ -68,9 +69,11 @@ class FlashcardView extends ConsumerWidget {
     return null;
   }
 
+  bool get _flipped => flipped && !card.singleFace;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final aspect = _aspect(flipped ? card.back : card.front);
+    final aspect = _aspect(_flipped ? card.back : card.front);
     final h = maxHeight;
     if (h == null || aspect == null) return _build(context, aspect: aspect);
     return LayoutBuilder(
@@ -83,13 +86,17 @@ class FlashcardView extends ConsumerWidget {
 
   /// [scrollHeight]: the card is that high and its faces scroll vertically inside it.
   Widget _build(BuildContext context, {required double? aspect, double? scrollHeight}) {
+    final flipped = _flipped;
     Widget face(bool back) => _FaceSurface(
       key: ValueKey('${card.key}:$back'),
       face: back ? card.back : card.front,
       scrollHeight: scrollHeight,
+      templateKey: card.templateKey,
     );
     final Widget body;
-    if (PlengoMotion.reduced(context)) {
+    if (card.singleFace) {
+      body = face(false);
+    } else if (PlengoMotion.reduced(context)) {
       body = AnimatedSwitcher(duration: const Duration(milliseconds: 200), child: face(flipped));
     } else {
       body = TweenAnimationBuilder<double>(
@@ -112,8 +119,12 @@ class FlashcardView extends ConsumerWidget {
     final h = maxHeight;
     return Semantics(
       button: true,
-      label: flipped ? 'الوجه الخلفي للبطاقة' : 'الوجه الأمامي للبطاقة',
-      onTapHint: 'اقلب البطاقة',
+      label: card.singleFace
+          ? 'بطاقة بوجه واحد'
+          : flipped
+          ? 'الوجه الخلفي للبطاقة'
+          : 'الوجه الأمامي للبطاقة',
+      onTapHint: card.singleFace ? null : 'اقلب البطاقة',
       child: GestureDetector(
         onTap: onTap,
         child: h != null && aspect != null && scrollHeight == null
@@ -129,9 +140,12 @@ class FlashcardView extends ConsumerWidget {
 
 /// The card surface: radius 26, card colour, a soft drop shadow (a line border in dark mode).
 class _FaceSurface extends StatelessWidget {
-  const _FaceSurface({super.key, required this.face, this.scrollHeight});
+  const _FaceSurface({super.key, required this.face, this.scrollHeight, this.templateKey});
 
   final CardFaceView face;
+
+  /// The student's card frame, drawn around the face.
+  final String? templateKey;
 
   /// A long card: this high, its face scrolling vertically inside.
   final double? scrollHeight;
@@ -154,7 +168,11 @@ class _FaceSurface extends StatelessWidget {
       ),
       child: ClipRRect(
         borderRadius: r,
-        child: scrollHeight == null ? CardFace(face: face) : _LongFace(face: face, height: scrollHeight!),
+        child: templateKey != null
+            ? TemplateFrame(templateKey: templateKey!, child: CardFace(face: face, framed: true))
+            : scrollHeight == null
+            ? CardFace(face: face)
+            : _LongFace(face: face, height: scrollHeight!),
       ),
     );
   }
@@ -227,9 +245,12 @@ Future<void> showCardZoom(BuildContext context, CardFaceView face) => Navigator.
 
 /// One face: an image-only face keeps the image's aspect ratio; text is centred below any image.
 class CardFace extends ConsumerWidget {
-  const CardFace({super.key, required this.face});
+  const CardFace({super.key, required this.face, this.framed = false});
 
   final CardFaceView face;
+
+  /// Inside a [TemplateFrame], which already keeps the margin.
+  final bool framed;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -245,9 +266,9 @@ class CardFace extends ConsumerWidget {
       return AspectRatio(aspectRatio: (face.image?.width ?? 3) / (face.image?.height ?? 2), child: image);
     }
     return ConstrainedBox(
-      constraints: const BoxConstraints(minHeight: 220),
+      constraints: BoxConstraints(minHeight: framed ? 180 : 220),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(framed ? 4 : 20),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

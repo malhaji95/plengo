@@ -11,7 +11,8 @@ import '../../core/srs/scheduler.dart';
 import '../../core/srs/srs_key.dart';
 import '../../shared/ui/ui.dart';
 import '../../shared/widgets/async_view.dart';
-import '../bookmarks/bookmark_providers.dart';
+import '../access/access_banner.dart';
+import '../bookmarks/star_button.dart';
 import '../home/streak_moment.dart';
 import '../reports/report_sheet.dart';
 import 'card_face.dart';
@@ -75,6 +76,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
         body: child,
       ),
       data: (s) {
+        if (s.lockedDeck case final deck?) return _Locked(deck: deck, title: widget.title);
         final card = s.current;
         final q = s.queue;
         final left = q.newCount + q.learningCount + q.reviewCount;
@@ -120,7 +122,11 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                                 child: _Counts(queue: q, current: bucket, title: widget.title),
                               ),
                               const SizedBox(width: 6),
-                              _CardMenu(card: card),
+                              StarButton(card: card),
+                              if (ref.watch(contentReportsEnabledProvider) && !SrsKey.isUserCard(card.key)) ...[
+                                const SizedBox(width: 6),
+                                _CardMenu(card: card),
+                              ],
                             ],
                           ),
                         ),
@@ -165,13 +171,17 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        if (!s.flipped) ...[
+                                        if (!s.flipped && !card.singleFace) ...[
                                           Icon(Icons.touch_app_outlined, size: 18, color: st.mute),
                                           const SizedBox(width: 6),
                                         ],
                                         Flexible(
                                           child: Text(
-                                            s.flipped ? 'كيف كان تذكّرك؟' : 'اضغط على البطاقة لعرض الإجابة',
+                                            s.flipped
+                                                ? 'كيف كان تذكّرك؟'
+                                                : card.singleFace
+                                                ? 'تذكّر ما تعرفه عن البطاقة ثم قيّم تذكّرك'
+                                                : 'اضغط على البطاقة لعرض الإجابة',
                                             textAlign: TextAlign.center,
                                             style: PlengoType.caption.copyWith(color: st.mute),
                                           ),
@@ -191,7 +201,11 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                               constraints: const BoxConstraints(minHeight: 70),
                               child: Center(
                                 child: previews == null
-                                    ? PlengoButton(label: 'اقلب البطاقة', onPressed: ctl.flip)
+                                    ? PlengoButton(
+                                        // A single-face card has no back: the button only reveals the ratings.
+                                        label: card.singleFace ? 'عرض التقييم' : 'اقلب البطاقة',
+                                        onPressed: ctl.flip,
+                                      )
                                     : IntrinsicHeight(
                                         child: Row(
                                           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -308,7 +322,7 @@ class _Counts extends StatelessWidget {
   }
 }
 
-/// The ⋮ menu of the current card: save it and, for official cards, report a problem.
+/// The ⋮ menu of an official card: report a problem (saving is the ★ next to it).
 class _CardMenu extends ConsumerWidget {
   const _CardMenu({required this.card});
 
@@ -316,43 +330,15 @@ class _CardMenu extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final own = SrsKey.isUserCard(card.key);
-    final type = own ? BookmarkItemType.userCard : BookmarkItemType.flashcard;
-    final id = own ? SrsKey.idOf(card.key) : card.key;
-    final saved = ref.watch(bookmarkKeysProvider).value?.contains(bookmarkKey(type, id)) ?? false;
-    final reportsOn = ref.watch(contentReportsEnabledProvider) && !own;
     final s = context.surface;
     return PopupMenuButton<String>(
-      tooltip: reportsOn ? 'خيارات البطاقة: حفظ، إبلاغ عن مشكلة' : 'خيارات البطاقة: حفظ',
-      onSelected: (v) async {
-        if (v == 'report') {
-          await showReportSheet(context, ref, ReportItemType.flashcard, card.key);
-          return;
-        }
-        try {
-          await ref.read(bookmarkKeysProvider.notifier).toggle(type, id);
-        } catch (e) {
-          if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تعذّر الحفظ، حاول مرة أخرى')));
-          }
-        }
-      },
-      itemBuilder: (_) => [
+      tooltip: 'خيارات البطاقة: إبلاغ عن مشكلة',
+      onSelected: (_) => showReportSheet(context, ref, ReportItemType.flashcard, card.key),
+      itemBuilder: (_) => const [
         PopupMenuItem(
-          value: 'save',
-          child: Row(
-            children: [
-              Icon(saved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded),
-              const SizedBox(width: 10),
-              Text(saved ? 'إزالة من المحفوظات' : 'حفظ'),
-            ],
-          ),
+          value: 'report',
+          child: Row(children: [Icon(Icons.flag_outlined), SizedBox(width: 10), Text('إبلاغ عن مشكلة')]),
         ),
-        if (reportsOn)
-          const PopupMenuItem(
-            value: 'report',
-            child: Row(children: [Icon(Icons.flag_outlined), SizedBox(width: 10), Text('إبلاغ عن مشكلة')]),
-          ),
       ],
       child: SizedBox.square(
         dimension: PlengoSpace.minTouch,
@@ -532,4 +518,40 @@ class _Done extends ConsumerWidget {
       ],
     );
   }
+}
+
+/// A locked deck has no study session (v3 §6): the notice, and its free preview in Browse.
+class _Locked extends StatelessWidget {
+  const _Locked({required this.deck, required this.title});
+
+  final StudentDeck deck;
+  final String title;
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(
+      automaticallyImplyLeading: false,
+      leading: const PlengoCloseButton(tooltip: 'إنهاء المراجعة'),
+      leadingWidth: kPlengoLeadingWidth,
+      title: Text(title),
+    ),
+    body: ListView(
+      padding: const EdgeInsets.all(20),
+      children: [
+        Text(
+          'المراجعة متاحة بعد تفعيل «${deck.titleAr}»',
+          key: const Key('study.locked'),
+          textAlign: TextAlign.center,
+          style: PlengoType.section.copyWith(color: context.surface.ink),
+        ),
+        const SizedBox(height: 14),
+        LockedNotice(subjectId: deck.subjectId, teacherTrackId: deck.teacherTrackId),
+        PlengoButton(
+          label: 'تصفح البطاقات المتاحة',
+          variant: PlengoButtonVariant.secondary,
+          onPressed: () => context.pushReplacement('${Routes.decks}/${deck.id}/browse'),
+        ),
+      ],
+    ),
+  );
 }

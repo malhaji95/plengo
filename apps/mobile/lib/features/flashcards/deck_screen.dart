@@ -64,9 +64,18 @@ class DeckScreen extends ConsumerWidget {
                   Text(d.description!, style: PlengoType.sub.copyWith(color: context.surface.mute)),
                 ],
                 const SizedBox(height: 16),
-                if (d.locked)
-                  LockedNotice(subjectId: d.subjectId, teacherTrackId: d.teacherTrackId)
-                else ...[
+                if (d.locked) ...[
+                  LockedNotice(subjectId: d.subjectId, teacherTrackId: d.teacherTrackId),
+                  // The first cards of a locked deck can be browsed (v3 §6); study needs activation.
+                  if (d.cardCount > 0)
+                    PlengoButton(
+                      key: const Key('deck.preview'),
+                      label: 'تصفّح بطاقات التجربة',
+                      icon: Icons.visibility_outlined,
+                      variant: PlengoButtonVariant.secondary,
+                      onPressed: () => context.push('${Routes.decks}/$deckId/browse'),
+                    ),
+                ] else ...[
                   _TodayCard(deckId: deckId),
                   const SizedBox(height: 16),
                   OfflineDownloadTile(
