@@ -6,7 +6,7 @@ import '../../shared/ui/ui.dart';
 import '../../shared/widgets/coming_soon.dart';
 
 // Placeholders for تدرّب (v3 §5, §9); the practice feature replaces them. Routes: [Routes.practice],
-// [Routes.practiceSetup] (`/practice/:subjectId`) and [Routes.practiceDiagrams].
+// [Routes.practiceSetup] (`/practice/:subjectId`); [Routes.practiceDiagrams] is `features/diagrams`.
 
 /// تدرّب: the student's subjects and «اختبارات بلينغو المخصصة».
 class PracticeHomeScreen extends StatelessWidget {
@@ -40,13 +40,4 @@ class PracticeSetupScreen extends StatelessWidget {
     onAction: () =>
         context.push(Uri(path: Routes.randomPractice, queryParameters: {'subjectId': subjectId}).toString()),
   );
-}
-
-/// رسمات العلوم: name the numbered parts of a diagram.
-class DiagramsScreen extends StatelessWidget {
-  const DiagramsScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) =>
-      const ComingSoonScaffold(title: 'رسمات العلوم', icon: Icons.schema_rounded, hue: PlengoColors.green);
 }

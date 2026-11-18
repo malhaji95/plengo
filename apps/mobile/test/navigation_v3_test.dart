@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plengo/app/router.dart';
 import 'package:plengo/features/bookmarks/saved_tab.dart';
+import 'package:plengo/features/diagrams/diagrams_screen.dart';
 import 'package:plengo/features/make_cards/make_cards_screen.dart';
 import 'package:plengo/features/my_subjects/my_subjects_screen.dart';
 import 'package:plengo/features/plengo_cards/plengo_cards_screen.dart';

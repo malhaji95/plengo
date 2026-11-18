@@ -9,6 +9,7 @@ import '../../shared/ui/ui.dart';
 import '../home/home_providers.dart';
 import '../quizzes/quiz_providers.dart';
 import '../offline/offline_providers.dart';
+import '../loyalty/loyalty_repository.dart' show loyaltyEnabledProvider;
 import 'app_drawer.dart';
 
 /// Bottom navigation plus a side drawer on phones, a permanent side rail on wide (web/tablet) layouts
@@ -62,20 +63,24 @@ class _HomeShellState extends ConsumerState<HomeShell> {
 
   void _openMenu() => _scaffold.currentState?.openDrawer();
 
-  /// The drawer / rail menu; the active place is filled yellow.
-  Widget _menu({required bool drawer}) => PlengoSideRail(
-    key: Key(drawer ? 'shell.drawer' : 'shell.rail'),
-    destinations: [for (final p in drawerPlaces) p.destination],
-    selectedIndex: drawerPlaces.indexWhere((p) => p.branch == shell.currentIndex),
-    dividerBefore: drawerDividerBefore,
-    width: drawer ? 288 : PlengoSpace.railWidth,
-    border: !drawer,
-    footer: const DrawerArt(),
-    onSelected: (i) {
-      if (drawer) Navigator.of(context).pop();
-      _go(drawerPlaces[i].branch);
-    },
-  );
+  /// The drawer / rail menu; the active place is filled yellow. Pushed places (نقاطي) open over the shell.
+  Widget _menu({required bool drawer}) {
+    final places = visibleDrawerPlaces(loyalty: ref.watch(loyaltyEnabledProvider));
+    return PlengoSideRail(
+      key: Key(drawer ? 'shell.drawer' : 'shell.rail'),
+      destinations: [for (final p in places) p.destination],
+      selectedIndex: places.indexWhere((p) => p.route == null && p.branch == shell.currentIndex),
+      dividerBefore: drawerDividerBefore,
+      width: drawer ? 288 : PlengoSpace.railWidth,
+      border: !drawer,
+      footer: const DrawerArt(),
+      onSelected: (i) {
+        if (drawer) Navigator.of(context).pop();
+        final route = places[i].route;
+        route == null ? _go(places[i].branch) : context.push(route);
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

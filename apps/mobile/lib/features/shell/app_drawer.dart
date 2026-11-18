@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
 
+import '../../app/router.dart';
 import '../../shared/ui/ui.dart';
 import '../../shared/widgets/optional_asset.dart';
 
-/// The shell's places (v3 §1). [branch] is the [StatefulShellRoute] branch index in the router.
+/// The shell's places (v3 §1). [branch] is the [StatefulShellRoute] branch index in the router; a
+/// place with a [route] instead is a screen pushed over the shell (branch -1).
 @immutable
 class ShellPlace {
-  const ShellPlace(this.branch, this.destination);
+  const ShellPlace(this.branch, this.destination) : route = null;
+
+  const ShellPlace.route(String this.route, this.destination) : branch = -1;
 
   final int branch;
+  final String? route;
   final PlengoNavDestination destination;
 }
+
 
 /// Branch indices of the tab shell (see `buildRouter`). The first five are the bottom bar, in order.
 abstract final class ShellBranch {
@@ -46,7 +52,8 @@ const _account = PlengoNavDestination(
 /// Bottom bar destinations, index = branch.
 const bottomBarDestinations = [_home, _subjects, _practice, _mySubjects, _account];
 
-/// Drawer (and wide-screen rail) rows in the owner's order; the last two sit under a divider.
+/// Drawer (and wide-screen rail) rows in the owner's order; نقاطي, المحفوظات and المراجعة sit under a
+/// divider. نقاطي is left out while loyalty is off (see [visibleDrawerPlaces]).
 const drawerPlaces = [
   ShellPlace(ShellBranch.home, _home),
   ShellPlace(ShellBranch.subjects, _subjects),
@@ -65,6 +72,10 @@ const drawerPlaces = [
     ),
   ),
   ShellPlace(ShellBranch.account, _account),
+  ShellPlace.route(
+    Routes.loyalty,
+    PlengoNavDestination(icon: Icons.star_outline_rounded, selectedIcon: Icons.star_rounded, label: 'نقاطي'),
+  ),
   ShellPlace(
     ShellBranch.saved,
     PlengoNavDestination(icon: Icons.bookmark_border_rounded, selectedIcon: Icons.bookmark_rounded, label: 'المحفوظات'),
@@ -75,8 +86,14 @@ const drawerPlaces = [
   ),
 ];
 
-/// Index in [drawerPlaces] of the divider (before المحفوظات).
+/// Index in [drawerPlaces] of the divider (before نقاطي, or المحفوظات when نقاطي is hidden).
 const drawerDividerBefore = 7;
+
+/// [drawerPlaces] without نقاطي unless [loyalty] is on.
+List<ShellPlace> visibleDrawerPlaces({required bool loyalty}) => [
+  for (final p in drawerPlaces)
+    if (loyalty || p.route != Routes.loyalty) p,
+];
 
 /// The drawer's illustration slot (600 × 900 transparent PNG, sent by the owner).
 const drawerArtAsset = 'assets/brand/drawer_art.png';
