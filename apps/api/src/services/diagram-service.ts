@@ -84,7 +84,7 @@ export function cleanLabels(input: LabelInput[]): Label[] {
     const answers: string[] = [];
     for (const raw of l.answers) {
       const original = raw.trim().replace(/\s+/g, ' ');
-      const normalized = normalizeArabic(original);
+      const normalized = diagramAnswerKey(original);
       if (!normalized) invalid('labels', 'empty_answer');
       if (seen.has(normalized)) continue;
       seen.add(normalized);
@@ -95,11 +95,18 @@ export function cleanLabels(input: LabelInput[]): Label[] {
   });
 }
 
-/** The written-answer rule (§14.5): an answer is correct when its normalised form matches one accepted. */
+/**
+ * A part name's comparison key: the written-answer normaliser (§14.5: trim, spaces, tashkeel, tatweel,
+ * alef and alef-maksura forms, punctuation), then ة → ه. Written answers keep ة/ه apart on purpose;
+ * part names are short nouns where students often type either, so diagrams fold them (v3 §9).
+ */
+export const diagramAnswerKey = (s: string) => normalizeArabic(s).replace(/ة/g, 'ه');
+
+/** An answer is correct when its key matches one accepted answer's key. */
 export function matchesAnswer(answer: string | null | undefined, accepted: string[]) {
   if (!answer) return false;
-  const given = normalizeArabic(answer);
-  return !!given && accepted.some((a) => normalizeArabic(a) === given);
+  const given = diagramAnswerKey(answer);
+  return !!given && accepted.some((a) => diagramAnswerKey(a) === given);
 }
 
 const DIAGRAM_COLUMNS = [

@@ -711,6 +711,140 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/diagrams": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Published diagrams of a scope: the subject (general content or a track), a unit with its lessons, or some lessons. Locked ones are listed with `locked: true` and no content. */
+        get: operations["listDiagrams"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/diagrams/practice": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Up to `count` random accessible diagrams of the scope with signed image URLs and their labels (numbers and marker positions, never answers). */
+        post: operations["startDiagramPractice"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/diagrams/{id}/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Grades the typed names (normalised like written answers) and reveals every label’s accepted answers. Counts toward the daily goal. */
+        post: operations["checkDiagram"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/loyalty": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Balance, points earned today toward the daily cap, and the current rules. */
+        get: operations["getLoyaltySummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/loyalty/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description The latest 100 point changes, newest first. */
+        get: operations["listLoyaltyHistory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/loyalty/rewards": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listLoyaltyRewards"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/loyalty/rewards/{id}/redeem": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Spends points. `unlock_deck` opens the deck at once (ALREADY_ENTITLED if it is already open); `custom` is recorded for the admin. INSUFFICIENT_POINTS when the balance is short. */
+        post: operations["redeemLoyaltyReward"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/loyalty/redemptions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listMyLoyaltyRedemptions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/quizzes": {
         parameters: {
             query?: never;
@@ -2603,6 +2737,217 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/diagrams": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminListDiagrams"];
+        put?: never;
+        post: operations["adminCreateDiagram"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/diagrams/import/template": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description The diagram import layout with example rows, as CSV or XLSX. */
+        get: operations["adminDiagramImportTemplate"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/diagrams/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description One row per label (diagram_ref groups rows). A dry run validates and lists the image files needed; the real run creates every diagram in one transaction, or nothing when any row has an error. */
+        post: operations["adminImportDiagrams"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/diagrams/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminGetDiagram"];
+        put?: never;
+        post?: never;
+        delete: operations["adminDeleteDiagram"];
+        options?: never;
+        head?: never;
+        patch: operations["adminUpdateDiagram"];
+        trace?: never;
+    };
+    "/api/v1/admin/diagrams/{id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["adminSetDiagramStatus"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/diagrams/{id}/free": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["adminSetDiagramFree"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/settings/loyalty": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminGetLoyaltySettings"];
+        put: operations["adminUpdateLoyaltySettings"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/loyalty/rewards": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminListLoyaltyRewards"];
+        put?: never;
+        post: operations["adminCreateLoyaltyReward"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/loyalty/rewards/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["adminDeleteLoyaltyReward"];
+        options?: never;
+        head?: never;
+        patch: operations["adminUpdateLoyaltyReward"];
+        trace?: never;
+    };
+    "/api/v1/admin/loyalty/redemptions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminListLoyaltyRedemptions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/loyalty/redemptions/{id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description `fulfilled` marks a custom reward handed over; `cancelled` refunds the points. */
+        post: operations["adminSetLoyaltyRedemptionStatus"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/students/{id}/loyalty": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["adminGetStudentLoyalty"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/students/{id}/loyalty/adjust": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["adminAdjustStudentLoyalty"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/admins": {
         parameters: {
             query?: never;
@@ -3255,6 +3600,54 @@ export interface components {
             data: components["schemas"]["AdminDeckList"];
             error: null;
         };
+        AdminDiagram: {
+            id: string;
+            subjectId: string;
+            subjectNameAr: string;
+            teacherTrackId: string | null;
+            trackTitleAr: string | null;
+            unitId: string | null;
+            lessonId: string | null;
+            titleAr: string;
+            description: string | null;
+            imageMediaId: string;
+            image: components["schemas"]["CardImage"] | null;
+            isFree: boolean;
+            /** @enum {string} */
+            freeSource: "rule" | "manual_override";
+            /** @enum {string} */
+            status: "draft" | "published" | "archived";
+            sortOrder: number;
+            contentVersion: number;
+            labels: components["schemas"]["AdminDiagramLabel"][];
+            createdAt: string;
+            updatedAt: string;
+        };
+        AdminDiagramEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AdminDiagram"];
+            error: null;
+        };
+        AdminDiagramLabel: {
+            id: string;
+            number: number;
+            x: number | null;
+            y: number | null;
+            answers: string[];
+            sortOrder: number;
+        };
+        AdminDiagramPage: {
+            items: components["schemas"]["AdminDiagram"][];
+            nextCursor: string | null;
+            totalCount: number;
+        };
+        AdminDiagramPageEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AdminDiagramPage"];
+            error: null;
+        };
         AdminEntitlement: {
             id: string;
             scope: components["schemas"]["AccessScope"];
@@ -3294,6 +3687,59 @@ export interface components {
             /** @constant */
             success: true;
             data: components["schemas"]["AdminLoginResult"];
+            error: null;
+        };
+        AdminLoyaltyRedemption: {
+            id: string;
+            rewardId: string;
+            titleAr: string;
+            kind: components["schemas"]["LoyaltyRewardKind"];
+            costPoints: number;
+            deckId: string | null;
+            status: components["schemas"]["LoyaltyRedemptionStatus"];
+            note: string | null;
+            createdAt: string;
+            handledAt: string | null;
+            userId: string;
+            studentEmail: string | null;
+            studentName: string | null;
+            handledByAdminId: string | null;
+        };
+        AdminLoyaltyRedemptionPage: {
+            items: components["schemas"]["AdminLoyaltyRedemption"][];
+            nextCursor: string | null;
+        };
+        AdminLoyaltyRedemptionPageEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AdminLoyaltyRedemptionPage"];
+            error: null;
+        };
+        AdminLoyaltyReward: {
+            id: string;
+            titleAr: string;
+            description: string | null;
+            costPoints: number;
+            kind: components["schemas"]["LoyaltyRewardKind"];
+            deckId: string | null;
+            deckTitleAr: string | null;
+            isActive: boolean;
+            sortOrder: number;
+            redemptionCount: number;
+            createdAt: string;
+            updatedAt: string;
+        };
+        AdminLoyaltyRewardEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AdminLoyaltyReward"];
+            error: null;
+        };
+        AdminLoyaltyRewardList: components["schemas"]["AdminLoyaltyReward"][];
+        AdminLoyaltyRewardListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AdminLoyaltyRewardList"];
             error: null;
         };
         AdminNotification: {
@@ -3540,6 +3986,20 @@ export interface components {
             error: null;
         };
         AdminStudentList: components["schemas"]["AdminStudent"][];
+        AdminStudentLoyalty: {
+            userId: string;
+            balance: number;
+            earnedToday: number;
+            ledger: components["schemas"]["LoyaltyLedgerEntry"][];
+            redemptions: components["schemas"]["LoyaltyRedemption"][];
+            unlockedDeckIds: string[];
+        };
+        AdminStudentLoyaltyEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["AdminStudentLoyalty"];
+            error: null;
+        };
         AdminStudentPage: {
             items: components["schemas"]["AdminStudentList"];
             nextCursor: string | null;
@@ -3826,6 +4286,12 @@ export interface components {
             writtenAnswer?: string | null;
             timeSpentMs?: number | null;
         };
+        CheckDiagramRequest: {
+            answers: {
+                number: number;
+                answer: string;
+            }[];
+        };
         CheckResult: {
             isCorrect: boolean;
             correctOptionId: string | null;
@@ -3960,6 +4426,19 @@ export interface components {
             description?: string | null;
             coverMediaId?: string | null;
         };
+        CreateDiagramRequest: {
+            /** Format: uuid */
+            subjectId: string;
+            teacherTrackId?: string | null;
+            unitId?: string | null;
+            lessonId?: string | null;
+            titleAr: string;
+            description?: string | null;
+            /** Format: uuid */
+            imageMediaId: string;
+            labels: components["schemas"]["DiagramLabel"][];
+            publish?: boolean;
+        };
         CreateFacultyRequest: {
             code: string;
             nameAr: string;
@@ -3979,6 +4458,15 @@ export interface components {
             unitId?: string | null;
             code: string;
             titleAr: string;
+        };
+        CreateLoyaltyRewardRequest: {
+            titleAr: string;
+            description?: string | null;
+            costPoints: number;
+            kind: components["schemas"]["LoyaltyRewardKind"];
+            deckId?: string | null;
+            isActive?: boolean;
+            sortOrder?: number;
         };
         CreateNotificationRequest: {
             /** @enum {string} */
@@ -4145,6 +4633,89 @@ export interface components {
             data: components["schemas"]["DeletedResult"];
             error: null;
         };
+        DiagramCheckResult: {
+            diagramId: string;
+            correctCount: number;
+            totalCount: number;
+            labels: components["schemas"]["DiagramLabelResult"][];
+        };
+        DiagramCheckResultEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["DiagramCheckResult"];
+            error: null;
+        };
+        DiagramImportPreview: {
+            ref: string;
+            titleAr: string;
+            subjectCode: string;
+            unitCode: string | null;
+            lessonCode: string | null;
+            teacherTrackCode: string | null;
+            imageFile: string;
+            labels: {
+                number: number;
+                answers: string[];
+            }[];
+        };
+        DiagramImportRequest: {
+            format: components["schemas"]["ImportFormat"];
+            fileName: string;
+            contentBase64: string;
+            images?: {
+                [key: string]: string;
+            };
+            dryRun: boolean;
+            publish?: boolean;
+        };
+        DiagramImportResult: {
+            dryRun: boolean;
+            totalRows: number;
+            diagrams: components["schemas"]["DiagramImportPreview"][];
+            requiredImages: string[];
+            missingImages: string[];
+            errors: components["schemas"]["ImportError"][];
+            createdIds: string[];
+        };
+        DiagramImportResultEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["DiagramImportResult"];
+            error: null;
+        };
+        DiagramLabel: {
+            number: number;
+            x?: number | null;
+            y?: number | null;
+            answers: string[];
+        };
+        DiagramLabelResult: {
+            labelId: string;
+            number: number;
+            answer: string | null;
+            isCorrect: boolean;
+            acceptedAnswers: string[];
+        };
+        DiagramPractice: {
+            diagrams: components["schemas"]["PracticeDiagram"][];
+            availableCount: number;
+            lockedCount: number;
+            urlsExpireAt: string;
+        };
+        DiagramPracticeEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["DiagramPractice"];
+            error: null;
+        };
+        DiagramPracticeRequest: {
+            /** Format: uuid */
+            subjectId: string;
+            teacherTrackId?: string | null;
+            unitId?: string | null;
+            lessonIds?: string[];
+            count: number;
+        };
         DueCard: {
             card: components["schemas"]["StudentCard"];
             deckTitleAr: string;
@@ -4262,7 +4833,7 @@ export interface components {
             id: string;
             scope: components["schemas"]["AccessScope"];
             /** @enum {string} */
-            contentKind: "questions" | "flashcard_decks" | "quizzes" | "all";
+            contentKind: "questions" | "flashcard_decks" | "quizzes" | "all" | "diagrams";
             /** @enum {string} */
             ruleType: "manual" | "first_n_items" | "first_n_lessons" | "first_unit" | "percentage";
             ruleValue: number | null;
@@ -4286,7 +4857,7 @@ export interface components {
             paidCount: number;
             byKind: {
                 /** @enum {string} */
-                contentKind: "questions" | "flashcard_decks" | "quizzes" | "all";
+                contentKind: "questions" | "flashcard_decks" | "quizzes" | "all" | "diagrams";
                 freeCount: number;
                 paidCount: number;
             }[];
@@ -4303,7 +4874,7 @@ export interface components {
             subjectId?: string | null;
             teacherTrackId?: string | null;
             /** @enum {string} */
-            contentKind: "questions" | "flashcard_decks" | "quizzes" | "all";
+            contentKind: "questions" | "flashcard_decks" | "quizzes" | "all" | "diagrams";
             /** @enum {string} */
             ruleType: "manual" | "first_n_items" | "first_n_lessons" | "first_unit" | "percentage";
             ruleValue?: number | null;
@@ -4483,6 +5054,119 @@ export interface components {
             flashcardsTotal: number;
             completionPercent: number;
             lessonId: string;
+        };
+        LoyaltyAdjustRequest: {
+            delta: number;
+            note: string;
+        };
+        LoyaltyLedgerEntry: {
+            id: string;
+            delta: number;
+            reason: components["schemas"]["LoyaltyReason"];
+            refId: string | null;
+            day: string;
+            note: string | null;
+            createdAt: string;
+        };
+        LoyaltyLedgerPage: {
+            items: components["schemas"]["LoyaltyLedgerEntry"][];
+        };
+        LoyaltyLedgerPageEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["LoyaltyLedgerPage"];
+            error: null;
+        };
+        /** @enum {string} */
+        LoyaltyReason: "review" | "correct_answer" | "redemption" | "refund" | "admin_adjust";
+        LoyaltyRedeemResult: {
+            redemption: components["schemas"]["LoyaltyRedemption"];
+            balance: number;
+        };
+        LoyaltyRedeemResultEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["LoyaltyRedeemResult"];
+            error: null;
+        };
+        LoyaltyRedemption: {
+            id: string;
+            rewardId: string;
+            titleAr: string;
+            kind: components["schemas"]["LoyaltyRewardKind"];
+            costPoints: number;
+            deckId: string | null;
+            status: components["schemas"]["LoyaltyRedemptionStatus"];
+            note: string | null;
+            createdAt: string;
+            handledAt: string | null;
+        };
+        LoyaltyRedemptionEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["LoyaltyRedemption"];
+            error: null;
+        };
+        LoyaltyRedemptionList: components["schemas"]["LoyaltyRedemption"][];
+        LoyaltyRedemptionListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["LoyaltyRedemptionList"];
+            error: null;
+        };
+        /** @enum {string} */
+        LoyaltyRedemptionStatus: "pending" | "fulfilled" | "cancelled";
+        LoyaltyReward: {
+            id: string;
+            titleAr: string;
+            description: string | null;
+            costPoints: number;
+            kind: components["schemas"]["LoyaltyRewardKind"];
+            deckId: string | null;
+            deckTitleAr: string | null;
+            deckSubjectId: string | null;
+            alreadyOwned: boolean;
+            affordable: boolean;
+            sortOrder: number;
+        };
+        /** @enum {string} */
+        LoyaltyRewardKind: "unlock_deck" | "custom";
+        LoyaltyRewardList: {
+            balance: number;
+            items: components["schemas"]["LoyaltyReward"][];
+        };
+        LoyaltyRewardListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["LoyaltyRewardList"];
+            error: null;
+        };
+        LoyaltySettings: {
+            enabled: boolean;
+            pointsPerReview: number;
+            dailyCap: number;
+            pointsPerCorrectQuestion: number;
+        };
+        LoyaltySettingsEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["LoyaltySettings"];
+            error: null;
+        };
+        LoyaltySummary: {
+            enabled: boolean;
+            balance: number;
+            earnedToday: number;
+            dailyCap: number;
+            remainingToday: number | null;
+            day: string;
+            rules: components["schemas"]["LoyaltySettings"];
+        };
+        LoyaltySummaryEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["LoyaltySummary"];
+            error: null;
         };
         MarkAnswerCorrectResult: {
             questionId: string;
@@ -4930,6 +5614,22 @@ export interface components {
             data: components["schemas"]["PlengoDeckList"];
             error: null;
         };
+        PracticeDiagram: {
+            id: string;
+            subjectId: string;
+            unitId: string | null;
+            lessonId: string | null;
+            titleAr: string;
+            image: components["schemas"]["CardImage"];
+            labels: components["schemas"]["PracticeDiagramLabel"][];
+            contentVersion: number;
+        };
+        PracticeDiagramLabel: {
+            id: string;
+            number: number;
+            x: number | null;
+            y: number | null;
+        };
         Promotion: {
             id: string;
             scope: components["schemas"]["AccessScope"];
@@ -5059,6 +5759,11 @@ export interface components {
             success: true;
             data: components["schemas"]["RedeemResult"];
             error: null;
+        };
+        RedemptionStatusRequest: {
+            /** @enum {string} */
+            status: "fulfilled" | "cancelled";
+            note?: string | null;
         };
         RefreshLeasesRequest: {
             scopes: components["schemas"]["LeaseScope"][];
@@ -5381,6 +6086,7 @@ export interface components {
         SrsSyncResult: {
             acceptedLogs: number;
             appliedStates: number;
+            pointsEarned: number;
             states: components["schemas"]["SrsCardState"][];
         };
         SrsSyncResultEnvelope: {
@@ -5480,6 +6186,30 @@ export interface components {
             /** @constant */
             success: true;
             data: components["schemas"]["StudentDeckList"];
+            error: null;
+        };
+        StudentDiagram: {
+            id: string;
+            subjectId: string;
+            teacherTrackId: string | null;
+            unitId: string | null;
+            lessonId: string | null;
+            titleAr: string;
+            labelCount: number;
+            isFree: boolean;
+            locked: boolean;
+            sortOrder: number;
+        };
+        StudentDiagramList: {
+            items: components["schemas"]["StudentDiagram"][];
+            totalCount: number;
+            accessibleCount: number;
+            lockedCount: number;
+        };
+        StudentDiagramListEnvelope: {
+            /** @constant */
+            success: true;
+            data: components["schemas"]["StudentDiagramList"];
             error: null;
         };
         StudentNotification: {
@@ -5920,6 +6650,15 @@ export interface components {
             description?: string | null;
             coverMediaId?: string | null;
         };
+        UpdateDiagramRequest: {
+            unitId?: string | null;
+            lessonId?: string | null;
+            titleAr?: string;
+            description?: string | null;
+            /** Format: uuid */
+            imageMediaId?: string;
+            labels?: components["schemas"]["DiagramLabel"][];
+        };
         UpdateFacultyRequest: {
             code?: string;
             nameAr?: string;
@@ -5932,6 +6671,15 @@ export interface components {
         };
         UpdateLevelRequest: {
             nameAr?: string;
+            sortOrder?: number;
+        };
+        UpdateLoyaltyRewardRequest: {
+            titleAr?: string;
+            description?: string | null;
+            costPoints?: number;
+            kind?: components["schemas"]["LoyaltyRewardKind"];
+            deckId?: string | null;
+            isActive?: boolean;
             sortOrder?: number;
         };
         UpdateNotificationPreferences: {
@@ -7209,6 +7957,183 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DueCardsEnvelope"];
+                };
+            };
+        };
+    };
+    listDiagrams: {
+        parameters: {
+            query: {
+                subjectId: string;
+                teacherTrackId?: string;
+                unitId?: string;
+                lessonIds?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentDiagramListEnvelope"];
+                };
+            };
+        };
+    };
+    startDiagramPractice: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DiagramPracticeRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DiagramPracticeEnvelope"];
+                };
+            };
+        };
+    };
+    checkDiagram: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CheckDiagramRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DiagramCheckResultEnvelope"];
+                };
+            };
+        };
+    };
+    getLoyaltySummary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoyaltySummaryEnvelope"];
+                };
+            };
+        };
+    };
+    listLoyaltyHistory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoyaltyLedgerPageEnvelope"];
+                };
+            };
+        };
+    };
+    listLoyaltyRewards: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoyaltyRewardListEnvelope"];
+                };
+            };
+        };
+    };
+    redeemLoyaltyReward: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoyaltyRedeemResultEnvelope"];
+                };
+            };
+        };
+    };
+    listMyLoyaltyRedemptions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoyaltyRedemptionListEnvelope"];
                 };
             };
         };
@@ -10982,6 +11907,461 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ReorderedResultEnvelope"];
+                };
+            };
+        };
+    };
+    adminListDiagrams: {
+        parameters: {
+            query?: {
+                subjectId?: string;
+                teacherTrackId?: string;
+                generalOnly?: "true" | "false";
+                unitId?: string;
+                lessonId?: string;
+                status?: "draft" | "published" | "archived";
+                q?: string;
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminDiagramPageEnvelope"];
+                };
+            };
+        };
+    };
+    adminCreateDiagram: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateDiagramRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminDiagramEnvelope"];
+                };
+            };
+        };
+    };
+    adminDiagramImportTemplate: {
+        parameters: {
+            query: {
+                format: components["schemas"]["ImportFormat"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    adminImportDiagrams: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DiagramImportRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DiagramImportResultEnvelope"];
+                };
+            };
+        };
+    };
+    adminGetDiagram: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminDiagramEnvelope"];
+                };
+            };
+        };
+    };
+    adminDeleteDiagram: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeletedResultEnvelope"];
+                };
+            };
+        };
+    };
+    adminUpdateDiagram: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateDiagramRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminDiagramEnvelope"];
+                };
+            };
+        };
+    };
+    adminSetDiagramStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuestionStatusRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminDiagramEnvelope"];
+                };
+            };
+        };
+    };
+    adminSetDiagramFree: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuestionFreeRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminDiagramEnvelope"];
+                };
+            };
+        };
+    };
+    adminGetLoyaltySettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoyaltySettingsEnvelope"];
+                };
+            };
+        };
+    };
+    adminUpdateLoyaltySettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LoyaltySettings"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoyaltySettingsEnvelope"];
+                };
+            };
+        };
+    };
+    adminListLoyaltyRewards: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminLoyaltyRewardListEnvelope"];
+                };
+            };
+        };
+    };
+    adminCreateLoyaltyReward: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateLoyaltyRewardRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminLoyaltyRewardEnvelope"];
+                };
+            };
+        };
+    };
+    adminDeleteLoyaltyReward: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeletedResultEnvelope"];
+                };
+            };
+        };
+    };
+    adminUpdateLoyaltyReward: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateLoyaltyRewardRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminLoyaltyRewardEnvelope"];
+                };
+            };
+        };
+    };
+    adminListLoyaltyRedemptions: {
+        parameters: {
+            query?: {
+                status?: components["schemas"]["LoyaltyRedemptionStatus"];
+                userId?: string;
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminLoyaltyRedemptionPageEnvelope"];
+                };
+            };
+        };
+    };
+    adminSetLoyaltyRedemptionStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RedemptionStatusRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoyaltyRedemptionEnvelope"];
+                };
+            };
+        };
+    };
+    adminGetStudentLoyalty: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminStudentLoyaltyEnvelope"];
+                };
+            };
+        };
+    };
+    adminAdjustStudentLoyalty: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LoyaltyAdjustRequest"];
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminStudentLoyaltyEnvelope"];
                 };
             };
         };
