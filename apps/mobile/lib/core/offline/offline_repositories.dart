@@ -24,9 +24,9 @@ class OfflineQuestionRepository extends QuestionRepository {
   }
 
   @override
-  Future<StudentQuestionPage> page(QuestionQuery q, {String? cursor}) async {
+  Future<StudentQuestionPage> page(QuestionQuery q, {String? cursor, String? categoryIds}) async {
     try {
-      return await super.page(q, cursor: cursor);
+      return await super.page(q, cursor: cursor, categoryIds: categoryIds);
     } catch (e) {
       if (!_offline(e) || cursor != null) rethrow;
       final local = await content.questions(
@@ -35,10 +35,13 @@ class OfflineQuestionRepository extends QuestionRepository {
         unitId: q.unitId,
         lessonId: q.lessonId,
       );
-      if (local.isEmpty) rethrow;
+      // Packs do not know the category tree: a filtered list keeps the questions filed directly under it.
+      final wanted = categoryIds?.split(',').toSet();
+      final shown = wanted == null ? local : local.where((pq) => wanted.contains(pq.question.categoryId)).toList();
+      if (shown.isEmpty) rethrow;
       return StudentQuestionPage(
         items: [
-          for (final pq in local)
+          for (final pq in shown)
             StudentQuestion(
               id: pq.question.id,
               type: StudentQuestionType.values.firstWhere((t) => t.json == pq.question.type.json),
@@ -58,8 +61,8 @@ class OfflineQuestionRepository extends QuestionRepository {
             ),
         ],
         nextCursor: null,
-        totalCount: local.length,
-        accessibleCount: local.length,
+        totalCount: shown.length,
+        accessibleCount: shown.length,
       );
     }
   }

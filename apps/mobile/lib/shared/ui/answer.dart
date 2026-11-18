@@ -214,6 +214,8 @@ class FeedbackPanel extends StatefulWidget {
     this.onReport,
     this.reportAction,
     this.extra,
+    this.actions,
+    this.correctAnswerLabel,
   });
 
   static const correctTitle = 'أحسنت!';
@@ -244,6 +246,12 @@ class FeedbackPanel extends StatefulWidget {
 
   /// Extra content above the button (e.g. the in-session streak chip).
   final Widget? extra;
+
+  /// Replaces the continue button (e.g. the written-answer self-grade buttons).
+  final Widget? actions;
+
+  /// Defaults to «الإجابة الصحيحة: » (e.g. «الإجابة النموذجية: » for written answers).
+  final String? correctAnswerLabel;
 
   @override
   State<FeedbackPanel> createState() => _FeedbackPanelState();
@@ -288,13 +296,16 @@ class _FeedbackPanelState extends State<FeedbackPanel> with SingleTickerProvider
       if (!ok && widget.correctAnswer != null)
         DefaultTextStyle.merge(
           style: TextStyle(fontFamily: PlengoType.family, fontSize: 15, fontWeight: FontWeight.w700, color: hue.ink),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('الإجابة الصحيحة: '),
-              Expanded(child: widget.correctAnswer!),
-            ],
-          ),
+          // A custom (longer) label wraps: the answer goes under it when the line is full.
+          child: widget.correctAnswerLabel != null
+              ? Wrap(children: [Text(widget.correctAnswerLabel!), widget.correctAnswer!])
+              : Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('الإجابة الصحيحة: '),
+                    Expanded(child: widget.correctAnswer!),
+                  ],
+                ),
         ),
       if (widget.explanation != null)
         DefaultTextStyle.merge(
@@ -366,11 +377,12 @@ class _FeedbackPanelState extends State<FeedbackPanel> with SingleTickerProvider
                   ),
                 ),
               const SizedBox(height: 14),
-              PlengoButton(
-                label: widget.actionLabel ?? (ok ? 'متابعة' : 'فهمت، متابعة'),
-                variant: ok ? PlengoButtonVariant.success : PlengoButtonVariant.danger,
-                onPressed: widget.onContinue,
-              ),
+              widget.actions ??
+                  PlengoButton(
+                    label: widget.actionLabel ?? (ok ? 'متابعة' : 'فهمت، متابعة'),
+                    variant: ok ? PlengoButtonVariant.success : PlengoButtonVariant.danger,
+                    onPressed: widget.onContinue,
+                  ),
             ],
           ),
         ),

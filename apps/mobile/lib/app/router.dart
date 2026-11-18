@@ -235,6 +235,7 @@ GoRouter buildRouter(Ref ref, {required bool couponRedemption}) {
                           subjectId: state.pathParameters['id']!,
                           unitId: state.uri.queryParameters['unitId'],
                           lessonId: state.uri.queryParameters['lessonId'],
+                          categoryIds: state.uri.queryParameters['categoryIds'],
                         ),
                       ),
                     ],

@@ -16,8 +16,8 @@ import 'catalog_providers.dart';
 import 'scope_widgets.dart';
 
 /// Everything placed in one lesson of a subject's general content (V-Lesson): the lesson questions
-/// first (the primary entry, with progress), then its flashcard decks (pink) and quizzes (orange).
-/// Sections without content are hidden.
+/// first (the primary entry, with progress, grouped by question category — v3 §3), then its flashcard
+/// decks (pink) and quizzes (orange). Sections without content are hidden.
 class LessonScreen extends ConsumerWidget {
   const LessonScreen({super.key, required this.subjectId, required this.lessonId});
 
@@ -33,7 +33,9 @@ class LessonScreen extends ConsumerWidget {
     final query = (subjectId: subjectId, teacherTrackId: null, unitId: null, lessonId: lessonId);
     final decks = ref.watch(decksProvider(query));
     final quizzes = ref.watch(quizzesProvider(query));
-    final questions = ref.watch(questionListProvider(query));
+    final questions = ref.watch(questionListProvider((query: query, categoryIds: null)));
+    // Categories are a refinement: when they cannot be read the card keeps its single entry.
+    final categories = ref.watch(questionCategoriesProvider(query));
     final progress = ref
         .watch(progressProvider((subjectId: subjectId, teacherTrackId: null)))
         .value
@@ -41,11 +43,14 @@ class LessonScreen extends ConsumerWidget {
         .where((l) => l.lessonId == lessonId)
         .firstOrNull;
 
-    final loading = decks.isLoading || quizzes.isLoading || questions.isLoading;
+    final loading = decks.isLoading || quizzes.isLoading || questions.isLoading || categories.isLoading;
     final failed = [decks, quizzes, questions].where((v) => v.hasError && !v.hasValue).firstOrNull;
     final deckList = decks.value ?? const [];
     final quizList = quizzes.value ?? const [];
     final questionCount = questions.value?.totalCount ?? 0;
+    final groups = groupCategories(categories.value?.items ?? const []);
+    final otherCount = categories.value?.uncategorized.questionCount ?? 0;
+    final questionsPath = '${Routes.subjects}/$subjectId/questions?lessonId=$lessonId';
     final s = context.surface;
 
     Widget body;
@@ -55,7 +60,8 @@ class LessonScreen extends ConsumerWidget {
         onRetry: () {
           ref.invalidate(decksProvider(query));
           ref.invalidate(quizzesProvider(query));
-          ref.invalidate(questionListProvider(query));
+          ref.invalidate(questionListProvider((query: query, categoryIds: null)));
+          ref.invalidate(questionCategoriesProvider(query));
         },
         data: (_) => const SizedBox(),
       );
@@ -82,7 +88,10 @@ class LessonScreen extends ConsumerWidget {
                 count: questionCount,
                 attempted: progress?.questionsAttempted ?? 0,
                 total: progress?.questionsTotal ?? questionCount,
-                onPressed: () => context.go('${Routes.subjects}/$subjectId/questions?lessonId=$lessonId'),
+                groups: groups,
+                otherCount: otherCount,
+                onPressed: () => context.go(questionsPath),
+                onCategory: (ids) => context.go('$questionsPath&categoryIds=$ids'),
               ),
               const SizedBox(height: PlengoSpace.section),
             ],
@@ -114,19 +123,30 @@ class LessonScreen extends ConsumerWidget {
   }
 }
 
-/// The primary entry of a lesson: its questions with progress and «تابع التدريب».
+/// The primary entry of a lesson: its questions with progress, one row per question category (children
+/// nested under their parent, «أسئلة أخرى» for the rest — v3 §3) and «تابع التدريب».
 class _LessonQuestionsCard extends StatelessWidget {
   const _LessonQuestionsCard({
     required this.count,
     required this.attempted,
     required this.total,
     required this.onPressed,
+    this.groups = const [],
+    this.otherCount = 0,
+    this.onCategory,
   });
 
   final int count;
   final int attempted;
   final int total;
   final VoidCallback onPressed;
+  final List<CategoryGroup> groups;
+
+  /// Questions filed under no category.
+  final int otherCount;
+
+  /// Opens the questions of a category (its id, or [uncategorizedCategory]).
+  final ValueChanged<String>? onCategory;
 
   @override
   Widget build(BuildContext context) {
@@ -168,6 +188,37 @@ class _LessonQuestionsCard extends StatelessWidget {
               semanticsLabel: 'أجبت عن $attempted من $total',
             ),
           ],
+          if (groups.isNotEmpty && onCategory != null) ...[
+            const SizedBox(height: 12),
+            Semantics(
+              header: true,
+              child: Text('حسب نوع السؤال', style: PlengoType.chip.copyWith(color: blue.ink)),
+            ),
+            const SizedBox(height: 6),
+            for (final g in groups) ...[
+              CategoryRow(
+                key: Key('lesson.category.${g.id}'),
+                name: g.nameAr,
+                count: g.questionCount,
+                onTap: () => onCategory!(g.id),
+              ),
+              for (final c in g.children)
+                CategoryRow(
+                  key: Key('lesson.category.${c.id}'),
+                  name: c.nameAr,
+                  count: c.questionCount,
+                  nested: true,
+                  onTap: () => onCategory!(c.id),
+                ),
+            ],
+            if (otherCount > 0)
+              CategoryRow(
+                key: const Key('lesson.category.other'),
+                name: 'أسئلة أخرى',
+                count: otherCount,
+                onTap: () => onCategory!(uncategorizedCategory),
+              ),
+          ],
           const SizedBox(height: 12),
           PlengoButton(
             label: attempted > 0 ? 'تابع التدريب' : 'ابدأ التدريب',
@@ -195,4 +246,68 @@ class LessonDeckRow extends StatelessWidget {
     trailing: deck.locked ? const LockedChip() : null,
     onTap: () => context.go('${Routes.decks}/${deck.id}'),
   );
+}
+
+/// One question category of a lesson: its name, the question count and a chevron; [nested] rows (child
+/// categories) sit indented under their parent.
+class CategoryRow extends StatelessWidget {
+  const CategoryRow({super.key, required this.name, required this.count, required this.onTap, this.nested = false});
+
+  final String name;
+  final int count;
+  final VoidCallback onTap;
+  final bool nested;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = context.surface;
+    final blue = PlengoColors.blue;
+    final r = BorderRadius.circular(14);
+    return Padding(
+      padding: EdgeInsetsDirectional.only(top: 6, start: nested ? 24 : 0),
+      child: Semantics(
+        button: true,
+        label: '$name، ${questionCountLabel(count)}',
+        excludeSemantics: true,
+        onTap: onTap,
+        child: Material(
+          color: s.card,
+          borderRadius: r,
+          child: InkWell(
+            borderRadius: r,
+            onTap: onTap,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: 48),
+              child: Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(12, 6, 6, 6),
+                child: Row(
+                  children: [
+                    Icon(
+                      nested ? Icons.subdirectory_arrow_left_rounded : Icons.label_rounded,
+                      size: 18,
+                      color: s.isDark ? s.action : blue.base,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        name,
+                        style: PlengoType.rowTitle.copyWith(
+                          color: s.ink,
+                          fontSize: nested ? 14 : 15,
+                          fontWeight: nested ? FontWeight.w600 : FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    PlengoChip(label: '$count', hue: blue),
+                    Icon(Icons.chevron_right_rounded, color: s.mute),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }

@@ -518,6 +518,13 @@ class _ResultCard extends StatelessWidget {
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     PlengoChip(label: status, hue: hue, icon: icon),
+                    if (q.markedCorrectByStudent)
+                      const PlengoChip(
+                        key: Key('result.markedCorrect'),
+                        label: 'صحّحتها بنفسك',
+                        hue: PlengoColors.blue,
+                        icon: Icons.edit_note_rounded,
+                      ),
                     if (q.flagged)
                       const PlengoChip(label: 'معلّمة', hue: PlengoColors.yellow, icon: Icons.flag_rounded),
                     Text('السؤال $index', style: PlengoType.chip.copyWith(color: s.mute)),

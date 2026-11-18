@@ -11,13 +11,25 @@ class QuestionRepository {
 
   final ApiClient client;
 
-  Future<StudentQuestionPage> page(QuestionQuery q, {String? cursor}) => guardApi(
+  /// [categoryIds]: comma-separated category ids (a parent includes its children, v3 §3).
+  Future<StudentQuestionPage> page(QuestionQuery q, {String? cursor, String? categoryIds}) => guardApi(
     () async => (await client.api.questions.listQuestions(
       subjectId: q.subjectId,
       teacherTrackId: q.teacherTrackId,
       unitId: q.unitId,
       lessonId: q.lessonId,
+      categoryIds: categoryIds,
       cursor: cursor,
+    )).data,
+  );
+
+  /// The question categories of a subject with published counts for the scope, unit or lesson (v3 §3, §5).
+  Future<StudentQuestionCategoryList> categories(QuestionQuery q) => guardApi(
+    () async => (await client.api.questions.listQuestionCategories(
+      subjectId: q.subjectId,
+      teacherTrackId: q.teacherTrackId,
+      unitId: q.unitId,
+      lessonId: q.lessonId,
     )).data,
   );
 

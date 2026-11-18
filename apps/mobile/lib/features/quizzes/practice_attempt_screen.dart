@@ -45,6 +45,15 @@ class _PracticeAttemptScreenState extends ConsumerState<PracticeAttemptScreen> {
   /// Correct answers in a row checked in this session (DECISIONS #10).
   int _run = 0;
 
+  /// [_run] before the last check, restored (+1) when the student counts a written answer as correct.
+  int _runBefore = 0;
+
+  /// Written answers the student counted as correct (v3 §5).
+  late final Set<String> _marked = {
+    for (final q in _questions)
+      if (q.markedCorrectByStudent) q.questionId,
+  };
+
   String get _id => widget.attempt.attempt.id;
   AttemptQuestion get _q => _questions[_index];
   bool get _isWritten => _q.type == AttemptQuestionType.written;
@@ -72,6 +81,7 @@ class _PracticeAttemptScreenState extends ConsumerState<PracticeAttemptScreen> {
       if (mounted) {
         setState(() {
           _results[_q.questionId] = result;
+          _runBefore = _run;
           _run = result.isCorrect ? _run + 1 : 0;
         });
       }
@@ -83,6 +93,37 @@ class _PracticeAttemptScreenState extends ConsumerState<PracticeAttemptScreen> {
       if (mounted) setState(() => _busy = false);
     }
   }
+
+  /// «إجابتي صحيحة لكن بصياغة مختلفة» (v3 §5): the server records the override, then the score and
+  /// the correct-in-a-row chip count it.
+  Future<void> _markCorrect() async {
+    final id = _q.questionId;
+    setState(() {
+      _busy = true;
+      _error = null;
+    });
+    try {
+      final marked = await ref.read(learningRepositoryProvider).markCorrect(_id, id);
+      if (!mounted) return;
+      setState(() {
+        _results[id] = marked.result.isCorrect ? marked.result : acceptedAsCorrect(marked.result);
+        _marked.add(id);
+        _run = _runBefore + 1;
+      });
+    } on ApiException catch (e) {
+      if (mounted) {
+        setState(() => _error = e.code == 'NETWORK_ERROR' ? 'يحتاج هذا إلى اتصال بالإنترنت' : e.message);
+      }
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  void _advance() => setState(() {
+    _index++;
+    _error = null;
+    _shownAt.reset();
+  });
 
   Future<void> _finish() async {
     setState(() => _busy = true);
@@ -196,11 +237,11 @@ class _PracticeAttemptScreenState extends ConsumerState<PracticeAttemptScreen> {
                       ? null
                       : last
                       ? _finish
-                      : () => setState(() {
-                          _index++;
-                          _error = null;
-                          _shownAt.reset();
-                        }),
+                      : _advance,
+                  written: _isWritten,
+                  onSelfGradeCorrect: _isWritten ? _markCorrect : null,
+                  selfGradeBusy: _busy,
+                  markedCorrect: _marked.contains(_q.questionId),
                 ),
             ],
           ),

@@ -24,25 +24,30 @@ const _typeLabels = {
 /// Questions of a subject's general content or of a track, optionally one lesson (spec §14).
 /// Locked questions show as metadata only (§8.6); free ones stay open inside a locked scope.
 class QuestionsScreen extends ConsumerWidget {
-  const QuestionsScreen({super.key, required this.query, required this.title});
+  const QuestionsScreen({super.key, required this.query, required this.title, this.categoryIds});
 
   final QuestionQuery query;
   final String title;
 
+  /// Narrows the list to these categories (comma separated), or [uncategorizedCategory] (v3 §3).
+  final String? categoryIds;
+
+  QuestionListKey get _key => (query: query, categoryIds: categoryIds);
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final list = ref.watch(questionListProvider(query));
+    final list = ref.watch(questionListProvider(_key));
     final s = context.surface;
     return Scaffold(
       appBar: AppBar(leading: const PlengoBackButton(), leadingWidth: kPlengoLeadingWidth, title: Text(title)),
       body: AsyncView(
         value: list,
-        onRetry: () => ref.invalidate(questionListProvider(query)),
+        onRetry: () => ref.invalidate(questionListProvider(_key)),
         data: (state) => state.items.isEmpty
             ? const PlengoEmptyState(title: 'لا توجد أسئلة هنا بعد', icon: Icons.quiz_outlined)
             : NotificationListener<ScrollNotification>(
                 onNotification: (n) {
-                  if (n.metrics.extentAfter < 400) ref.read(questionListProvider(query).notifier).loadMore();
+                  if (n.metrics.extentAfter < 400) ref.read(questionListProvider(_key).notifier).loadMore();
                   return false;
                 },
                 child: ContentWidthBox(
@@ -164,22 +169,33 @@ class _QuestionTile extends StatelessWidget {
   }
 }
 
-/// Route entry for `/subjects/:id/questions[?lessonId=]`: titles come from the (cached) outline.
+/// Route entry for `/subjects/:id/questions[?lessonId=][&categoryIds=]`: titles come from the (cached)
+/// outline, or the category's name when the list is narrowed to one category (v3 §3).
 class SubjectQuestionsRoute extends ConsumerWidget {
-  const SubjectQuestionsRoute({super.key, required this.subjectId, this.unitId, this.lessonId});
+  const SubjectQuestionsRoute({super.key, required this.subjectId, this.unitId, this.lessonId, this.categoryIds});
 
   final String subjectId;
   final String? unitId;
   final String? lessonId;
+  final String? categoryIds;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final query = (subjectId: subjectId, teacherTrackId: null, unitId: unitId, lessonId: lessonId);
     final outline = ref.watch(subjectOutlineProvider(subjectId)).value;
     final lessons = [...?outline?.lessons, ...?outline?.units.expand((u) => u.lessons)];
     final lessonTitle = lessons.where((l) => l.id == lessonId).firstOrNull?.titleAr;
+    final ids = categoryIds == null || categoryIds!.isEmpty ? null : categoryIds;
+    final categoryTitle = switch (ids) {
+      null => null,
+      uncategorizedCategory => 'أسئلة أخرى',
+      _ when ids.contains(',') => null,
+      _ => ref.watch(questionCategoriesProvider(query)).value?.items.where((c) => c.id == ids).firstOrNull?.nameAr,
+    };
     return QuestionsScreen(
-      query: (subjectId: subjectId, teacherTrackId: null, unitId: unitId, lessonId: lessonId),
-      title: lessonTitle ?? (outline != null ? 'أسئلة ${outline.subject.nameAr}' : 'الأسئلة'),
+      query: query,
+      categoryIds: ids,
+      title: categoryTitle ?? lessonTitle ?? (outline != null ? 'أسئلة ${outline.subject.nameAr}' : 'الأسئلة'),
     );
   }
 }
