@@ -237,6 +237,12 @@ Future<PumpedApp> pumpApp(
   final flashcards = MockFlashcardRepository();
   when(() => flashcards.push(any(), ready: any(named: 'ready'))).thenAnswer((_) async => 0);
   when(() => flashcards.pull(any())).thenAnswer((_) async {});
+  when(
+    () => flashcards.plengoDecks(
+      subjectId: any(named: 'subjectId'),
+      educationLevelId: any(named: 'educationLevelId'),
+    ),
+  ).thenAnswer((_) async => const PlengoDeckList(groups: []));
   arrangeFlashcards?.call(flashcards);
 
   final learning = MockLearningRepository();
