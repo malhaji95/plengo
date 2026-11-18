@@ -15,6 +15,8 @@ import 'clients/access_client.dart';
 import 'clients/questions_client.dart';
 import 'clients/flashcards_client.dart';
 import 'clients/srs_client.dart';
+import 'clients/diagrams_client.dart';
+import 'clients/loyalty_client.dart';
 import 'clients/quizzes_client.dart';
 import 'clients/attempts_client.dart';
 import 'clients/mistakes_client.dart';
@@ -26,6 +28,8 @@ import 'clients/reports_client.dart';
 import 'clients/offline_client.dart';
 import 'clients/home_client.dart';
 import 'clients/notifications_client.dart';
+import 'clients/admin_diagrams_client.dart';
+import 'clients/admin_loyalty_client.dart';
 
 /// Plengo API `v1.0.0`
 class PlengoApi {
@@ -51,6 +55,8 @@ class PlengoApi {
   QuestionsClient? _questions;
   FlashcardsClient? _flashcards;
   SrsClient? _srs;
+  DiagramsClient? _diagrams;
+  LoyaltyClient? _loyalty;
   QuizzesClient? _quizzes;
   AttemptsClient? _attempts;
   MistakesClient? _mistakes;
@@ -62,6 +68,8 @@ class PlengoApi {
   OfflineClient? _offline;
   HomeClient? _home;
   NotificationsClient? _notifications;
+  AdminDiagramsClient? _adminDiagrams;
+  AdminLoyaltyClient? _adminLoyalty;
 
   ConfigClient get config => _config ??= ConfigClient(_dio, baseUrl: _baseUrl);
 
@@ -85,6 +93,10 @@ class PlengoApi {
 
   SrsClient get srs => _srs ??= SrsClient(_dio, baseUrl: _baseUrl);
 
+  DiagramsClient get diagrams => _diagrams ??= DiagramsClient(_dio, baseUrl: _baseUrl);
+
+  LoyaltyClient get loyalty => _loyalty ??= LoyaltyClient(_dio, baseUrl: _baseUrl);
+
   QuizzesClient get quizzes => _quizzes ??= QuizzesClient(_dio, baseUrl: _baseUrl);
 
   AttemptsClient get attempts => _attempts ??= AttemptsClient(_dio, baseUrl: _baseUrl);
@@ -106,4 +118,8 @@ class PlengoApi {
   HomeClient get home => _home ??= HomeClient(_dio, baseUrl: _baseUrl);
 
   NotificationsClient get notifications => _notifications ??= NotificationsClient(_dio, baseUrl: _baseUrl);
+
+  AdminDiagramsClient get adminDiagrams => _adminDiagrams ??= AdminDiagramsClient(_dio, baseUrl: _baseUrl);
+
+  AdminLoyaltyClient get adminLoyalty => _adminLoyalty ??= AdminLoyaltyClient(_dio, baseUrl: _baseUrl);
 }

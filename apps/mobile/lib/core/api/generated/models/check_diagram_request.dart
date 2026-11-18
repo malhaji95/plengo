@@ -1,0 +1,22 @@
+// coverage:ignore-file
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, unused_import, invalid_annotation_target, unnecessary_import
+
+import 'package:json_annotation/json_annotation.dart';
+
+import 'answers.dart';
+
+part 'check_diagram_request.g.dart';
+
+@JsonSerializable()
+class CheckDiagramRequest {
+  const CheckDiagramRequest({
+    required this.answers,
+  });
+  
+  factory CheckDiagramRequest.fromJson(Map<String, Object?> json) => _$CheckDiagramRequestFromJson(json);
+  
+  final List<Answers> answers;
+
+  Map<String, Object?> toJson() => _$CheckDiagramRequestToJson(this);
+}

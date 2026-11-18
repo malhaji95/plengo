@@ -13,6 +13,7 @@ class SrsSyncResult {
   const SrsSyncResult({
     required this.acceptedLogs,
     required this.appliedStates,
+    required this.pointsEarned,
     required this.states,
   });
   
@@ -20,6 +21,7 @@ class SrsSyncResult {
   
   final int acceptedLogs;
   final int appliedStates;
+  final int pointsEarned;
   final List<SrsCardState> states;
 
   Map<String, Object?> toJson() => _$SrsSyncResultToJson(this);
