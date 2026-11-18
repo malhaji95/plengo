@@ -194,10 +194,7 @@ class _DiagramSessionState extends ConsumerState<DiagramSession> {
                           ),
                           const SizedBox(height: 10),
                         ],
-                        if (result != null) ...[
-                          const SizedBox(height: 4),
-                          _DiagramScoreLine(result: result),
-                        ],
+                        if (result != null) ...[const SizedBox(height: 4), _DiagramScoreLine(result: result)],
                         if (_error != null) ...[const SizedBox(height: 8), InlineError(_error)],
                       ],
                     ),

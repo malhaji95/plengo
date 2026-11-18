@@ -379,12 +379,7 @@ class _DiagramsScreenState extends ConsumerState<DiagramsScreen> {
               if (accessible != null && accessible > 0) ...[
                 const SizedBox(height: 16),
                 label('عدد الرسومات'),
-                _Stepper(
-                  value: count,
-                  min: 1,
-                  max: max,
-                  onChanged: (v) => setState(() => _count = v),
-                ),
+                _Stepper(value: count, min: 1, max: max, onChanged: (v) => setState(() => _count = v)),
                 const SizedBox(height: 16),
                 label('طريقة التصحيح'),
                 RadioRow(
@@ -436,7 +431,11 @@ class _Availability extends StatelessWidget {
     final s = context.surface;
     final v = value;
     if (scope == null || v == null) {
-      return Text(hint, key: const Key('diagrams.hint'), style: PlengoType.sub.copyWith(color: s.mute));
+      return Text(
+        hint,
+        key: const Key('diagrams.hint'),
+        style: PlengoType.sub.copyWith(color: s.mute),
+      );
     }
     return switch (v) {
       AsyncValue(:final value?) => Wrap(
@@ -532,10 +531,7 @@ class _LockedBox extends ConsumerWidget {
               Icon(Icons.lock_rounded, color: red.ink),
               const SizedBox(width: 10),
               Expanded(
-                child: Text(
-                  'رسومات هذا الاختيار مقفلة ($locked)',
-                  style: PlengoType.rowTitle.copyWith(color: red.ink),
-                ),
+                child: Text('رسومات هذا الاختيار مقفلة ($locked)', style: PlengoType.rowTitle.copyWith(color: red.ink)),
               ),
             ],
           ),

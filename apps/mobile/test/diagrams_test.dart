@@ -62,7 +62,14 @@ void main() {
     unitId: 'u1',
     lessonId: 'l1',
     titleAr: title,
-    image: CardImage(mediaId: 'm$id', cacheKey: 'k$id', fullUrl: 'https://cdn/$id.png', thumbUrl: '', width: 800, height: 600),
+    image: CardImage(
+      mediaId: 'm$id',
+      cacheKey: 'k$id',
+      fullUrl: 'https://cdn/$id.png',
+      thumbUrl: '',
+      width: 800,
+      height: 600,
+    ),
     labels: [
       PracticeDiagramLabel(id: '$id-b', number: 2, x: null, y: null),
       PracticeDiagramLabel(id: '$id-a', number: 1, x: 0.25, y: 0.4),
@@ -77,7 +84,13 @@ void main() {
     correctCount: second ? 2 : 1,
     totalCount: 2,
     labels: [
-      DiagramLabelResult(labelId: '$id-a', number: 1, answer: 'النواة', isCorrect: true, acceptedAnswers: const ['النواة']),
+      DiagramLabelResult(
+        labelId: '$id-a',
+        number: 1,
+        answer: 'النواة',
+        isCorrect: true,
+        acceptedAnswers: const ['النواة'],
+      ),
       DiagramLabelResult(
         labelId: '$id-b',
         number: 2,
@@ -106,9 +119,9 @@ void main() {
     addTearDown(tester.view.reset);
     final repo = MockDiagramRepository();
     when(() => repo.list(any())).thenAnswer((_) async => listOf());
-    when(() => repo.start(any())).thenAnswer(
-      (_) async => DiagramPractice(diagrams: diagrams, availableCount: 4, lockedCount: 0, urlsExpireAt: ''),
-    );
+    when(
+      () => repo.start(any()),
+    ).thenAnswer((_) async => DiagramPractice(diagrams: diagrams, availableCount: 4, lockedCount: 0, urlsExpireAt: ''));
     when(() => repo.check(any(), any())).thenAnswer(
       (i) async => result(i.positionalArguments.first as String, second: i.positionalArguments.first == 'd2'),
     );
@@ -117,9 +130,9 @@ void main() {
       tester,
       signedInAs: testMe,
       arrangeCatalog: (c) {
-        when(() => c.subjects(any())).thenAnswer(
-          (_) async => [catalogSubject('bio', 'علم الأحياء'), catalogSubject('chem', 'الكيمياء')],
-        );
+        when(
+          () => c.subjects(any()),
+        ).thenAnswer((_) async => [catalogSubject('bio', 'علم الأحياء'), catalogSubject('chem', 'الكيمياء')]);
         when(() => c.outline('bio')).thenAnswer((_) async => outline);
       },
       extraOverrides: [diagramRepositoryProvider.overrideWithValue(repo)],

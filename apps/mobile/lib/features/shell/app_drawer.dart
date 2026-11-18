@@ -17,7 +17,6 @@ class ShellPlace {
   final PlengoNavDestination destination;
 }
 
-
 /// Branch indices of the tab shell (see `buildRouter`). The first five are the bottom bar, in order.
 abstract final class ShellBranch {
   static const home = 0, subjects = 1, practice = 2, mySubjects = 3, account = 4;

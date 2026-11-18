@@ -62,6 +62,7 @@ class _LoyaltyScreenState extends ConsumerState<LoyaltyScreen> {
       if (!mounted) return;
       await _refresh();
       if (!mounted) return;
+      setState(() => _redeeming = null);
       await _showSuccess(r, result);
     } on ApiException catch (e) {
       messenger.showSnackBar(SnackBar(key: const Key('loyalty.error'), content: Text(e.message)));
@@ -84,7 +85,9 @@ class _LoyaltyScreenState extends ConsumerState<LoyaltyScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Center(child: StateIllustration(icon: Icons.check_rounded, hue: PlengoColors.green, size: 96)),
+            const Center(
+              child: StateIllustration(icon: Icons.check_rounded, hue: PlengoColors.green, size: 96),
+            ),
             const SizedBox(height: 12),
             Semantics(
               header: true,
@@ -116,7 +119,9 @@ class _LoyaltyScreenState extends ConsumerState<LoyaltyScreen> {
                 icon: Icons.style_rounded,
                 onPressed: () {
                   Navigator.pop(sheet);
-                  context.push('${Routes.decks}/$deckId');
+                  // `go`, not `push`: the deck page lives in the tab shell, which a pushed top-level route
+                  // cannot stack under itself.
+                  context.go('${Routes.decks}/$deckId');
                 },
               )
             else
@@ -131,11 +136,7 @@ class _LoyaltyScreenState extends ConsumerState<LoyaltyScreen> {
   Widget build(BuildContext context) {
     final summary = ref.watch(loyaltySummaryProvider);
     return Scaffold(
-      appBar: AppBar(
-        leading: const PlengoBackButton(),
-        leadingWidth: kPlengoLeadingWidth,
-        title: const Text('نقاطي'),
-      ),
+      appBar: AppBar(leading: const PlengoBackButton(), leadingWidth: kPlengoLeadingWidth, title: const Text('نقاطي')),
       body: AsyncView(
         value: summary,
         onRetry: () => ref.invalidate(loyaltySummaryProvider),
@@ -241,7 +242,9 @@ class _TodayCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              remaining == 0 ? 'بلغت حدّ اليوم، عُد غداً لتجمع المزيد.' : 'تبقّى لك ${pointsLabel(remaining ?? cap - earned)} اليوم.',
+              remaining == 0
+                  ? 'بلغت حدّ اليوم، عُد غداً لتجمع المزيد.'
+                  : 'تبقّى لك ${pointsLabel(remaining ?? cap - earned)} اليوم.',
               style: PlengoType.caption.copyWith(color: s.mute),
             ),
           ] else
@@ -283,7 +286,12 @@ class _RulesCard extends StatelessWidget {
           if (rules.pointsPerReview > 0)
             row(Icons.style_rounded, PlengoColors.pink, 'راجع بطاقة من بطاقاتك المستحقة', '+${rules.pointsPerReview}'),
           if (rules.pointsPerCorrectQuestion > 0)
-            row(Icons.check_circle_rounded, PlengoColors.green, 'أجب عن سؤال إجابة صحيحة', '+${rules.pointsPerCorrectQuestion}'),
+            row(
+              Icons.check_circle_rounded,
+              PlengoColors.green,
+              'أجب عن سؤال إجابة صحيحة',
+              '+${rules.pointsPerCorrectQuestion}',
+            ),
           if (rules.dailyCap > 0)
             row(Icons.today_rounded, PlengoColors.blue, 'الحد الأعلى للنقاط في اليوم', '${rules.dailyCap}'),
         ],
@@ -379,7 +387,7 @@ class _RewardCard extends StatelessWidget {
                     label: 'افتح',
                     variant: PlengoButtonVariant.ghost,
                     size: PlengoButtonSize.small,
-                    onPressed: () => context.push('${Routes.decks}/${r.deckId}'),
+                    onPressed: () => context.go('${Routes.decks}/${r.deckId}'),
                   ),
               ],
             )
@@ -507,7 +515,11 @@ class _History extends ConsumerWidget {
                         : _reasons[e.reason] ?? '',
                     caption: damascusDate(e.createdAt),
                     trailing: Text(
-                      '${e.delta > 0 ? '+' : e.delta < 0 ? '−' : ''}${e.delta.abs()}',
+                      '${e.delta > 0
+                          ? '+'
+                          : e.delta < 0
+                          ? '−'
+                          : ''}${e.delta.abs()}',
                       textDirection: TextDirection.ltr,
                       style: PlengoType.rowTitle.copyWith(
                         color: e.delta >= 0
@@ -536,7 +548,9 @@ class _Note extends StatelessWidget {
     return PlengoCard(
       child: Row(
         children: [
-          Expanded(child: Text(text, style: PlengoType.sub.copyWith(color: s.mute))),
+          Expanded(
+            child: Text(text, style: PlengoType.sub.copyWith(color: s.mute)),
+          ),
           if (onRetry != null) TextButton(onPressed: onRetry, child: const Text('إعادة المحاولة')),
         ],
       ),

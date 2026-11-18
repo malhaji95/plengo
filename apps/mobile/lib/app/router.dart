@@ -93,6 +93,7 @@ abstract final class Routes {
 
   /// Practice setup for one subject: `/practice/<subjectId>`.
   static const practiceSetup = '/practice';
+
   /// رسمات العلوم; `?subjectId=` preselects the subject.
   static const practiceDiagrams = '/practice/diagrams';
 

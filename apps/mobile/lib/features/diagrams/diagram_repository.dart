@@ -41,9 +41,7 @@ class DiagramRepository {
   );
 }
 
-final diagramRepositoryProvider = Provider<DiagramRepository>(
-  (ref) => DiagramRepository(ref.watch(apiClientProvider)),
-);
+final diagramRepositoryProvider = Provider<DiagramRepository>((ref) => DiagramRepository(ref.watch(apiClientProvider)));
 
 /// The diagrams of a scope with the accessible and locked counts.
 final diagramListProvider = FutureProvider.autoDispose.family<StudentDiagramList, DiagramScope>(
