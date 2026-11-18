@@ -105,9 +105,19 @@ AttemptFilters practiceFilters({
   return AttemptFilters(
     subjectId: subjectId,
     unitId: unitId,
-    lessonIds: everyLesson ? null : [for (final id in scopeLessonIds) if (selectedLessonIds.contains(id)) id],
+    lessonIds: everyLesson
+        ? null
+        : [
+            for (final id in scopeLessonIds)
+              if (selectedLessonIds.contains(id)) id,
+          ],
     categoryIds: categoryIds.isEmpty ? null : categoryIds,
-    types: types.isEmpty ? null : [for (final t in AttemptFiltersTypes.values) if (types.contains(t)) t],
+    types: types.isEmpty
+        ? null
+        : [
+            for (final t in AttemptFiltersTypes.values)
+              if (types.contains(t)) t,
+          ],
     count: count == practiceAllQuestions ? null : count,
     allQuestions: count == practiceAllQuestions ? true : null,
   );

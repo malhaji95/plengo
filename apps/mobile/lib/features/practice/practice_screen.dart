@@ -315,7 +315,12 @@ class _SetupFormState extends ConsumerState<_SetupForm> {
     return (
       subjectId: _subjectId,
       unitId: _unitId,
-      lessonIds: every ? null : [for (final id in scope) if (_lessons.contains(id)) id].join(','),
+      lessonIds: every
+          ? null
+          : [
+              for (final id in scope)
+                if (_lessons.contains(id)) id,
+            ].join(','),
     );
   }
 
@@ -470,16 +475,12 @@ class _SetupFormState extends ConsumerState<_SetupForm> {
                 PillSelector<int>(
                   padding: EdgeInsets.zero,
                   options: [
-                    for (final n in practiceCounts)
-                      PlengoOption(n, n == practiceAllQuestions ? 'جميع الأسئلة' : '$n'),
+                    for (final n in practiceCounts) PlengoOption(n, n == practiceAllQuestions ? 'جميع الأسئلة' : '$n'),
                   ],
                   selected: _count,
                   onSelected: (n) => setState(() => _count = n),
                 ),
-                if (locked) ...[
-                  const SizedBox(height: PlengoSpace.section),
-                  LockedNotice(subjectId: _subjectId),
-                ],
+                if (locked) ...[const SizedBox(height: PlengoSpace.section), LockedNotice(subjectId: _subjectId)],
                 const SizedBox(height: 12),
                 Center(
                   child: PlengoButton(
@@ -526,7 +527,10 @@ class _SetupFormState extends ConsumerState<_SetupForm> {
       child: Text(text, style: PlengoType.chip.copyWith(color: s.mute)),
     );
     return [
-      for (final u in o.units.where((u) => u.lessons.isNotEmpty)) ...[label(u.titleAr), for (final l in u.lessons) row(l)],
+      for (final u in o.units.where((u) => u.lessons.isNotEmpty)) ...[
+        label(u.titleAr),
+        for (final l in u.lessons) row(l),
+      ],
       if (o.lessons.isNotEmpty) ...[label('دروس عامة'), for (final l in o.lessons) row(l)],
     ];
   }
@@ -964,9 +968,7 @@ class ToggleChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final s = context.surface;
     final fixed = onTap == null;
-    final bg = selected
-        ? (fixed ? s.track : (s.isDark ? PlengoColors.yellow.base : PlengoColors.ink))
-        : s.card;
+    final bg = selected ? (fixed ? s.track : (s.isDark ? PlengoColors.yellow.base : PlengoColors.ink)) : s.card;
     final fg = selected && !fixed ? (s.isDark ? PlengoColors.ink : Colors.white) : s.ink;
     final r = BorderRadius.circular(PlengoRadius.pill);
     final spoken = [label, ?count == null ? null : '$count سؤال', if (locked) 'مقفل'].join('، ');

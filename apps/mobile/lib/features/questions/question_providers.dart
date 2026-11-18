@@ -134,7 +134,8 @@ List<CategoryGroup> groupCategories(List<StudentQuestionCategory> items, {bool k
   }
   return [
     for (final c in items)
-      if (c.parentId == null || !ids.contains(c.parentId)) CategoryGroup(category: c, children: children[c.id] ?? const []),
+      if (c.parentId == null || !ids.contains(c.parentId))
+        CategoryGroup(category: c, children: children[c.id] ?? const []),
   ].where((g) => keepEmpty || g.questionCount > 0).toList();
 }
 
