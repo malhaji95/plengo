@@ -30,50 +30,53 @@ class DiagramSteps extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = context.surface;
+    Widget line(bool show, bool done) =>
+        Container(height: 2, color: !show ? Colors.transparent : (done ? s.action : s.line));
     return Semantics(
       label: 'الخطوة ${current + 1} من 3: ${labels[current]}',
       excludeSemantics: true,
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          for (final (i, label) in labels.indexed) ...[
-            if (i > 0)
-              Expanded(
-                child: Container(
-                  height: 2,
-                  margin: const EdgeInsets.only(bottom: 22),
-                  color: i <= current ? s.action : s.line,
-                ),
+          for (final (i, label) in labels.indexed)
+            Expanded(
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Expanded(child: line(i > 0, i <= current)),
+                      Container(
+                        width: 26,
+                        height: 26,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(shape: BoxShape.circle, color: i <= current ? s.action : s.track),
+                        child: i < current
+                            ? Icon(Icons.check_rounded, size: 16, color: s.onAction)
+                            : Text(
+                                '${i + 1}',
+                                textScaler: TextScaler.noScaling,
+                                style: PlengoType.chip.copyWith(color: i <= current ? s.onAction : s.mute),
+                              ),
+                      ),
+                      Expanded(child: line(i < labels.length - 1, i < current)),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      label,
+                      maxLines: 1,
+                      style: PlengoType.caption.copyWith(
+                        color: i == current ? s.ink : s.mute,
+                        fontWeight: i == current ? FontWeight.w700 : FontWeight.w400,
+                        height: 1.2,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 26,
-                  height: 26,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: i <= current ? s.action : s.track,
-                  ),
-                  child: i < current
-                      ? Icon(Icons.check_rounded, size: 16, color: s.onAction)
-                      : Text(
-                          '${i + 1}',
-                          style: PlengoType.chip.copyWith(color: i <= current ? s.onAction : s.mute),
-                        ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  label,
-                  style: PlengoType.caption.copyWith(
-                    color: i == current ? s.ink : s.mute,
-                    fontWeight: i == current ? FontWeight.w700 : FontWeight.w400,
-                    height: 1.2,
-                  ),
-                ),
-              ],
             ),
-          ],
         ],
       ),
     );

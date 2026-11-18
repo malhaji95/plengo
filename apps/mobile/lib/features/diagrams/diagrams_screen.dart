@@ -373,7 +373,7 @@ class _DiagramsScreenState extends ConsumerState<DiagramsScreen> {
               _Availability(
                 scope: scope,
                 value: available,
-                hint: _mode == DiagramMode.lessons ? 'اختر درساً واحداً على الأقل' : 'اختر الدرس',
+                hint: _mode == DiagramMode.lessons ? 'اختر درساً واحداً على الأقل' : 'اختر درساً لترى رسوماته',
                 onRetry: scope == null ? null : () => ref.invalidate(diagramListProvider(scope)),
               ),
               if (accessible != null && accessible > 0) ...[
