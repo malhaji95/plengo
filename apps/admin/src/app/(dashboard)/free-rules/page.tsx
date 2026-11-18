@@ -26,6 +26,7 @@ const KINDS: Record<RuleRequest['contentKind'], string> = {
   questions: 'الأسئلة',
   flashcard_decks: 'مجموعات البطاقات',
   quizzes: 'الاختبارات',
+  diagrams: 'رسمات العلوم',
 };
 const RULES: Record<RuleRequest['ruleType'], string> = {
   manual: 'يدوي (العناصر المحددة فقط)',

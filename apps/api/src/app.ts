@@ -26,6 +26,10 @@ import { adminAuthRoutes } from './routes/admin/auth.js';
 import { adminFlashcardRoutes } from './routes/admin/flashcards.js';
 import { adminQuestionRoutes } from './routes/admin/questions.js';
 import { adminQuizRoutes } from './routes/admin/quizzes.js';
+import { adminDiagramRoutes } from './routes/admin/diagrams.js';
+import { adminLoyaltyRoutes } from './routes/admin/loyalty.js';
+import { diagramRoutes } from './routes/diagrams.js';
+import { loyaltyRoutes } from './routes/loyalty.js';
 import { adminStructureRoutes } from './routes/admin/structure.js';
 import { adminTeacherRoutes } from './routes/admin/teachers.js';
 import { authRoutes } from './routes/auth.js';
@@ -137,6 +141,8 @@ export async function buildApp(app: App, c: Container): Promise<App> {
   await app.register(accessRoutes(c), { prefix: '/api/v1' });
   await app.register(questionRoutes(c), { prefix: '/api/v1' });
   await app.register(flashcardRoutes(c), { prefix: '/api/v1' });
+  await app.register(diagramRoutes(c), { prefix: '/api/v1' });
+  await app.register(loyaltyRoutes(c), { prefix: '/api/v1' });
   await app.register(learningRoutes(c), { prefix: '/api/v1' });
   await app.register(myDeckRoutes(c), { prefix: '/api/v1' });
   await app.register(offlineRoutes(c), { prefix: '/api/v1' });
@@ -149,6 +155,8 @@ export async function buildApp(app: App, c: Container): Promise<App> {
   await app.register(adminQuestionRoutes(c), { prefix: '/api/v1/admin' });
   await app.register(adminFlashcardRoutes(c), { prefix: '/api/v1/admin' });
   await app.register(adminQuizRoutes(c), { prefix: '/api/v1/admin' });
+  await app.register(adminDiagramRoutes(c), { prefix: '/api/v1/admin' });
+  await app.register(adminLoyaltyRoutes(c), { prefix: '/api/v1/admin' });
   await app.register(adminAccountRoutes(c), { prefix: '/api/v1/admin' });
   await app.register(adminReportRoutes(c), { prefix: '/api/v1/admin' });
   await app.register(adminHomeRoutes(c), { prefix: '/api/v1/admin' });

@@ -101,6 +101,8 @@ describe('navigation (§26.1)', () => {
     '/question-analytics',
     '/import-export',
     '/question-categories',
+    '/diagrams',
+    '/loyalty',
     '/audit-log',
     '/settings',
   ];

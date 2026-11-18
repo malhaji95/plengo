@@ -178,7 +178,7 @@ export function createStatsService(deps: {
         repo.reviewsPerDay(userId, new Date(startOfBusinessDay(today - 29))),
         access.context(userId),
       ]);
-      const open = states.filter((s) => ctx.canAccessItem(s.deck));
+      const open = states.filter((s) => ctx.canAccessDeck(s.deck));
       const dueBy = (day: number) => startOfBusinessDay(day + 1);
       const forecast = Array.from({ length: 7 }, (_, i) => {
         const day = today + i;

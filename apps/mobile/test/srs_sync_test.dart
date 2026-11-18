@@ -61,6 +61,7 @@ void main() {
         ok({
           'acceptedLogs': 1,
           'appliedStates': 1,
+          'pointsEarned': 0,
           'states': [serverState('c1', newer)],
         }),
       );
@@ -88,13 +89,15 @@ void main() {
 
   test('an undone log is sent again, flagged undone', () async {
     final log = await review('c1', Rating.easy, t0);
-    final adapter = FakeAdapter((o) async => (200, ok({'acceptedLogs': 1, 'appliedStates': 0, 'states': []})));
+    final adapter = FakeAdapter(
+      (o) async => (200, ok({'acceptedLogs': 1, 'appliedStates': 0, 'pointsEarned': 0, 'states': []})),
+    );
     await repoWith(adapter).push(store);
     await store.markUndone(log.id);
     Map<String, Object?>? sent;
     final again = FakeAdapter((o) async {
       sent = jsonDecode(jsonEncode(o.data)) as Map<String, Object?>; // as sent on the wire
-      return (200, ok({'acceptedLogs': 0, 'appliedStates': 0, 'states': []}));
+      return (200, ok({'acceptedLogs': 0, 'appliedStates': 0, 'pointsEarned': 0, 'states': []}));
     });
     await repoWith(again).push(store);
     expect(((sent!['logs']! as List).single as Map)['undone'], true);

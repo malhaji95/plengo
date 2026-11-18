@@ -10,6 +10,7 @@ SrsSyncResult _$SrsSyncResultFromJson(Map<String, dynamic> json) =>
     SrsSyncResult(
       acceptedLogs: (json['acceptedLogs'] as num).toInt(),
       appliedStates: (json['appliedStates'] as num).toInt(),
+      pointsEarned: (json['pointsEarned'] as num).toInt(),
       states: (json['states'] as List<dynamic>)
           .map((e) => SrsCardState.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -19,5 +20,6 @@ Map<String, dynamic> _$SrsSyncResultToJson(SrsSyncResult instance) =>
     <String, dynamic>{
       'acceptedLogs': instance.acceptedLogs,
       'appliedStates': instance.appliedStates,
+      'pointsEarned': instance.pointsEarned,
       'states': instance.states,
     };

@@ -3,9 +3,11 @@ import { appSettings, type Db } from '@plengo/db';
 import {
   accessSettingsSchema,
   learningSettingsSchema,
+  loyaltySettingsSchema,
   remoteConfigSchema,
   type AccessSettings,
   type LearningSettings,
+  type LoyaltySettings,
   type RemoteConfig,
 } from '@plengo/contracts';
 
@@ -29,6 +31,15 @@ export const DEFAULT_REMOTE_CONFIG: RemoteConfig = {
 const REMOTE_CONFIG_KEY = 'remote_config';
 const ACCESS_SETTINGS_KEY = 'access';
 const LEARNING_SETTINGS_KEY = 'learning';
+const LOYALTY_SETTINGS_KEY = 'loyalty';
+
+/** v3 §10: one point per reviewed card, at most 50 a day; correct answers earn nothing by default. */
+export const DEFAULT_LOYALTY_SETTINGS: LoyaltySettings = {
+  enabled: true,
+  pointsPerReview: 1,
+  dailyCap: 50,
+  pointsPerCorrectQuestion: 0,
+};
 /** The `defaultFreeLessons` value the free flags were last recomputed with (v3 §3). */
 const FREE_DEFAULTS_APPLIED_KEY = 'free_defaults_applied';
 
@@ -98,6 +109,16 @@ export function createConfigService(db: Db) {
 
     async setLearningSettings(value: LearningSettings, adminId: string | null) {
       await write(LEARNING_SETTINGS_KEY, value, adminId);
+      return value;
+    },
+
+    async getLoyaltySettings(): Promise<LoyaltySettings> {
+      const stored = ((await read(LOYALTY_SETTINGS_KEY)) ?? {}) as Partial<LoyaltySettings>;
+      return loyaltySettingsSchema.parse({ ...DEFAULT_LOYALTY_SETTINGS, ...stored });
+    },
+
+    async setLoyaltySettings(value: LoyaltySettings, adminId: string | null) {
+      await write(LOYALTY_SETTINGS_KEY, value, adminId);
       return value;
     },
 

@@ -133,7 +133,7 @@ export function createOfflineService(deps: {
       repo.quizzesInScope(subjectId, trackId),
     ]);
     const questions = questionRows.filter(ok);
-    const openDecks = decks.filter(ok);
+    const openDecks = decks.filter((d) => ok(d) || ctx.isDeckUnlocked(d.id));
     const cards = await repo.cardsOfDecks(openDecks.map((d) => d.id));
     const questionIds = new Set(questions.map((q) => q.id));
     const members = await repo.quizMembers(quizRows.map((q) => q.id));

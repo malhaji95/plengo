@@ -81,6 +81,8 @@ export function createSrsService(deps: {
   structureRepo: StructureRepository;
   teacherRepo: TeacherRepository;
   access: AccessService;
+  /** Loyalty (v3 §10): newly stored official card reviews, after the sync commits; returns points. */
+  onReviewsSynced?: (userId: string, logs: { id: string; reviewedAt: Date }[]) => Promise<number>;
   now?: () => Date;
 }) {
   const {
@@ -129,6 +131,7 @@ export function createSrsService(deps: {
 
       const result = await db.transaction(async (tx) => {
         let acceptedLogs = 0;
+        const newReviews: { id: string; reviewedAt: Date }[] = [];
         for (const log of body.logs) {
           const inserted = await repo.insertLog(tx, {
             id: log.id,
@@ -143,6 +146,8 @@ export function createSrsService(deps: {
             devicePlatform: platform,
           });
           if (inserted) acceptedLogs += 1;
+          if (inserted && !log.undone && log.flashcardId)
+            newReviews.push({ id: log.id, reviewedAt: new Date(log.reviewedAt) });
           // Each new rating counts toward the daily goal of its day (§19.4).
           if (inserted && !log.undone)
             await learningRepo.addDailyActivity(tx, userId, new Date(log.reviewedAt), 1);
@@ -180,7 +185,7 @@ export function createSrsService(deps: {
           if (
             deck &&
             reviewedAt.getTime() <= at.getTime() + 60_000 &&
-            (await access.canAccessItem(userId, deck))
+            (await access.canAccessDeck(userId, deck))
           ) {
             await learningRepo.touchProgress(tx, {
               userId,
@@ -194,11 +199,17 @@ export function createSrsService(deps: {
             });
           }
         }
-        return { acceptedLogs, appliedStates };
+        return { acceptedLogs, appliedStates, newReviews };
       });
+      const pointsEarned = (await deps.onReviewsSynced?.(userId, result.newReviews)) ?? 0;
 
       const states = await repo.statesFor(userId, ids, userCardIds);
-      return { ...result, states: states.map(toApi) };
+      return {
+        acceptedLogs: result.acceptedLogs,
+        appliedStates: result.appliedStates,
+        pointsEarned,
+        states: states.map(toApi),
+      };
     },
 
     /**
@@ -226,7 +237,7 @@ export function createSrsService(deps: {
         return visible.get(key)!;
       };
       const open = [];
-      for (const r of rows) if (ctx.canAccessItem(r.deck) && (await isVisible(r.deck))) open.push(r);
+      for (const r of rows) if (ctx.canAccessDeck(r.deck) && (await isVisible(r.deck))) open.push(r);
 
       const cardRows = new Map(
         (await flashcardRepo.cardsByIds(open.map((r) => r.state.flashcardId!))).map((c) => [c.id, c]),

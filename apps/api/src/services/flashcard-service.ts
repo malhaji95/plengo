@@ -547,13 +547,13 @@ export function createFlashcardService(deps: {
         }),
         access.context(userId),
       ]);
-      return toStudentDecks(decks, (d) => ctx.canAccessItem(d));
+      return toStudentDecks(decks, (d) => ctx.canAccessDeck(d));
     },
 
     async studentDeck(userId: string, id: string): Promise<StudentDeck> {
       const deck = await publishedDeck(id);
       const ctx = await access.context(userId);
-      return (await toStudentDecks([deck], (d) => ctx.canAccessItem(d)))[0]!;
+      return (await toStudentDecks([deck], (d) => ctx.canAccessDeck(d)))[0]!;
     },
 
     /**
@@ -564,7 +564,7 @@ export function createFlashcardService(deps: {
     async deckCards(userId: string, id: string) {
       const deck = await publishedDeck(id);
       const ctx = await access.context(userId);
-      const open = ctx.canAccessItem(deck);
+      const open = ctx.canAccessDeck(deck);
       const cards = await repo.listCards(id, { publishedOnly: true });
       return {
         deck: (await toStudentDecks([deck], () => open))[0]!,
@@ -598,7 +598,7 @@ export function createFlashcardService(deps: {
       ]);
       const views = await toStudentDecks(
         decks.filter((d) => d.cardCount > 0),
-        (d) => ctx.canAccessItem(d),
+        (d) => ctx.canAccessDeck(d),
       );
       const covers = new Map(
         subjectRows.map((s) => [s.id, publicImageUrl(storage, s.coverVariants, s.coverStatus)] as const),

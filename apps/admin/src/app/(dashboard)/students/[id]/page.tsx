@@ -6,6 +6,7 @@ import { useParams } from 'next/navigation';
 import { EntitlementTable } from '@/components/access/entitlement-table';
 import { GrantForm } from '@/components/access/grant-form';
 import { FormError } from '@/components/form-error';
+import { StudentLoyalty } from '@/components/loyalty/student-loyalty';
 import { Card } from '@/components/ui/card';
 import { formatDate } from '@/lib/access';
 import { api, unwrap } from '@/lib/api';
@@ -96,6 +97,7 @@ export default function StudentPage() {
         <h2 className="font-semibold">منح وصول جديد</h2>
         <GrantForm studentId={id} onGranted={detail.reload} />
       </Card>
+      <StudentLoyalty studentId={id} />
       <Card className="space-y-3">
         <h2 className="font-semibold">الجلسات النشطة</h2>
         <FormError message={sessions.error ?? error} />

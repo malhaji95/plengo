@@ -84,7 +84,7 @@ export function createUserContentService(deps: {
       if (c.deletedAt || c.status !== 'published') continue;
       if (!decks.has(c.deckId)) decks.set(c.deckId, await flashcardRepo.getDeck(c.deckId));
       const d = decks.get(c.deckId);
-      if (!d || d.status !== 'published' || !ctx.canAccessItem(d)) continue;
+      if (!d || d.status !== 'published' || !ctx.canAccessDeck(d)) continue;
       const key = `${d.subjectId}:${d.teacherTrackId}`;
       if (!visible.has(key)) {
         visible.set(

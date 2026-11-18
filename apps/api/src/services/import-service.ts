@@ -326,6 +326,11 @@ export function createImportService(deps: {
   }
 
   return {
+    /** Structure codes → ids, as the question import resolves them (diagram import reuses it, v3 §9). */
+    placements,
+    /** Header-indexed rows of a parsed CSV/XLSX table. */
+    rowsOf: toRaw,
+
     /** Stores the upload and queues parsing; the admin polls the job for the preview. */
     async create(
       actor: AdminActor,

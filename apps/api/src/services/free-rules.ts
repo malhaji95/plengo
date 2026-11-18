@@ -7,7 +7,7 @@ import type { FreeContentKind, FreeRuleType } from '@plengo/contracts';
  */
 
 export type ItemKind = Exclude<FreeContentKind, 'all'>;
-export const ITEM_KINDS: ItemKind[] = ['questions', 'flashcard_decks', 'quizzes'];
+export const ITEM_KINDS: ItemKind[] = ['questions', 'flashcard_decks', 'quizzes', 'diagrams'];
 
 export interface RuleSpec {
   ruleType: FreeRuleType;

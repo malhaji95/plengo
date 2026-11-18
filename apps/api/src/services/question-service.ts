@@ -73,6 +73,8 @@ export function createQuestionService(deps: {
   inOpenExam?: (userId: string, questionId: string) => Promise<boolean>;
   /** A graded check counts toward the daily goal (§19.4). */
   onGraded?: (userId: string) => Promise<void>;
+  /** A correct check may earn loyalty points (v3 §10). */
+  onCorrect?: (userId: string, questionId: string) => Promise<unknown>;
   /** Publishing, unpublishing or deleting a question changes the quizzes that contain it. */
   onVisibilityChange?: (questionId: string) => Promise<void>;
   now?: () => Date;
@@ -539,6 +541,7 @@ export function createQuestionService(deps: {
       }
       const result = grade(q, input);
       await deps.onGraded?.(userId);
+      if (result.isCorrect) await deps.onCorrect?.(userId, id);
       return result;
     },
   };

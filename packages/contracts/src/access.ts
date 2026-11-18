@@ -263,7 +263,7 @@ export const updatePromotionBodySchema = z.object({
   isActive: z.boolean().optional(),
 });
 
-export const freeContentKindSchema = z.enum(['questions', 'flashcard_decks', 'quizzes', 'all']);
+export const freeContentKindSchema = z.enum(['questions', 'flashcard_decks', 'quizzes', 'all', 'diagrams']);
 export const freeRuleTypeSchema = z.enum([
   'manual',
   'first_n_items',

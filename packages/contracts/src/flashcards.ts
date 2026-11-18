@@ -155,6 +155,8 @@ export const srsSyncBodySchema = z.object({
 export const srsSyncResultSchema = z.object({
   acceptedLogs: int(),
   appliedStates: int(),
+  /** Loyalty points this sync earned (v3 §10): new official card reviews, within the daily cap. */
+  pointsEarned: int(),
   /** What the server now holds for every card in the request (last review wins, §13.8). */
   states: z.array(srsCardStateSchema),
 });

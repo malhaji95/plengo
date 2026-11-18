@@ -36,6 +36,8 @@ export const freeContentKindEnum = pgEnum('free_content_kind', [
   'flashcard_decks',
   'quizzes',
   'all',
+  /** v3 §9: «رسمات العلوم». Added last so existing enum positions stay. */
+  'diagrams',
 ]);
 export const freeRuleTypeEnum = pgEnum('free_rule_type', [
   'manual',
@@ -125,4 +127,19 @@ export const importStatusEnum = pgEnum('import_status', [
   'failed',
   'importing',
   'completed',
+]);
+
+/* Loyalty (v3 §10). */
+export const loyaltyReasonEnum = pgEnum('loyalty_reason', [
+  'review',
+  'correct_answer',
+  'redemption',
+  'refund',
+  'admin_adjust',
+]);
+export const loyaltyRewardKindEnum = pgEnum('loyalty_reward_kind', ['unlock_deck', 'custom']);
+export const loyaltyRedemptionStatusEnum = pgEnum('loyalty_redemption_status', [
+  'pending',
+  'fulfilled',
+  'cancelled',
 ]);

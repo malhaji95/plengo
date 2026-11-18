@@ -256,7 +256,7 @@ export function createLearningService(deps: {
         const d = decks.get(b.itemType === 'deck' ? b.itemId : (card?.deckId ?? ''));
         const cardLive = b.itemType === 'deck' || (card && !card.deletedAt && card.status === 'published');
         if (d && d.status === 'published' && cardLive && (await isVisible(d.subjectId, d.teacherTrackId))) {
-          const locked = !ctx.canAccessItem(d);
+          const locked = !ctx.canAccessDeck(d);
           Object.assign(base, {
             available: true,
             locked,
@@ -466,7 +466,7 @@ export function createLearningService(deps: {
           ).locked,
       );
       const cs = cRows
-        .filter((c) => ctx.canAccessItem(c.deck))
+        .filter((c) => ctx.canAccessDeck(c.deck))
         .map((c) => ({ id: c.id, unitId: c.deck.unitId, lessonId: c.deck.lessonId }));
 
       const [answered, submitted, studied] = await Promise.all([

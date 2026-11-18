@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { FormError } from '@/components/form-error';
+import { LoyaltySettingsCard } from '@/components/loyalty/settings-card';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input, Label } from '@/components/ui/input';
@@ -257,6 +258,7 @@ export default function SettingsPage() {
           </Button>
         </div>
       </Card>
+      <LoyaltySettingsCard />
     </div>
   );
 }

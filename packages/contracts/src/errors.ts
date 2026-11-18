@@ -17,6 +17,7 @@ export const ERROR_MESSAGES = {
   CONTENT_LOCKED: 'هذا المحتوى غير متاح على حسابك',
   ATTEMPT_ALREADY_SUBMITTED: 'تم تسليم هذا الاختبار مسبقاً',
   QUOTA_EXCEEDED: 'وصلت إلى الحد الأقصى المسموح',
+  INSUFFICIENT_POINTS: 'نقاطك غير كافية لهذه المكافأة',
   RATE_LIMITED: 'محاولات كثيرة، حاول لاحقاً',
   VALIDATION_ERROR: 'البيانات المدخلة غير صحيحة',
   NOT_FOUND: 'العنصر غير موجود',
