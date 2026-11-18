@@ -328,6 +328,7 @@ void main() {
       createdAt: '2026-09-20T00:00:00Z',
       locked: false,
       available: true,
+      group: null,
       titleAr: title,
       subjectId: subjectId,
       subjectNameAr: subjectId == 'p' ? 'الفيزياء' : 'الرياضيات',
