@@ -103,7 +103,7 @@ void main() {
   );
 
   group('Home', () {
-    testWidgets('order follows homeOrderV2; the mistakes row shows only with mistakes', (tester) async {
+    testWidgets('order follows homeOrderV2; the hard-cards row replaces the mistakes row', (tester) async {
       useSize(tester, const Size(390, 2400));
       await pumpApp(
         tester,
@@ -124,8 +124,9 @@ void main() {
         for (var i = 1; i < order.length; i++) {
           expect(order[i - 1], lessThan(order[i]), reason: 'section $i is out of order');
         }
-        // The mistakes row sits inside the Today card, before the countdown.
-        expect(top('6 أسئلة في بنك الأخطاء'), inExclusiveRange(today, countdown));
+        // v3: the hard-cards row sits inside the Today card, before the countdown; no mistakes row.
+        expect(top('مراجعة البطاقات الصعبة'), inExclusiveRange(today, countdown));
+        expect(find.textContaining('في بنك الأخطاء'), findsNothing);
       } else {
         expect(countdown, lessThan(banners));
         expect(banners, lessThan(today));
@@ -134,15 +135,25 @@ void main() {
       }
     });
 
-    testWidgets('no mistakes: no mistakes row', (tester) async {
+    testWidgets('no mistakes row; hard cards open the saved cards and due cards open موادي', (tester) async {
       useSize(tester, const Size(390, 2400));
-      await pumpApp(
+      final app = await pumpApp(
         tester,
         signedInAs: testMe,
         arrangeHome: (h) => when(() => h.home()).thenAnswer((_) async => fullHome(mistakes: 0)),
       );
       expect(find.textContaining('في بنك الأخطاء'), findsNothing);
       expect(find.text('مراجعة الأخطاء'), findsNothing);
+      final router = app.container.read(routerProvider);
+      await tester.tap(find.text('مراجعة البطاقات الصعبة'));
+      await tester.pumpAndSettle();
+      expect(router.routeInformationProvider.value.uri.toString(), '/saved?filter=cards');
+
+      router.go(Routes.home);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('مراجعة البطاقات المستحقة (12)'));
+      await tester.pumpAndSettle();
+      expect(router.routeInformationProvider.value.uri.path, Routes.mySubjects);
     });
 
     testWidgets('Continue shows the lesson progress and resumes; cards show rings and unit progress', (tester) async {

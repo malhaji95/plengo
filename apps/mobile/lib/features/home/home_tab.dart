@@ -10,18 +10,23 @@ import '../../core/api/api_exception.dart';
 import '../../core/api/generated/export.dart';
 import '../../shared/text/bidi.dart';
 import '../../shared/ui/ui.dart';
+import '../shell/app_drawer.dart';
 import '../../shared/widgets/async_view.dart';
 import '../../shared/widgets/network_avatar.dart';
 import '../../shared/widgets/responsive.dart';
 import '../access/access_format.dart';
 import '../learning/scope_learning.dart' show progressProvider;
 import '../offline/offline_providers.dart';
+import '../flashcards/hard_cards.dart';
+import 'auto_advance.dart';
 import 'home_providers.dart';
+import '../my_subjects/my_subjects_providers.dart' show nextLessonsProvider;
+import 'next_lesson_carousel.dart';
 import 'notification_screens.dart';
 
-/// Home (spec §19.1, V-Home): greeting and bell, Continue hero, today's work with goal and streak,
-/// mistakes shortcut, exam countdown, banners, my subjects and tracks, free content and followed
-/// teachers. [RedesignFlags.homeOrderV2] picks the order. Offline it falls back to what works without
+/// Home (spec §19.1, V-Home, v3 §2): ☰ menu, greeting and bell, the Continue hero (latest item only),
+/// «راجع الدرس التالي:», today's work with goal, streak and the hard-cards shortcut, exam countdown,
+/// auto-rotating banners, my subjects and tracks, free content and followed teachers. [RedesignFlags.homeOrderV2] picks the order. Offline it falls back to what works without
 /// a connection (V-Offline); while loading it shows a skeleton of the layout (V-Loading).
 class HomeTab extends ConsumerWidget {
   const HomeTab({super.key});
@@ -36,8 +41,10 @@ class HomeTab extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 76,
-        titleSpacing: PlengoSpace.screen,
+        titleSpacing: DrawerMenuButton.leadingOf(context) == null ? PlengoSpace.screen : 4,
         automaticallyImplyLeading: false,
+        leading: DrawerMenuButton.leadingOf(context),
+        leadingWidth: kPlengoLeadingWidth,
         title: Row(
           children: [
             NetworkAvatar(url: me?.avatarUrl, name: name ?? '', radius: 23),
@@ -111,10 +118,11 @@ class _HomeBody extends ConsumerWidget {
     final h = home;
     final v2 = RedesignFlags.homeOrderV2;
     final countdown = h.countdown == null ? null : _CountdownCard(countdown: h.countdown!);
-    final banners = h.banners.isEmpty ? null : _BannerSlider(banners: h.banners);
-    final today = _TodayCard(today: h.today, mistakes: v2 ? h.activeMistakes : 0);
-    final mistakes = !v2 && h.activeMistakes > 0 ? _MistakesRow(count: h.activeMistakes) : null;
+    final banners = h.banners.isEmpty ? null : BannerSlider(banners: h.banners);
+    final today = _TodayCard(today: h.today);
     final cont = _ContinueSection(resume: h.resume, showHeader: !v2);
+    // Hides itself while loading or when there is no next lesson.
+    const next = NextLessonCarousel();
     final subjects = h.myAccess.isEmpty ? null : _MySubjects(access: h.myAccess);
     final free = h.freeSubjects.isEmpty ? null : _FreeContent(items: h.freeSubjects);
     final teachers = h.followedTeachers.isEmpty ? null : _FollowedTeachers(teachers: h.followedTeachers);
@@ -124,7 +132,7 @@ class _HomeBody extends ConsumerWidget {
         final wide = v2 && box.maxWidth - _listPadding.horizontal >= _sideBySideWidth;
         final sections = <Widget?>[
           if (v2) ...[
-            if (wide)
+            if (wide) ...[
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -132,9 +140,11 @@ class _HomeBody extends ConsumerWidget {
                   const SizedBox(width: PlengoSpace.section),
                   Expanded(child: today),
                 ],
-              )
-            else ...[
+              ),
+              next,
+            ] else ...[
               cont,
+              next,
               today,
             ],
             countdown,
@@ -146,18 +156,26 @@ class _HomeBody extends ConsumerWidget {
             countdown,
             banners,
             today,
-            mistakes,
             cont,
+            next,
             subjects,
             free,
             teachers,
           ],
         ];
         final shown = sections.whereType<Widget>().toList();
+        // The carousel brings no gap of its own while it is empty.
+        Widget gapBefore(Widget w) => w is NextLessonCarousel
+            ? Consumer(
+                builder: (context, ref, _) => (ref.watch(nextLessonsProvider).value ?? const []).isEmpty
+                    ? const SizedBox.shrink()
+                    : const SizedBox(height: PlengoSpace.section),
+              )
+            : const SizedBox(height: PlengoSpace.section);
         return ListView(
           padding: _listPadding,
           children: [
-            for (final (i, w) in shown.indexed) ...[if (i > 0) const SizedBox(height: PlengoSpace.section), w],
+            for (final (i, w) in shown.indexed) ...[if (i > 0) gapBefore(w), w],
           ],
         );
       },
@@ -206,8 +224,8 @@ String _resumeSubtitle(ResumeItem r) {
   return '${_resumeKind(r).action} · ${where.join(' · ')}';
 }
 
-/// The blue Continue hero for the latest resume item (or a start-here hero), and any older resume
-/// items as rows under it.
+/// The blue Continue hero for the latest resume item only (v3 §2: no older rows under it), or a
+/// start-here hero.
 class _ContinueSection extends StatelessWidget {
   const _ContinueSection({required this.resume, required this.showHeader});
 
@@ -224,7 +242,6 @@ class _ContinueSection extends StatelessWidget {
       children: [
         if (showHeader) const SectionHeader('متابعة التعلم', top: 0),
         if (resume.isEmpty) const _StartHero() else _ContinueHero(item: resume.first),
-        for (final r in resume.skip(1)) ...[const SizedBox(height: PlengoSpace.listGap), ResumeTile(item: r)],
       ],
     );
   }
@@ -354,13 +371,12 @@ class ResumeTile extends StatelessWidget {
 // ---------------------------------------------------------------------------------------------------
 // Today
 
+/// Today (v3 §2): the daily goal ring, the due cards (opening موادي) and «مراجعة البطاقات الصعبة»
+/// (opening the saved cards) instead of the mistakes row.
 class _TodayCard extends ConsumerWidget {
-  const _TodayCard({required this.today, required this.mistakes});
+  const _TodayCard({required this.today});
 
   final Today today;
-
-  /// Active mistakes shown as the red-soft row inside the card (0: no row).
-  final int mistakes;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -443,7 +459,7 @@ class _TodayCard extends ConsumerWidget {
             PlengoButton(
               label: 'مراجعة البطاقات المستحقة (${t.dueCards})',
               icon: Icons.style_outlined,
-              onPressed: () => context.push(Routes.dueStudy),
+              onPressed: () => context.go(Routes.mySubjects),
             )
           else
             Row(
@@ -455,27 +471,30 @@ class _TodayCard extends ConsumerWidget {
                 ),
               ],
             ),
-          if (mistakes > 0) ...[const SizedBox(height: PlengoSpace.listGap), _MistakesRow(count: mistakes)],
+          const SizedBox(height: PlengoSpace.listGap),
+          const HardCardsRow(),
         ],
       ),
     );
   }
 }
 
-/// The red-soft shortcut to the mistakes bank (only when it is not empty).
-class _MistakesRow extends StatelessWidget {
-  const _MistakesRow({required this.count});
-
-  final int count;
+/// «مراجعة البطاقات الصعبة» (v3 §2, §8): opens the saved cards, hard ones first and marked «صعبة».
+class HardCardsRow extends ConsumerWidget {
+  const HardCardsRow({super.key});
 
   @override
-  Widget build(BuildContext context) => ListRow(
-    background: PlengoColors.red.soft,
-    leading: const SubjectIconTile(icon: Icons.replay_rounded, hue: PlengoColors.red, size: 36),
-    title: 'مراجعة الأخطاء',
-    caption: '${countedQuestions(count)} في بنك الأخطاء',
-    onTap: () => context.go(Routes.mistakes),
-  );
+  Widget build(BuildContext context, WidgetRef ref) {
+    final hard = ref.watch(hardCardsProvider).value?.length ?? 0;
+    return ListRow(
+      key: const Key('home.hardCards'),
+      background: PlengoColors.orange.soft,
+      leading: const SubjectIconTile(icon: Icons.local_fire_department_rounded, hue: PlengoColors.orange, size: 36),
+      title: 'مراجعة البطاقات الصعبة',
+      caption: hard > 0 ? '$hard من البطاقات تحتاج تركيزاً' : 'البطاقات التي تجدها صعبة والمحفوظة',
+      onTap: () => context.go(Uri(path: Routes.saved, queryParameters: {'filter': 'cards'}).toString()),
+    );
+  }
 }
 
 // ---------------------------------------------------------------------------------------------------
@@ -516,17 +535,54 @@ class _CountdownCard extends StatelessWidget {
   }
 }
 
-class _BannerSlider extends ConsumerStatefulWidget {
-  const _BannerSlider({required this.banners});
+/// The Home banners (v3 §2): swipe, dots, and they rotate by themselves every [interval] (paused while
+/// touched; never with reduced motion).
+class BannerSlider extends ConsumerStatefulWidget {
+  const BannerSlider({super.key, required this.banners});
 
   final List<HomeBanner> banners;
 
+  static const interval = Duration(seconds: 5);
+
   @override
-  ConsumerState<_BannerSlider> createState() => _BannerSliderState();
+  ConsumerState<BannerSlider> createState() => BannerSliderState();
 }
 
-class _BannerSliderState extends ConsumerState<_BannerSlider> {
+class BannerSliderState extends ConsumerState<BannerSlider> with AutoAdvance {
   int _page = 0;
+
+  @override
+  final pager = PageController();
+
+  @override
+  int get pageCount => widget.banners.length;
+
+  @override
+  Duration get autoAdvanceInterval => BannerSlider.interval;
+
+  /// The banner shown.
+  int get page => _page;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    syncAutoAdvance();
+  }
+
+  @override
+  void didUpdateWidget(BannerSlider oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.banners.length != widget.banners.length) {
+      if (_page >= widget.banners.length) _page = 0;
+      syncAutoAdvance();
+    }
+  }
+
+  @override
+  void dispose() {
+    pager.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -541,58 +597,47 @@ class _BannerSliderState extends ConsumerState<_BannerSlider> {
       children: [
         AspectRatio(
           aspectRatio: ratio.clamp(1.2, 3.5),
-          child: PageView.builder(
-            itemCount: banners.length,
-            onPageChanged: (i) => setState(() => _page = i),
-            itemBuilder: (context, i) {
-              final b = banners[i];
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 2),
-                child: Semantics(
-                  label: b.titleAr,
-                  button: b.action != BannerAction.none,
-                  child: ClipRRect(
-                    borderRadius: radius,
-                    child: ColoredBox(
-                      color: PlengoColors.pink.soft,
-                      child: Material(
-                        type: MaterialType.transparency,
-                        child: InkWell(
-                          onTap: b.action == BannerAction.none
-                              ? null
-                              : () => openAction(context, ref, b.action, b.actionTarget),
-                          child: image(context, b),
+          child: holdOnTouch(
+            PageView.builder(
+              controller: pager,
+              itemCount: banners.length,
+              onPageChanged: (i) => setState(() => _page = i),
+              itemBuilder: (context, i) {
+                final b = banners[i];
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 2),
+                  child: Semantics(
+                    label: b.titleAr,
+                    button: b.action != BannerAction.none,
+                    child: ClipRRect(
+                      borderRadius: radius,
+                      child: ColoredBox(
+                        color: PlengoColors.pink.soft,
+                        child: Material(
+                          type: MaterialType.transparency,
+                          child: InkWell(
+                            onTap: b.action == BannerAction.none
+                                ? null
+                                : () => openAction(context, ref, b.action, b.actionTarget),
+                            child: image(context, b),
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ),
         if (banners.length > 1)
           Padding(
             padding: const EdgeInsetsDirectional.only(top: 8),
-            child: Semantics(
+            child: PageDots(
+              count: banners.length,
+              index: _page,
               label: 'البانر ${_page + 1} من ${banners.length}',
-              excludeSemantics: true,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  for (var i = 0; i < banners.length; i++)
-                    AnimatedContainer(
-                      duration: PlengoMotion.of(context, PlengoMotion.press),
-                      width: i == _page ? 20 : 8,
-                      height: 8,
-                      margin: const EdgeInsets.symmetric(horizontal: 3),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
-                        color: i == _page ? s.action : s.line,
-                      ),
-                    ),
-                ],
-              ),
+              active: s.action,
             ),
           ),
       ],
