@@ -113,6 +113,20 @@
       "when": 1794254856155,
       "tag": "0015_review_reminder",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1794951649929,
+      "tag": "0016_v3_categories_cards",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1794951663594,
+      "tag": "0017_default_question_categories",
+      "breakpoints": true
     }
   ]
 }

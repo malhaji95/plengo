@@ -22,6 +22,8 @@ export const userDecks = pgTable(
     name: text('name').notNull(),
     subjectId: uuid('subject_id').references(() => subjects.id, { onDelete: 'set null' }),
     color: text('color'),
+    /** The card frame the deck renders on (v3 §7), e.g. `physics`, `medical`, `grid`, `stars`. */
+    templateKey: text('template_key'),
     sortOrder: integer('sort_order').notNull().default(0),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull(),

@@ -1,5 +1,6 @@
 import { sql } from 'drizzle-orm';
 import {
+  type AnyPgColumn,
   boolean,
   check,
   foreignKey,
@@ -25,6 +26,38 @@ import { lessons, subjects, units } from './structure.js';
 import { teacherTracks } from './teachers.js';
 
 /*
+ * Question categories (v3 §3, §5): «علل», «قارن», «عرّف»… A category with no subject is global and
+ * usable in every subject; a subject's own categories add to the global ones. `parent_id` groups
+ * children under a parent (one level is what the admin offers; deeper levels are not forbidden).
+ * `code` is the stable reference used by bulk import; unique among live rows of the same subject
+ * (or among the live global ones).
+ */
+export const questionCategories = pgTable(
+  'question_categories',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    subjectId: uuid('subject_id').references(() => subjects.id),
+    parentId: uuid('parent_id').references((): AnyPgColumn => questionCategories.id),
+    code: text('code').notNull(),
+    nameAr: text('name_ar').notNull(),
+    sortOrder: integer('sort_order').notNull().default(0),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+    deletedAt: timestamp('deleted_at', { withTimezone: true }),
+  },
+  (t) => [
+    uniqueIndex('question_categories_subject_code_live_idx')
+      .on(t.subjectId, t.code)
+      .where(sql`deleted_at is null and subject_id is not null`),
+    uniqueIndex('question_categories_global_code_live_idx')
+      .on(t.code)
+      .where(sql`deleted_at is null and subject_id is null`),
+    index('question_categories_parent_idx').on(t.parentId),
+    check('question_categories_not_own_parent_ck', sql`${t.parentId} is null or ${t.parentId} <> ${t.id}`),
+  ],
+);
+
+/*
  * Questions (spec §14). A question belongs to a subject and optionally to one teacher track, unit and
  * lesson; composite keys keep all of them inside the same subject (§6.1, §7.3). Its access scope is
  * the track when set, otherwise the subject's general content (§8.1).
@@ -41,6 +74,8 @@ export const questions = pgTable(
     teacherTrackId: uuid('teacher_track_id'),
     unitId: uuid('unit_id'),
     lessonId: uuid('lesson_id'),
+    /** Optional question category (v3 §3); global or of the question's subject. */
+    categoryId: uuid('category_id').references(() => questionCategories.id),
     questionText: text('question_text').notNull(),
     explanation: text('explanation'),
     difficulty: difficultyEnum('difficulty'),
@@ -77,6 +112,7 @@ export const questions = pgTable(
     index('questions_scope_status_sort_idx').on(t.subjectId, t.teacherTrackId, t.status, t.sortOrder),
     index('questions_unit_idx').on(t.unitId),
     index('questions_lesson_idx').on(t.lessonId),
+    index('questions_category_idx').on(t.categoryId),
   ],
 );
 
@@ -170,7 +206,10 @@ export const flashcardDecks = pgTable(
   ],
 );
 
-/** Official cards: a front image and a back image (§13.1). */
+/**
+ * Official cards: a front image and a back image (§13.1). A single-face card (v3 §6) has no back: a
+ * ready-made card shown without flipping.
+ */
 export const flashcards = pgTable(
   'flashcards',
   {
@@ -181,9 +220,7 @@ export const flashcards = pgTable(
     frontMediaId: uuid('front_media_id')
       .notNull()
       .references(() => mediaFiles.id),
-    backMediaId: uuid('back_media_id')
-      .notNull()
-      .references(() => mediaFiles.id),
+    backMediaId: uuid('back_media_id').references(() => mediaFiles.id),
     sortOrder: integer('sort_order').notNull().default(0),
     status: contentStatusEnum('status').notNull().default('published'),
     /** Bumped when the card's images, order or status change (§22.3). */

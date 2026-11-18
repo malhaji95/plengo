@@ -36,8 +36,14 @@ export type AttemptFilters = {
   teacherTrackId?: string | null;
   unitId?: string | null;
   lessonId?: string | null;
+  /** Practice setup (v3 §5): several lessons of the subject. */
+  lessonIds?: string[];
+  /** Question categories; a parent includes its children. */
+  categoryIds?: string[];
   types?: ('mcq' | 'true_false' | 'written')[];
   count?: number;
+  /** «جميع الأسئلة»: every matching accessible question, capped by the server. */
+  allQuestions?: boolean;
   questionIds?: string[];
 };
 
@@ -103,6 +109,11 @@ export const quizAttemptAnswers = pgTable(
     selectedOptionId: uuid('selected_option_id'),
     writtenAnswer: text('written_answer'),
     isCorrect: boolean('is_correct'),
+    /**
+     * Practice only (v3 §5): the student marked a wrong written answer as correct («إجابتي صحيحة لكن
+     * بصياغة مختلفة»); `is_correct` is then true.
+     */
+    markedCorrectByStudent: boolean('marked_correct_by_student').notNull().default(false),
     gradedAt: timestamp('graded_at', { withTimezone: true }),
     flagged: boolean('flagged').notNull().default(false),
     answeredAt: timestamp('answered_at', { withTimezone: true }),
