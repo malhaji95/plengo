@@ -74,6 +74,7 @@ void main() {
     teacherTrackId: null,
     unitId: null,
     lessonId: null,
+    categoryId: null,
     sortOrder: 0,
     difficulty: null,
     isFree: true,

@@ -14,6 +14,8 @@ class DeckCards {
   const DeckCards({
     required this.deck,
     required this.cards,
+    required this.previewOnly,
+    required this.previewLimit,
     required this.urlsExpireAt,
   });
   
@@ -21,6 +23,9 @@ class DeckCards {
   
   final StudentDeck deck;
   final List<StudentCard> cards;
+  final bool previewOnly;
+  @JsonKey(includeIfNull: true)
+  final int? previewLimit;
   final String urlsExpireAt;
 
   Map<String, Object?> toJson() => _$DeckCardsToJson(this);

@@ -20,6 +20,7 @@ class OfflineQuestion {
     required this.teacherTrackId,
     required this.unitId,
     required this.lessonId,
+    required this.categoryId,
     required this.sortOrder,
     required this.difficulty,
     required this.isFree,
@@ -40,6 +41,8 @@ class OfflineQuestion {
   final String? unitId;
   @JsonKey(includeIfNull: true)
   final String? lessonId;
+  @JsonKey(includeIfNull: true)
+  final String? categoryId;
   final int sortOrder;
   @JsonKey(includeIfNull: true)
   final OfflineQuestionDifficulty? difficulty;

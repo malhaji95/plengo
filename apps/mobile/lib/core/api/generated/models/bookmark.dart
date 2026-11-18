@@ -4,6 +4,7 @@
 
 import 'package:json_annotation/json_annotation.dart';
 
+import 'bookmark_group.dart';
 import 'bookmark_item_type.dart';
 import 'student_card.dart';
 import 'student_deck.dart';
@@ -28,6 +29,7 @@ class Bookmark {
     required this.deck,
     required this.card,
     required this.userCard,
+    required this.group,
   });
   
   factory Bookmark.fromJson(Map<String, Object?> json) => _$BookmarkFromJson(json);
@@ -52,6 +54,8 @@ class Bookmark {
   final StudentCard? card;
   @JsonKey(includeIfNull: true)
   final UserCard? userCard;
+  @JsonKey(includeIfNull: true)
+  final BookmarkGroup? group;
 
   Map<String, Object?> toJson() => _$BookmarkToJson(this);
 }

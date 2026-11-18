@@ -14,6 +14,7 @@ OfflineQuestion _$OfflineQuestionFromJson(Map<String, dynamic> json) =>
       teacherTrackId: json['teacherTrackId'] as String?,
       unitId: json['unitId'] as String?,
       lessonId: json['lessonId'] as String?,
+      categoryId: json['categoryId'] as String?,
       sortOrder: (json['sortOrder'] as num).toInt(),
       difficulty: $enumDecodeNullable(
         _$OfflineQuestionDifficultyEnumMap,
@@ -38,6 +39,7 @@ Map<String, dynamic> _$OfflineQuestionToJson(OfflineQuestion instance) =>
       'teacherTrackId': instance.teacherTrackId,
       'unitId': instance.unitId,
       'lessonId': instance.lessonId,
+      'categoryId': instance.categoryId,
       'sortOrder': instance.sortOrder,
       'difficulty': instance.difficulty,
       'isFree': instance.isFree,

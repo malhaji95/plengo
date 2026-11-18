@@ -28,6 +28,9 @@ Bookmark _$BookmarkFromJson(Map<String, dynamic> json) => Bookmark(
   userCard: json['userCard'] == null
       ? null
       : UserCard.fromJson(json['userCard'] as Map<String, dynamic>),
+  group: json['group'] == null
+      ? null
+      : BookmarkGroup.fromJson(json['group'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$BookmarkToJson(Bookmark instance) => <String, dynamic>{
@@ -44,6 +47,7 @@ Map<String, dynamic> _$BookmarkToJson(Bookmark instance) => <String, dynamic>{
   'deck': instance.deck,
   'card': instance.card,
   'userCard': instance.userCard,
+  'group': instance.group,
 };
 
 const _$BookmarkItemTypeEnumMap = {

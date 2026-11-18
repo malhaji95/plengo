@@ -15,8 +15,11 @@ class AttemptFilters {
     this.teacherTrackId,
     this.unitId,
     this.lessonId,
+    this.lessonIds,
+    this.categoryIds,
     this.types,
     this.count,
+    this.allQuestions,
     this.questionIds,
   });
   
@@ -31,9 +34,15 @@ class AttemptFilters {
   @JsonKey(includeIfNull: false)
   final String? lessonId;
   @JsonKey(includeIfNull: false)
+  final List<String>? lessonIds;
+  @JsonKey(includeIfNull: false)
+  final List<String>? categoryIds;
+  @JsonKey(includeIfNull: false)
   final List<AttemptFiltersTypes>? types;
   @JsonKey(includeIfNull: false)
   final int? count;
+  @JsonKey(includeIfNull: false)
+  final bool? allQuestions;
   @JsonKey(includeIfNull: false)
   final List<String>? questionIds;
 

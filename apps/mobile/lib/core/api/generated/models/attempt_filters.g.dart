@@ -12,10 +12,17 @@ AttemptFilters _$AttemptFiltersFromJson(Map<String, dynamic> json) =>
       teacherTrackId: json['teacherTrackId'] as String?,
       unitId: json['unitId'] as String?,
       lessonId: json['lessonId'] as String?,
+      lessonIds: (json['lessonIds'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList(),
+      categoryIds: (json['categoryIds'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList(),
       types: (json['types'] as List<dynamic>?)
           ?.map((e) => $enumDecode(_$AttemptFiltersTypesEnumMap, e))
           .toList(),
       count: (json['count'] as num?)?.toInt(),
+      allQuestions: json['allQuestions'] as bool?,
       questionIds: (json['questionIds'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
@@ -27,8 +34,11 @@ Map<String, dynamic> _$AttemptFiltersToJson(AttemptFilters instance) =>
       'teacherTrackId': ?instance.teacherTrackId,
       'unitId': ?instance.unitId,
       'lessonId': ?instance.lessonId,
+      'lessonIds': ?instance.lessonIds,
+      'categoryIds': ?instance.categoryIds,
       'types': ?instance.types,
       'count': ?instance.count,
+      'allQuestions': ?instance.allQuestions,
       'questionIds': ?instance.questionIds,
     };
 

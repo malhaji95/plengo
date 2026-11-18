@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 
 import '../models/deck_cards_envelope.dart';
+import '../models/plengo_deck_list_envelope.dart';
 import '../models/student_deck_envelope.dart';
 import '../models/student_deck_list_envelope.dart';
 
@@ -21,6 +22,13 @@ abstract class FlashcardsClient {
     @Query('teacherTrackId') String? teacherTrackId,
     @Query('unitId') String? unitId,
     @Query('lessonId') String? lessonId,
+  });
+
+  /// «فلاش كاردز بلينغو» (v3 §6): published general decks of the level (the student's own by default), grouped by subject, with cover (product image), card count and locked/free.
+  @GET('/api/v1/decks/plengo')
+  Future<PlengoDeckListEnvelope> listPlengoDecks({
+    @Query('subjectId') String? subjectId,
+    @Query('educationLevelId') String? educationLevelId,
   });
 
   @GET('/api/v1/decks/{id}')

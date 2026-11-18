@@ -13,6 +13,7 @@ class UserDeck {
     required this.name,
     required this.subjectId,
     required this.color,
+    required this.templateKey,
     required this.sortOrder,
     required this.cardCount,
     required this.createdAt,
@@ -28,6 +29,8 @@ class UserDeck {
   final String? subjectId;
   @JsonKey(includeIfNull: true)
   final String? color;
+  @JsonKey(includeIfNull: true)
+  final String? templateKey;
   final int sortOrder;
   final int cardCount;
   final String createdAt;

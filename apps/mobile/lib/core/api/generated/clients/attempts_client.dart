@@ -10,6 +10,7 @@ import '../models/attempt_status.dart';
 import '../models/attempt_summary_page_envelope.dart';
 import '../models/check_attempt_answer_request.dart';
 import '../models/check_result_envelope.dart';
+import '../models/mark_answer_correct_result_envelope.dart';
 import '../models/save_answer_request.dart';
 import '../models/saved_answer_envelope.dart';
 import '../models/start_attempt_request.dart';
@@ -51,6 +52,13 @@ abstract class AttemptsClient {
     @Path('id') required String id,
     @Path('questionId') required String questionId,
     @Body() required CheckAttemptAnswerRequest body,
+  });
+
+  /// «إجابتي صحيحة لكن بصياغة مختلفة» (v3 §5): practice attempts only, for a graded written answer. Counts it as correct and updates the score, mistakes and statistics. Idempotent.
+  @POST('/api/v1/attempts/{id}/answers/{questionId}/mark-correct')
+  Future<MarkAnswerCorrectResultEnvelope> markAttemptAnswerCorrect({
+    @Path('id') required String id,
+    @Path('questionId') required String questionId,
   });
 
   @POST('/api/v1/attempts/{id}/submit')

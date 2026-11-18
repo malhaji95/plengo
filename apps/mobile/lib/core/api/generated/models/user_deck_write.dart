@@ -16,6 +16,7 @@ class UserDeckWrite {
     required this.updatedAt,
     this.subjectId,
     this.color,
+    this.templateKey,
     this.deletedAt,
   });
   
@@ -27,6 +28,8 @@ class UserDeckWrite {
   final String? subjectId;
   @JsonKey(includeIfNull: false)
   final String? color;
+  @JsonKey(includeIfNull: false)
+  final String? templateKey;
   final int sortOrder;
   final DateTime createdAt;
   final DateTime updatedAt;

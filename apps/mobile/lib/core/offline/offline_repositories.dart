@@ -46,6 +46,7 @@ class OfflineQuestionRepository extends QuestionRepository {
               teacherTrackId: pq.question.teacherTrackId,
               unitId: pq.question.unitId,
               lessonId: pq.question.lessonId,
+              categoryId: pq.question.categoryId,
               sortOrder: pq.question.sortOrder,
               difficulty: pq.question.difficulty == null
                   ? null
@@ -102,7 +103,7 @@ class OfflineFlashcardRepository extends FlashcardRepository {
     sortOrder: c.sortOrder,
     contentVersion: 0,
     front: _image(c.front),
-    back: _image(c.back),
+    back: c.back == null ? null : _image(c.back!),
   );
 
   @override
@@ -124,7 +125,13 @@ class OfflineFlashcardRepository extends FlashcardRepository {
       final deck = _offline(e) ? await content.deck(id) : null;
       final cards = deck == null ? null : await content.cards(id);
       if (deck == null || cards == null) rethrow;
-      return DeckCards(deck: _deck(deck), cards: [for (final c in cards) officialCard(c)], urlsExpireAt: '');
+      return DeckCards(
+        deck: _deck(deck),
+        cards: [for (final c in cards) officialCard(c)],
+        previewOnly: false,
+        previewLimit: null,
+        urlsExpireAt: '',
+      );
     }
   }
 
@@ -138,7 +145,10 @@ class OfflineFlashcardRepository extends FlashcardRepository {
           key: c.id,
           officialId: c.id,
           front: CardFaceView(image: _image(c.front), localImage: await content.image(c.front.mediaId)),
-          back: CardFaceView(image: _image(c.back), localImage: await content.image(c.back.mediaId)),
+          back: switch (c.back) {
+            final back? => CardFaceView(image: _image(back), localImage: await content.image(back.mediaId)),
+            null => const CardFaceView(),
+          },
         ),
     ];
   }

@@ -24,7 +24,8 @@ class OfflineCard {
   final String deckId;
   final int sortOrder;
   final OfflineImage front;
-  final OfflineImage back;
+  @JsonKey(includeIfNull: true)
+  final OfflineImage? back;
 
   Map<String, Object?> toJson() => _$OfflineCardToJson(this);
 }

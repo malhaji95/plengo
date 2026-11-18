@@ -27,6 +27,7 @@ class _QuestionsClient implements QuestionsClient {
     String? teacherTrackId,
     String? unitId,
     String? lessonId,
+    String? categoryIds,
     String? cursor,
   }) async {
     final _extra = <String, dynamic>{};
@@ -36,6 +37,7 @@ class _QuestionsClient implements QuestionsClient {
       r'teacherTrackId': teacherTrackId,
       r'unitId': unitId,
       r'lessonId': lessonId,
+      r'categoryIds': categoryIds,
       r'cursor': cursor,
     };
     queryParameters.removeWhere((k, v) => v == null);
@@ -55,6 +57,44 @@ class _QuestionsClient implements QuestionsClient {
     late StudentQuestionPageEnvelope _value;
     try {
       _value = StudentQuestionPageEnvelope.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options, response: _result);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<StudentQuestionCategoryListEnvelope> listQuestionCategories({
+    required String subjectId,
+    String? teacherTrackId,
+    String? unitId,
+    String? lessonId,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{
+      r'subjectId': subjectId,
+      r'teacherTrackId': teacherTrackId,
+      r'unitId': unitId,
+      r'lessonId': lessonId,
+    };
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<StudentQuestionCategoryListEnvelope>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/api/v1/question-categories',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, Object?>>(_options);
+    late StudentQuestionCategoryListEnvelope _value;
+    try {
+      _value = StudentQuestionCategoryListEnvelope.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options, response: _result);
       rethrow;

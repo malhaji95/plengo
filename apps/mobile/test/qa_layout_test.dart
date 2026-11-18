@@ -116,9 +116,15 @@ void main() {
           (_) async => [fc.deckWith('d1', cardCount: 42, isFree: true), fc.deckWith('d3', cardCount: 11, locked: true)],
         );
         when(() => f.deck('d1')).thenAnswer((_) async => fc.deck());
-        when(
-          () => f.deckCards('d1'),
-        ).thenAnswer((_) async => DeckCards(deck: fc.deck(), cards: [fc.card(0), fc.card(1)], urlsExpireAt: ''));
+        when(() => f.deckCards('d1')).thenAnswer(
+          (_) async => DeckCards(
+            deck: fc.deck(),
+            cards: [fc.card(0), fc.card(1)],
+            previewOnly: false,
+            previewLimit: null,
+            urlsExpireAt: '',
+          ),
+        );
         when(
           () => f.due(subjectId: any(named: 'subjectId')),
         ).thenAnswer((_) async => DueCards(cards: [due(0), due(1)], userCards: const [], urlsExpireAt: ''));
@@ -243,6 +249,7 @@ void main() {
                 question: null,
                 deck: null,
                 card: null,
+                group: null,
                 userCard: null,
               ),
               Bookmark(
@@ -258,6 +265,7 @@ void main() {
                 question: null,
                 deck: null,
                 card: null,
+                group: null,
                 userCard: null,
               ),
             ],

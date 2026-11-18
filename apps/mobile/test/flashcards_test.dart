@@ -91,7 +91,13 @@ void main() {
       arrangeFlashcards: (f) {
         when(() => f.deck('d1')).thenAnswer((_) async => deck());
         when(() => f.deckCards('d1')).thenAnswer(
-          (_) async => DeckCards(deck: deck(), cards: [for (var i = 0; i < cards; i++) card(i)], urlsExpireAt: ''),
+          (_) async => DeckCards(
+            deck: deck(),
+            cards: [for (var i = 0; i < cards; i++) card(i)],
+            previewOnly: false,
+            previewLimit: null,
+            urlsExpireAt: '',
+          ),
         );
       },
     );
@@ -387,9 +393,10 @@ void main() {
       ),
       arrangeFlashcards: (f) {
         when(() => f.deck('d1')).thenAnswer((_) async => deck());
-        when(
-          () => f.deckCards('d1'),
-        ).thenAnswer((_) async => DeckCards(deck: deck(), cards: [card(0)], urlsExpireAt: ''));
+        when(() => f.deckCards('d1')).thenAnswer(
+          (_) async =>
+              DeckCards(deck: deck(), cards: [card(0)], previewOnly: false, previewLimit: null, urlsExpireAt: ''),
+        );
       },
     );
     await tester.binding.setSurfaceSize(const Size(800, 1400));
@@ -448,9 +455,15 @@ void main() {
             (_) async => [deckWith('d1', cardCount: 42, isFree: true), deckWith('d3', cardCount: 11, locked: true)],
           );
           when(() => f.deck('d1')).thenAnswer((_) async => deck());
-          when(
-            () => f.deckCards('d1'),
-          ).thenAnswer((_) async => DeckCards(deck: deck(), cards: [card(0), card(1)], urlsExpireAt: ''));
+          when(() => f.deckCards('d1')).thenAnswer(
+            (_) async => DeckCards(
+              deck: deck(),
+              cards: [card(0), card(1)],
+              previewOnly: false,
+              previewLimit: null,
+              urlsExpireAt: '',
+            ),
+          );
           when(
             () => f.due(subjectId: any(named: 'subjectId')),
           ).thenAnswer((_) async => DueCards(cards: [due(0), due(1)], userCards: const [], urlsExpireAt: ''));

@@ -12,7 +12,9 @@ StudentCard _$StudentCardFromJson(Map<String, dynamic> json) => StudentCard(
   sortOrder: (json['sortOrder'] as num).toInt(),
   contentVersion: (json['contentVersion'] as num).toInt(),
   front: CardImage.fromJson(json['front'] as Map<String, dynamic>),
-  back: CardImage.fromJson(json['back'] as Map<String, dynamic>),
+  back: json['back'] == null
+      ? null
+      : CardImage.fromJson(json['back'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$StudentCardToJson(StudentCard instance) =>

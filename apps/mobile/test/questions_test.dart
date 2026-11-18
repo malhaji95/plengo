@@ -24,6 +24,7 @@ StudentQuestion question(
   teacherTrackId: null,
   unitId: null,
   lessonId: lessonId,
+  categoryId: null,
   sortOrder: 0,
   difficulty: null,
   isFree: isFree,

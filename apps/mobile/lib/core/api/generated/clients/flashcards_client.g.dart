@@ -59,6 +59,40 @@ class _FlashcardsClient implements FlashcardsClient {
   }
 
   @override
+  Future<PlengoDeckListEnvelope> listPlengoDecks({
+    String? subjectId,
+    String? educationLevelId,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{
+      r'subjectId': subjectId,
+      r'educationLevelId': educationLevelId,
+    };
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<PlengoDeckListEnvelope>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/api/v1/decks/plengo',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, Object?>>(_options);
+    late PlengoDeckListEnvelope _value;
+    try {
+      _value = PlengoDeckListEnvelope.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options, response: _result);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
   Future<StudentDeckEnvelope> getDeck({required String id}) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};

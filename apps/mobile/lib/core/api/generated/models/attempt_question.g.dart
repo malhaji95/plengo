@@ -19,6 +19,7 @@ AttemptQuestion _$AttemptQuestionFromJson(Map<String, dynamic> json) =>
       selectedOptionId: json['selectedOptionId'] as String?,
       writtenAnswer: json['writtenAnswer'] as String?,
       flagged: json['flagged'] as bool,
+      markedCorrectByStudent: json['markedCorrectByStudent'] as bool,
       answeredAt: json['answeredAt'] as String?,
       timeSpentMs: (json['timeSpentMs'] as num?)?.toInt(),
       result: json['result'] == null
@@ -37,6 +38,7 @@ Map<String, dynamic> _$AttemptQuestionToJson(AttemptQuestion instance) =>
       'selectedOptionId': instance.selectedOptionId,
       'writtenAnswer': instance.writtenAnswer,
       'flagged': instance.flagged,
+      'markedCorrectByStudent': instance.markedCorrectByStudent,
       'answeredAt': instance.answeredAt,
       'timeSpentMs': instance.timeSpentMs,
       'result': instance.result,

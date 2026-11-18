@@ -135,9 +135,15 @@ void main() {
     final app = await pumpApp(
       tester,
       signedInAs: testMe,
-      arrangeFlashcards: (f) => when(
-        () => f.deckCards('d1'),
-      ).thenAnswer((_) async => DeckCards(deck: deck(), cards: [card(0), card(1)], urlsExpireAt: '')),
+      arrangeFlashcards: (f) => when(() => f.deckCards('d1')).thenAnswer(
+        (_) async => DeckCards(
+          deck: deck(),
+          cards: [card(0), card(1)],
+          previewOnly: false,
+          previewLimit: null,
+          urlsExpireAt: '',
+        ),
+      ),
     );
     app.container.read(routerProvider).go('${Routes.decks}/d1/browse');
     await tester.pumpAndSettle();
@@ -192,9 +198,10 @@ void main() {
     final app = await pumpApp(
       tester,
       signedInAs: testMe,
-      arrangeFlashcards: (f) => when(
-        () => f.deckCards('d1'),
-      ).thenAnswer((_) async => DeckCards(deck: deck(), cards: [card(0)], urlsExpireAt: '')),
+      arrangeFlashcards: (f) => when(() => f.deckCards('d1')).thenAnswer(
+        (_) async =>
+            DeckCards(deck: deck(), cards: [card(0)], previewOnly: false, previewLimit: null, urlsExpireAt: ''),
+      ),
     );
     when(() => app.reports.create(any(), any(), any(), any())).thenAnswer(
       (_) async => const Report(
@@ -232,9 +239,10 @@ void main() {
       signedInAs: testMe,
       config: configWith(studentDecks: false, contentReports: false),
       arrangeFlashcards: (f) {
-        when(
-          () => f.deckCards('d1'),
-        ).thenAnswer((_) async => DeckCards(deck: deck(), cards: [card(0)], urlsExpireAt: ''));
+        when(() => f.deckCards('d1')).thenAnswer(
+          (_) async =>
+              DeckCards(deck: deck(), cards: [card(0)], previewOnly: false, previewLimit: null, urlsExpireAt: ''),
+        );
         when(
           () => f.due(subjectId: any(named: 'subjectId')),
         ).thenAnswer((_) async => const DueCards(cards: [], userCards: [], urlsExpireAt: ''));

@@ -22,6 +22,7 @@ class AttemptQuestion {
     required this.selectedOptionId,
     required this.writtenAnswer,
     required this.flagged,
+    required this.markedCorrectByStudent,
     required this.answeredAt,
     required this.timeSpentMs,
     required this.result,
@@ -42,6 +43,7 @@ class AttemptQuestion {
   @JsonKey(includeIfNull: true)
   final String? writtenAnswer;
   final bool flagged;
+  final bool markedCorrectByStudent;
   @JsonKey(includeIfNull: true)
   final String? answeredAt;
   @JsonKey(includeIfNull: true)

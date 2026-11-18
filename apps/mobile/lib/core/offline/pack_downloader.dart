@@ -150,7 +150,7 @@ class PackDownloader {
       final images = <String, OfflineImage>{
         for (final item in page.items)
           if (item.card case final card?)
-            for (final img in [card.front, card.back]) '${img.mediaId}:${img.version}': img,
+            for (final img in [card.front, ?card.back]) '${img.mediaId}:${img.version}': img,
       };
       // Progress moves with every image, so a large deck never looks frozen between chunks.
       final perImage = images.isEmpty ? 0 : ids.length * perItem ~/ images.length;

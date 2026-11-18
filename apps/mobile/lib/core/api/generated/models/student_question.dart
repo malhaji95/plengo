@@ -19,6 +19,7 @@ class StudentQuestion {
     required this.teacherTrackId,
     required this.unitId,
     required this.lessonId,
+    required this.categoryId,
     required this.sortOrder,
     required this.difficulty,
     required this.isFree,
@@ -38,6 +39,8 @@ class StudentQuestion {
   final String? unitId;
   @JsonKey(includeIfNull: true)
   final String? lessonId;
+  @JsonKey(includeIfNull: true)
+  final String? categoryId;
   final num sortOrder;
   @JsonKey(includeIfNull: true)
   final StudentQuestionDifficulty? difficulty;

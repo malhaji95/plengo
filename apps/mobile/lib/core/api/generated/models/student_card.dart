@@ -26,7 +26,8 @@ class StudentCard {
   final int sortOrder;
   final int contentVersion;
   final CardImage front;
-  final CardImage back;
+  @JsonKey(includeIfNull: true)
+  final CardImage? back;
 
   Map<String, Object?> toJson() => _$StudentCardToJson(this);
 }

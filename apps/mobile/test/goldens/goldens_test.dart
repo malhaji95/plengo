@@ -156,6 +156,7 @@ void main() {
       teacherTrackId: null,
       unitId: null,
       lessonId: null,
+      categoryId: null,
       sortOrder: 0,
       difficulty: null,
       isFree: true,
@@ -252,8 +253,13 @@ void main() {
           arrangeFlashcards: (f) {
             when(() => f.deck('d1')).thenAnswer((_) async => fc.deck());
             when(() => f.deckCards('d1')).thenAnswer(
-              (_) async =>
-                  DeckCards(deck: fc.deck(), cards: [for (var i = 0; i < 3; i++) fc.card(i)], urlsExpireAt: ''),
+              (_) async => DeckCards(
+                deck: fc.deck(),
+                cards: [for (var i = 0; i < 3; i++) fc.card(i)],
+                previewOnly: false,
+                previewLimit: null,
+                urlsExpireAt: '',
+              ),
             );
           },
         );

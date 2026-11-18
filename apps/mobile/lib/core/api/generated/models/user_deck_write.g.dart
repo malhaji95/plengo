@@ -15,6 +15,7 @@ UserDeckWrite _$UserDeckWriteFromJson(Map<String, dynamic> json) =>
       updatedAt: DateTime.parse(json['updatedAt'] as String),
       subjectId: json['subjectId'] as String?,
       color: json['color'] as String?,
+      templateKey: json['templateKey'] as String?,
       deletedAt: json['deletedAt'] == null
           ? null
           : DateTime.parse(json['deletedAt'] as String),
@@ -26,6 +27,7 @@ Map<String, dynamic> _$UserDeckWriteToJson(UserDeckWrite instance) =>
       'name': instance.name,
       'subjectId': ?instance.subjectId,
       'color': ?instance.color,
+      'templateKey': ?instance.templateKey,
       'sortOrder': instance.sortOrder,
       'createdAt': instance.createdAt.toIso8601String(),
       'updatedAt': instance.updatedAt.toIso8601String(),

@@ -87,7 +87,7 @@ class LeaseManager {
       final premium = items.values.where((i) => !i.isFree).toList();
       for (final card in premium.where((i) => i.type == 'card')) {
         final c = OfflineCard.fromJson(jsonDecode(card.json) as Map<String, Object?>);
-        for (final media in [c.front.mediaId, c.back.mediaId]) {
+        for (final media in [c.front.mediaId, ?c.back?.mediaId]) {
           final f = await store.file(p.packKey, media);
           if (f == null) continue;
           await store.removeFile(p.packKey, media);
