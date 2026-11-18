@@ -213,7 +213,8 @@ class _PreviewCarouselState extends State<_PreviewCarousel> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             PlengoIconButton(
-              icon: Icons.chevron_right_rounded,
+              // Mirrored in Arabic: points to the start edge, where the previous card lies.
+              icon: Icons.chevron_left_rounded,
               tooltip: 'البطاقة السابقة',
               onPressed: _index > 0 ? () => _go(-1) : null,
             ),
@@ -226,7 +227,7 @@ class _PreviewCarouselState extends State<_PreviewCarousel> {
             ),
             const SizedBox(width: 12),
             PlengoIconButton(
-              icon: Icons.chevron_left_rounded,
+              icon: Icons.chevron_right_rounded,
               tooltip: 'البطاقة التالية',
               onPressed: _index < cards.length - 1 ? () => _go(1) : null,
             ),
