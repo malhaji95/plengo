@@ -62,7 +62,7 @@ void main() {
     await tester.tap(find.descendant(of: bar, matching: find.text('تدرّب')));
     await tester.pumpAndSettle();
     expect(find.byType(PracticeHomeScreen), findsOneWidget);
-    expect(find.text('قريباً'), findsOneWidget);
+    expect(find.text('اختبارات بلينغو المخصصة'), findsOneWidget);
     expect(tester.widget<PlengoNavBar>(bar).selectedIndex, 2);
 
     await tester.tap(find.descendant(of: bar, matching: find.text('موادي')));
