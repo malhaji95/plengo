@@ -259,7 +259,7 @@ void main() {
       Map<String, Object?>? sent;
       final adapter = FakeAdapter((o) async {
         sent = body(o.data);
-        return (200, ok({'acceptedLogs': 2, 'appliedStates': 2, 'states': <Object?>[]}));
+        return (200, ok({'acceptedLogs': 2, 'appliedStates': 2, 'pointsEarned': 0, 'states': <Object?>[]}));
       });
       Future<bool?> ready(String key) async => switch (SrsKey.idOf(key)) {
         'u2' => false,
