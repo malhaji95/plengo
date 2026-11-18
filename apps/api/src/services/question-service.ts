@@ -15,6 +15,7 @@ import { scopeOf, type AccessService } from './access-service.js';
 import { assertVisibleScope, invalid, resolvePlacement, validateContentScope } from './content-placement.js';
 import type { AuditService } from './audit-service.js';
 import type { FreeContentSource, FreeRuleService } from './free-rule-service.js';
+import type { QuestionCategoryService } from './question-category-service.js';
 import { grade, type AnswerInput } from './grading.js';
 import type { AdminActor } from './structure-service.js';
 
@@ -26,6 +27,7 @@ type OptionInput = { id?: string | undefined; text: string; isCorrect: boolean }
 interface ContentInput {
   unitId?: string | null | undefined;
   lessonId?: string | null | undefined;
+  categoryId?: string | null | undefined;
   questionText?: string | undefined;
   explanation?: string | null | undefined;
   difficulty?: QuestionRow['difficulty'] | undefined;
@@ -65,6 +67,7 @@ export function createQuestionService(deps: {
   teacherRepo: TeacherRepository;
   access: AccessService;
   freeRules: FreeRuleService;
+  categories: QuestionCategoryService;
   audit: AuditService;
   /** Exams give no feedback until the end (§15.2): the stateless check is refused meanwhile. */
   inOpenExam?: (userId: string, questionId: string) => Promise<boolean>;
@@ -74,7 +77,7 @@ export function createQuestionService(deps: {
   onVisibilityChange?: (questionId: string) => Promise<void>;
   now?: () => Date;
 }) {
-  const { db, repo, structureRepo, teacherRepo, access, freeRules, audit } = deps;
+  const { db, repo, structureRepo, teacherRepo, access, freeRules, categories, audit } = deps;
   const now = deps.now ?? (() => new Date());
   const notFound = (): never => {
     throw new AppError('NOT_FOUND');
@@ -113,10 +116,13 @@ export function createQuestionService(deps: {
     resolvePlacement(structureRepo, subjectId, unitId, lessonId);
 
   async function toAdmin(rows: QuestionWithContent[]): Promise<AdminQuestion[]> {
-    const names = await repo.names(
-      [...new Set(rows.map((r) => r.subjectId))],
-      [...new Set(rows.flatMap((r) => (r.teacherTrackId ? [r.teacherTrackId] : [])))],
-    );
+    const [names, categoryNames] = await Promise.all([
+      repo.names(
+        [...new Set(rows.map((r) => r.subjectId))],
+        [...new Set(rows.flatMap((r) => (r.teacherTrackId ? [r.teacherTrackId] : [])))],
+      ),
+      categories.names(rows.flatMap((r) => (r.categoryId ? [r.categoryId] : []))),
+    ]);
     return rows.map((q) => ({
       id: q.id,
       type: q.type,
@@ -126,6 +132,8 @@ export function createQuestionService(deps: {
       trackTitleAr: q.teacherTrackId ? (names.tracks.get(q.teacherTrackId) ?? null) : null,
       unitId: q.unitId,
       lessonId: q.lessonId,
+      categoryId: q.categoryId,
+      categoryNameAr: q.categoryId ? (categoryNames.get(q.categoryId) ?? null) : null,
       questionText: q.questionText,
       explanation: q.explanation,
       difficulty: q.difficulty,
@@ -229,6 +237,7 @@ export function createQuestionService(deps: {
     teacherTrackId: q.teacherTrackId,
     unitId: q.unitId,
     lessonId: q.lessonId,
+    categoryId: q.categoryId,
     sortOrder: q.sortOrder,
     difficulty: q.difficulty,
     isFree: q.isFree,
@@ -241,7 +250,16 @@ export function createQuestionService(deps: {
   return {
     // ---- admin ----
 
-    async adminList(filter: QuestionFilter, cursor: string | undefined, limit: number) {
+    async adminList(
+      query: Omit<QuestionFilter, 'categoryIds'> & { categoryId?: string | undefined },
+      cursor: string | undefined,
+      limit: number,
+    ) {
+      const { categoryId, ...rest } = query;
+      const filter: QuestionFilter = {
+        ...rest,
+        ...(categoryId ? { categoryIds: await categories.expand([categoryId]) } : {}),
+      };
       const page = await repo.page(filter, cursor, limit);
       return {
         items: await toAdmin(await repo.attachContent(page.items)),
@@ -271,6 +289,7 @@ export function createQuestionService(deps: {
       await validateContentScope({ structureRepo, teacherRepo }, input.subjectId, trackId);
       const place = await placement(input.subjectId, input.unitId ?? null, input.lessonId ?? null);
       const body = content(input.type, input, []);
+      if (input.categoryId) await categories.assertUsable(input.categoryId, input.subjectId);
       const scope = questionScope({ subjectId: input.subjectId, teacherTrackId: trackId });
       const at = now();
 
@@ -280,6 +299,7 @@ export function createQuestionService(deps: {
           subjectId: input.subjectId,
           teacherTrackId: trackId,
           ...place,
+          categoryId: input.categoryId ?? null,
           questionText: input.questionText,
           explanation: input.explanation ?? null,
           difficulty: input.difficulty ?? null,
@@ -350,13 +370,21 @@ export function createQuestionService(deps: {
         (merged.difficulty ?? null) !== current.difficulty ||
         !sameOptions ||
         !sameAnswers;
-      const placementChanged = place.unitId !== current.unitId || place.lessonId !== current.lessonId;
+      const categoryId = patch.categoryId !== undefined ? patch.categoryId : current.categoryId;
+      if (patch.categoryId && patch.categoryId !== current.categoryId)
+        await categories.assertUsable(patch.categoryId, current.subjectId);
+      // Placement and category are organisation only: they do not bump the version.
+      const placementChanged =
+        place.unitId !== current.unitId ||
+        place.lessonId !== current.lessonId ||
+        categoryId !== current.categoryId;
       if (!contentChanged && !placementChanged) return adminGet(id);
 
       await db.transaction(async (tx) => {
         const locked = (await repo.getForUpdate(tx, id)) ?? notFound();
         await repo.update(tx, id, {
           ...place,
+          categoryId,
           questionText: merged.questionText!,
           explanation: merged.explanation ?? null,
           difficulty: merged.difficulty ?? null,
@@ -463,6 +491,7 @@ export function createQuestionService(deps: {
         teacherTrackId?: string | undefined;
         unitId?: string | undefined;
         lessonId?: string | undefined;
+        categoryIds?: string[] | undefined;
         cursor?: string | undefined;
         limit: number;
       },
@@ -474,6 +503,7 @@ export function createQuestionService(deps: {
         generalOnly: !query.teacherTrackId,
         unitId: query.unitId,
         lessonId: query.lessonId,
+        ...(query.categoryIds ? { categoryIds: await categories.expand(query.categoryIds) } : {}),
         status: 'published',
       };
       const [page, counts, ctx] = await Promise.all([

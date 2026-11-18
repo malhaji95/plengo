@@ -2,6 +2,11 @@ import type { FastifyRequest } from 'fastify';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
 import {
+  adminQuestionCategoryListSchema,
+  adminQuestionCategoryQuerySchema,
+  adminQuestionCategorySchema,
+  createQuestionCategoryBodySchema,
+  updateQuestionCategoryBodySchema,
   adminQuestionPageSchema,
   adminQuestionQuerySchema,
   adminQuestionSchema,
@@ -31,6 +36,58 @@ export function adminQuestionRoutes(c: Container): FastifyPluginAsyncZod {
 
   return async (app) => {
     app.addHook('onRequest', c.guards.requireAdmin);
+
+    // ---- question categories (v3 §3) ----
+    const cats = c.questionCategories;
+    app.get(
+      '/question-categories',
+      {
+        schema: {
+          operationId: 'adminListQuestionCategories',
+          tags,
+          querystring: adminQuestionCategoryQuerySchema,
+          response: { 200: successEnvelope(adminQuestionCategoryListSchema) },
+        },
+      },
+      async (request) => ok(await cats.adminList(request.query)),
+    );
+    app.post(
+      '/question-categories',
+      {
+        schema: {
+          operationId: 'adminCreateQuestionCategory',
+          tags,
+          body: createQuestionCategoryBodySchema,
+          response: { 200: successEnvelope(adminQuestionCategorySchema) },
+        },
+      },
+      async (request) => ok(await cats.create(actor(request), request.body)),
+    );
+    app.patch(
+      '/question-categories/:id',
+      {
+        schema: {
+          operationId: 'adminUpdateQuestionCategory',
+          tags,
+          params: idParams,
+          body: updateQuestionCategoryBodySchema,
+          response: { 200: successEnvelope(adminQuestionCategorySchema) },
+        },
+      },
+      async (request) => ok(await cats.update(actor(request), request.params.id, request.body)),
+    );
+    app.delete(
+      '/question-categories/:id',
+      {
+        schema: {
+          operationId: 'adminDeleteQuestionCategory',
+          tags,
+          params: idParams,
+          response: { 200: successEnvelope(deletedSchema) },
+        },
+      },
+      async (request) => ok(await cats.remove(actor(request), request.params.id)),
+    );
 
     app.get(
       '/questions',

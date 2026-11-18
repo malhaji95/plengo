@@ -5,6 +5,8 @@ import {
   deckListQuerySchema,
   dueCardsSchema,
   dueQuerySchema,
+  plengoDeckListSchema,
+  plengoDeckQuerySchema,
   srsStatesPageSchema,
   srsStatesQuerySchema,
   srsSyncBodySchema,
@@ -36,6 +38,20 @@ export function flashcardRoutes(c: Container): FastifyPluginAsyncZod {
         },
       },
       async (request) => ok(await c.flashcards.studentDecks(authOf(request).userId, request.query)),
+    );
+    app.get(
+      '/decks/plengo',
+      {
+        schema: {
+          operationId: 'listPlengoDecks',
+          description:
+            "«فلاش كاردز بلينغو» (v3 §6): published general decks of the level (the student's own by default), grouped by subject, with cover (product image), card count and locked/free.",
+          tags,
+          querystring: plengoDeckQuerySchema,
+          response: { 200: successEnvelope(plengoDeckListSchema) },
+        },
+      },
+      async (request) => ok(await c.flashcards.plengoDecks(authOf(request).userId, request.query)),
     );
     app.get(
       '/decks/:id',

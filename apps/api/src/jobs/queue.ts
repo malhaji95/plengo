@@ -6,6 +6,7 @@ export const QUEUES = {
   mediaCleanup: 'media.cleanup-orphans',
   couponsGenerate: 'coupons.generate',
   recomputeFree: 'access.recompute-free',
+  applyDefaultFree: 'access.apply-default-free',
   expireEntitlements: 'access.expire-entitlements',
   renormalizeAnswers: 'questions.renormalize',
   abandonAttempts: 'attempts.abandon-stale',
@@ -26,6 +27,8 @@ export interface JobPayloads {
     subjectId: string | null;
     teacherTrackId: string | null;
   };
+  /** v3 §3: re-apply the default free lessons if the setting changed since last applied. */
+  'access.apply-default-free': Record<string, never>;
   'access.expire-entitlements': Record<string, never>;
   'questions.renormalize': Record<string, never>;
   'attempts.abandon-stale': Record<string, never>;
@@ -73,6 +76,8 @@ export class PgBossQueue implements JobQueue {
     await this.boss.schedule(QUEUES.dueReminders, '0 * * * *', {}, { tz: 'Asia/Damascus' });
     // After a deploy that bumps the normalizer version, stored accepted answers catch up (§14.5).
     await this.boss.send(QUEUES.renormalizeAnswers, {}, { singletonKey: 'startup' });
+    // Free flags follow the default free lessons setting (v3 §3), also on the first deploy with it.
+    await this.boss.send(QUEUES.applyDefaultFree, {}, { singletonKey: 'startup' });
     for (const name of Object.values(QUEUES)) {
       await this.boss.work<JobPayloads[typeof name]>(name, { batchSize: 1 }, async (jobs) => {
         for (const job of jobs) {

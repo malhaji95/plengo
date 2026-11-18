@@ -5,6 +5,7 @@ import {
   flashcards,
   lessons,
   mediaFiles,
+  profiles,
   subjects,
   teacherTracks,
   units,
@@ -16,7 +17,8 @@ import type { Scope } from './access-repository.js';
 export type DeckRow = typeof flashcardDecks.$inferSelect;
 export type CardRow = typeof flashcards.$inferSelect;
 export type MediaRow = typeof mediaFiles.$inferSelect;
-export type CardWithMedia = CardRow & { front: MediaRow; back: MediaRow };
+/** `back` is null for a single-face card (v3 §6). */
+export type CardWithMedia = CardRow & { front: MediaRow; back: MediaRow | null };
 
 type Conn = Db | Tx;
 
@@ -33,6 +35,7 @@ export function deckScopeWhere(scope: Scope): SQL {
 
 export interface DeckFilter {
   subjectId?: string | undefined;
+  subjectIds?: string[] | undefined;
   teacherTrackId?: string | undefined;
   generalOnly?: boolean | undefined;
   unitId?: string | undefined;
@@ -49,9 +52,9 @@ export function createFlashcardRepository(db: Db) {
       .select({ card: flashcards, front, back })
       .from(flashcards)
       .innerJoin(front, eq(front.id, flashcards.frontMediaId))
-      .innerJoin(back, eq(back.id, flashcards.backMediaId));
+      .leftJoin(back, eq(back.id, flashcards.backMediaId));
 
-  const toCard = (r: { card: CardRow; front: MediaRow; back: MediaRow }): CardWithMedia => ({
+  const toCard = (r: { card: CardRow; front: MediaRow; back: MediaRow | null }): CardWithMedia => ({
     ...r.card,
     front: r.front,
     back: r.back,
@@ -86,6 +89,7 @@ export function createFlashcardRepository(db: Db) {
           and(
             liveDeck,
             f.subjectId ? eq(flashcardDecks.subjectId, f.subjectId) : undefined,
+            f.subjectIds ? inArray(flashcardDecks.subjectId, f.subjectIds) : undefined,
             f.teacherTrackId ? eq(flashcardDecks.teacherTrackId, f.teacherTrackId) : undefined,
             f.generalOnly ? isNull(flashcardDecks.teacherTrackId) : undefined,
             f.unitId ? eq(flashcardDecks.unitId, f.unitId) : undefined,
@@ -274,6 +278,15 @@ export function createFlashcardRepository(db: Db) {
         .select({ id: flashcardDecks.id, t: flashcardDecks.titleAr })
         .from(flashcardDecks)
         .where(and(inArray(flashcardDecks.id, ids), isNull(flashcardDecks.deletedAt)));
+    },
+
+    /** The student's education level (null before onboarding). */
+    async studentLevel(userId: string) {
+      const [row] = await db
+        .select({ levelId: profiles.educationLevelId })
+        .from(profiles)
+        .where(eq(profiles.userId, userId));
+      return row?.levelId ?? null;
     },
 
     async getMedia(id: string) {

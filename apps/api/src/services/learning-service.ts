@@ -121,6 +121,7 @@ export function createLearningService(deps: {
       teacherTrackId: q.teacherTrackId,
       unitId: q.unitId,
       lessonId: q.lessonId,
+      categoryId: q.categoryId,
       sortOrder: q.sortOrder,
       difficulty: q.difficulty,
       isFree: q.isFree,
@@ -177,15 +178,40 @@ export function createLearningService(deps: {
         d ? [[d.id, d] as const] : [],
       ),
     );
-    const n = await names(
-      [...ids(qRows, (q) => q.subjectId), ...ids([...decks.values()], (d) => d.subjectId)],
-      [],
-      [],
-      [],
-    );
-
     const ownRows = await userContent.ownCards(userId, byType('user_card'));
     const ownViews = new Map((await userContent.toCards(userId, ownRows)).map((v) => [v.id, v]));
+    const ownDecks = await userContent.ownDecks(userId, [...new Set(ownRows.map((r) => r.deckId))]);
+
+    const deckList = [...decks.values()];
+    const n = await names(
+      [
+        ...ids(qRows, (q) => q.subjectId),
+        ...ids(deckList, (d) => d.subjectId),
+        ...ids([...ownDecks.values()], (d) => d.subjectId),
+      ],
+      [],
+      [...ids(qRows, (q) => q.unitId), ...ids(deckList, (d) => d.unitId)],
+      [...ids(qRows, (q) => q.lessonId), ...ids(deckList, (d) => d.lessonId)],
+    );
+    /** Where the item is filed in المحفوظات (v3 §8): subject → unit → deck. */
+    const groupOf = (p: {
+      subjectId: string | null;
+      unitId?: string | null;
+      lessonId?: string | null;
+      deckId?: string | null;
+      deckTitle?: string | null;
+      ownDeck?: boolean;
+    }): NonNullable<Bookmark['group']> => ({
+      subjectId: p.subjectId,
+      subjectNameAr: p.subjectId ? (n.subjects.get(p.subjectId) ?? null) : null,
+      unitId: p.unitId ?? null,
+      unitTitleAr: p.unitId ? (n.units.get(p.unitId) ?? null) : null,
+      lessonId: p.lessonId ?? null,
+      lessonTitleAr: p.lessonId ? (n.lessons.get(p.lessonId) ?? null) : null,
+      deckId: p.deckId ?? null,
+      deckTitle: p.deckTitle ?? null,
+      ownDeck: p.ownDeck ?? false,
+    });
 
     const out: Bookmark[] = [];
     for (const b of rows) {
@@ -203,6 +229,7 @@ export function createLearningService(deps: {
         deck: null as Bookmark['deck'],
         card: null as Bookmark['card'],
         userCard: null as Bookmark['userCard'],
+        group: null as Bookmark['group'],
       };
       if (b.itemType === 'question') {
         const q = qMap.get(b.itemId);
@@ -221,6 +248,7 @@ export function createLearningService(deps: {
             subjectId: q.subjectId,
             subjectNameAr: n.subjects.get(q.subjectId) ?? null,
             question: studentQuestion(q, locked, options),
+            group: groupOf({ subjectId: q.subjectId, unitId: q.unitId, lessonId: q.lessonId }),
           });
         }
       } else if (b.itemType === 'deck' || b.itemType === 'flashcard') {
@@ -238,16 +266,32 @@ export function createLearningService(deps: {
             deck: await cards.studentDeck(userId, d.id),
             // Signed URLs only for cards the student can open (§12.5).
             card: card && !locked ? await cards.toStudentCard(card) : null,
+            group: groupOf({
+              subjectId: d.subjectId,
+              unitId: d.unitId,
+              lessonId: d.lessonId,
+              deckId: d.id,
+              deckTitle: d.titleAr,
+            }),
           });
         }
       } else if (b.itemType === 'user_card') {
         const view = ownViews.get(b.itemId);
         if (view && !view.deletedAt) {
+          const deck = ownDecks.get(view.deckId);
           Object.assign(base, {
             available: true,
             locked: view.locked,
             titleAr: view.front.text ?? view.back.text,
+            subjectId: deck?.subjectId ?? null,
+            subjectNameAr: deck?.subjectId ? (n.subjects.get(deck.subjectId) ?? null) : null,
             userCard: view,
+            group: groupOf({
+              subjectId: deck?.subjectId ?? null,
+              deckId: view.deckId,
+              deckTitle: deck?.name ?? null,
+              ownDeck: true,
+            }),
           });
         }
       }

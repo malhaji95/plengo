@@ -396,14 +396,20 @@ describe('redemption (§9.4)', () => {
     // Superseded rows are hidden from "My access".
     expect((await studentCall<unknown[]>(s, 'GET', '/access')).data).toHaveLength(1);
 
-    const setting = await adminCall('PUT', '/settings/access', { allowTemporaryToPermanentUpgrade: false });
+    const setting = await adminCall('PUT', '/settings/access', {
+      allowTemporaryToPermanentUpgrade: false,
+      defaultFreeLessons: 0,
+    });
     expect(setting.status).toBe(200);
     try {
       const other = await student();
       await redeem(other, temp.codes[1]!);
       expect((await redeem(other, perm.codes[1]!)).error?.code).toBe('ALREADY_ENTITLED');
     } finally {
-      await adminCall('PUT', '/settings/access', { allowTemporaryToPermanentUpgrade: true });
+      await adminCall('PUT', '/settings/access', {
+        allowTemporaryToPermanentUpgrade: true,
+        defaultFreeLessons: 0,
+      });
     }
   });
 
@@ -940,6 +946,7 @@ describe('free rules (§8.4)', () => {
       structureRepo: t.c.structureRepo,
       audit: t.c.audit,
       jobs: t.queue,
+      config: t.c.configService,
       sources: [source],
     });
     const scope = subjectScope(subjectId);

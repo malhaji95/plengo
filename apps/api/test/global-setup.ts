@@ -20,5 +20,12 @@ export default async function setup() {
 
   const pool = createPool(url.toString(), 1);
   await runMigrations(createDb(pool));
+  // Tests written before v3 expect no default free lessons; the v3 tests turn it on and back off.
+  await pool.query(
+    `insert into app_settings (key, value) values
+       ('access', '{"allowTemporaryToPermanentUpgrade": true, "defaultFreeLessons": 0}'),
+       ('free_defaults_applied', '{"defaultFreeLessons": 0}')
+     on conflict (key) do nothing`,
+  );
   await pool.end();
 }

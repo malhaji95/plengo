@@ -4,6 +4,8 @@ import {
   checkAnswerBodySchema,
   checkResultSchema,
   questionListQuerySchema,
+  studentQuestionCategoryListSchema,
+  studentQuestionCategoryQuerySchema,
   studentQuestionPageSchema,
   studentQuestionSchema,
   successEnvelope,
@@ -32,6 +34,20 @@ export function questionRoutes(c: Container): FastifyPluginAsyncZod {
         },
       },
       async (request) => ok(await c.questions.studentList(authOf(request).userId, request.query)),
+    );
+    app.get(
+      '/question-categories',
+      {
+        schema: {
+          operationId: 'listQuestionCategories',
+          description:
+            'Question categories of a subject (global and its own) with published question counts for the scope, unit or lesson (v3 §3, §5). The lesson page groups its questions with it: pass `lessonId`.',
+          tags,
+          querystring: studentQuestionCategoryQuerySchema,
+          response: { 200: successEnvelope(studentQuestionCategoryListSchema) },
+        },
+      },
+      async (request) => ok(await c.questionCategories.studentList(authOf(request).userId, request.query)),
     );
     app.get(
       '/questions/:id',

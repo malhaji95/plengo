@@ -29,12 +29,18 @@ export const DEFAULT_REMOTE_CONFIG: RemoteConfig = {
 const REMOTE_CONFIG_KEY = 'remote_config';
 const ACCESS_SETTINGS_KEY = 'access';
 const LEARNING_SETTINGS_KEY = 'learning';
+/** The `defaultFreeLessons` value the free flags were last recomputed with (v3 §3). */
+const FREE_DEFAULTS_APPLIED_KEY = 'free_defaults_applied';
 
 /** spec §16.1: two correct answers in a row master a mistake. */
 export const DEFAULT_LEARNING_SETTINGS: LearningSettings = { mistakeMasteryStreak: 2 };
 
 /** spec §8.3: a permanent code may replace an active temporary entitlement unless an admin disables it. */
-export const DEFAULT_ACCESS_SETTINGS: AccessSettings = { allowTemporaryToPermanentUpgrade: true };
+export const DEFAULT_ACCESS_SETTINGS: AccessSettings = {
+  allowTemporaryToPermanentUpgrade: true,
+  // v3 §3: the first three lessons of every subject are free unless it has its own rule.
+  defaultFreeLessons: 3,
+};
 const CACHE_MS = 30_000;
 
 /** Remote config lives in app_settings (admin-editable later); defaults fill any missing keys. */
@@ -93,6 +99,15 @@ export function createConfigService(db: Db) {
     async setLearningSettings(value: LearningSettings, adminId: string | null) {
       await write(LEARNING_SETTINGS_KEY, value, adminId);
       return value;
+    },
+
+    async getAppliedDefaultFreeLessons(): Promise<number | null> {
+      const stored = (await read(FREE_DEFAULTS_APPLIED_KEY)) as { defaultFreeLessons?: number } | null;
+      return typeof stored?.defaultFreeLessons === 'number' ? stored.defaultFreeLessons : null;
+    },
+
+    async setAppliedDefaultFreeLessons(value: number) {
+      await write(FREE_DEFAULTS_APPLIED_KEY, { defaultFreeLessons: value }, null);
     },
 
     async setAccessSettings(value: AccessSettings, adminId: string | null) {

@@ -1,5 +1,5 @@
-import { and, eq } from 'drizzle-orm';
-import { freeAccessRules, teacherTracks, type Db } from '@plengo/db';
+import { and, eq, isNull } from 'drizzle-orm';
+import { freeAccessRules, subjects, teacherTracks, type Db } from '@plengo/db';
 import type { FreeContentKind, FreeRule, FreeRulePreview, FreeRuleType } from '@plengo/contracts';
 import { AppError } from '../lib/app-error.js';
 import type { JobQueue } from '../jobs/queue.js';
@@ -12,6 +12,7 @@ import {
 } from '../repositories/access-repository.js';
 import type { StructureRepository } from '../repositories/structure-repository.js';
 import type { AuditService } from './audit-service.js';
+import type { ConfigService } from './config-service.js';
 import {
   ITEM_KINDS,
   effectiveRule,
@@ -49,9 +50,27 @@ export function createFreeRuleService(deps: {
   structureRepo: StructureRepository;
   audit: AuditService;
   jobs: JobQueue;
+  config: ConfigService;
   sources: FreeContentSource[];
 }) {
-  const { db, accessRepo, structureRepo, audit, jobs, sources } = deps;
+  const { db, accessRepo, structureRepo, audit, jobs, config, sources } = deps;
+
+  /**
+   * v3 §3: a kind with no rule in its scope (neither its own nor `all`) gets the default rule — the
+   * first `defaultFreeLessons` lessons are free. Explicit rules (even `manual`) and manual item
+   * overrides still win.
+   */
+  async function defaultRule(): Promise<RuleSpec | null> {
+    const { defaultFreeLessons } = await config.getAccessSettings();
+    return defaultFreeLessons > 0 ? { ruleType: 'first_n_lessons', ruleValue: defaultFreeLessons } : null;
+  }
+
+  async function ruleFor(
+    rules: { contentKind: FreeContentKind; ruleType: FreeRuleType; ruleValue: number | null }[],
+    kind: ItemKind,
+  ) {
+    return effectiveRule(rules, kind) ?? (await defaultRule());
+  }
 
   async function outlineOf(scope: Scope): Promise<ScopeOutline> {
     let subjectId = scope.subjectId;
@@ -84,10 +103,9 @@ export function createFreeRuleService(deps: {
     const outline = await outlineOf(input.scope);
     const rule: RuleSpec | null = input.ruleType
       ? { ruleType: input.ruleType, ruleValue: 'ruleValue' in input ? (input.ruleValue ?? null) : null }
-      : // Removing a specific rule falls back to the scope's `all` rule.
-        input.contentKind !== 'all'
-        ? (existing.find((r) => r.contentKind === 'all') ?? null)
-        : null;
+      : // Removing a specific rule falls back to the scope's `all` rule, then to the default.
+        ((input.contentKind !== 'all' ? existing.find((r) => r.contentKind === 'all') : undefined) ??
+        (await defaultRule()));
     const byKind = [];
     for (const kind of affectedKinds(input.contentKind, existing)) {
       const source = sources.find((s) => s.kind === kind);
@@ -113,6 +131,20 @@ export function createFreeRuleService(deps: {
         ruleValue: r.ruleValue,
         updatedAt: r.updatedAt.toISOString(),
       }));
+  }
+
+  /**
+   * Re-evaluates every kind's effective rule over the scope's rule-sourced items. With
+   * `onlyDefaulted`, only kinds that follow the default (no rule of their own) are touched.
+   */
+  async function recompute(scope: Scope, opts: { onlyDefaulted?: boolean } = {}) {
+    const [rules, outline] = await Promise.all([rulesOf(scope), outlineOf(scope)]);
+    for (const source of sources) {
+      if (opts.onlyDefaulted && effectiveRule(rules, source.kind)) continue;
+      const items = await source.items(scope);
+      const rule = await ruleFor(rules, source.kind);
+      await source.applyRule(scope, ruleFreeIds(rule, items, outline));
+    }
   }
 
   return {
@@ -201,14 +233,31 @@ export function createFreeRuleService(deps: {
       return { id, deleted: true as const };
     },
 
-    /** Job: re-evaluate every kind's effective rule over the scope's rule-sourced items. */
-    async recompute(scope: Scope) {
-      const [rules, outline] = await Promise.all([rulesOf(scope), outlineOf(scope)]);
-      for (const source of sources) {
-        const items = await source.items(scope);
-        const rule = effectiveRule(rules, source.kind);
-        await source.applyRule(scope, ruleFreeIds(rule, items, outline));
-      }
+    recompute,
+
+    /**
+     * Job (v3 §3): when `defaultFreeLessons` differs from the value last applied, re-evaluate every
+     * scope's kinds that follow the default, then remember the value. Runs at startup and after the
+     * setting changes; a no-op otherwise.
+     */
+    async applyDefaultIfChanged() {
+      const { defaultFreeLessons } = await config.getAccessSettings();
+      if ((await config.getAppliedDefaultFreeLessons()) === defaultFreeLessons) return false;
+      const [subjectRows, trackRows] = await Promise.all([
+        db.select({ id: subjects.id }).from(subjects).where(isNull(subjects.deletedAt)),
+        db.select({ id: teacherTracks.id }).from(teacherTracks).where(isNull(teacherTracks.deletedAt)),
+      ]);
+      const scopes: Scope[] = [
+        ...subjectRows.map((s) => ({ scopeType: 'subject' as const, subjectId: s.id, teacherTrackId: null })),
+        ...trackRows.map((t) => ({
+          scopeType: 'teacher_track' as const,
+          subjectId: null,
+          teacherTrackId: t.id,
+        })),
+      ];
+      for (const scope of scopes) await recompute(scope, { onlyDefaulted: true });
+      await config.setAppliedDefaultFreeLessons(defaultFreeLessons);
+      return true;
     },
 
     /**
@@ -223,7 +272,7 @@ export function createFreeRuleService(deps: {
         outlineOf(scope),
         source.items(scope),
       ]);
-      return ruleFreeIds(effectiveRule(rules, kind), items, outline).has(itemId);
+      return ruleFreeIds(await ruleFor(rules, kind), items, outline).has(itemId);
     },
   };
 }

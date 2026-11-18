@@ -277,6 +277,9 @@ export function adminAccessRoutes(c: Container): FastifyPluginAsyncZod {
       async (request) => {
         const before = await c.configService.getAccessSettings();
         const saved = await c.configService.setAccessSettings(request.body, authOf(request).userId);
+        // v3 §3: content in the first N lessons follows the new default.
+        if (saved.defaultFreeLessons !== before.defaultFreeLessons)
+          await c.jobs.send('access.apply-default-free', {}, { singletonKey: 'settings' });
         await c.audit.record({
           actorAdminId: authOf(request).userId,
           action: 'settings.changed',

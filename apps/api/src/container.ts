@@ -14,6 +14,7 @@ import { createAttemptRepository } from './repositories/attempt-repository.js';
 import { createBookmarkRepository } from './repositories/bookmark-repository.js';
 import { createLearningRepository } from './repositories/learning-repository.js';
 import { createQuestionRepository } from './repositories/question-repository.js';
+import { createQuestionCategoryRepository } from './repositories/question-category-repository.js';
 import { createQuizRepository } from './repositories/quiz-repository.js';
 import { createSrsRepository } from './repositories/srs-repository.js';
 import { createStatsRepository } from './repositories/stats-repository.js';
@@ -49,6 +50,10 @@ import {
   questionFreeSource,
   type QuestionService,
 } from './services/question-service.js';
+import {
+  createQuestionCategoryService,
+  type QuestionCategoryService,
+} from './services/question-category-service.js';
 import { createAuthService, type AuthService } from './services/auth-service.js';
 import { createCatalogService, type CatalogService } from './services/catalog-service.js';
 import { createConfigService, type ConfigService } from './services/config-service.js';
@@ -95,6 +100,7 @@ export interface Container {
   coupons: CouponService;
   promotions: PromotionService;
   freeRules: FreeRuleService;
+  questionCategories: QuestionCategoryService;
   questions: QuestionService;
   flashcards: FlashcardService;
   srs: SrsService;
@@ -196,10 +202,20 @@ export function createContainer(
   });
   const promotions = createPromotionService({ db, accessRepo, audit, now: overrides.now });
   const questionRepo = createQuestionRepository(db);
+  const teacherRepo = createTeacherRepository(db);
+  const questionCategories = createQuestionCategoryService({
+    repo: createQuestionCategoryRepository(db),
+    structureRepo,
+    teacherRepo,
+    access,
+    audit,
+    now: overrides.now,
+  });
   const imports = createImportService({
     db,
     repo: createImportRepository(db),
     questionRepo,
+    categories: questionCategories,
     audit,
     jobs: overrides.jobs,
     now: overrides.now,
@@ -216,9 +232,9 @@ export function createContainer(
     structureRepo,
     audit,
     jobs: overrides.jobs,
+    config: configService,
     sources: [questionFreeSource(questionRepo), deckFreeSource(flashcardRepo), quizFreeSource(quizRepo)],
   });
-  const teacherRepo = createTeacherRepository(db);
   const questions = createQuestionService({
     db,
     repo: questionRepo,
@@ -226,6 +242,7 @@ export function createContainer(
     teacherRepo,
     access,
     freeRules,
+    categories: questionCategories,
     audit,
     inOpenExam: (userId, questionId) => attemptRepo.inOpenExam(userId, questionId),
     onVisibilityChange: (questionId) => quizRepo.bumpContaining(questionId),
@@ -289,6 +306,7 @@ export function createContainer(
     teacherRepo,
     access,
     config: configService,
+    categories: questionCategories,
     now: overrides.now,
   });
   const learning = createLearningService({
@@ -403,6 +421,7 @@ export function createContainer(
     coupons,
     promotions,
     freeRules,
+    questionCategories,
     questions,
     flashcards,
     srs,
@@ -478,6 +497,9 @@ export function createContainer(
             ? { scopeType: 'subject', subjectId: scope.subjectId!, teacherTrackId: null }
             : { scopeType: 'teacher_track', subjectId: null, teacherTrackId: scope.teacherTrackId! },
         ),
+      'access.apply-default-free': async () => {
+        await freeRules.applyDefaultIfChanged();
+      },
       'access.expire-entitlements': async () => {
         await access.expireAllStale();
       },

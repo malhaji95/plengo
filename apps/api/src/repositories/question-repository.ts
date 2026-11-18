@@ -45,6 +45,9 @@ export interface QuestionFilter {
   lessonId?: string | undefined;
   status?: QuestionRow['status'] | undefined;
   type?: QuestionRow['type'] | undefined;
+  /** Already expanded to include child categories. */
+  categoryIds?: string[] | undefined;
+  uncategorized?: boolean | undefined;
   q?: string | undefined;
 }
 
@@ -58,6 +61,12 @@ function filterWhere(f: QuestionFilter): SQL {
     f.lessonId ? eq(questions.lessonId, f.lessonId) : undefined,
     f.status ? eq(questions.status, f.status) : undefined,
     f.type ? eq(questions.type, f.type) : undefined,
+    f.categoryIds
+      ? f.categoryIds.length
+        ? inArray(questions.categoryId, f.categoryIds)
+        : sql`false`
+      : undefined,
+    f.uncategorized ? isNull(questions.categoryId) : undefined,
     f.q ? ilike(questions.questionText, `%${f.q.replace(/[\\%_]/g, (c) => `\\${c}`)}%`) : undefined,
   )!;
 }
@@ -307,6 +316,9 @@ export function createQuestionRepository(db: Db) {
         teacherTrackId: string | null;
         unitId?: string | null | undefined;
         lessonId?: string | null | undefined;
+        lessonIds?: string[] | undefined;
+        /** Already expanded to include child categories. */
+        categoryIds?: string[] | undefined;
         types?: QuestionRow['type'][] | undefined;
         freeOnly: boolean;
       },
@@ -325,6 +337,8 @@ export function createQuestionRepository(db: Db) {
               : isNull(questions.teacherTrackId),
             f.unitId ? eq(questions.unitId, f.unitId) : undefined,
             f.lessonId ? eq(questions.lessonId, f.lessonId) : undefined,
+            f.lessonIds?.length ? inArray(questions.lessonId, f.lessonIds) : undefined,
+            f.categoryIds?.length ? inArray(questions.categoryId, f.categoryIds) : undefined,
             f.types?.length ? inArray(questions.type, f.types) : undefined,
             f.freeOnly ? eq(questions.isFree, true) : undefined,
           ),

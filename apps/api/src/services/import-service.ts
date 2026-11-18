@@ -7,6 +7,7 @@ import { parseCsv, readXlsx, toCsv, toXlsx, type Table } from '../lib/tabular.js
 import type { ImportJobRow, ImportRepository } from '../repositories/import-repository.js';
 import type { QuestionRepository } from '../repositories/question-repository.js';
 import type { AuditService } from './audit-service.js';
+import type { QuestionCategoryService } from './question-category-service.js';
 import { questionScope } from './question-service.js';
 import type { AdminActor } from './structure-service.js';
 
@@ -17,11 +18,20 @@ type Difficulty = 'easy' | 'medium' | 'hard';
 /** A row that passed validation, resolved to ids, as stored until the import is committed. */
 export interface ValidRow {
   rowNumber: number;
-  codes: { subject: string; unit: string | null; lesson: string | null; track: string | null; level: string };
+  codes: {
+    subject: string;
+    unit: string | null;
+    lesson: string | null;
+    track: string | null;
+    level: string;
+    /** Optional (v3 §3); older stored rows have none. */
+    category?: string | null;
+  };
   subjectId: string;
   teacherTrackId: string | null;
   unitId: string | null;
   lessonId: string | null;
+  categoryId?: string | null;
   questionText: string;
   explanation: string | null;
   difficulty: Difficulty | null;
@@ -34,7 +44,8 @@ type RowError = { rowNumber: number; field: string | null; message: string };
 
 const LETTERS = ['a', 'b', 'c', 'd', 'e', 'f'] as const;
 const PLACEMENT = ['education_level_code', 'subject_code', 'unit_code', 'lesson_code', 'teacher_track_code'];
-const TAIL = ['explanation', 'difficulty', 'is_free_override'];
+/** `category_code` (v3 §3) is optional: a global category's code or one of the row's subject. */
+const TAIL = ['explanation', 'difficulty', 'is_free_override', 'category_code'];
 
 /** Column layouts of spec §27; MCQ may add option_e/f and written answers up to 10. */
 export const COLUMNS: Record<Kind, string[]> = {
@@ -95,15 +106,18 @@ export function createImportService(deps: {
   db: Db;
   repo: ImportRepository;
   questionRepo: QuestionRepository;
+  categories: QuestionCategoryService;
   audit: AuditService;
   jobs: JobQueue;
   now?: (() => Date) | undefined;
 }) {
-  const { db, repo, questionRepo, audit, jobs } = deps;
+  const { db, repo, questionRepo, categories, audit, jobs } = deps;
   const now = deps.now ?? (() => new Date());
 
   type Codes = ValidRow['codes'];
-  type Placement = Pick<ValidRow, 'subjectId' | 'teacherTrackId' | 'unitId' | 'lessonId'>;
+  type Placement = Pick<ValidRow, 'subjectId' | 'teacherTrackId' | 'unitId' | 'lessonId'> & {
+    categoryId: string | null;
+  };
 
   /** Resolves structure codes to ids; unknown or mismatched codes become field errors. */
   async function placements(list: Codes[]) {
@@ -120,6 +134,7 @@ export function createImportService(deps: {
       repo.tracks(distinct((c) => c.track)),
     ]);
     const tracks = new Map(trackRows.map((t) => [t.slug, t]));
+    const categoryOf = await categories.codeLookup(subjectIds);
 
     return list.map((c): { placement: Placement | null; errors: { field: string; message: string }[] } => {
       const errors: { field: string; message: string }[] = [];
@@ -145,6 +160,8 @@ export function createImportService(deps: {
       if (c.track && !track) fail('teacher_track_code', 'رمز المسار غير معروف');
       else if (track && subject && track.subjectId !== subject.id)
         fail('teacher_track_code', 'المسار لا يتبع هذه المادة');
+      const category = subject && c.category ? categoryOf(subject.id, c.category) : null;
+      if (subject && c.category && !category) fail('category_code', 'رمز التصنيف غير معروف في هذه المادة');
       if (errors.length || !subject) return { placement: null, errors };
       return {
         placement: {
@@ -152,6 +169,7 @@ export function createImportService(deps: {
           teacherTrackId: track?.id ?? null,
           unitId: unit?.id ?? lesson?.unitId ?? null,
           lessonId: lesson?.id ?? null,
+          categoryId: category?.id ?? null,
         },
         errors,
       };
@@ -169,6 +187,7 @@ export function createImportService(deps: {
       unit: r.get('unit_code') || null,
       lesson: r.get('lesson_code') || null,
       track: r.get('teacher_track_code') || null,
+      category: r.get('category_code') || null,
     }));
     const placed = await placements(codes);
     const rows: ValidRow[] = [];
@@ -408,7 +427,8 @@ export function createImportService(deps: {
           p.subjectId !== r.subjectId ||
           p.unitId !== r.unitId ||
           p.lessonId !== r.lessonId ||
-          p.teacherTrackId !== r.teacherTrackId
+          p.teacherTrackId !== r.teacherTrackId ||
+          p.categoryId !== (r.categoryId ?? null)
         );
       });
       if (moved) {
@@ -436,6 +456,7 @@ export function createImportService(deps: {
               teacherTrackId: r.teacherTrackId,
               unitId: r.unitId,
               lessonId: r.lessonId,
+              categoryId: r.categoryId ?? null,
               questionText: r.questionText,
               explanation: r.explanation,
               difficulty: r.difficulty,
@@ -531,6 +552,7 @@ export function createImportService(deps: {
             unit_code: r.unitCode ?? '',
             lesson_code: r.lessonCode ?? '',
             teacher_track_code: r.trackSlug ?? '',
+            category_code: r.categoryCode ?? '',
             question: r.q.questionText,
             explanation: r.q.explanation ?? '',
             difficulty: r.q.difficulty ?? '',

@@ -86,6 +86,14 @@ export function createAttemptRepository(db: Db) {
       return new Map(rows.map((r) => [r.attemptId, r.n]));
     },
 
+    /** The student counted this graded answer as correct (v3 §5). */
+    async markCorrect(tx: Tx, answerId: string) {
+      await tx
+        .update(quizAttemptAnswers)
+        .set({ isCorrect: true, markedCorrectByStudent: true })
+        .where(eq(quizAttemptAnswers.id, answerId));
+    },
+
     async upsertAnswer(
       tx: Tx,
       values: typeof quizAttemptAnswers.$inferInsert,

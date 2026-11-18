@@ -218,6 +218,75 @@ export function createLearningRepository(db: Db) {
         );
     },
 
+    /**
+     * Undoes the mistake bank and statistics of a wrong grade made at `wrongAt`, as if the answer had
+     * been correct (v3 §5 «بصياغة مختلفة»): a mistake that grade created is deleted; one it renewed
+     * loses that wrong and counts a correct answer instead (it may reach mastery). Subject and
+     * question statistics count the answer as correct.
+     */
+    async undoWrong(
+      tx: Tx,
+      u: {
+        userId: string;
+        question: GradedAnswer['question'];
+        wrongAt: Date;
+        masteryStreak: number;
+        at: Date;
+      },
+    ) {
+      const created = await tx
+        .delete(userMistakes)
+        .where(
+          and(
+            eq(userMistakes.userId, u.userId),
+            eq(userMistakes.questionId, u.question.id),
+            eq(userMistakes.wrongCount, 1),
+            eq(userMistakes.firstWrongAt, u.wrongAt),
+          ),
+        )
+        .returning({ id: userMistakes.questionId });
+      if (!created.length) {
+        await tx
+          .update(userMistakes)
+          .set({
+            wrongCount: sql`greatest(${userMistakes.wrongCount} - 1, 1)`,
+            correctStreak: sql`${userMistakes.correctStreak} + 1`,
+            status: sql`case when ${userMistakes.correctStreak} + 1 >= ${u.masteryStreak} then 'mastered'::mistake_status else 'active'::mistake_status end`,
+            updatedAt: u.at,
+          })
+          .where(
+            and(
+              eq(userMistakes.userId, u.userId),
+              eq(userMistakes.questionId, u.question.id),
+              eq(userMistakes.lastWrongAt, u.wrongAt),
+              eq(userMistakes.status, 'active'),
+            ),
+          );
+      }
+      await tx
+        .update(userSubjectStats)
+        .set({
+          correct: sql`least(${userSubjectStats.correct} + 1, ${userSubjectStats.answered})`,
+          updatedAt: u.at,
+        })
+        .where(
+          and(
+            eq(userSubjectStats.userId, u.userId),
+            eq(userSubjectStats.subjectId, u.question.subjectId),
+            u.question.teacherTrackId
+              ? eq(userSubjectStats.teacherTrackId, u.question.teacherTrackId)
+              : isNull(userSubjectStats.teacherTrackId),
+          ),
+        );
+      await tx
+        .update(questionStats)
+        .set({
+          correctCount: sql`least(${questionStats.correctCount} + 1, ${questionStats.attemptCount})`,
+          updatedAt: u.at,
+        })
+        .where(eq(questionStats.questionId, u.question.id));
+    },
+
     async addSubjectStats(tx: Tx, g: GradedAnswer) {
       await tx
         .insert(userSubjectStats)

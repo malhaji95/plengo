@@ -193,7 +193,7 @@ export function createOfflineService(deps: {
       if (i.type === 'quiz') return sum + QUIZ_BYTES;
       if (i.type === 'deck') return sum + DECK_BYTES;
       const c = cards.get(i.id)!;
-      return sum + imageSize(c.front) + imageSize(c.back);
+      return sum + imageSize(c.front) + (c.back ? imageSize(c.back) : 0);
     }, 0);
   }
 
@@ -265,6 +265,7 @@ export function createOfflineService(deps: {
       teacherTrackId: q.teacherTrackId,
       unitId: q.unitId,
       lessonId: q.lessonId,
+      categoryId: q.categoryId,
       sortOrder: q.sortOrder,
       difficulty: q.difficulty,
       isFree: q.isFree,
@@ -405,7 +406,7 @@ export function createOfflineService(deps: {
               deckId: c.card.deckId,
               sortOrder: c.card.sortOrder,
               front: await image(c.front),
-              back: await image(c.back),
+              back: c.back ? await image(c.back) : null,
             },
           });
         }

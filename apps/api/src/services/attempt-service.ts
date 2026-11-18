@@ -1,5 +1,11 @@
 import { randomInt } from 'node:crypto';
-import type { AttemptQuestion, AttemptSummary, AttemptView, CheckResult } from '@plengo/contracts';
+import {
+  PRACTICE_ALL_MAX,
+  type AttemptQuestion,
+  type AttemptSummary,
+  type AttemptView,
+  type CheckResult,
+} from '@plengo/contracts';
 import type { AttemptFilters, Db, Tx } from '@plengo/db';
 import { AppError } from '../lib/app-error.js';
 import type { AnswerRow, AttemptRepository, AttemptRow } from '../repositories/attempt-repository.js';
@@ -12,6 +18,7 @@ import { scopeOf, type AccessService } from './access-service.js';
 import type { ConfigService } from './config-service.js';
 import { assertVisibleScope, invalid } from './content-placement.js';
 import { grade, questionSnapshot, type AnswerInput, type QuestionSnapshot } from './grading.js';
+import type { QuestionCategoryService } from './question-category-service.js';
 import { quizAccess, type QuizService } from './quiz-service.js';
 
 /** Timed exams: submissions later than this after the deadline are marked late (§15.5). */
@@ -63,6 +70,7 @@ export function createAttemptService(deps: {
   teacherRepo: TeacherRepository;
   access: AccessService;
   config: ConfigService;
+  categories: QuestionCategoryService;
   now?: () => Date;
 }) {
   const {
@@ -76,6 +84,7 @@ export function createAttemptService(deps: {
     teacherRepo,
     access,
     config,
+    categories,
   } = deps;
   const now = deps.now ?? (() => new Date());
   const notFound = (): never => {
@@ -182,6 +191,7 @@ export function createAttemptService(deps: {
           selectedOptionId: ans?.selectedOptionId ?? null,
           writtenAnswer: ans?.writtenAnswer ?? null,
           flagged: ans?.flagged ?? false,
+          markedCorrectByStudent: ans?.markedCorrectByStudent ?? false,
           answeredAt: ans?.answeredAt?.toISOString() ?? null,
           timeSpentMs: ans?.timeSpentMs ?? null,
           result: revealed ? resultFrom(snap, ans) : null,
@@ -318,7 +328,11 @@ export function createAttemptService(deps: {
     };
   }
 
-  /** Random practice (§15.3): published questions the student can open, drawn server-side. */
+  /**
+   * Random practice (§15.3): published questions the student can open, drawn server-side. The v3
+   * practice setup (§5) narrows by several lessons, categories (children included) and types, and
+   * «جميع الأسئلة» takes every match up to PRACTICE_ALL_MAX.
+   */
   async function random(userId: string, f: AttemptFilters) {
     if (!f.subjectId) invalid('filters.subjectId');
     const trackId = f.teacherTrackId ?? null;
@@ -333,10 +347,12 @@ export function createAttemptService(deps: {
         teacherTrackId: trackId,
         unitId: f.unitId,
         lessonId: f.lessonId,
+        lessonIds: f.lessonIds,
+        categoryIds: f.categoryIds?.length ? await categories.expand(f.categoryIds) : undefined,
         types: f.types,
         freeOnly: !scopeOpen,
       },
-      f.count ?? DEFAULT_PRACTICE_COUNT,
+      f.allQuestions ? PRACTICE_ALL_MAX : (f.count ?? DEFAULT_PRACTICE_COUNT),
     );
     if (!rows.length) invalid('filters', 'no_questions');
     const content = await withContent(rows.map((r) => r.id));
@@ -351,7 +367,10 @@ export function createAttemptService(deps: {
       questions: rows.map((r) => content.get(r.id)!),
       shuffleOptions: true,
       timeLimitSeconds: null,
-      progress: { unitId: f.unitId ?? null, lessonId: f.lessonId ?? null },
+      progress: {
+        unitId: f.unitId ?? null,
+        lessonId: f.lessonId ?? (f.lessonIds?.length === 1 ? f.lessonIds[0]! : null),
+      },
     };
   }
 
@@ -756,6 +775,56 @@ export function createAttemptService(deps: {
           : [];
       });
       return { view: submitted, mismatches };
+    },
+
+    /**
+     * «إجابتي صحيحة لكن بصياغة مختلفة» (v3 §5): in a practice attempt, a graded wrong written answer
+     * counts as correct. The answer, the attempt's score (once submitted), the mistake bank (the
+     * mistake this grade made is undone, as if the answer had been correct) and the statistics change
+     * together. Idempotent; refused in exams and for other question types.
+     */
+    async markCorrect(userId: string, id: string, questionId: string) {
+      const attempt = await owned(userId, id);
+      if (attempt.mode !== 'practice') invalid('mode', 'exam_not_allowed');
+      if (!attempt.questionOrder.includes(questionId)) notFound();
+      const { mistakeMasteryStreak } = await config.getLearningSettings();
+      const [question] = await questionRepo.byIds([questionId]);
+      const final = await db.transaction(async (tx) => {
+        const locked = (await repo.getForUpdate(tx, id, userId))!;
+        const stored = (await repo.answers(id, tx)).find((a) => a.questionId === questionId);
+        if (!stored?.gradedAt || stored.isCorrect === null) invalid('answer', 'not_graded');
+        const snap = stored!.questionSnapshot as unknown as QuestionSnapshot | null;
+        if (snap?.type !== 'written') invalid('questionId', 'not_written');
+        if (stored!.isCorrect) return { attempt: locked, snap: snap! };
+        const at = now();
+        await repo.markCorrect(tx, stored!.id);
+        if (question) {
+          await learningRepo.undoWrong(tx, {
+            userId,
+            question,
+            wrongAt: stored!.gradedAt!,
+            masteryStreak: mistakeMasteryStreak,
+            at,
+          });
+        }
+        const updated =
+          locked.status === 'submitted'
+            ? await repo.update(tx, id, {
+                correctCount: (locked.correctCount ?? 0) + 1,
+                scorePercent: locked.totalCount
+                  ? Math.round((((locked.correctCount ?? 0) + 1) * 100) / locked.totalCount)
+                  : 0,
+                lastActivityAt: at,
+              })
+            : await repo.update(tx, id, { lastActivityAt: at });
+        return { attempt: updated, snap: snap! };
+      });
+      const answered = (await repo.answerCounts([id])).get(id) ?? 0;
+      return {
+        questionId,
+        result: resultFrom(final.snap, { isCorrect: true } as AnswerRow),
+        attempt: summary(final.attempt, answered, await passingOf(final.attempt)),
+      };
     },
 
     /** Nightly job (§15.5). */

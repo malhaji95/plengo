@@ -14,6 +14,7 @@ import {
   checkResultSchema,
   deletedSchema,
   flashcardStatsSchema,
+  markAnswerCorrectResultSchema,
   mistakeListSchema,
   mistakeQuerySchema,
   progressQuerySchema,
@@ -139,6 +140,21 @@ export function learningRoutes(c: Container): FastifyPluginAsyncZod {
       },
       async (request) =>
         ok(await c.attempts.check(user(request), request.params.id, request.params.questionId, request.body)),
+    );
+    app.post(
+      '/attempts/:id/answers/:questionId/mark-correct',
+      {
+        schema: {
+          operationId: 'markAttemptAnswerCorrect',
+          description:
+            '«إجابتي صحيحة لكن بصياغة مختلفة» (v3 §5): practice attempts only, for a graded written answer. Counts it as correct and updates the score, mistakes and statistics. Idempotent.',
+          tags,
+          params: answerParams,
+          response: { 200: successEnvelope(markAnswerCorrectResultSchema) },
+        },
+      },
+      async (request) =>
+        ok(await c.attempts.markCorrect(user(request), request.params.id, request.params.questionId)),
     );
     app.post(
       '/attempts/:id/submit',

@@ -224,10 +224,14 @@ describe('student decks (§8.6, §12.5)', () => {
       `/decks?subjectId=${w.subjectId}`,
     );
     expect(list.data).toMatchObject([{ id: deck.id, locked: true, cardCount: 2 }]);
-    const locked = await studentCall(s, 'GET', `/decks/${deck.id}/cards`);
-    expect(locked.error?.code).toBe('CONTENT_LOCKED');
-    expect(locked.raw).not.toContain('dev-storage');
-    expect(locked.raw).not.toContain('memory://');
+    // v3 §6: a locked deck previews its first cards (here: both) instead of refusing.
+    const locked = await studentCall<{ previewOnly: boolean; previewLimit: number; cards: unknown[] }>(
+      s,
+      'GET',
+      `/decks/${deck.id}/cards`,
+    );
+    expect(locked.data).toMatchObject({ previewOnly: true, previewLimit: 5 });
+    expect(locked.data.cards).toHaveLength(2);
 
     const outline = await studentCall<{ deckCount: { total: number; free: number } }>(
       s,
@@ -249,10 +253,14 @@ describe('student decks (§8.6, §12.5)', () => {
     expect(open.data.cards).toHaveLength(2);
     expect(open.data.cards[0]!.front.fullUrl).toMatch(/^memory:\/\/private\/.+sig=/);
     expect(open.data.cards[0]!.front.cacheKey).toMatch(/^[0-9a-f-]{36}:1$/);
-    // A subject entitlement does not open the track's deck.
-    expect((await studentCall(s, 'GET', `/decks/${trackDeck.deck.id}/cards`)).error?.code).toBe(
-      'CONTENT_LOCKED',
+    expect(open.data).toMatchObject({ previewOnly: false });
+    // A subject entitlement does not open the track's deck: it stays a preview.
+    const trackCards = await studentCall<{ previewOnly: boolean }>(
+      s,
+      'GET',
+      `/decks/${trackDeck.deck.id}/cards`,
     );
+    expect(trackCards.data.previewOnly).toBe(true);
 
     await adminCall('POST', `/decks/${deck.id}/status`, { status: 'archived' });
     expect((await studentCall(s, 'GET', `/decks/${deck.id}`)).status).toBe(404);

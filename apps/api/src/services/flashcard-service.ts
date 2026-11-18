@@ -1,4 +1,11 @@
-import type { AdminCard, AdminDeck, CardImage, StudentCard, StudentDeck } from '@plengo/contracts';
+import {
+  DECK_PREVIEW_LIMIT,
+  type AdminCard,
+  type AdminDeck,
+  type CardImage,
+  type StudentCard,
+  type StudentDeck,
+} from '@plengo/contracts';
 import type { Db } from '@plengo/db';
 import { AppError } from '../lib/app-error.js';
 import type { Scope } from '../repositories/access-repository.js';
@@ -90,7 +97,10 @@ export function createFlashcardService(deps: {
   }
 
   async function toStudentCard(c: CardWithMedia): Promise<StudentCard> {
-    const [frontImage, backImage] = await Promise.all([image(c.front), image(c.back)]);
+    const [frontImage, backImage] = await Promise.all([
+      image(c.front),
+      c.back ? image(c.back) : Promise.resolve(null),
+    ]);
     return {
       id: c.id,
       deckId: c.deckId,
@@ -377,16 +387,17 @@ export function createFlashcardService(deps: {
     async createCard(
       actor: AdminActor,
       deckId: string,
-      input: { frontMediaId: string; backMediaId: string },
+      input: { frontMediaId: string; backMediaId?: string | null | undefined },
     ) {
       await assertCardImage(input.frontMediaId, 'frontMediaId');
-      await assertCardImage(input.backMediaId, 'backMediaId');
+      if (input.backMediaId) await assertCardImage(input.backMediaId, 'backMediaId');
+      if (input.backMediaId === input.frontMediaId) invalid('backMediaId', 'duplicate_image');
       const id = await db.transaction(async (tx) => {
         const deck = (await repo.getDeckForUpdate(tx, deckId)) ?? notFound();
         const card = await repo.insertCard(tx, {
           deckId,
           frontMediaId: input.frontMediaId,
-          backMediaId: input.backMediaId,
+          backMediaId: input.backMediaId ?? null,
           sortOrder: await repo.nextCardSortOrder(tx, deckId),
         });
         await bumpDeck(tx, deck, actor);
@@ -396,17 +407,21 @@ export function createFlashcardService(deps: {
       return toAdminCard((await repo.getCard(id))!);
     },
 
-    /** Bulk upload (§27): every pair is appended in order in one transaction; one deck version bump. */
+    /**
+     * Bulk upload (§27): every pair is appended in order in one transaction; one deck version bump.
+     * A card without `backMediaId` is single-face (v3 §6).
+     */
     async createCards(
       actor: AdminActor,
       deckId: string,
-      cards: { frontMediaId: string; backMediaId: string }[],
+      input: { frontMediaId: string; backMediaId?: string | null | undefined }[],
     ) {
-      const ids = cards.flatMap((c) => [c.frontMediaId, c.backMediaId]);
+      const cards = input.map((c) => ({ frontMediaId: c.frontMediaId, backMediaId: c.backMediaId ?? null }));
+      const ids = cards.flatMap((c) => (c.backMediaId ? [c.frontMediaId, c.backMediaId] : [c.frontMediaId]));
       if (new Set(ids).size !== ids.length) invalid('cards', 'duplicate_image');
       for (const [i, c] of cards.entries()) {
         await assertCardImage(c.frontMediaId, `cards.${i}.frontMediaId`);
-        await assertCardImage(c.backMediaId, `cards.${i}.backMediaId`);
+        if (c.backMediaId) await assertCardImage(c.backMediaId, `cards.${i}.backMediaId`);
       }
       const created = await db.transaction(async (tx) => {
         const deck = (await repo.getDeckForUpdate(tx, deckId)) ?? notFound();
@@ -432,7 +447,8 @@ export function createFlashcardService(deps: {
       id: string,
       patch: {
         frontMediaId?: string | undefined;
-        backMediaId?: string | undefined;
+        /** Null removes the back (single-face card). */
+        backMediaId?: string | null | undefined;
         status?: DeckRow['status'] | undefined;
       },
     ): Promise<AdminCard> {
@@ -443,9 +459,11 @@ export function createFlashcardService(deps: {
         await assertCardImage(patch.backMediaId, 'backMediaId');
       const next = {
         frontMediaId: patch.frontMediaId ?? current.frontMediaId,
-        backMediaId: patch.backMediaId ?? current.backMediaId,
+        backMediaId: patch.backMediaId !== undefined ? patch.backMediaId : current.backMediaId,
         status: patch.status ?? current.status,
       };
+      if (next.backMediaId && next.backMediaId === next.frontMediaId)
+        invalid('backMediaId', 'duplicate_image');
       if (
         next.frontMediaId === current.frontMediaId &&
         next.backMediaId === current.backMediaId &&
@@ -538,15 +556,69 @@ export function createFlashcardService(deps: {
       return (await toStudentDecks([deck], (d) => ctx.canAccessItem(d)))[0]!;
     },
 
-    /** Cards with signed image URLs; locked decks answer CONTENT_LOCKED (§8.6, §12.5). */
+    /**
+     * Cards with signed image URLs (§12.5). A locked deck returns only its first
+     * `DECK_PREVIEW_LIMIT` cards with `previewOnly` (v3 §6) — the browse-before-buying preview;
+     * offline packs still leave locked decks out.
+     */
     async deckCards(userId: string, id: string) {
       const deck = await publishedDeck(id);
-      await access.assertCanAccessItem(userId, deck);
+      const ctx = await access.context(userId);
+      const open = ctx.canAccessItem(deck);
       const cards = await repo.listCards(id, { publishedOnly: true });
       return {
-        deck: (await toStudentDecks([deck], () => true))[0]!,
-        cards: await Promise.all(cards.map(toStudentCard)),
+        deck: (await toStudentDecks([deck], () => open))[0]!,
+        cards: await Promise.all((open ? cards : cards.slice(0, DECK_PREVIEW_LIMIT)).map(toStudentCard)),
+        previewOnly: !open,
+        previewLimit: open ? null : DECK_PREVIEW_LIMIT,
         urlsExpireAt: new Date(now().getTime() + SIGNED_URL_TTL_SECONDS * 1000).toISOString(),
+      };
+    },
+
+    /**
+     * «فلاش كاردز بلينغو» (v3 §6): published general (non-track) decks of the visible subjects of a
+     * level (the student's own by default), grouped by subject in subject order.
+     */
+    async plengoDecks(
+      userId: string,
+      q: { subjectId?: string | undefined; educationLevelId?: string | undefined },
+    ) {
+      const levelId = q.educationLevelId ?? (await repo.studentLevel(userId));
+      const subjectRows = (
+        await structureRepo.listSubjects(levelId ? { levelId } : {}, { studentVisible: true })
+      ).filter((s) => !q.subjectId || s.id === q.subjectId);
+      if (!subjectRows.length) return { groups: [] };
+      const [decks, ctx] = await Promise.all([
+        repo.listDecks({
+          subjectIds: subjectRows.map((s) => s.id),
+          generalOnly: true,
+          status: 'published',
+        }),
+        access.context(userId),
+      ]);
+      const views = await toStudentDecks(
+        decks.filter((d) => d.cardCount > 0),
+        (d) => ctx.canAccessItem(d),
+      );
+      const covers = new Map(
+        subjectRows.map((s) => [s.id, publicImageUrl(storage, s.coverVariants, s.coverStatus)] as const),
+      );
+      return {
+        groups: subjectRows.flatMap((s) => {
+          const own = views.filter((d) => d.subjectId === s.id);
+          return own.length
+            ? [
+                {
+                  subjectId: s.id,
+                  subjectNameAr: s.nameAr,
+                  subjectCode: s.code,
+                  subjectCoverUrl: covers.get(s.id) ?? null,
+                  subjectSortOrder: s.sortOrder,
+                  decks: own,
+                },
+              ]
+            : [];
+        }),
       };
     },
   };

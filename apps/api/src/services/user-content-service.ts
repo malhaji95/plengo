@@ -64,6 +64,7 @@ export function createUserContentService(deps: {
     name: d.name,
     subjectId: d.subjectId,
     color: d.color,
+    templateKey: d.templateKey,
     sortOrder: d.sortOrder,
     cardCount,
     createdAt: d.createdAt.toISOString(),
@@ -127,7 +128,11 @@ export function createUserContentService(deps: {
             ...base,
             locked: !c,
             front: { text: null, mediaId: null, image: c ? await flashcards.image(c.front) : null },
-            back: { text: null, mediaId: null, image: c ? await flashcards.image(c.back) : null },
+            back: {
+              text: null,
+              mediaId: null,
+              image: c?.back ? await flashcards.image(c.back) : null,
+            },
           };
         }
         return {
@@ -256,6 +261,7 @@ export function createUserContentService(deps: {
             name: d.name,
             subjectId: d.subjectId ?? null,
             color: d.color ?? null,
+            templateKey: d.templateKey ?? null,
             sortOrder: d.sortOrder,
             createdAt: existing?.createdAt ?? clamp(d.createdAt),
             updatedAt,
@@ -364,6 +370,12 @@ export function createUserContentService(deps: {
         }
       });
       return { appliedDecks, appliedCards, rejected };
+    },
+
+    /** The student's decks among `ids` (deleted ones included), by id. */
+    async ownDecks(userId: string, ids: string[]) {
+      const rows = await Promise.all(ids.map((id) => repo.deck(userId, id)));
+      return new Map(rows.flatMap((r) => (r ? [[r.deck.id, r.deck] as const] : [])));
     },
 
     /** The student's live cards among `ids`, for SRS and bookmarks. */

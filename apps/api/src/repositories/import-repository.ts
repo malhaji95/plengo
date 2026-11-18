@@ -5,6 +5,7 @@ import {
   importJobs,
   lessons,
   questionAnswers,
+  questionCategories,
   questionOptions,
   questions,
   subjects,
@@ -122,6 +123,7 @@ export function createImportRepository(db: Db) {
           unitCode: units.code,
           lessonCode: lessons.code,
           trackSlug: teacherTracks.slug,
+          categoryCode: questionCategories.code,
         })
         .from(questions)
         .innerJoin(subjects, eq(subjects.id, questions.subjectId))
@@ -129,6 +131,10 @@ export function createImportRepository(db: Db) {
         .leftJoin(units, eq(units.id, questions.unitId))
         .leftJoin(lessons, eq(lessons.id, questions.lessonId))
         .leftJoin(teacherTracks, eq(teacherTracks.id, questions.teacherTrackId))
+        .leftJoin(
+          questionCategories,
+          and(eq(questionCategories.id, questions.categoryId), isNull(questionCategories.deletedAt)),
+        )
         .where(
           and(
             eq(questions.type, type),

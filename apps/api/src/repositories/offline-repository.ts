@@ -45,14 +45,14 @@ export function createOfflineRepository(db: Db) {
         )
         .orderBy(asc(flashcardDecks.sortOrder), asc(flashcardDecks.id)),
 
-    /** Live published cards of these decks with both images. */
+    /** Live published cards of these decks with their images (no back for single-face cards). */
     async cardsOfDecks(deckIds: string[]) {
       if (!deckIds.length) return [];
       return db
         .select({ card: flashcards, front, back })
         .from(flashcards)
         .innerJoin(front, eq(front.id, flashcards.frontMediaId))
-        .innerJoin(back, eq(back.id, flashcards.backMediaId))
+        .leftJoin(back, eq(back.id, flashcards.backMediaId))
         .where(
           and(
             inArray(flashcards.deckId, deckIds),
