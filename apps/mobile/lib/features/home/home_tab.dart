@@ -18,6 +18,7 @@ import '../access/access_format.dart';
 import '../learning/scope_learning.dart' show progressProvider;
 import '../offline/offline_providers.dart';
 import '../flashcards/hard_cards.dart';
+import '../loyalty/loyalty_screen.dart' show LoyaltyPointsChip;
 import 'auto_advance.dart';
 import 'home_providers.dart';
 import '../my_subjects/my_subjects_providers.dart' show nextLessonsProvider;
@@ -70,6 +71,7 @@ class HomeTab extends ConsumerWidget {
           ],
         ),
         actions: [
+          const LoyaltyPointsChip(),
           PlengoIconButton(
             icon: Icons.notifications_outlined,
             tooltip: 'الإشعارات',

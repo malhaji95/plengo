@@ -26,6 +26,7 @@ import 'package:plengo/features/access/access_providers.dart';
 import 'package:plengo/features/flashcards/card_face.dart';
 import 'package:plengo/features/flashcards/flashcard_providers.dart';
 import 'package:plengo/features/home/home_providers.dart';
+import 'package:plengo/features/loyalty/loyalty_repository.dart';
 import 'package:plengo/features/my_decks/card_editor_screen.dart';
 import 'package:plengo/features/offline/offline_providers.dart';
 import 'package:plengo/features/my_decks/my_decks_providers.dart';
@@ -54,6 +55,20 @@ class MockMyDecksRepository extends Mock implements MyDecksRepository {}
 class MockReportRepository extends Mock implements ReportRepository {}
 
 class MockHomeRepository extends Mock implements HomeRepository {}
+
+class MockLoyaltyRepository extends Mock implements LoyaltyRepository {}
+
+/// A loyalty summary; [enabled] false hides every loyalty entry point.
+LoyaltySummary loyaltySummary({bool enabled = true, int balance = 120, int earnedToday = 30, int dailyCap = 100}) =>
+    LoyaltySummary(
+      enabled: enabled,
+      balance: balance,
+      earnedToday: earnedToday,
+      dailyCap: dailyCap,
+      remainingToday: dailyCap == 0 ? null : (dailyCap - earnedToday).clamp(0, dailyCap),
+      day: '2026-11-18',
+      rules: LoyaltySettings(enabled: enabled, pointsPerReview: 1, dailyCap: dailyCap, pointsPerCorrectQuestion: 2),
+    );
 
 const noWeek = [false, false, false, false, false, false, false];
 const noToday = Today(dueCards: 0, goal: 20, done: 0, goalMet: false, streak: 0, week: noWeek);
@@ -184,6 +199,7 @@ typedef PumpedApp = ({
   MockMyDecksRepository myDecks,
   MockReportRepository reports,
   MockHomeRepository home,
+  MockLoyaltyRepository loyalty,
   List<Uri> launched,
   AppDatabase db,
   ProviderContainer container,
@@ -203,6 +219,7 @@ Future<PumpedApp> pumpApp(
   void Function(MockLearningRepository learning)? arrangeLearning,
   void Function(MockMyDecksRepository myDecks)? arrangeMyDecks,
   void Function(MockHomeRepository home)? arrangeHome,
+  void Function(MockLoyaltyRepository loyalty)? arrangeLoyalty,
   int Function()? clock,
   RemoteConfig? config,
   Uint8List? pickedImage,
@@ -263,6 +280,11 @@ Future<PumpedApp> pumpApp(
   final home = MockHomeRepository();
   when(() => home.home()).thenAnswer((_) async => testHome(resume: await learning.resume()));
   arrangeHome?.call(home);
+
+  // Loyalty is off unless a test turns it on.
+  final loyalty = MockLoyaltyRepository();
+  when(() => loyalty.summary()).thenAnswer((_) async => loyaltySummary(enabled: false));
+  arrangeLoyalty?.call(loyalty);
   final launched = <Uri>[];
 
   final db = AppDatabase(NativeDatabase.memory());
@@ -285,6 +307,7 @@ Future<PumpedApp> pumpApp(
       myDecksRepositoryProvider.overrideWithValue(myDecks),
       reportRepositoryProvider.overrideWithValue(reports),
       homeRepositoryProvider.overrideWithValue(home),
+      loyaltyRepositoryProvider.overrideWithValue(loyalty),
       bannerImageBuilderProvider.overrideWithValue((_, b) => Center(child: Text('banner:${b.titleAr}'))),
       externalUrlLauncherProvider.overrideWithValue((uri) async => launched.add(uri)),
       imagePickProvider.overrideWithValue(({required camera, required maxSide}) async => pickedImage),
@@ -316,6 +339,7 @@ Future<PumpedApp> pumpApp(
     myDecks: myDecks,
     reports: reports,
     home: home,
+    loyalty: loyalty,
     launched: launched,
     db: db,
     container: container,

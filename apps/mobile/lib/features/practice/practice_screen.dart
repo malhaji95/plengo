@@ -9,7 +9,6 @@ import '../../core/api/api_exception.dart';
 import '../../core/api/generated/export.dart';
 import '../../shared/ui/ui.dart';
 import '../../shared/widgets/async_view.dart';
-import '../../shared/widgets/coming_soon.dart';
 import '../../shared/widgets/optional_asset.dart';
 import '../access/access_banner.dart';
 import '../home/next_lesson_carousel.dart' show PageDots;
@@ -22,7 +21,7 @@ import '../subjects/scope_widgets.dart' show ContentWidthBox, LockedChip;
 import 'practice_providers.dart';
 
 // تدرّب (v3 §5): [PracticeHomeScreen] at [Routes.practice], [PracticeSetupScreen] at
-// `/practice/:subjectId` and [DiagramsScreen] at [Routes.practiceDiagrams] (a later phase).
+// `/practice/:subjectId`; [Routes.practiceDiagrams] lives in `features/diagrams`.
 
 /// تدرّب: a header, the subjects of the student's stage and «اختبارات بلينغو المخصصة».
 class PracticeHomeScreen extends ConsumerWidget {
@@ -1031,13 +1030,4 @@ class ToggleChip extends StatelessWidget {
       ),
     );
   }
-}
-
-/// رسمات العلوم: name the numbered parts of a diagram (v3 §9, a later phase).
-class DiagramsScreen extends StatelessWidget {
-  const DiagramsScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) =>
-      const ComingSoonScaffold(title: 'رسمات العلوم', icon: Icons.schema_rounded, hue: PlengoColors.green);
 }

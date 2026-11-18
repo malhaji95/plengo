@@ -20,12 +20,14 @@ import '../features/flashcards/review_tab.dart';
 import '../features/flashcards/study_screen.dart';
 import '../features/bookmarks/saved_tab.dart';
 import '../features/debug/widget_catalog_screen.dart';
+import '../features/diagrams/diagrams_screen.dart';
 import '../features/home/home_tab.dart';
 import '../features/home/notification_screens.dart';
 import '../features/home/streak_screen.dart';
 import '../features/learning/mistakes_screen.dart';
 import '../features/legal/legal_screen.dart';
 import '../features/learning/stats_screen.dart';
+import '../features/loyalty/loyalty_screen.dart';
 import '../features/make_cards/create_group_screen.dart';
 import '../features/make_cards/group_screens.dart';
 import '../features/make_cards/make_cards_screen.dart';
@@ -93,7 +95,12 @@ abstract final class Routes {
 
   /// Practice setup for one subject: `/practice/<subjectId>`.
   static const practiceSetup = '/practice';
+
+  /// رسمات العلوم; `?subjectId=` preselects the subject.
   static const practiceDiagrams = '/practice/diagrams';
+
+  /// نقاطي: loyalty balance, rewards and history (V3_PLAN §10).
+  static const loyalty = '/loyalty';
   static const mySubjects = '/my-subjects';
 
   /// `?subjectId=` narrows the Plengo decks to one subject.
@@ -292,7 +299,13 @@ GoRouter buildRouter(Ref ref, {required bool couponRedemption}) {
                 builder: (_, _) => const PracticeHomeScreen(),
                 routes: [
                   // Before `:subjectId`.
-                  GoRoute(path: 'diagrams', builder: (_, _) => const DiagramsScreen()),
+                  GoRoute(
+                    path: 'diagrams',
+                    builder: (_, state) => DiagramsScreen(
+                      subjectId: state.uri.queryParameters['subjectId'],
+                      teacherTrackId: state.uri.queryParameters['teacherTrackId'],
+                    ),
+                  ),
                   GoRoute(
                     path: ':subjectId',
                     builder: (_, state) => PracticeSetupScreen(subjectId: state.pathParameters['subjectId']!),
@@ -488,6 +501,7 @@ GoRouter buildRouter(Ref ref, {required bool couponRedemption}) {
       if (couponRedemption) GoRoute(path: Routes.redeem, builder: (_, _) => const RedeemScreen()),
       GoRoute(path: Routes.onboardingGoal, builder: (_, _) => const GoalStepScreen()),
       GoRoute(path: Routes.streak, builder: (_, _) => const StreakScreen()),
+      GoRoute(path: Routes.loyalty, builder: (_, _) => const LoyaltyScreen()),
       if (kDebugMode) GoRoute(path: Routes.debugCatalog, builder: (_, _) => const WidgetCatalogScreen()),
     ],
   );
