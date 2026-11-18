@@ -6,6 +6,7 @@ import '../../app/providers.dart';
 import '../../app/router.dart';
 import '../../core/api/generated/export.dart';
 import '../../shared/ui/ui.dart';
+import '../shell/app_drawer.dart';
 import '../../shared/widgets/async_view.dart';
 import '../../shared/widgets/responsive.dart';
 import '../access/access_providers.dart';
@@ -52,6 +53,8 @@ class _SubjectsScreenState extends ConsumerState<SubjectsScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: DrawerMenuButton.leadingOf(context),
+        leadingWidth: kPlengoLeadingWidth,
         title: const Text('المواد'),
         actions: [
           Padding(

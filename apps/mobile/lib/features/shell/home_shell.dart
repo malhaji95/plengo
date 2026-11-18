@@ -9,9 +9,12 @@ import '../../shared/ui/ui.dart';
 import '../home/home_providers.dart';
 import '../quizzes/quiz_providers.dart';
 import '../offline/offline_providers.dart';
+import 'app_drawer.dart';
 
-/// Bottom navigation on phones, a side rail on wide (web/tablet) layouts (spec §23.1, §24). While
-/// signed in, exams submitted offline are retried every minute (spec §15.2).
+/// Bottom navigation plus a side drawer on phones, a permanent side rail on wide (web/tablet) layouts
+/// (spec §23.1, §24, v3 §1). The bottom bar holds the five main places; the drawer and the rail list
+/// every place, with المحفوظات and المراجعة under a divider. While signed in, exams submitted offline are
+/// retried every minute (spec §15.2).
 class HomeShell extends ConsumerStatefulWidget {
   const HomeShell({super.key, required this.shell});
 
@@ -27,13 +30,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
 
   StatefulNavigationShell get shell => widget.shell;
 
-  static const _destinations = [
-    PlengoNavDestination(icon: Icons.home_outlined, selectedIcon: Icons.home_rounded, label: 'الرئيسية'),
-    PlengoNavDestination(icon: Icons.menu_book_outlined, selectedIcon: Icons.menu_book_rounded, label: 'المواد'),
-    PlengoNavDestination(icon: Icons.style_outlined, selectedIcon: Icons.style_rounded, label: 'المراجعة'),
-    PlengoNavDestination(icon: Icons.bookmark_border_rounded, selectedIcon: Icons.bookmark_rounded, label: 'المحفوظات'),
-    PlengoNavDestination(icon: Icons.person_outline_rounded, selectedIcon: Icons.person_rounded, label: 'حسابي'),
-  ];
+  final _scaffold = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -57,11 +54,28 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     super.dispose();
   }
 
-  void _go(int index) {
+  void _go(int branch) {
     // Returning to Home shows fresh counts (due cards, goal, unread), keeping the old ones meanwhile.
-    if (index == 0) ref.invalidate(homeProvider);
-    shell.goBranch(index, initialLocation: index == shell.currentIndex);
+    if (branch == ShellBranch.home) ref.invalidate(homeProvider);
+    shell.goBranch(branch, initialLocation: branch == shell.currentIndex);
   }
+
+  void _openMenu() => _scaffold.currentState?.openDrawer();
+
+  /// The drawer / rail menu; the active place is filled yellow.
+  Widget _menu({required bool drawer}) => PlengoSideRail(
+    key: Key(drawer ? 'shell.drawer' : 'shell.rail'),
+    destinations: [for (final p in drawerPlaces) p.destination],
+    selectedIndex: drawerPlaces.indexWhere((p) => p.branch == shell.currentIndex),
+    dividerBefore: drawerDividerBefore,
+    width: drawer ? 288 : PlengoSpace.railWidth,
+    border: !drawer,
+    footer: const DrawerArt(),
+    onSelected: (i) {
+      if (drawer) Navigator.of(context).pop();
+      _go(drawerPlaces[i].branch);
+    },
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -104,7 +118,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
       return Scaffold(
         body: Row(
           children: [
-            PlengoSideRail(destinations: _destinations, selectedIndex: shell.currentIndex, onSelected: _go),
+            _menu(drawer: false),
             Expanded(
               child: Align(
                 alignment: Alignment.topCenter,
@@ -119,10 +133,21 @@ class _HomeShellState extends ConsumerState<HomeShell> {
       );
     }
     return Scaffold(
-      body: content,
+      key: _scaffold,
+      drawer: Drawer(
+        width: 288,
+        backgroundColor: context.surface.card,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadiusDirectional.horizontal(end: Radius.circular(PlengoRadius.card)),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: _menu(drawer: true),
+      ),
+      body: ShellMenuScope(openMenu: _openMenu, child: content),
       bottomNavigationBar: PlengoNavBar(
-        destinations: _destinations,
-        selectedIndex: shell.currentIndex,
+        destinations: bottomBarDestinations,
+        // Places outside the bar (المحفوظات, المراجعة, …) select no tab.
+        selectedIndex: shell.currentIndex < ShellBranch.bottomBarCount ? shell.currentIndex : -1,
         onSelected: _go,
       ),
     );

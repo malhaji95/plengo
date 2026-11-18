@@ -256,131 +256,134 @@ void main() {
     expect(find.text('لديك كود تفعيل؟'), findsNothing);
   });
 
-  testWidgets('learning path: completed units collapse, the current unit shows done / current / upcoming / quiz', (
-    tester,
-  ) async {
-    phoneSize(tester, const Size(360, 2000));
-    Lesson lesson(String id, String title, String unitId) =>
-        Lesson(id: id, subjectId: 'p', unitId: unitId, code: id, titleAr: title, sortOrder: 0);
-    LessonProgress done(String id, int pct, {int questions = 0}) => LessonProgress(
-      questionsAttempted: 0,
-      questionsCorrect: 0,
-      questionsTotal: questions,
-      quizzesCompleted: 0,
-      quizzesTotal: 0,
-      flashcardsStudied: 0,
-      flashcardsTotal: 0,
-      completionPercent: pct,
-      lessonId: id,
-    );
-    final app = await pumpApp(
-      tester,
-      signedInAs: testMe,
-      arrangeCatalog: (c) => when(() => c.outline('p')).thenAnswer(
-        (_) async => SubjectOutline(
-          subject: subject('p', 'الفيزياء'),
-          units: [
-            UnitWithLessons(
-              id: 'u1',
-              subjectId: 'p',
-              code: 'u1',
-              titleAr: 'الحركة',
-              sortOrder: 0,
-              lessons: [lesson('l1', 'السرعة', 'u1')],
-            ),
-            UnitWithLessons(
-              id: 'u2',
-              subjectId: 'p',
-              code: 'u2',
-              titleAr: 'الكهرباء',
-              sortOrder: 1,
-              lessons: [lesson('l2', 'التيار', 'u2'), lesson('l3', 'المقاومة', 'u2'), lesson('l4', 'الدارات', 'u2')],
-            ),
-          ],
-          lessons: const [],
-          access: noAccess,
-          questionCount: noQuestions,
-          deckCount: noQuestions,
-          quizCount: noQuestions,
-          tracks: const [],
-        ),
-      ),
-      arrangeLearning: (l) {
-        when(() => l.progress('p', teacherTrackId: null)).thenAnswer(
-          (_) async => ScopeProgress(
-            questionsAttempted: 0,
-            questionsCorrect: 0,
-            questionsTotal: 0,
-            quizzesCompleted: 0,
-            quizzesTotal: 0,
-            flashcardsStudied: 0,
-            flashcardsTotal: 0,
-            completionPercent: 50,
-            subjectId: 'p',
-            teacherTrackId: null,
-            lastActivityAt: null,
-            units: const [],
-            lessons: [done('l1', 100), done('l2', 100), done('l3', 30, questions: 12)],
+  testWidgets(
+    'learning path: every unit is listed (no completed-units row); stations show finished / current / open / quiz',
+    (tester) async {
+      phoneSize(tester, const Size(360, 2000));
+      Lesson lesson(String id, String title, String unitId) =>
+          Lesson(id: id, subjectId: 'p', unitId: unitId, code: id, titleAr: title, sortOrder: 0);
+      LessonProgress done(String id, int pct, {int questions = 0}) => LessonProgress(
+        questionsAttempted: 0,
+        questionsCorrect: 0,
+        questionsTotal: questions,
+        quizzesCompleted: 0,
+        quizzesTotal: 0,
+        flashcardsStudied: 0,
+        flashcardsTotal: 0,
+        completionPercent: pct,
+        lessonId: id,
+      );
+      final app = await pumpApp(
+        tester,
+        signedInAs: testMe,
+        arrangeCatalog: (c) => when(() => c.outline('p')).thenAnswer(
+          (_) async => SubjectOutline(
+            subject: subject('p', 'الفيزياء'),
+            units: [
+              UnitWithLessons(
+                id: 'u1',
+                subjectId: 'p',
+                code: 'u1',
+                titleAr: 'الحركة',
+                sortOrder: 0,
+                lessons: [lesson('l1', 'السرعة', 'u1')],
+              ),
+              UnitWithLessons(
+                id: 'u2',
+                subjectId: 'p',
+                code: 'u2',
+                titleAr: 'الكهرباء',
+                sortOrder: 1,
+                lessons: [lesson('l2', 'التيار', 'u2'), lesson('l3', 'المقاومة', 'u2'), lesson('l4', 'الدارات', 'u2')],
+              ),
+            ],
+            lessons: const [],
+            access: permanentAccess,
+            questionCount: noQuestions,
+            deckCount: noQuestions,
+            quizCount: noQuestions,
+            tracks: const [],
           ),
-        );
-        when(() => l.quizzes(any())).thenAnswer(
-          (_) async => [
-            const StudentQuiz(
-              id: 'qz',
+        ),
+        arrangeLearning: (l) {
+          when(() => l.progress('p', teacherTrackId: null)).thenAnswer(
+            (_) async => ScopeProgress(
+              questionsAttempted: 0,
+              questionsCorrect: 0,
+              questionsTotal: 0,
+              quizzesCompleted: 0,
+              quizzesTotal: 0,
+              flashcardsStudied: 0,
+              flashcardsTotal: 0,
+              completionPercent: 50,
               subjectId: 'p',
               teacherTrackId: null,
-              unitId: 'u2',
-              lessonId: null,
-              titleAr: 'اختبار الكهرباء',
-              description: null,
-              allowedModes: StudentQuizAllowedModes.both,
-              timeLimitSeconds: 1800,
-              passingScorePercent: 60,
-              maxAttempts: null,
-              isMockExam: false,
-              allowOffline: false,
-              isFree: false,
-              sortOrder: 0,
-              contentVersion: 1,
-              totalCount: 20,
-              accessibleCount: 20,
-              lockedCount: 0,
-              locked: false,
-              attemptsUsed: 0,
-              bestScorePercent: null,
-              inProgressAttemptId: null,
+              lastActivityAt: null,
+              units: const [],
+              lessons: [done('l1', 100), done('l2', 100), done('l3', 30, questions: 12)],
             ),
-          ],
-        );
-      },
-    );
-    app.container.read(routerProvider).go('/subjects/p');
-    await tester.pumpAndSettle();
+          );
+          when(() => l.quizzes(any())).thenAnswer(
+            (_) async => [
+              const StudentQuiz(
+                id: 'qz',
+                subjectId: 'p',
+                teacherTrackId: null,
+                unitId: 'u2',
+                lessonId: null,
+                titleAr: 'اختبار الكهرباء',
+                description: null,
+                allowedModes: StudentQuizAllowedModes.both,
+                timeLimitSeconds: 1800,
+                passingScorePercent: 60,
+                maxAttempts: null,
+                isMockExam: false,
+                allowOffline: false,
+                isFree: false,
+                sortOrder: 0,
+                contentVersion: 1,
+                totalCount: 20,
+                accessibleCount: 20,
+                lockedCount: 0,
+                locked: false,
+                attemptsUsed: 0,
+                bestScorePercent: null,
+                inProgressAttemptId: null,
+              ),
+            ],
+          );
+        },
+      );
+      app.container.read(routerProvider).go('/subjects/p');
+      await tester.pumpAndSettle();
 
-    // Unit 1 is complete: collapsed into the green row; unit 2 is the current unit.
-    expect(find.text('وحدة واحدة مكتملة'), findsOneWidget);
-    expect(find.text('السرعة'), findsNothing);
-    expect(find.text('الوحدة 2'), findsOneWidget);
-    expect(find.text('3 دروس + اختبار الوحدة'), findsOneWidget);
-    expect(find.bySemanticsLabel('التيار، مكتمل'), findsOneWidget);
-    expect(find.bySemanticsLabel('المقاومة، الحالي'), findsOneWidget);
-    expect(find.bySemanticsLabel('الدارات، لم يبدأ'), findsOneWidget);
-    expect(find.bySemanticsLabel('اختبار الكهرباء، اختبار الوحدة'), findsOneWidget);
-    expect(find.text('ابدأ هنا'), findsOneWidget);
-    expect(tester.takeException(), isNull);
+      // v3: unit 1 is complete and stays a plain row with its ✓ (no «وحدة واحدة مكتملة» row); unit 2 is
+      // the current unit, drawn as stations.
+      expect(find.text('وحدة واحدة مكتملة'), findsNothing);
+      expect(find.text('درس واحد · مكتملة'), findsOneWidget);
+      expect(find.text('السرعة'), findsNothing);
+      expect(find.text('الوحدة 2'), findsOneWidget);
+      expect(find.text('3 دروس + اختبار الوحدة'), findsOneWidget);
+      expect(find.bySemanticsLabel('التيار، مكتمل'), findsOneWidget);
+      expect(find.bySemanticsLabel('المقاومة، الحالي'), findsOneWidget);
+      expect(find.bySemanticsLabel('الدارات، لم يبدأ'), findsOneWidget);
+      expect(find.bySemanticsLabel('اختبار الكهرباء، اختبار الوحدة'), findsOneWidget);
+      expect(find.text('ابدأ هنا'), findsOneWidget);
+      expect(tester.takeException(), isNull);
 
-    // A tap opens the node's card; its action continues the lesson's questions.
-    await tester.tap(find.bySemanticsLabel('المقاومة، الحالي'));
-    await tester.pumpAndSettle();
-    expect(find.text('12 سؤالاً · أنجزت \u206630%\u2069'), findsOneWidget);
-    expect(find.text('عرض الدرس بالتفصيل'), findsOneWidget);
-    await tester.tap(find.text('تابع الدرس'));
-    await tester.pumpAndSettle();
-    expect(
-      app.container.read(routerProvider).routeInformationProvider.value.uri.toString(),
-      '/subjects/p/questions?lessonId=l3',
-    );
-  });
+      // A tap opens the node's card; its action continues the lesson's questions.
+      await tester.tap(find.bySemanticsLabel('المقاومة، الحالي'));
+      await tester.pumpAndSettle();
+      expect(find.text('12 سؤالاً · أنجزت \u206630%\u2069'), findsOneWidget);
+      expect(find.text('عرض الدرس بالتفصيل'), findsOneWidget);
+      await tester.tap(find.text('تابع الدرس'));
+      await tester.pumpAndSettle();
+      expect(
+        app.container.read(routerProvider).routeInformationProvider.value.uri.toString(),
+        '/subjects/p/questions?lessonId=l3',
+      );
+    },
+  );
 
   testWidgets('learning path: an upcoming lesson stays tappable and opens its lesson page', (tester) async {
     phoneSize(tester, const Size(360, 2000));
@@ -404,7 +407,7 @@ void main() {
             ),
           ],
           lessons: const [],
-          access: noAccess,
+          access: permanentAccess,
           questionCount: noQuestions,
           deckCount: noQuestions,
           quizCount: noQuestions,
@@ -467,8 +470,17 @@ void main() {
     await tester.tap(find.text('الفيزياء'));
     await tester.pumpAndSettle();
     expect(find.text('480 · 40 مجاني'), findsOneWidget);
+    // v3: no locked box; the locked station opens the activation sheet.
+    expect(find.text('إدخال كود التفعيل'), findsNothing);
+    final station = find.bySemanticsLabel('السرعة، مقفل، يحتاج إلى تفعيل');
+    await tester.ensureVisible(station);
+    await tester.pumpAndSettle();
+    await tester.tap(station);
+    await tester.pumpAndSettle();
     expect(find.text('إدخال كود التفعيل'), findsOneWidget);
     expect(tester.takeException(), isNull);
+    Navigator.of(tester.element(find.byKey(const Key('lockedLesson.sheet')))).pop();
+    await tester.pumpAndSettle();
     expect(app.container.read(routerProvider).routeInformationProvider.value.uri.path, '/subjects/p');
   });
 }

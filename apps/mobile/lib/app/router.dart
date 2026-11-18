@@ -26,6 +26,10 @@ import '../features/home/streak_screen.dart';
 import '../features/learning/mistakes_screen.dart';
 import '../features/legal/legal_screen.dart';
 import '../features/learning/stats_screen.dart';
+import '../features/make_cards/make_cards_screen.dart';
+import '../features/my_subjects/my_subjects_screen.dart';
+import '../features/plengo_cards/plengo_cards_screen.dart';
+import '../features/practice/practice_screen.dart';
 import '../features/onboarding/goal_step_screen.dart';
 import '../features/my_decks/card_editor_screen.dart';
 import '../features/my_decks/my_deck_screen.dart';
@@ -81,6 +85,21 @@ abstract final class Routes {
   static const quizzes = '/quizzes';
   static const attempts = '/attempts';
   static const randomPractice = '/practice/random';
+
+  /// v3 places (V3_PLAN §1). Branches of the tab shell; see `ShellBranch` for their indices.
+  static const practice = '/practice';
+
+  /// Practice setup for one subject: `/practice/<subjectId>`.
+  static const practiceSetup = '/practice';
+  static const practiceDiagrams = '/practice/diagrams';
+  static const mySubjects = '/my-subjects';
+
+  /// `?subjectId=` narrows the Plengo decks to one subject.
+  static const plengoCards = '/plengo-cards';
+  static const makeCards = '/make-cards';
+
+  /// The student's own groups; `?subjectId=` narrows them to one subject.
+  static const makeCardsGroups = '/make-cards/groups';
 
   /// Redesign v2 screens (placeholders until they are built; nothing links to them yet).
   static const onboardingGoal = '/onboarding/goal';
@@ -166,6 +185,16 @@ GoRouter buildRouter(Ref ref, {required bool couponRedemption}) {
         path: Routes.resetPassword,
         builder: (_, state) => ResetPasswordScreen(email: state.uri.queryParameters['email'] ?? ''),
       ),
+      // Before the shell, so `/practice/random` is not read as the practice setup of a subject «random».
+      GoRoute(
+        path: Routes.randomPractice,
+        builder: (_, state) => RandomPracticeScreen(
+          subjectId: state.uri.queryParameters['subjectId'] ?? '',
+          teacherTrackId: state.uri.queryParameters['teacherTrackId'],
+        ),
+      ),
+      // Branch order is `ShellBranch`: the five bottom-bar places, then المراجعة, المحفوظات and the two
+      // card places that only the drawer lists.
       StatefulShellRoute.indexedStack(
         builder: (_, _, shell) => HomeShell(shell: shell),
         branches: [
@@ -253,6 +282,41 @@ GoRouter buildRouter(Ref ref, {required bool couponRedemption}) {
           StatefulShellBranch(
             routes: [
               GoRoute(
+                path: Routes.practice,
+                builder: (_, _) => const PracticeHomeScreen(),
+                routes: [
+                  // Before `:subjectId`.
+                  GoRoute(path: 'diagrams', builder: (_, _) => const DiagramsScreen()),
+                  GoRoute(
+                    path: ':subjectId',
+                    builder: (_, state) => PracticeSetupScreen(subjectId: state.pathParameters['subjectId']!),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [GoRoute(path: Routes.mySubjects, builder: (_, _) => const MySubjectsScreen())],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: Routes.account,
+                builder: (_, _) => const AccountScreen(),
+                routes: [
+                  GoRoute(path: 'sessions', builder: (_, _) => const SessionsScreen()),
+                  GoRoute(path: 'placement', builder: (_, _) => const PlacementScreen()),
+                  GoRoute(path: 'following', builder: (_, _) => const FollowedTeachersScreen()),
+                  GoRoute(path: 'access', builder: (_, _) => const MyAccessScreen()),
+                  GoRoute(path: 'offline', builder: (_, _) => const OfflineStorageScreen()),
+                  GoRoute(path: 'notifications', builder: (_, _) => const NotificationSettingsScreen()),
+                ],
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
                 path: Routes.review,
                 builder: (_, _) => const ReviewTab(),
                 routes: [
@@ -295,20 +359,34 @@ GoRouter buildRouter(Ref ref, {required bool couponRedemption}) {
             ],
           ),
           StatefulShellBranch(
-            routes: [GoRoute(path: Routes.saved, builder: (_, _) => const SavedTab())],
+            routes: [
+              GoRoute(
+                path: Routes.saved,
+                builder: (_, state) => SavedTab(
+                  filter: state.uri.queryParameters['filter'],
+                  subjectId: state.uri.queryParameters['subjectId'],
+                ),
+              ),
+            ],
           ),
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: Routes.account,
-                builder: (_, _) => const AccountScreen(),
+                path: Routes.plengoCards,
+                builder: (_, state) => PlengoCardsScreen(subjectId: state.uri.queryParameters['subjectId']),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: Routes.makeCards,
+                builder: (_, _) => const MakeCardsScreen(),
                 routes: [
-                  GoRoute(path: 'sessions', builder: (_, _) => const SessionsScreen()),
-                  GoRoute(path: 'placement', builder: (_, _) => const PlacementScreen()),
-                  GoRoute(path: 'following', builder: (_, _) => const FollowedTeachersScreen()),
-                  GoRoute(path: 'access', builder: (_, _) => const MyAccessScreen()),
-                  GoRoute(path: 'offline', builder: (_, _) => const OfflineStorageScreen()),
-                  GoRoute(path: 'notifications', builder: (_, _) => const NotificationSettingsScreen()),
+                  GoRoute(
+                    path: 'groups',
+                    builder: (_, state) => MyGroupsScreen(subjectId: state.uri.queryParameters['subjectId']),
+                  ),
                 ],
               ),
             ],
@@ -354,13 +432,6 @@ GoRouter buildRouter(Ref ref, {required bool couponRedemption}) {
       GoRoute(
         path: '${Routes.attempts}/:id/results',
         builder: (_, state) => ResultsScreen(attemptId: state.pathParameters['id']!),
-      ),
-      GoRoute(
-        path: Routes.randomPractice,
-        builder: (_, state) => RandomPracticeScreen(
-          subjectId: state.uri.queryParameters['subjectId'] ?? '',
-          teacherTrackId: state.uri.queryParameters['teacherTrackId'],
-        ),
       ),
       if (couponRedemption) GoRoute(path: Routes.redeem, builder: (_, _) => const RedeemScreen()),
       GoRoute(path: Routes.onboardingGoal, builder: (_, _) => const GoalStepScreen()),

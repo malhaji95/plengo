@@ -51,6 +51,8 @@ flutter:
   assets:
     - assets/legal/
     - assets/brand/
+    # Subject header art (v3 §3): assets/subjects/<subject code>.png, 1080 × 480.
+    - assets/subjects/
     - assets/fonts/OFL.txt
   # Bundled so web never fetches fonts from a CDN (spec §24). Its licence is on the licences page.
   fonts:

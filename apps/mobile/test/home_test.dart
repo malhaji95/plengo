@@ -136,7 +136,7 @@ void main() {
     await reveal(tester, find.text('هدف اليوم: 8 من 20'));
     expect(find.text('4 أيام متتالية'), findsOneWidget);
     await reveal(tester, find.text('مراجعة البطاقات المستحقة (12)'));
-    await reveal(tester, find.text('6 أسئلة في بنك الأخطاء'));
+    await reveal(tester, find.text('مراجعة البطاقات الصعبة'));
     await reveal(tester, find.text('باقي 87 يوماً على امتحان الشهادة الثانوية'));
     await reveal(tester, find.text('banner:عرض الصيف'));
     await reveal(tester, find.text('أ. أحمد'));

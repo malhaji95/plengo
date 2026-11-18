@@ -22,6 +22,7 @@ class ScopeHeader extends ConsumerWidget {
     this.teacherTrackId,
     this.onDownload,
     this.downloadLabel = 'تحميل المادة للاستخدام دون اتصال',
+    this.art,
   });
 
   final String title;
@@ -32,6 +33,10 @@ class ScopeHeader extends ConsumerWidget {
   /// Shows the download button (mobile only); usually scrolls to the download tile.
   final VoidCallback? onDownload;
   final String downloadLabel;
+
+  /// Decoration behind the header (the subject's header art, v3 §3), drawn over the blue and under the
+  /// text; decorative only.
+  final Widget? art;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -51,6 +56,10 @@ class ScopeHeader extends ConsumerWidget {
           color: PlengoColors.blue.base,
           child: Stack(
             children: [
+              if (art != null)
+                Positioned.fill(
+                  child: ExcludeSemantics(child: IgnorePointer(child: art)),
+                ),
               const PositionedDirectional(top: -60, end: -60, child: _Blob(180, PlengoColors.heroBlob)),
               PositionedDirectional(top: 18, end: 76, child: _Blob(28, PlengoColors.yellow.base)),
               PositionedDirectional(top: 52, end: 116, child: _Blob(16, PlengoColors.pink.base)),
@@ -252,6 +261,8 @@ class ScopeShortcuts extends ConsumerWidget {
     required this.questionsPath,
     this.decksLabel = 'البطاقات',
     this.questionsLabel = 'بنك الأسئلة',
+    this.showRandom = true,
+    this.showDecks = true,
   });
 
   final String subjectId;
@@ -265,12 +276,17 @@ class ScopeShortcuts extends ConsumerWidget {
   final String decksLabel;
   final String questionsLabel;
 
+  /// The subject page (v3 §3) reaches random practice and the decks through its own shortcuts, so it
+  /// leaves these two out here.
+  final bool showRandom;
+  final bool showDecks;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final randomEnabled = ref.watch(remoteConfigProvider).value?.features.randomPractice ?? true;
     final items = <Widget>[
       if (quizCount.total > 0)
-        _Shortcut(
+        ShortcutTile(
           icon: Icons.assignment_rounded,
           hue: PlengoColors.blue,
           label: 'الاختبارات',
@@ -278,8 +294,8 @@ class ScopeShortcuts extends ConsumerWidget {
           spoken: quizCountLabel(quizCount.total),
           onTap: () => context.go(quizzesPath),
         ),
-      if (randomEnabled && questionCount.total > 0)
-        _Shortcut(
+      if (showRandom && randomEnabled && questionCount.total > 0)
+        ShortcutTile(
           icon: Icons.shuffle_rounded,
           hue: PlengoColors.orange,
           label: 'تدريب عشوائي',
@@ -292,8 +308,8 @@ class ScopeShortcuts extends ConsumerWidget {
             ).toString(),
           ),
         ),
-      if (deckCount.total > 0)
-        _Shortcut(
+      if (showDecks && deckCount.total > 0)
+        ShortcutTile(
           icon: Icons.style_rounded,
           hue: PlengoColors.pink,
           label: decksLabel,
@@ -302,7 +318,7 @@ class ScopeShortcuts extends ConsumerWidget {
           onTap: () => context.go(decksPath),
         ),
       if (questionCount.total > 0)
-        _Shortcut(
+        ShortcutTile(
           icon: Icons.quiz_rounded,
           hue: PlengoColors.green,
           label: questionsLabel,
@@ -311,6 +327,19 @@ class ScopeShortcuts extends ConsumerWidget {
           onTap: () => context.go(questionsPath),
         ),
     ];
+    return ShortcutRow(items: items);
+  }
+}
+
+/// Up to four [ShortcutTile]s side by side, the same width even when some are missing; nothing when
+/// [items] is empty.
+class ShortcutRow extends StatelessWidget {
+  const ShortcutRow({super.key, required this.items});
+
+  final List<Widget> items;
+
+  @override
+  Widget build(BuildContext context) {
     if (items.isEmpty) return const SizedBox.shrink();
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -323,8 +352,11 @@ class ScopeShortcuts extends ConsumerWidget {
   }
 }
 
-class _Shortcut extends StatelessWidget {
-  const _Shortcut({
+/// One shortcut: a soft-coloured icon tile, the label and a caption ([count]); [spoken] replaces the
+/// caption for screen readers.
+class ShortcutTile extends StatelessWidget {
+  const ShortcutTile({
+    super.key,
     required this.icon,
     required this.hue,
     required this.label,

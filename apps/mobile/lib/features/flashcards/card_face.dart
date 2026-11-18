@@ -46,7 +46,9 @@ bool faceHasImage(CardFaceView face) => face.image != null || face.localImage !=
 /// vertical axis (≈500 ms, ease-out), or a crossfade when the system asks for reduced motion. Official
 /// cards are images shown as they are (DECISIONS #14: no extra frame or logo); the student's own cards
 /// can have text, an image or both on each face (spec §13.9). With [maxHeight], an image card is
-/// narrowed so it fits that height.
+/// narrowed so it fits that height; a long card (one that would end up narrower than
+/// [longCardMinWidthFraction] of the room) keeps the full width instead and scrolls vertically inside
+/// the card (v3 §6), while a tap still flips it.
 class FlashcardView extends ConsumerWidget {
   const FlashcardView({super.key, required this.card, required this.flipped, required this.onTap, this.maxHeight});
 
@@ -54,6 +56,9 @@ class FlashcardView extends ConsumerWidget {
   final bool flipped;
   final VoidCallback onTap;
   final double? maxHeight;
+
+  /// Below this share of the available width a fitted image card counts as long and scrolls instead.
+  static const longCardMinWidthFraction = 0.6;
 
   static double? _aspect(CardFaceView f) {
     final text = f.text?.trim();
@@ -65,7 +70,24 @@ class FlashcardView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    Widget face(bool back) => _FaceSurface(key: ValueKey('${card.key}:$back'), face: back ? card.back : card.front);
+    final aspect = _aspect(flipped ? card.back : card.front);
+    final h = maxHeight;
+    if (h == null || aspect == null) return _build(context, aspect: aspect);
+    return LayoutBuilder(
+      builder: (context, box) {
+        final long = box.maxWidth.isFinite && h * aspect < box.maxWidth * longCardMinWidthFraction;
+        return _build(context, aspect: aspect, scrollHeight: long ? h : null);
+      },
+    );
+  }
+
+  /// [scrollHeight]: the card is that high and its faces scroll vertically inside it.
+  Widget _build(BuildContext context, {required double? aspect, double? scrollHeight}) {
+    Widget face(bool back) => _FaceSurface(
+      key: ValueKey('${card.key}:$back'),
+      face: back ? card.back : card.front,
+      scrollHeight: scrollHeight,
+    );
     final Widget body;
     if (PlengoMotion.reduced(context)) {
       body = AnimatedSwitcher(duration: const Duration(milliseconds: 200), child: face(flipped));
@@ -87,7 +109,6 @@ class FlashcardView extends ConsumerWidget {
         },
       );
     }
-    final aspect = _aspect(flipped ? card.back : card.front);
     final h = maxHeight;
     return Semantics(
       button: true,
@@ -95,7 +116,7 @@ class FlashcardView extends ConsumerWidget {
       onTapHint: 'اقلب البطاقة',
       child: GestureDetector(
         onTap: onTap,
-        child: h != null && aspect != null
+        child: h != null && aspect != null && scrollHeight == null
             ? ConstrainedBox(
                 constraints: BoxConstraints(maxWidth: h * aspect),
                 child: body,
@@ -108,9 +129,12 @@ class FlashcardView extends ConsumerWidget {
 
 /// The card surface: radius 26, card colour, a soft drop shadow (a line border in dark mode).
 class _FaceSurface extends StatelessWidget {
-  const _FaceSurface({super.key, required this.face});
+  const _FaceSurface({super.key, required this.face, this.scrollHeight});
 
   final CardFaceView face;
+
+  /// A long card: this high, its face scrolling vertically inside.
+  final double? scrollHeight;
 
   @override
   Widget build(BuildContext context) {
@@ -130,10 +154,45 @@ class _FaceSurface extends StatelessWidget {
       ),
       child: ClipRRect(
         borderRadius: r,
-        child: CardFace(face: face),
+        child: scrollHeight == null ? CardFace(face: face) : _LongFace(face: face, height: scrollHeight!),
       ),
     );
   }
+}
+
+/// A long card's face: [height] high, scrolling vertically with a visible scrollbar.
+class _LongFace extends StatefulWidget {
+  const _LongFace({required this.face, required this.height});
+
+  final CardFaceView face;
+  final double height;
+
+  @override
+  State<_LongFace> createState() => _LongFaceState();
+}
+
+class _LongFaceState extends State<_LongFace> {
+  final _scroll = ScrollController();
+
+  @override
+  void dispose() {
+    _scroll.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    key: const Key('flashcard.longScroll'),
+    height: widget.height,
+    child: Scrollbar(
+      controller: _scroll,
+      thumbVisibility: true,
+      child: SingleChildScrollView(
+        controller: _scroll,
+        child: CardFace(face: widget.face),
+      ),
+    ),
+  );
 }
 
 /// Opens [face] full screen with pinch-to-zoom (the zoom button of image cards).

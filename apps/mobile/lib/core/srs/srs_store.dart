@@ -144,6 +144,20 @@ class SrsStore {
   Future<String?> cursor() => db.getValue(cursorKey);
   Future<void> setCursor(String cursor) => db.setValue(cursorKey, cursor);
 
+  /// Official cards the student finds hard (v3 §8): at least [minLapses] lapses («مرة أخرى» on a
+  /// learnt card), or an ease at or below [maxEase] (each lapse takes 0.2 off the starting 2.5). The
+  /// student's own cards (`u:` keys) are left out.
+  Future<Set<String>> hardCardIds({int minLapses = 2, double maxEase = 2.1}) async {
+    final rows =
+        await (db.select(db.srsCardStates)..where(
+              (t) =>
+                  t.flashcardId.like('u:%').not() &
+                  (t.lapses.isBiggerOrEqualValue(minLapses) | t.ease.isSmallerOrEqualValue(maxEase)),
+            ))
+            .get();
+    return {for (final r in rows) r.flashcardId};
+  }
+
   /// Reviewed cards due before [before] (the offline "all due cards" session, §13.2).
   Future<Map<String, CardState>> dueStates(int before) async {
     final rows = await (db.select(

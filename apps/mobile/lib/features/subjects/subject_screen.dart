@@ -9,7 +9,9 @@ import '../../shared/text/bidi.dart';
 import '../../shared/ui/ui.dart';
 import '../../shared/widgets/async_view.dart';
 import '../../shared/widgets/network_avatar.dart';
+import '../../shared/widgets/optional_asset.dart';
 import '../access/access_banner.dart';
+import '../flashcards/flashcard_providers.dart' show decksProvider;
 import '../home/home_providers.dart';
 import '../learning/scope_learning.dart';
 import '../offline/download_widgets.dart';
@@ -17,11 +19,17 @@ import '../offline/offline_providers.dart';
 import '../quizzes/quiz_providers.dart';
 import 'catalog_providers.dart';
 import 'learning_path.dart';
+import 'locked_lessons.dart';
 import 'scope_widgets.dart';
 
-/// A subject page (V-Subject): blue header with progress, access state, the four shortcuts, then the
-/// learning path of the current unit (flag `learningPath`; off: the units accordion), general
-/// lessons and teacher tracks.
+/// A subject page (V-Subject, v3 §3): the blue header with its art slot and progress, the access chip,
+/// the four v3 shortcuts (تدريب · بطاقات بلينغو · راجع أخطاءك · بطاقاتي) with الاختبارات and بنك الأسئلة
+/// under them, then every unit with the selected one drawn as a path of stations (flag `learningPath`;
+/// off: the units accordion), general lessons and teacher tracks.
+///
+/// Locked content is shown on the stations themselves ([lockedLessonIds]): a locked station opens the
+/// activation sheet. The old «هذا المحتوى يحتاج إلى تفعيل» box is gone; it only stays for a subject
+/// without access that has no lessons to carry the lock, so activation is still reachable from it.
 class SubjectScreen extends ConsumerWidget {
   const SubjectScreen({super.key, required this.subjectId});
 
@@ -74,24 +82,34 @@ class _OutlineViewState extends ConsumerState<_OutlineView> {
         outline.deckCount.total == 0 &&
         outline.quizCount.total == 0;
     final canDownload = ref.watch(offlinePacksAvailableProvider);
+    final locked = _lockedLessons(ref, outline, progress);
+    final hasLessons = outline.lessons.isNotEmpty || outline.units.any((u) => u.lessons.isNotEmpty);
     return ScopePage(
       header: ScopeHeader(
         title: outline.subject.nameAr,
         subtitle: outline.subject.description,
         subjectId: id,
         onDownload: canDownload ? _showDownload : null,
+        art: SubjectHeaderArt(code: outline.subject.code),
       ),
       children: [
-        ScopeAccessBanner(access: outline.access, subjectId: outline.subject.id),
-        ScopeShortcuts(
-          subjectId: id,
-          quizCount: outline.quizCount,
-          questionCount: outline.questionCount,
-          deckCount: outline.deckCount,
-          quizzesPath: '${Routes.subjects}/$id/quizzes',
-          decksPath: '${Routes.subjects}/$id/decks',
-          questionsPath: '${Routes.subjects}/$id/questions',
-        ),
+        if (outline.access.hasAccess || !hasLessons)
+          ScopeAccessBanner(access: outline.access, subjectId: outline.subject.id),
+        SubjectShortcuts(subjectId: id, questionCount: outline.questionCount, deckCount: outline.deckCount),
+        if (outline.quizCount.total > 0 || outline.questionCount.total > 0) ...[
+          const SizedBox(height: 8),
+          ScopeShortcuts(
+            subjectId: id,
+            quizCount: outline.quizCount,
+            questionCount: outline.questionCount,
+            deckCount: outline.deckCount,
+            quizzesPath: '${Routes.subjects}/$id/quizzes',
+            decksPath: '${Routes.subjects}/$id/decks',
+            questionsPath: '${Routes.subjects}/$id/questions',
+            showRandom: false,
+            showDecks: false,
+          ),
+        ],
         const SizedBox(height: 12),
         KeyedSubtree(
           key: _downloadKey,
@@ -104,8 +122,8 @@ class _OutlineViewState extends ConsumerState<_OutlineView> {
         if (empty) const PlengoEmptyState(title: 'محتوى هذه المادة قيد الإعداد', icon: Icons.hourglass_empty),
         if (outline.units.isNotEmpty)
           RedesignFlags.learningPath
-              ? _UnitsPath(outline: outline, progress: progress)
-              : _UnitsAccordion(outline: outline, progress: progress),
+              ? _UnitsPath(outline: outline, progress: progress, locked: locked)
+              : _UnitsAccordion(outline: outline, progress: progress, locked: locked),
         if (outline.lessons.isNotEmpty) ...[
           if (outline.units.isNotEmpty) const SectionHeader('دروس عامة', top: 12),
           for (final lesson in outline.lessons)
@@ -115,6 +133,7 @@ class _OutlineViewState extends ConsumerState<_OutlineView> {
                 lesson: lesson,
                 subjectId: id,
                 completion: progress?.lessons.where((l) => l.lessonId == lesson.id).firstOrNull?.completionPercent,
+                locked: locked.contains(lesson.id),
               ),
             ),
         ],
@@ -132,6 +151,116 @@ class _OutlineViewState extends ConsumerState<_OutlineView> {
               ),
             ),
         ],
+      ],
+    );
+  }
+}
+
+/// [lockedLessonIds] for the page: the subject's quizzes and decks are only fetched without access.
+Set<String> _lockedLessons(WidgetRef ref, SubjectOutline outline, ScopeProgress? progress) {
+  if (outline.access.hasAccess) return const {};
+  final id = outline.subject.id;
+  return lockedLessonIds(
+        outline: outline,
+        quizzes: ref.watch(quizzesProvider((subjectId: id, teacherTrackId: null, unitId: null, lessonId: null))),
+        decks: ref.watch(decksProvider((subjectId: id, teacherTrackId: null, unitId: null, lessonId: null))),
+        percents: {for (final l in progress?.lessons ?? const <LessonProgress>[]) l.lessonId: l.completionPercent},
+      ) ??
+      const {};
+}
+
+/// The subject's header art (v3 §3): `assets/subjects/<code>.png` (1080 × 480) when the owner's file
+/// is bundled, else white science doodles over the blue.
+class SubjectHeaderArt extends StatelessWidget {
+  const SubjectHeaderArt({super.key, required this.code});
+
+  final String code;
+
+  static String assetFor(String code) => 'assets/subjects/$code.png';
+
+  @override
+  Widget build(BuildContext context) => OptionalAssetImage(
+    path: assetFor(code),
+    fit: BoxFit.cover,
+    alignment: AlignmentDirectional.centerEnd,
+    placeholder: const _Doodles(),
+  );
+}
+
+/// Generic science doodles (flask, formula, bulb, microscope, bolt, globe) in faint white.
+class _Doodles extends StatelessWidget {
+  const _Doodles();
+
+  @override
+  Widget build(BuildContext context) {
+    const c = Color(0x33FFFFFF);
+    Widget doodle(IconData icon, double size, double angle) => Transform.rotate(
+      angle: angle,
+      child: Icon(icon, size: size, color: c),
+    );
+    return Stack(
+      key: const Key('subject.art.placeholder'),
+      clipBehavior: Clip.hardEdge,
+      children: [
+        PositionedDirectional(top: 14, start: 150, child: doodle(Icons.science_outlined, 34, -0.2)),
+        PositionedDirectional(top: 62, start: 96, child: doodle(Icons.functions_rounded, 30, 0.1)),
+        PositionedDirectional(bottom: 30, start: 20, child: doodle(Icons.lightbulb_outline_rounded, 30, 0.25)),
+        PositionedDirectional(bottom: 24, start: 130, child: doodle(Icons.biotech_outlined, 32, -0.1)),
+        PositionedDirectional(top: 20, end: 150, child: doodle(Icons.bolt_rounded, 28, 0.3)),
+        PositionedDirectional(bottom: 34, end: 120, child: doodle(Icons.public_rounded, 26, 0)),
+      ],
+    );
+  }
+}
+
+/// The four v3 shortcuts under the subject name (v3 §3): تدريب (تدرّب for this subject), بطاقات بلينغو
+/// (the Plengo decks of this subject), راجع أخطاءك (the saved cards of this subject) and بطاقاتي (the
+/// student's own groups for this subject).
+class SubjectShortcuts extends StatelessWidget {
+  const SubjectShortcuts({super.key, required this.subjectId, required this.questionCount, required this.deckCount});
+
+  final String subjectId;
+  final ContentCount questionCount;
+  final ContentCount deckCount;
+
+  @override
+  Widget build(BuildContext context) {
+    String q(Map<String, String> query) => Uri(queryParameters: query).query;
+    return ShortcutRow(
+      key: const Key('subject.shortcuts'),
+      items: [
+        ShortcutTile(
+          icon: Icons.fact_check_rounded,
+          hue: PlengoColors.blue,
+          label: 'تدريب',
+          count: questionCount.total > 0 ? '${questionCount.total}' : '',
+          spoken: 'تدرّب على أسئلة المادة',
+          onTap: () => context.go('${Routes.practice}/$subjectId'),
+        ),
+        ShortcutTile(
+          icon: Icons.style_rounded,
+          hue: PlengoColors.pink,
+          label: 'بطاقات بلينغو',
+          count: deckCount.total > 0 ? shortcutCount(deckCount) : '',
+          spoken: 'فلاش كاردز بلينغو لهذه المادة',
+          onTap: () => context.go('${Routes.plengoCards}?${q({'subjectId': subjectId})}'),
+        ),
+        ShortcutTile(
+          icon: Icons.local_fire_department_rounded,
+          hue: PlengoColors.orange,
+          label: 'راجع أخطاءك',
+          count: '',
+          spoken: 'البطاقات المحفوظة والصعبة في هذه المادة',
+          onTap: () => context.go('${Routes.saved}?${q({'filter': 'cards', 'subjectId': subjectId})}'),
+        ),
+        ShortcutTile(
+          icon: Icons.collections_bookmark_rounded,
+          hue: PlengoColors.green,
+          label: 'بطاقاتي',
+          count: '',
+          spoken: 'مجموعات بطاقاتك لهذه المادة',
+          onTap: () => context.go('${Routes.makeCardsGroups}?${q({'subjectId': subjectId})}'),
+        ),
       ],
     );
   }
@@ -156,14 +285,15 @@ Map<String, PathNodeState> _states(WidgetRef ref, SubjectOutline outline, ScopeP
   );
 }
 
-/// Learning-path layout (flag `learningPath`): completed units collapse into one green row, the
-/// selected unit (the current one by default) shows its banner and zig-zag path, the others are
-/// compact rows that open their path when tapped.
+/// Learning-path layout (flag `learningPath`): every unit in order; the selected unit (the current one
+/// by default) shows its banner and its stations, the others are compact rows (finished ones with a ✓)
+/// that open their path when tapped. v3 §3: no collapsed «completed units» row.
 class _UnitsPath extends ConsumerStatefulWidget {
-  const _UnitsPath({required this.outline, required this.progress});
+  const _UnitsPath({required this.outline, required this.progress, required this.locked});
 
   final SubjectOutline outline;
   final ScopeProgress? progress;
+  final Set<String> locked;
 
   @override
   ConsumerState<_UnitsPath> createState() => _UnitsPathState();
@@ -171,7 +301,6 @@ class _UnitsPath extends ConsumerStatefulWidget {
 
 class _UnitsPathState extends ConsumerState<_UnitsPath> {
   String? _selected;
-  bool _showCompleted = false;
 
   @override
   Widget build(BuildContext context) {
@@ -192,8 +321,6 @@ class _UnitsPathState extends ConsumerState<_UnitsPath> {
         outline.units.where((u) => !complete.contains(u.id)).firstOrNull ??
         outline.units.first;
     final selected = outline.units.where((u) => u.id == _selected).firstOrNull ?? currentUnit;
-    final completedUnits = outline.units.where((u) => complete.contains(u.id)).toList();
-    final showCompleted = _showCompleted || complete.contains(selected.id);
 
     Widget unitView(int index, UnitWithLessons unit) {
       final percentDone = _unitPercent(widget.progress, unit.id) ?? 0;
@@ -236,62 +363,23 @@ class _UnitsPathState extends ConsumerState<_UnitsPath> {
               states: states,
               progress: lessonProgress,
               quiz: quiz,
+              locked: widget.locked,
+              onLocked: (lesson) => showLockedLessonSheet(context, subjectId: id, lesson: lesson),
             ),
         ],
       );
     }
 
-    final indexOf = {for (final (i, u) in outline.units.indexed) u.id: i};
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const SizedBox(height: 8),
-        if (completedUnits.isNotEmpty) ...[
-          _CompletedUnitsRow(
-            units: completedUnits,
-            expanded: showCompleted,
-            onTap: complete.contains(selected.id) ? null : () => setState(() => _showCompleted = !_showCompleted),
+        for (final (i, u) in outline.units.indexed)
+          Padding(
+            padding: const EdgeInsetsDirectional.only(bottom: PlengoSpace.listGap),
+            child: unitView(i, u),
           ),
-          const SizedBox(height: PlengoSpace.listGap),
-          if (showCompleted)
-            for (final u in completedUnits)
-              Padding(
-                padding: const EdgeInsetsDirectional.only(bottom: PlengoSpace.listGap),
-                child: unitView(indexOf[u.id]!, u),
-              ),
-        ],
-        for (final u in outline.units)
-          if (!complete.contains(u.id))
-            Padding(
-              padding: const EdgeInsetsDirectional.only(bottom: PlengoSpace.listGap),
-              child: unitView(indexOf[u.id]!, u),
-            ),
       ],
-    );
-  }
-}
-
-class _CompletedUnitsRow extends StatelessWidget {
-  const _CompletedUnitsRow({required this.units, required this.expanded, required this.onTap});
-
-  final List<UnitWithLessons> units;
-  final bool expanded;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final green = PlengoColors.green;
-    final lessons = units.fold(0, (n, u) => n + u.lessons.length);
-    return ListRow(
-      key: const Key('units.completed'),
-      background: green.soft,
-      leading: SubjectIconTile(icon: Icons.check_rounded, hue: green, size: 36),
-      title: completedUnitsLabel(units.length),
-      caption: '${lessonCountLabel(lessons)} · يمكنك العودة لأي درس',
-      trailing: onTap == null
-          ? null
-          : Text(expanded ? 'إخفاء' : 'عرض', style: PlengoType.chip.copyWith(color: green.ink, fontSize: 13)),
-      onTap: onTap,
     );
   }
 }
@@ -387,10 +475,11 @@ class _UnitBadge extends StatelessWidget {
 /// Flag `learningPath` off: the restyled units accordion (number or ✓ badge, lessons count, %, bar,
 /// unit download, lessons list with «التالي» on the current lesson).
 class _UnitsAccordion extends ConsumerWidget {
-  const _UnitsAccordion({required this.outline, required this.progress});
+  const _UnitsAccordion({required this.outline, required this.progress, required this.locked});
 
   final SubjectOutline outline;
   final ScopeProgress? progress;
+  final Set<String> locked;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -455,6 +544,7 @@ class _UnitsAccordion extends ConsumerWidget {
                         showDivider: j < unit.lessons.length - 1,
                         completion: lessonProgress[lesson.id]?.completionPercent,
                         next: states[lesson.id] == PathNodeState.current,
+                        locked: locked.contains(lesson.id),
                       ),
                   ],
                 ),
@@ -474,6 +564,7 @@ class _LessonRow extends StatelessWidget {
     this.flat = false,
     this.showDivider = true,
     this.next = false,
+    this.locked = false,
   });
 
   final Lesson lesson;
@@ -483,10 +574,24 @@ class _LessonRow extends StatelessWidget {
   final bool showDivider;
   final bool next;
 
+  /// Locked content (v3 §3): a lock and «مقفل»; a tap opens the activation sheet.
+  final bool locked;
+
   @override
   Widget build(BuildContext context) {
     final value = completion ?? 0;
     final done = value >= 100;
+    if (locked) {
+      return ListRow(
+        flat: flat,
+        showDivider: showDivider,
+        icon: Icons.lock_rounded,
+        hue: PlengoColors.red,
+        title: lesson.titleAr,
+        trailing: const LockedChip(),
+        onTap: () => showLockedLessonSheet(context, subjectId: subjectId, lesson: lesson),
+      );
+    }
     return ListRow(
       flat: flat,
       showDivider: showDivider,
