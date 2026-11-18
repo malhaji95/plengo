@@ -84,8 +84,23 @@ String quizMeta(StudentQuiz q) => [
   if (q.locked) 'مقفل',
 ].join(' · ');
 
-/// One unit drawn as a zig-zag path (V-Subject): lesson nodes, then the unit-quiz node. Tapping a node
-/// opens its card under it; tapping again closes it.
+/// What a lesson station shows (v3 §3): locked content (black and white with a lock), started (blue),
+/// finished (green), or open and not started yet (white, outlined).
+enum StationState { locked, started, finished, open }
+
+/// The station of a lesson from its completion and whether its content is locked.
+StationState stationState({required int percent, required bool locked}) => locked
+    ? StationState.locked
+    : percent >= 100
+    ? StationState.finished
+    : percent > 0
+    ? StationState.started
+    : StationState.open;
+
+/// One unit drawn as a zig-zag path (V-Subject, v3 §3): lesson stations, then the unit-quiz node.
+/// Tapping a station opens its card under it (tapping again closes it); a locked station calls
+/// [onLocked] instead (the activation sheet). The current lesson (DECISIONS #7) is drawn larger with
+/// «ابدأ هنا».
 class LessonPath extends StatefulWidget {
   const LessonPath({
     super.key,
@@ -95,6 +110,8 @@ class LessonPath extends StatefulWidget {
     required this.states,
     required this.progress,
     this.quiz,
+    this.locked = const {},
+    this.onLocked,
   });
 
   final String subjectId;
@@ -103,6 +120,10 @@ class LessonPath extends StatefulWidget {
   final Map<String, PathNodeState> states;
   final Map<String, LessonProgress> progress;
   final StudentQuiz? quiz;
+
+  /// Ids of the lessons whose content is locked for the student.
+  final Set<String> locked;
+  final ValueChanged<Lesson>? onLocked;
 
   @override
   State<LessonPath> createState() => _LessonPathState();
@@ -123,26 +144,31 @@ class _LessonPathState extends State<LessonPath> {
         double offset(int i) => math.sin(i * 0.9) * amp * (rtl ? -1 : 1);
         final nodes = <Widget>[];
         for (final (i, lesson) in widget.lessons.indexed) {
-          final state = widget.states[lesson.id] ?? PathNodeState.upcoming;
           final p = widget.progress[lesson.id];
-          final kind = switch (state) {
-            PathNodeState.done => _NodeKind.done,
-            PathNodeState.current => _NodeKind.current,
-            PathNodeState.upcoming => _NodeKind.upcoming,
+          final station = stationState(percent: p?.completionPercent ?? 0, locked: widget.locked.contains(lesson.id));
+          final current =
+              station != StationState.locked &&
+              (widget.states[lesson.id] ?? PathNodeState.upcoming) == PathNodeState.current;
+          final kind = switch (station) {
+            StationState.locked => _NodeKind.locked,
+            StationState.started => _NodeKind.started,
+            StationState.finished => _NodeKind.finished,
+            StationState.open => _NodeKind.open,
           };
           nodes.add(
             _PathItem(
               key: Key('path.${lesson.id}'),
               kind: kind,
+              current: current,
               title: lesson.titleAr,
               meta: lessonMeta(p),
               dx: offset(i),
               open: _open == lesson.id,
-              onTap: () => _toggle(lesson.id),
-              actionLabel: switch (state) {
-                PathNodeState.done => 'تدرّب مجدداً',
-                PathNodeState.current => (p?.completionPercent ?? 0) > 0 ? 'تابع الدرس' : 'ابدأ الدرس',
-                PathNodeState.upcoming => 'ابدأ الدرس',
+              onTap: station == StationState.locked ? () => widget.onLocked?.call(lesson) : () => _toggle(lesson.id),
+              actionLabel: switch (station) {
+                StationState.finished => 'تدرّب مجدداً',
+                StationState.started => 'تابع الدرس',
+                _ => 'ابدأ الدرس',
               },
               onAction: () => context.go(
                 (p?.questionsTotal ?? 0) > 0
@@ -172,6 +198,7 @@ class _LessonPathState extends State<LessonPath> {
         }
         return Semantics(
           container: true,
+          explicitChildNodes: true,
           label: 'دروس ${widget.unitTitle}',
           child: Padding(
             padding: const EdgeInsetsDirectional.only(top: 14, bottom: 6),
@@ -183,7 +210,7 @@ class _LessonPathState extends State<LessonPath> {
   }
 }
 
-enum _NodeKind { done, current, upcoming, quiz }
+enum _NodeKind { finished, started, open, locked, quiz }
 
 class _PathItem extends StatelessWidget {
   const _PathItem({
@@ -196,11 +223,13 @@ class _PathItem extends StatelessWidget {
     required this.onTap,
     required this.actionLabel,
     required this.onAction,
+    this.current = false,
     this.onDetails,
     this.locked = false,
   });
 
   final _NodeKind kind;
+  final bool current;
   final String title;
   final String meta;
   final double dx;
@@ -209,19 +238,23 @@ class _PathItem extends StatelessWidget {
   final String actionLabel;
   final VoidCallback onAction;
   final VoidCallback? onDetails;
+
+  /// The quiz node's lock badge.
   final bool locked;
 
-  String get _stateLabel => switch (kind) {
-    _NodeKind.done => 'مكتمل',
-    _NodeKind.current => 'الحالي',
-    _NodeKind.upcoming => 'لم يبدأ',
-    _NodeKind.quiz => locked ? 'اختبار الوحدة، مقفل' : 'اختبار الوحدة',
-  };
+  String get _stateLabel => current
+      ? 'الحالي'
+      : switch (kind) {
+          _NodeKind.finished => 'مكتمل',
+          _NodeKind.started => 'بدأته',
+          _NodeKind.open => 'لم يبدأ',
+          _NodeKind.locked => 'مقفل، يحتاج إلى تفعيل',
+          _NodeKind.quiz => locked ? 'اختبار الوحدة، مقفل' : 'اختبار الوحدة',
+        };
 
   @override
   Widget build(BuildContext context) {
     final s = context.surface;
-    final current = kind == _NodeKind.current;
     // Full width, so the node shifted by [dx] stays inside this box and can be hit.
     return Padding(
       padding: const EdgeInsetsDirectional.only(bottom: 10),
@@ -248,11 +281,11 @@ class _PathItem extends StatelessWidget {
                   ),
                 Semantics(
                   button: true,
-                  expanded: open,
+                  expanded: kind == _NodeKind.locked ? null : open,
                   label: '$title، $_stateLabel',
                   excludeSemantics: true,
                   onTap: onTap,
-                  child: _Node(kind: kind, locked: locked, onTap: onTap),
+                  child: _Node(kind: kind, current: current, locked: locked, onTap: onTap),
                 ),
                 const SizedBox(height: 6),
                 ExcludeSemantics(
@@ -261,14 +294,14 @@ class _PathItem extends StatelessWidget {
                     child: Text(
                       title,
                       textAlign: TextAlign.center,
-                      style: PlengoType.chip.copyWith(color: s.ink, height: 1.5),
+                      style: PlengoType.chip.copyWith(color: kind == _NodeKind.locked ? s.mute : s.ink, height: 1.5),
                     ),
                   ),
                 ),
               ],
             ),
           ),
-          if (open)
+          if (open && kind != _NodeKind.locked)
             _NodeCard(
               kind: kind,
               title: title,
@@ -283,37 +316,49 @@ class _PathItem extends StatelessWidget {
   }
 }
 
+/// A station: finished green with a tick, started blue with ▶, open white with a blue outline, locked
+/// grey with a lock (never colour alone: each has its own icon), the unit quiz orange with a trophy.
 class _Node extends StatelessWidget {
-  const _Node({required this.kind, required this.locked, required this.onTap});
+  const _Node({required this.kind, required this.current, required this.locked, required this.onTap});
 
   final _NodeKind kind;
+  final bool current;
   final bool locked;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final s = context.surface;
-    final size = kind == _NodeKind.current ? PlengoSpace.pathNodeCurrent : PlengoSpace.pathNode;
+    final size = current ? PlengoSpace.pathNodeCurrent : PlengoSpace.pathNode;
+    final greyShadow = s.isDark ? s.line : const Color(0xFFD9D3C7);
     final (Color fill, Color fg, Color shadow, IconData icon, Border? border) = switch (kind) {
-      _NodeKind.done => (
-        PlengoColors.yellow.base,
+      _NodeKind.finished => (
+        PlengoColors.green.base,
         PlengoColors.ink,
-        PlengoColors.yellow.shadow,
+        PlengoColors.green.shadow,
         Icons.check_rounded,
         null,
       ),
-      _NodeKind.current => (
+      _NodeKind.started => (
         PlengoColors.blue.base,
         Colors.white,
         PlengoColors.blue.shadow,
         Icons.play_arrow_rounded,
         null,
       ),
-      _NodeKind.upcoming => (
-        s.track,
-        s.mute,
-        s.isDark ? s.line : const Color(0xFFD9D3C7),
-        Icons.menu_book_rounded,
+      _NodeKind.open => (
+        s.card,
+        s.action,
+        greyShadow,
+        current ? Icons.play_arrow_rounded : Icons.menu_book_rounded,
+        Border.all(color: s.action, width: 3),
+      ),
+      // Black and white (v3): neutral greys, no warm tint.
+      _NodeKind.locked => (
+        s.isDark ? const Color(0xFF3A3A3A) : const Color(0xFFE4E4E4),
+        s.isDark ? const Color(0xFFBDBDBD) : const Color(0xFF555555),
+        s.isDark ? const Color(0xFF262626) : const Color(0xFFC4C4C4),
+        Icons.lock_rounded,
         null,
       ),
       _NodeKind.quiz => (
@@ -325,13 +370,14 @@ class _Node extends StatelessWidget {
       ),
     };
     return SizedBox(
-      width: size + (kind == _NodeKind.current ? 16 : 0),
-      height: size + (kind == _NodeKind.current ? 16 : 6),
+      width: size + (current ? 16 : 0),
+      height: size + (current ? 16 : 6),
       child: Center(
         child: Stack(
           clipBehavior: Clip.none,
           children: [
             Container(
+              key: Key('node.${kind.name}'),
               width: size,
               height: size,
               decoration: BoxDecoration(
@@ -340,7 +386,7 @@ class _Node extends StatelessWidget {
                 border: border,
                 boxShadow: [
                   BoxShadow(color: shadow, offset: const Offset(0, 6)),
-                  if (kind == _NodeKind.current) BoxShadow(color: s.actionSoft, spreadRadius: 8),
+                  if (current) BoxShadow(color: s.actionSoft, spreadRadius: 8),
                 ],
               ),
               child: Material(
@@ -349,7 +395,7 @@ class _Node extends StatelessWidget {
                 clipBehavior: Clip.antiAlias,
                 child: InkWell(
                   onTap: onTap,
-                  child: Icon(icon, color: fg, size: kind == _NodeKind.current ? 40 : 34),
+                  child: Icon(icon, color: fg, size: current ? 40 : 34),
                 ),
               ),
             ),
@@ -395,11 +441,11 @@ class _NodeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Fills and their text: yellow/orange take dark ink; blue and the grey take white.
+    // Fills and their text: green/orange take dark ink; blue and the grey take white.
     final (Color bg, Color fg, Color actionFg) = switch (kind) {
-      _NodeKind.done => (PlengoColors.yellow.base, PlengoColors.ink, PlengoColors.ink),
-      _NodeKind.current => (PlengoColors.blue.base, Colors.white, PlengoColors.blue.base),
-      _NodeKind.upcoming => (const Color(0xFF5E5A52), Colors.white, PlengoColors.ink),
+      _NodeKind.finished => (PlengoColors.green.base, PlengoColors.ink, PlengoColors.green.ink),
+      _NodeKind.started => (PlengoColors.blue.base, Colors.white, PlengoColors.blue.base),
+      _NodeKind.open || _NodeKind.locked => (const Color(0xFF5E5A52), Colors.white, PlengoColors.ink),
       _NodeKind.quiz => (PlengoColors.orange.base, PlengoColors.ink, PlengoColors.orange.ink),
     };
     final r = BorderRadius.circular(PlengoRadius.row);

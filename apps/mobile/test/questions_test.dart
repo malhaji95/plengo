@@ -166,7 +166,8 @@ void main() {
     await tester.tap(find.text('الحركة'));
     await tester.pumpAndSettle();
     const query = (subjectId: 'p', teacherTrackId: null, unitId: null, lessonId: lessonId);
-    expect(verify(() => app.flashcards.decks(captureAny())).captured.single, query);
+    // The subject page looked up its decks first (locked stations, no access); then the lesson's.
+    expect(verify(() => app.flashcards.decks(captureAny())).captured.last, query);
     expect(verify(() => app.questions.page(captureAny(), cursor: any(named: 'cursor'))).captured.single, query);
     expect(find.text('البطاقات التعليمية'), findsOneWidget);
     expect(find.text('مفردات الحركة'), findsOneWidget);

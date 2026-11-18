@@ -108,6 +108,16 @@ const noAccess = ScopeAccess(
   promotionEndsAt: null,
 );
 
+/// Permanent access to a subject (an entitlement): nothing on its page is locked.
+const permanentAccess = ScopeAccess(
+  hasAccess: true,
+  reason: ScopeAccessReason.entitlement,
+  isPermanent: true,
+  entitlementExpiresAt: null,
+  promotionTitleAr: null,
+  promotionEndsAt: null,
+);
+
 const grade9 = EducationLevel(id: 'l9', code: 'grade-9', nameAr: 'الصف التاسع', sortOrder: 1, isCollege: false);
 const grade12 = EducationLevel(id: 'l12', code: 'grade-12', nameAr: 'البكالوريا', sortOrder: 2, isCollege: false);
 const college = EducationLevel(id: 'lc', code: 'college', nameAr: 'الجامعة', sortOrder: 3, isCollege: true);
