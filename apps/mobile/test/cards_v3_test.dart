@@ -481,7 +481,9 @@ void main() {
       final app = await pump(tester);
       await go(tester, app, Routes.makeCards);
       expect(find.byType(MakeCardsScreen), findsOneWidget);
-      expect(find.byKey(const Key('makeCards.template.physics')), findsNothing); // not bundled
+      for (final k in ['physics', 'medical']) {
+        expect(find.byKey(Key('makeCards.template.$k')), findsOneWidget, reason: k); // the owner's frames
+      }
       for (final k in ['grid', 'sun', 'clouds', 'stars']) {
         expect(find.byKey(Key('makeCards.template.$k')), findsOneWidget, reason: k);
       }
