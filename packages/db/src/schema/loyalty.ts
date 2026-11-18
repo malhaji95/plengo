@@ -67,10 +67,7 @@ export const loyaltyRewards = pgTable(
   },
   (t) => [
     check('loyalty_rewards_cost_ck', sql`${t.costPoints} > 0`),
-    check(
-      'loyalty_rewards_deck_ck',
-      sql`(${t.kind} = 'unlock_deck') = (${t.deckId} is not null)`,
-    ),
+    check('loyalty_rewards_deck_ck', sql`(${t.kind} = 'unlock_deck') = (${t.deckId} is not null)`),
   ],
 );
 

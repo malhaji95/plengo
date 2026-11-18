@@ -3,12 +3,14 @@ import {
   accounts,
   bookmarks,
   entitlements,
+  loyaltyLedger,
   mediaFiles,
   mobileRefreshTokens,
   offlineLeases,
   profiles,
   pushTokens,
   sessions,
+  studentDeckUnlocks,
   teacherFollowers,
   userDecks,
   userNotifications,
@@ -40,6 +42,9 @@ export function createAccountRepository() {
       await tx.delete(teacherFollowers).where(eq(teacherFollowers.userId, userId));
       // Student decks and their cards (cascade); their images are deleted by the caller.
       await tx.delete(userDecks).where(eq(userDecks.userId, userId));
+      // Loyalty points and deck unlocks end with the account (v3 §10); redemptions stay for the record.
+      await tx.delete(studentDeckUnlocks).where(eq(studentDeckUnlocks.userId, userId));
+      await tx.delete(loyaltyLedger).where(eq(loyaltyLedger.userId, userId));
       await tx
         .update(entitlements)
         .set({ status: 'revoked', revokedAt: at, revokeReason: 'account_deleted' })

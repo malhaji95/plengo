@@ -71,6 +71,8 @@ export function createAttemptService(deps: {
   access: AccessService;
   config: ConfigService;
   categories: QuestionCategoryService;
+  /** A correct practice check may earn loyalty points (v3 §10). */
+  onCorrect?: (userId: string, questionId: string) => Promise<unknown>;
   now?: () => Date;
 }) {
   const {
@@ -542,19 +544,24 @@ export function createAttemptService(deps: {
       const q = (await withContent([questionId])).get(questionId)!;
       checkShape(q, body);
       const { mistakeMasteryStreak } = await config.getLearningSettings();
-      return db.transaction(async (tx) => {
+      const checked = await db.transaction(async (tx) => {
         const locked = (await repo.getForUpdate(tx, id, userId))!;
         const stored = (await repo.answers(id, tx)).find((a) => a.questionId === questionId);
         if (stored?.gradedAt) {
           if (!sameAnswer(stored, body)) invalid('answer', 'already_checked');
-          return resultFrom(stored.questionSnapshot as unknown as QuestionSnapshot, stored);
+          return {
+            result: resultFrom(stored.questionSnapshot as unknown as QuestionSnapshot, stored),
+            fresh: false,
+          };
         }
         const result = gradeStored(q, body);
         const at = now();
         await applyGrade(tx, locked, q, body, result, at, mistakeMasteryStreak);
         await repo.update(tx, id, { lastActivityAt: at });
-        return result;
+        return { result, fresh: true };
       });
+      if (checked.fresh && checked.result.isCorrect) await deps.onCorrect?.(userId, questionId);
+      return checked.result;
     },
 
     /**

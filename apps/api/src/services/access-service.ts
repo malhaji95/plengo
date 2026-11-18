@@ -160,10 +160,12 @@ export function createAccessService(deps: {
    * without a query each (lists, quizzes). Build one per request: it is a snapshot of `at`.
    */
   async function context(userId: string, at = now()) {
-    const [owned, promos] = await Promise.all([
+    const [owned, promos, unlockedDecks] = await Promise.all([
       repo.activeEntitlements(userId, at),
       repo.runningPromotions(at),
+      repo.unlockedDeckIds(userId),
     ]);
+    const unlocked = new Set(unlockedDecks);
     const byScope = new Map(owned.map((e) => [scopeKey(e), e]));
     const promoByScope = new Map<string, (typeof promos)[number]>();
     for (const p of promos) {
@@ -191,6 +193,11 @@ export function createAccessService(deps: {
       scopeAccess,
       /** spec §8.6: item.is_free OR isPromoted(scopeOf(item)) OR hasActiveEntitlement(user, scopeOf(item)). */
       canAccessItem: (item: ScopedItem) => item.isFree === true || scopeAccess(scopeOf(item)).hasAccess,
+      /** A deck the student unlocked with loyalty points (v3 §10). */
+      isDeckUnlocked: (deckId: string) => unlocked.has(deckId),
+      /** canAccessItem for an official deck: also open when unlocked with points (v3 §10). */
+      canAccessDeck: (deck: ScopedItem & { id: string }) =>
+        deck.isFree === true || unlocked.has(deck.id) || scopeAccess(scopeOf(deck)).hasAccess,
     };
   }
 
@@ -270,6 +277,9 @@ export function createAccessService(deps: {
     },
     async canAccessItem(userId: string, item: ScopedItem) {
       return item.isFree === true || (await context(userId)).canAccessItem(item);
+    },
+    async canAccessDeck(userId: string, deck: ScopedItem & { id: string }) {
+      return deck.isFree === true || (await context(userId)).canAccessDeck(deck);
     },
     /** For content endpoints: locked items never return payloads (§8.6). */
     async assertCanAccessItem(userId: string, item: ScopedItem) {

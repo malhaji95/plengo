@@ -4,6 +4,7 @@ import {
   entitlements,
   profiles,
   promotions,
+  studentDeckUnlocks,
   subjects,
   teacherTracks,
   teachers,
@@ -159,6 +160,15 @@ export function createAccessRepository(db: Db) {
         .where(and(eq(entitlements.userId, userId), entitlementActiveAt(now))),
 
     runningPromotions: (now: Date) => db.select().from(promotions).where(promotionRunningAt(now)),
+
+    /** Decks the student unlocked with loyalty points (v3 §10). */
+    async unlockedDeckIds(userId: string) {
+      const rows = await db
+        .select({ deckId: studentDeckUnlocks.deckId })
+        .from(studentDeckUnlocks)
+        .where(eq(studentDeckUnlocks.userId, userId));
+      return rows.map((r) => r.deckId);
+    },
 
     /** All of a student's entitlements except superseded ones (they were replaced by an upgrade). */
     listForUser: (userId: string, options: { includeSuperseded?: boolean } = {}) =>

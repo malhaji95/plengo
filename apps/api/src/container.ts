@@ -29,6 +29,10 @@ import { createImportRepository } from './repositories/import-repository.js';
 import { createAccountRepository } from './repositories/account-repository.js';
 import { createReportRepository } from './repositories/report-repository.js';
 import { createUserContentRepository } from './repositories/user-content-repository.js';
+import { createDiagramRepository } from './repositories/diagram-repository.js';
+import { createLoyaltyRepository } from './repositories/loyalty-repository.js';
+import { createDiagramService, diagramFreeSource, type DiagramService } from './services/diagram-service.js';
+import { createLoyaltyService, type LoyaltyService } from './services/loyalty-service.js';
 import { createAccessService, type AccessService } from './services/access-service.js';
 import { createAuditService, type AuditService } from './services/audit-service.js';
 import { createCouponService, type CouponService } from './services/coupon-service.js';
@@ -103,6 +107,8 @@ export interface Container {
   questionCategories: QuestionCategoryService;
   questions: QuestionService;
   flashcards: FlashcardService;
+  diagrams: DiagramService;
+  loyalty: LoyaltyService;
   srs: SrsService;
   quizzes: QuizService;
   attempts: AttemptService;
@@ -225,6 +231,17 @@ export function createContainer(
   const attemptRepo = createAttemptRepository(db);
   const learningRepo = createLearningRepository(db);
   const srsRepo = createSrsRepository(db);
+  const diagramRepo = createDiagramRepository(db);
+  const loyalty = createLoyaltyService({
+    db,
+    repo: createLoyaltyRepository(db),
+    accessRepo,
+    flashcardRepo,
+    access,
+    config: configService,
+    audit,
+    now: overrides.now,
+  });
   // Each content table registers its free-content source (§8.4).
   const freeRules = createFreeRuleService({
     db,
@@ -233,7 +250,12 @@ export function createContainer(
     audit,
     jobs: overrides.jobs,
     config: configService,
-    sources: [questionFreeSource(questionRepo), deckFreeSource(flashcardRepo), quizFreeSource(quizRepo)],
+    sources: [
+      questionFreeSource(questionRepo),
+      deckFreeSource(flashcardRepo),
+      quizFreeSource(quizRepo),
+      diagramFreeSource(diagramRepo),
+    ],
   });
   const questions = createQuestionService({
     db,
@@ -248,6 +270,7 @@ export function createContainer(
     onVisibilityChange: (questionId) => quizRepo.bumpContaining(questionId),
     onGraded: (userId) =>
       learningRepo.addDailyActivity(db, userId, (overrides.now ?? (() => new Date()))(), 1),
+    onCorrect: (userId, questionId) => loyalty.awardCorrectAnswer(userId, questionId),
     now: overrides.now,
   });
   const flashcards = createFlashcardService({
@@ -281,6 +304,7 @@ export function createContainer(
     structureRepo,
     teacherRepo,
     access,
+    onReviewsSynced: (userId, logs) => loyalty.awardReviews(userId, logs),
     now: overrides.now,
   });
   const quizzes = createQuizService({
@@ -307,6 +331,21 @@ export function createContainer(
     access,
     config: configService,
     categories: questionCategories,
+    onCorrect: (userId, questionId) => loyalty.awardCorrectAnswer(userId, questionId),
+    now: overrides.now,
+  });
+  const diagrams = createDiagramService({
+    db,
+    repo: diagramRepo,
+    structureRepo,
+    teacherRepo,
+    access,
+    freeRules,
+    imports,
+    audit,
+    image: (m) => flashcards.image(m),
+    onChecked: (userId) =>
+      learningRepo.addDailyActivity(db, userId, (overrides.now ?? (() => new Date()))(), 1),
     now: overrides.now,
   });
   const learning = createLearningService({
@@ -424,6 +463,8 @@ export function createContainer(
     questionCategories,
     questions,
     flashcards,
+    diagrams,
+    loyalty,
     srs,
     quizzes,
     attempts,
