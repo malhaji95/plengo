@@ -420,7 +420,8 @@ void main() {
     expect(find.text('متقنة (3)'), findsOneWidget);
     expect(find.text('يُتقن السؤال بعد 2 إجابات صحيحة متتالية'), findsOneWidget);
     expect(find.text('أخطأت مرتين · صحيحة متتالية: 1', findRichText: true), findsOneWidget);
-    expect(find.text('تدرّب'), findsOneWidget);
+    // The mistake's practice button (the rail also lists the تدرّب place).
+    expect(find.descendant(of: find.byType(Scaffold).last, matching: find.text('تدرّب')), findsOneWidget);
     await tester.tap(find.byTooltip('إزالة من الأخطاء'));
     await tester.pumpAndSettle();
     verify(() => app.learning.removeMistake('m1')).called(1);

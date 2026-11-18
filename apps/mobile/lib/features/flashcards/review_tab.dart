@@ -8,6 +8,7 @@ import '../../core/api/generated/export.dart';
 import '../../core/content/flashcard_repository.dart';
 import '../../core/srs/scheduler.dart';
 import '../../shared/ui/ui.dart';
+import '../shell/app_drawer.dart';
 import '../../shared/widgets/async_view.dart';
 import '../../shared/widgets/responsive.dart';
 import '../home/home_providers.dart';
@@ -57,7 +58,13 @@ class _ReviewTabState extends ConsumerState<ReviewTab> {
     final due = ref.watch(dueCardsProvider);
     // The links work offline (student decks, §13.9); only the due list needs the server.
     return Scaffold(
-      appBar: AppBar(automaticallyImplyLeading: false, titleSpacing: PlengoSpace.screen, title: const Text('المراجعة')),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        leading: DrawerMenuButton.leadingOf(context),
+        leadingWidth: kPlengoLeadingWidth,
+        titleSpacing: DrawerMenuButton.leadingOf(context) == null ? PlengoSpace.screen : null,
+        title: const Text('المراجعة'),
+      ),
       body: ContentWidth(
         child: RefreshIndicator(
           onRefresh: () => ref.refresh(dueCardsProvider.future),

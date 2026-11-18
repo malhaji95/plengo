@@ -8,6 +8,7 @@ import '../../core/api/api_exception.dart';
 import '../../core/api/generated/export.dart';
 import '../../core/content/media_uploader.dart';
 import '../../shared/ui/ui.dart';
+import '../shell/app_drawer.dart';
 import '../../shared/widgets/network_avatar.dart';
 import '../../shared/widgets/responsive.dart';
 import '../access/access_providers.dart';
@@ -98,7 +99,11 @@ class AccountScreen extends ConsumerWidget {
     ];
 
     return Scaffold(
-      appBar: AppBar(title: const Text('حسابي')),
+      appBar: AppBar(
+        leading: DrawerMenuButton.leadingOf(context),
+        leadingWidth: kPlengoLeadingWidth,
+        title: const Text('حسابي'),
+      ),
       body: ContentWidth(
         child: ListView(
           padding: const EdgeInsetsDirectional.fromSTEB(PlengoSpace.screen, 4, PlengoSpace.screen, 28),

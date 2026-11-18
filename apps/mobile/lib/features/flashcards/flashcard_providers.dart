@@ -14,6 +14,7 @@ import '../../core/srs/scheduler.dart';
 import '../../core/srs/srs_key.dart';
 import '../../core/srs/srs_store.dart';
 import '../my_decks/my_decks_providers.dart';
+import 'hard_cards.dart';
 import '../../shared/util/uuid.dart';
 
 /// Downloaded decks are read from the device (spec §22.11).
@@ -313,6 +314,8 @@ class StudyController extends AsyncNotifier<StudyState> {
     );
     _undo.add((cardId: card.key, before: before, logId: logId));
     if (_undo.length > maxUndo) _undo.removeAt(0);
+    // «مرة أخرى» can make a card hard (v3 §8).
+    ref.invalidate(hardCardsProvider);
     final states = {...s.states, card.key: after};
     _shownAt = _now();
     state = AsyncData(
@@ -328,6 +331,7 @@ class StudyController extends AsyncNotifier<StudyState> {
     final last = _undo.removeLast();
     await _store.putState(last.cardId, last.before);
     await _store.markUndone(last.logId);
+    ref.invalidate(hardCardsProvider);
     final states = {...s.states, last.cardId: last.before};
     final queue = await _queue(s.order, states);
     state = AsyncData(

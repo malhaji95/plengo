@@ -10,7 +10,9 @@ import '../../shared/ui/ui.dart';
 import '../../shared/widgets/async_view.dart';
 import '../flashcards/card_face.dart';
 import '../flashcards/flashcard_ui.dart';
+import '../flashcards/hard_cards.dart';
 import '../questions/questions_screen.dart';
+import '../shell/app_drawer.dart';
 import 'bookmark_button.dart';
 import 'bookmark_providers.dart';
 
@@ -22,34 +24,70 @@ const _filters = <BookmarkItemType?, String>{
   BookmarkItemType.userCard: 'بطاقاتي',
 };
 
+/// `?filter=` values of the saved tab and the type each one selects.
+const savedFilters = <String, BookmarkItemType>{
+  'questions': BookmarkItemType.question,
+  'decks': BookmarkItemType.deck,
+  'cards': BookmarkItemType.flashcard,
+  'my-cards': BookmarkItemType.userCard,
+};
+
 /// The Saved tab (المحفوظات, spec §17). Items the student can no longer open show as locked.
-/// Redesign: V-Saved.
+/// Redesign: V-Saved. [filter] (`?filter=cards`, see [savedFilters]) picks the first type pill and
+/// [subjectId] (`?subjectId=`) keeps one subject's items (v3: «مراجعة البطاقات الصعبة» and «راجع
+/// أخطاءك»). Cards the student finds hard ([hardCardsProvider]) carry «صعبة» and come first.
 class SavedTab extends ConsumerStatefulWidget {
-  const SavedTab({super.key});
+  const SavedTab({super.key, this.filter, this.subjectId});
+
+  final String? filter;
+  final String? subjectId;
 
   @override
   ConsumerState<SavedTab> createState() => _SavedTabState();
 }
 
 class _SavedTabState extends ConsumerState<SavedTab> {
-  BookmarkItemType? _type;
+  late BookmarkItemType? _type = savedFilters[widget.filter];
+  late String? _subjectId = widget.subjectId;
+
+  @override
+  void didUpdateWidget(SavedTab oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // A new link into the tab (e.g. from موادي) replaces the filters.
+    if (oldWidget.filter != widget.filter || oldWidget.subjectId != widget.subjectId) {
+      _type = savedFilters[widget.filter];
+      _subjectId = widget.subjectId;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final list = ref.watch(bookmarksProvider);
+    final hard = ref.watch(hardCardsProvider).value ?? const <String>{};
+    final menu = DrawerMenuButton.leadingOf(context);
     // Toggling elsewhere refreshes the list.
     ref.listen(bookmarkKeysProvider, (_, _) => ref.invalidate(bookmarksProvider));
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        titleSpacing: PlengoSpace.screen,
+        leading: menu,
+        leadingWidth: kPlengoLeadingWidth,
+        titleSpacing: menu == null ? PlengoSpace.screen : null,
         title: const Text('المحفوظات'),
       ),
       body: AsyncView(
         value: list,
         onRetry: () => ref.invalidate(bookmarksProvider),
         data: (l) {
-          final items = l.items.where((b) => _type == null || b.itemType == _type).toList();
+          bool isHard(Bookmark b) => b.itemType == BookmarkItemType.flashcard && hard.contains(b.itemId);
+          final items = l.items
+              .where((b) => (_type == null || b.itemType == _type) && (_subjectId == null || b.subjectId == _subjectId))
+              .toList();
+          // Hard cards first, keeping the saved order otherwise.
+          final ordered = [...items.where(isHard), ...items.where((b) => !isHard(b))];
+          final subjectName = _subjectId == null
+              ? null
+              : l.items.where((b) => b.subjectId == _subjectId).firstOrNull?.subjectNameAr;
           return RefreshIndicator(
             onRefresh: () => ref.refresh(bookmarksProvider.future),
             child: Center(
@@ -63,6 +101,27 @@ class _SavedTabState extends ConsumerState<SavedTab> {
                       selected: _type,
                       onSelected: (t) => setState(() => _type = t),
                     ),
+                    if (_subjectId != null)
+                      Padding(
+                        padding: const EdgeInsetsDirectional.fromSTEB(PlengoSpace.screen, 8, PlengoSpace.screen, 0),
+                        child: Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          spacing: 8,
+                          children: [
+                            PlengoChip(
+                              label: subjectName ?? 'مادة واحدة',
+                              hue: PlengoColors.blue,
+                              icon: Icons.filter_alt_outlined,
+                            ),
+                            TextButton(
+                              key: const Key('saved.allSubjects'),
+                              style: TextButton.styleFrom(minimumSize: const Size(48, 48)),
+                              onPressed: () => setState(() => _subjectId = null),
+                              child: const Text('كل المواد'),
+                            ),
+                          ],
+                        ),
+                      ),
                     const SizedBox(height: 16),
                     if (items.isEmpty)
                       PlengoEmptyState(
@@ -73,7 +132,7 @@ class _SavedTabState extends ConsumerState<SavedTab> {
                         actionLabel: 'تصفّح المواد',
                         onAction: () => context.go(Routes.subjects),
                       ),
-                    for (final b in items)
+                    for (final b in ordered)
                       Padding(
                         padding: const EdgeInsetsDirectional.fromSTEB(
                           PlengoSpace.screen,
@@ -81,7 +140,7 @@ class _SavedTabState extends ConsumerState<SavedTab> {
                           PlengoSpace.screen,
                           PlengoSpace.listGap,
                         ),
-                        child: _BookmarkTile(bookmark: b),
+                        child: _BookmarkTile(bookmark: b, hard: isHard(b)),
                       ),
                   ],
                 ),
@@ -95,9 +154,12 @@ class _SavedTabState extends ConsumerState<SavedTab> {
 }
 
 class _BookmarkTile extends StatelessWidget {
-  const _BookmarkTile({required this.bookmark});
+  const _BookmarkTile({required this.bookmark, this.hard = false});
 
   final Bookmark bookmark;
+
+  /// One of the cards the student finds hard: marked «صعبة».
+  final bool hard;
 
   @override
   Widget build(BuildContext context) {
@@ -135,6 +197,11 @@ class _BookmarkTile extends StatelessWidget {
       leading: SubjectIconTile(icon: icon, hue: hue, soft: true),
       onTap: onTap,
       trailing: [
+        if (hard)
+          const Padding(
+            padding: EdgeInsetsDirectional.only(start: 4),
+            child: PlengoChip(label: 'صعبة', hue: PlengoColors.orange, icon: Icons.local_fire_department_rounded),
+          ),
         if (b.locked)
           const Padding(
             padding: EdgeInsetsDirectional.only(start: 4),
