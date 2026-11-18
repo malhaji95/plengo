@@ -127,6 +127,13 @@
       "when": 1794951663594,
       "tag": "0017_default_question_categories",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1795000696697,
+      "tag": "0018_diagrams_loyalty",
+      "breakpoints": true
     }
   ]
 }
