@@ -296,13 +296,16 @@ class _FeedbackPanelState extends State<FeedbackPanel> with SingleTickerProvider
       if (!ok && widget.correctAnswer != null)
         DefaultTextStyle.merge(
           style: TextStyle(fontFamily: PlengoType.family, fontSize: 15, fontWeight: FontWeight.w700, color: hue.ink),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(widget.correctAnswerLabel ?? 'الإجابة الصحيحة: '),
-              Expanded(child: widget.correctAnswer!),
-            ],
-          ),
+          // A custom (longer) label wraps: the answer goes under it when the line is full.
+          child: widget.correctAnswerLabel != null
+              ? Wrap(children: [Text(widget.correctAnswerLabel!), widget.correctAnswer!])
+              : Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('الإجابة الصحيحة: '),
+                    Expanded(child: widget.correctAnswer!),
+                  ],
+                ),
         ),
       if (widget.explanation != null)
         DefaultTextStyle.merge(
