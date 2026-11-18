@@ -38,6 +38,13 @@ class LearningRepository {
     () async => (await client.api.attempts.checkAttemptAnswer(id: attemptId, questionId: questionId, body: body)).data,
   );
 
+  /// «إجابتي صحيحة لكن بصياغة مختلفة» (v3 §5): a graded wrong written answer of a practice attempt
+  /// counts as correct.
+  Future<MarkAnswerCorrectResult> markCorrect(String attemptId, String questionId) => guardApi(
+    () async =>
+        (await client.api.attempts.markAttemptAnswerCorrect(id: attemptId, questionId: questionId)).data,
+  );
+
   Future<Attempt> submit(String attemptId, SubmitAttemptRequest body) =>
       guardApi(() async => (await client.api.attempts.submitAttempt(id: attemptId, body: body)).data);
 

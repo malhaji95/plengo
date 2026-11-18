@@ -214,6 +214,8 @@ class FeedbackPanel extends StatefulWidget {
     this.onReport,
     this.reportAction,
     this.extra,
+    this.actions,
+    this.correctAnswerLabel,
   });
 
   static const correctTitle = 'أحسنت!';
@@ -244,6 +246,12 @@ class FeedbackPanel extends StatefulWidget {
 
   /// Extra content above the button (e.g. the in-session streak chip).
   final Widget? extra;
+
+  /// Replaces the continue button (e.g. the written-answer self-grade buttons).
+  final Widget? actions;
+
+  /// Defaults to «الإجابة الصحيحة: » (e.g. «الإجابة النموذجية: » for written answers).
+  final String? correctAnswerLabel;
 
   @override
   State<FeedbackPanel> createState() => _FeedbackPanelState();
@@ -291,7 +299,7 @@ class _FeedbackPanelState extends State<FeedbackPanel> with SingleTickerProvider
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('الإجابة الصحيحة: '),
+              Text(widget.correctAnswerLabel ?? 'الإجابة الصحيحة: '),
               Expanded(child: widget.correctAnswer!),
             ],
           ),
@@ -366,11 +374,12 @@ class _FeedbackPanelState extends State<FeedbackPanel> with SingleTickerProvider
                   ),
                 ),
               const SizedBox(height: 14),
-              PlengoButton(
-                label: widget.actionLabel ?? (ok ? 'متابعة' : 'فهمت، متابعة'),
-                variant: ok ? PlengoButtonVariant.success : PlengoButtonVariant.danger,
-                onPressed: widget.onContinue,
-              ),
+              widget.actions ??
+                  PlengoButton(
+                    label: widget.actionLabel ?? (ok ? 'متابعة' : 'فهمت، متابعة'),
+                    variant: ok ? PlengoButtonVariant.success : PlengoButtonVariant.danger,
+                    onPressed: widget.onContinue,
+                  ),
             ],
           ),
         ),

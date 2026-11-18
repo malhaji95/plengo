@@ -361,6 +361,10 @@ class CheckBar extends StatelessWidget {
 /// The feedback panel for a graded answer (spec §4): «أحسنت!» or «ليست الإجابة الصحيحة», the correct
 /// answer, the explanation and the report flag. [addedToMistakes] shows «أضفناه إلى مراجعة الأخطاء»
 /// on a wrong answer; pass it only where the server really records the mistake.
+///
+/// Written answers (v3 §5): [written] labels the right answer «الإجابة النموذجية». A wrong written
+/// answer with [onSelfGradeCorrect] offers «إجابتي خاطئة» (continues) and «إجابتي صحيحة لكن بصياغة
+/// مختلفة» instead of the continue button; once accepted ([markedCorrect]) the panel turns green.
 class AnswerFeedbackPanel extends StatelessWidget {
   const AnswerFeedbackPanel({
     super.key,
@@ -370,6 +374,10 @@ class AnswerFeedbackPanel extends StatelessWidget {
     this.correctAnswerText,
     this.addedToMistakes = false,
     this.actionLabel,
+    this.written = false,
+    this.onSelfGradeCorrect,
+    this.selfGradeBusy = false,
+    this.markedCorrect = false,
   });
 
   final CheckResult result;
@@ -380,24 +388,69 @@ class AnswerFeedbackPanel extends StatelessWidget {
   final String? correctAnswerText;
   final bool addedToMistakes;
   final String? actionLabel;
+  final bool written;
+
+  /// «إجابتي صحيحة لكن بصياغة مختلفة»; null hides the self-grade buttons (exams, choice questions).
+  final VoidCallback? onSelfGradeCorrect;
+  final bool selfGradeBusy;
+
+  /// The student counted this written answer as correct.
+  final bool markedCorrect;
+
+  static const markedCorrectTitle = 'احتسبنا إجابتك صحيحة';
+  static const selfGradeWrongLabel = 'إجابتي خاطئة';
+  static const selfGradeCorrectLabel = 'إجابتي صحيحة لكن بصياغة مختلفة';
 
   @override
   Widget build(BuildContext context) {
     final ok = result.isCorrect;
     final hue = ok ? PlengoColors.green : PlengoColors.red;
     final answer = correctAnswerText ?? result.correctAnswer;
+    final selfGrade = written && !ok && onSelfGradeCorrect != null;
     return FeedbackPanel(
       key: ValueKey('feedback-$questionId'),
       correct: ok,
+      title: markedCorrect ? markedCorrectTitle : null,
       onContinue: onContinue,
       actionLabel: actionLabel,
+      correctAnswerLabel: written ? 'الإجابة النموذجية: ' : null,
       correctAnswer: answer == null ? null : Text(isolateLtr(answer)),
       explanation: result.explanation == null ? null : Text(isolateLtr(result.explanation!)),
       note: addedToMistakes ? FeedbackPanel.mistakesNote : null,
       reportAction: ReportButton(type: ReportItemType.question, id: questionId, soft: false, color: hue.ink),
+      actions: selfGrade
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                PlengoButton(
+                  key: const Key('selfgrade.wrong'),
+                  label: selfGradeWrongLabel,
+                  variant: PlengoButtonVariant.danger,
+                  onPressed: selfGradeBusy ? null : onContinue,
+                ),
+                const SizedBox(height: 10),
+                PlengoButton(
+                  key: const Key('selfgrade.correct'),
+                  label: selfGradeCorrectLabel,
+                  icon: Icons.check_circle_outline_rounded,
+                  variant: PlengoButtonVariant.secondary,
+                  busy: selfGradeBusy,
+                  onPressed: onSelfGradeCorrect,
+                ),
+              ],
+            )
+          : null,
     );
   }
 }
+
+/// [result] counted as correct (a written answer the student graded themselves).
+CheckResult acceptedAsCorrect(CheckResult result) => CheckResult(
+  isCorrect: true,
+  correctOptionId: result.correctOptionId,
+  correctAnswer: result.correctAnswer,
+  explanation: result.explanation,
+);
 
 /// Leaves a full-screen flow: back to where it was opened from, else Home.
 void leaveFlow(BuildContext context) {
@@ -452,6 +505,12 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
   /// Correct answers in a row in this session (DECISIONS #10).
   int _run = 0;
 
+  /// [_run] before the last check, restored (+1) when the student counts a written answer as correct.
+  int _runBefore = 0;
+
+  /// The current written answer was counted as correct by the student (v3 §5).
+  bool _markedCorrect = false;
+
   final _written = TextEditingController();
   String? _selected;
   CheckResult? _result;
@@ -486,6 +545,7 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
       setState(() {
         _result = result;
         _answered++;
+        _runBefore = _run;
         if (result.isCorrect) {
           _correct++;
           _run++;
@@ -500,6 +560,19 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
     }
   }
 
+  /// «إجابتي صحيحة لكن بصياغة مختلفة»: question-bank checks are not recorded, so the answer counts as
+  /// correct in this session's score only (v3 §5).
+  void _markCorrect() {
+    final result = _result;
+    if (result == null || result.isCorrect) return;
+    setState(() {
+      _result = acceptedAsCorrect(result);
+      _markedCorrect = true;
+      _correct++;
+      _run = _runBefore + 1;
+    });
+  }
+
   void _next() {
     if (_last) {
       Navigator.of(context).pop();
@@ -507,6 +580,7 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
     }
     setState(() {
       _index++;
+      _markedCorrect = false;
       _selected = null;
       _result = null;
       _error = null;
@@ -600,6 +674,9 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
                   addedToMistakes: false,
                   actionLabel: _last ? 'إنهاء' : null,
                   onContinue: _next,
+                  written: _isWritten,
+                  onSelfGradeCorrect: _isWritten ? _markCorrect : null,
+                  markedCorrect: _markedCorrect,
                 ),
             ],
           ),

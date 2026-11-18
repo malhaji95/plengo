@@ -324,6 +324,49 @@ class OfflineLearningRepository extends LearningRepository {
   }
 
   @override
+  Future<MarkAnswerCorrectResult> markCorrect(String attemptId, String questionId) async {
+    if (!isLocalAttempt(attemptId)) return super.markCorrect(attemptId, questionId);
+    final a = await _local(attemptId);
+    final q = a.questions.where((x) => x.questionId == questionId).firstOrNull;
+    if (q == null) throw const ApiException('NOT_FOUND', 'العنصر غير موجود');
+    final graded = q.result;
+    if (a.attempt.mode != AttemptSummaryMode.practice || q.type != AttemptQuestionType.written || graded == null) {
+      throw const ApiException('VALIDATION_ERROR', 'لا يمكن تعديل تصحيح هذه الإجابة');
+    }
+    final result = CheckResult(
+      isCorrect: true,
+      correctOptionId: graded.correctOptionId,
+      correctAnswer: graded.correctAnswer,
+      explanation: graded.explanation,
+    );
+    final updated = _with(
+      a,
+      questions: [
+        for (final x in a.questions)
+          x.questionId == questionId
+              ? AttemptQuestion(
+                  questionId: x.questionId,
+                  type: x.type,
+                  unitId: x.unitId,
+                  lessonId: x.lessonId,
+                  questionText: x.questionText,
+                  options: x.options,
+                  selectedOptionId: x.selectedOptionId,
+                  writtenAnswer: x.writtenAnswer,
+                  flagged: x.flagged,
+                  markedCorrectByStudent: true,
+                  answeredAt: x.answeredAt,
+                  timeSpentMs: x.timeSpentMs,
+                  result: result,
+                )
+              : x,
+      ],
+    );
+    await local.put(updated, createdAt: clock());
+    return MarkAnswerCorrectResult(questionId: questionId, result: result, attempt: updated.attempt);
+  }
+
+  @override
   Future<Attempt> submit(String attemptId, SubmitAttemptRequest body) async {
     if (!isLocalAttempt(attemptId)) return super.submit(attemptId, body);
     final a = await _local(attemptId);
