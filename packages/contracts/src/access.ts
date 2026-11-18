@@ -317,7 +317,15 @@ export const freeRulePreviewSchema = z.object({
 });
 
 /** Access settings stored in app_settings (spec §26.2). */
-export const accessSettingsSchema = z.object({ allowTemporaryToPermanentUpgrade: z.boolean() });
+export const accessSettingsSchema = z.object({
+  allowTemporaryToPermanentUpgrade: z.boolean(),
+  /**
+   * v3 §3: when a scope (a subject's general content or a teacher track) has no free rule for a
+   * content kind, content placed in its first N lessons is free (units in order, then their lessons,
+   * then lessons outside units). 0 turns the default off.
+   */
+  defaultFreeLessons: z.number().int().min(0).max(20),
+});
 
 export type ScopeType = z.infer<typeof scopeTypeSchema>;
 export type AccessScope = z.infer<typeof accessScopeSchema>;

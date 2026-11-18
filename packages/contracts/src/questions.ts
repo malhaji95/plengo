@@ -26,6 +26,8 @@ export const studentQuestionSchema = z.object({
   teacherTrackId: z.string().nullable(),
   unitId: z.string().nullable(),
   lessonId: z.string().nullable(),
+  /** Question category (v3 §3), global or of the subject. */
+  categoryId: z.string().nullable(),
   sortOrder: z.number(),
   difficulty: difficultySchema.nullable(),
   isFree: z.boolean(),
@@ -43,12 +45,21 @@ export const studentQuestionPageSchema = z.object({
   accessibleCount: z.number().int(),
 });
 
+/** Comma-separated UUIDs in a query string, e.g. `categoryIds=<uuid>,<uuid>`. */
+export const uuidListParam = z
+  .string()
+  .max(3800)
+  .regex(/^[0-9a-fA-F-]{36}(,[0-9a-fA-F-]{36})*$/)
+  .transform((v) => v.split(','));
+
 export const questionListQuerySchema = z.object({
   subjectId: z.uuid(),
   /** Omitted: the subject's general questions. Set: that track's questions (§8.1). */
   teacherTrackId: z.uuid().optional(),
   unitId: z.uuid().optional(),
   lessonId: z.uuid().optional(),
+  /** Comma-separated category ids (v3 §5); a parent category includes its children. */
+  categoryIds: uuidListParam.optional(),
   cursor: z.string().max(200).optional(),
   limit: z.coerce.number().int().min(1).max(100).default(30),
 });
@@ -92,6 +103,8 @@ export const adminQuestionSchema = z.object({
   trackTitleAr: z.string().nullable(),
   unitId: z.string().nullable(),
   lessonId: z.string().nullable(),
+  categoryId: z.string().nullable(),
+  categoryNameAr: z.string().nullable(),
   questionText: z.string(),
   explanation: z.string().nullable(),
   difficulty: difficultySchema.nullable(),
@@ -123,6 +136,10 @@ export const adminQuestionQuerySchema = z.object({
   lessonId: z.uuid().optional(),
   status: contentStatusSchema.optional(),
   type: questionTypeSchema.optional(),
+  /** This category and its children. */
+  categoryId: z.uuid().optional(),
+  /** Only questions without a category. */
+  uncategorized: boolParam.optional(),
   q: z.string().trim().max(200).optional(),
   cursor: z.string().max(200).optional(),
   limit: z.coerce.number().int().min(1).max(200).default(50),
@@ -142,6 +159,8 @@ export const questionOptionInputSchema = z.object({
 const questionContentShape = {
   unitId: z.uuid().nullable().optional(),
   lessonId: z.uuid().nullable().optional(),
+  /** A global category or one of the question's subject. */
+  categoryId: z.uuid().nullable().optional(),
   questionText,
   explanation: explanation.nullable().optional(),
   difficulty: difficultySchema.nullable().optional(),

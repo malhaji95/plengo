@@ -61,8 +61,14 @@ export const attemptFiltersSchema = z.object({
   teacherTrackId: z.uuid().nullable().optional(),
   unitId: z.uuid().nullable().optional(),
   lessonId: z.uuid().nullable().optional(),
+  /** Practice setup (v3 §5): several lessons of the subject (each may be in any unit). */
+  lessonIds: z.array(z.uuid()).max(200).optional(),
+  /** Question categories; a parent category includes its children. */
+  categoryIds: z.array(z.uuid()).max(100).optional(),
   types: z.array(questionTypeSchema).max(3).optional(),
   count: int().min(1).max(100).optional(),
+  /** «جميع الأسئلة»: every matching question the student can open, up to `PRACTICE_ALL_MAX` (200). */
+  allQuestions: z.boolean().optional(),
   /** Mistake reviews only: limit to these questions ("أعد الأخطاء فقط"). */
   questionIds: z.array(z.uuid()).max(200).optional(),
 });
@@ -96,6 +102,8 @@ export const attemptQuestionSchema = z.object({
   selectedOptionId: z.string().nullable(),
   writtenAnswer: z.string().nullable(),
   flagged: z.boolean(),
+  /** Practice only: the student marked this written answer correct («بصياغة مختلفة», v3 §5). */
+  markedCorrectByStudent: z.boolean(),
   answeredAt: z.string().nullable(),
   timeSpentMs: int().nullable(),
   /** Set after a practice check or once the attempt is submitted. */
@@ -179,6 +187,19 @@ export const submitAttemptBodySchema = z.object({
   answers: z.array(submitAnswerSchema).max(200),
   timeSpentMs: int().min(0).max(86_400_000).optional(),
 });
+
+/**
+ * «إجابتي صحيحة لكن بصياغة مختلفة» (v3 §5): the graded written answer now counts as correct; the
+ * attempt's score, the mistake bank and statistics were updated with it.
+ */
+export const markAnswerCorrectResultSchema = z.object({
+  questionId: z.string(),
+  result: checkResultSchema,
+  attempt: attemptSummarySchema,
+});
+
+/** Random practice «جميع الأسئلة» takes at most this many questions. */
+export const PRACTICE_ALL_MAX = 200;
 
 // ---- admin ----
 
@@ -292,6 +313,7 @@ const named: [z.ZodType, string][] = [
   [savedAnswerSchema, 'SavedAnswer'],
   [submitAnswerSchema, 'SubmitAnswer'],
   [submitAttemptBodySchema, 'SubmitAttemptRequest'],
+  [markAnswerCorrectResultSchema, 'MarkAnswerCorrectResult'],
   [adminQuizQuestionSchema, 'AdminQuizQuestion'],
   [adminQuizSchema, 'AdminQuiz'],
   [adminQuizListSchema, 'AdminQuizList'],

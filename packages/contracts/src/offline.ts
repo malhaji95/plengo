@@ -91,6 +91,7 @@ export const offlineQuestionSchema = z.object({
   teacherTrackId: z.string().nullable(),
   unitId: z.string().nullable(),
   lessonId: z.string().nullable(),
+  categoryId: z.string().nullable(),
   sortOrder: int(),
   difficulty: difficultySchema.nullable(),
   isFree: z.boolean(),
@@ -128,7 +129,8 @@ export const offlineCardSchema = z.object({
   deckId: z.string(),
   sortOrder: int(),
   front: offlineImageSchema,
-  back: offlineImageSchema,
+  /** Null for a single-face card (v3 §6). */
+  back: offlineImageSchema.nullable(),
 });
 
 export const offlineQuizSchema = z.object({

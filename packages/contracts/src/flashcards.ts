@@ -52,14 +52,41 @@ export const studentCardSchema = z.object({
   sortOrder: int(),
   contentVersion: int(),
   front: cardImageSchema,
-  back: cardImageSchema,
+  /** Null for a single-face card (v3 §6): it shows without flipping. */
+  back: cardImageSchema.nullable(),
 });
+
+/** Cards of a locked deck the student may browse before the locked notice (v3 §6). */
+export const DECK_PREVIEW_LIMIT = 5;
 
 export const deckCardsSchema = z.object({
   deck: studentDeckSchema,
+  /** Every published card, or only the first `previewLimit` when `previewOnly`. */
   cards: z.array(studentCardSchema),
+  /** The deck is locked: `cards` holds the preview only; show the locked notice after it. */
+  previewOnly: z.boolean(),
+  /** Set with `previewOnly` (5). */
+  previewLimit: int().nullable(),
   /** When the signed image URLs stop working; fetch again after this. */
   urlsExpireAt: z.string(),
+});
+
+/** «فلاش كاردز بلينغو» (v3 §6): the official decks as products, grouped by subject. */
+export const plengoDeckGroupSchema = z.object({
+  subjectId: z.string(),
+  subjectNameAr: z.string(),
+  subjectCode: z.string(),
+  subjectCoverUrl: z.string().nullable(),
+  subjectSortOrder: int(),
+  /** `coverUrl` is the product (box) image; `locked`/`isFree` as everywhere else. */
+  decks: z.array(studentDeckSchema),
+});
+export const plengoDeckListSchema = z.object({ groups: z.array(plengoDeckGroupSchema) });
+export const plengoDeckQuerySchema = z.object({
+  /** Only this subject. */
+  subjectId: z.uuid().optional(),
+  /** Defaults to the student's own level. */
+  educationLevelId: z.uuid().optional(),
 });
 
 // ---- spaced repetition ----
@@ -153,6 +180,8 @@ export const userDeckSchema = z.object({
   name: z.string(),
   subjectId: z.string().nullable(),
   color: z.string().nullable(),
+  /** The card frame the deck renders on (v3 §7), e.g. `physics`, `medical`, `grid`, `sun`. */
+  templateKey: z.string().nullable(),
   sortOrder: int(),
   /** Live cards in the deck. */
   cardCount: int(),
@@ -202,6 +231,12 @@ export const userDeckInputSchema = z.object({
   color: z
     .string()
     .regex(/^#[0-9a-fA-F]{6}$/)
+    .nullable()
+    .optional(),
+  /** Template key: lowercase letters, digits, `-` or `_` (v3 §7). */
+  templateKey: z
+    .string()
+    .regex(/^[a-z0-9][a-z0-9_-]{0,39}$/)
     .nullable()
     .optional(),
   sortOrder: int().min(0).max(100_000),
@@ -309,7 +344,8 @@ export const adminCardSchema = z.object({
   status: contentStatusSchema,
   contentVersion: int(),
   front: cardImageSchema,
-  back: cardImageSchema,
+  /** Null for a single-face card (v3 §6). */
+  back: cardImageSchema.nullable(),
 });
 export const adminCardListSchema = z.array(adminCardSchema);
 
@@ -339,10 +375,15 @@ export const createDeckBodySchema = z.object({
 });
 export const updateDeckBodySchema = z.object(deckContentShape).partial();
 
-export const createCardBodySchema = z.object({ frontMediaId: z.uuid(), backMediaId: z.uuid() });
+/** No `backMediaId` (or null): a single-face card (v3 §6). */
+export const createCardBodySchema = z.object({
+  frontMediaId: z.uuid(),
+  backMediaId: z.uuid().nullable().optional(),
+});
 export const updateCardBodySchema = z.object({
   frontMediaId: z.uuid().optional(),
-  backMediaId: z.uuid().optional(),
+  /** Null removes the back: the card becomes single-face. */
+  backMediaId: z.uuid().nullable().optional(),
   status: contentStatusSchema.optional(),
 });
 
@@ -365,6 +406,8 @@ const named: [z.ZodType, string][] = [
   [studentDeckListSchema, 'StudentDeckList'],
   [studentCardSchema, 'StudentCard'],
   [deckCardsSchema, 'DeckCards'],
+  [plengoDeckGroupSchema, 'PlengoDeckGroup'],
+  [plengoDeckListSchema, 'PlengoDeckList'],
   [srsStateInputSchema, 'SrsStateInput'],
   [srsCardStateSchema, 'SrsCardState'],
   [srsCardStateInputSchema, 'SrsSyncState'],

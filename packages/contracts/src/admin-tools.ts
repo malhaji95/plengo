@@ -198,7 +198,8 @@ export const bulkCardsBodySchema = z.object({
     .array(
       z.object({
         frontMediaId: z.uuid(),
-        backMediaId: z.uuid(),
+        /** Null or omitted: a single-face card (v3 §6). */
+        backMediaId: z.uuid().nullable().optional(),
       }),
     )
     .min(1)

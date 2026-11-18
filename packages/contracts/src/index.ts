@@ -8,6 +8,7 @@ export * from './structure.js';
 export * from './teachers.js';
 export * from './access.js';
 export * from './questions.js';
+export * from './categories.js';
 export * from './flashcards.js';
 export * from './quizzes.js';
 export * from './learning.js';

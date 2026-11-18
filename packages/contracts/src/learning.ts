@@ -140,6 +140,24 @@ export const flashcardStatsSchema = z.object({
 
 export const bookmarkItemTypeSchema = z.enum(['question', 'flashcard', 'user_card', 'deck']);
 
+/**
+ * Where a saved card is filed in المحفوظات (v3 §8): subject → unit → deck. Official cards and decks
+ * use the deck's subject and unit (a lesson's unit when the deck sits on a lesson); a student card
+ * uses its own deck and that deck's subject. Questions carry subject and unit with no deck.
+ */
+export const bookmarkGroupSchema = z.object({
+  subjectId: z.string().nullable(),
+  subjectNameAr: z.string().nullable(),
+  unitId: z.string().nullable(),
+  unitTitleAr: z.string().nullable(),
+  lessonId: z.string().nullable(),
+  lessonTitleAr: z.string().nullable(),
+  deckId: z.string().nullable(),
+  deckTitle: z.string().nullable(),
+  /** The deck is the student's own (§13.9). */
+  ownDeck: z.boolean(),
+});
+
 export const bookmarkSchema = z.object({
   id: z.string(),
   itemType: bookmarkItemTypeSchema,
@@ -157,6 +175,8 @@ export const bookmarkSchema = z.object({
   card: studentCardSchema.nullable(),
   /** A student's own card (§13.9). */
   userCard: userCardSchema.nullable(),
+  /** Null when the item is not available. */
+  group: bookmarkGroupSchema.nullable(),
 });
 export const bookmarkListSchema = z.object({
   items: z.array(bookmarkSchema),
@@ -252,6 +272,7 @@ const named: [z.ZodType, string][] = [
   [dayCountSchema, 'DayCount'],
   [flashcardStatsSchema, 'FlashcardStats'],
   [bookmarkItemTypeSchema, 'BookmarkItemType'],
+  [bookmarkGroupSchema, 'BookmarkGroup'],
   [bookmarkSchema, 'Bookmark'],
   [bookmarkListSchema, 'BookmarkList'],
   [bookmarkBodySchema, 'BookmarkRequest'],
