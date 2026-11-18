@@ -6,6 +6,8 @@ import '../../core/api/generated/export.dart';
 import '../../core/content/study_card.dart';
 import '../../shared/ui/ui.dart';
 import '../../shared/widgets/async_view.dart';
+import '../access/access_banner.dart';
+import '../bookmarks/star_button.dart';
 import '../my_decks/add_to_my_deck.dart';
 import '../my_decks/my_decks_providers.dart';
 import '../reports/report_sheet.dart';
@@ -32,7 +34,8 @@ class BrowseScreen extends ConsumerWidget {
       data: (d) => CardBrowser(
         title: d.title,
         cards: d.cards,
-        onAdd: !decksOn
+        lockedDeck: d.lockedDeck,
+        onAdd: !decksOn || d.lockedDeck != null
             ? null
             : (card) async {
                 final official = await officialCardFor(ref, deckId, card.key);
@@ -63,7 +66,7 @@ class MyBrowseScreen extends ConsumerWidget {
         title: deck?.name ?? 'تصفح',
         cards: [
           for (final r in rows)
-            if (!r.locked) StudyCard.own(r),
+            if (!r.locked) StudyCard.own(r, templateKey: deck?.templateKey),
         ],
       ),
     );
@@ -73,12 +76,16 @@ class MyBrowseScreen extends ConsumerWidget {
 /// The browse UI: «5 / 131» with a thin bar, the card (tap flips it, a horizontal swipe moves in the
 /// reading direction), «السابق | اقلب البطاقة | التالي», and «+ أضف إلى بطاقاتي» when [onAdd] is set.
 /// Keyboard on web: Space flips; the arrow pointing in the reading direction (left in Arabic) goes to
-/// the next card.
+/// the next card. Every card has its star (v3 §8). A single-face card has no flip button. With
+/// [lockedDeck] (a locked deck's preview, v3 §6) the cards end on the locked notice.
 class CardBrowser extends ConsumerStatefulWidget {
-  const CardBrowser({super.key, required this.title, required this.cards, this.onAdd, this.onReport});
+  const CardBrowser({super.key, required this.title, required this.cards, this.onAdd, this.onReport, this.lockedDeck});
 
   final String title;
   final List<StudyCard> cards;
+
+  /// The deck behind a preview: after its cards comes the locked notice.
+  final StudentDeck? lockedDeck;
 
   /// Adds the card to the student's decks; resolves to whether it was added.
   final Future<bool> Function(StudyCard card)? onAdd;
@@ -100,24 +107,31 @@ class _CardBrowserState extends ConsumerState<CardBrowser> {
     if (next != _index) setState(() => (_index = next, _flipped = false));
   }
 
-  void _flip() => setState(() => _flipped = !_flipped);
+  void _flip() {
+    final i = _index;
+    if (i < widget.cards.length && widget.cards[i].singleFace) return;
+    setState(() => _flipped = !_flipped);
+  }
 
   @override
   Widget build(BuildContext context) {
     final cards = widget.cards;
     final rtl = Directionality.of(context) == TextDirection.rtl;
     final s = context.surface;
-    if (cards.isEmpty) {
+    final locked = widget.lockedDeck;
+    if (cards.isEmpty && locked == null) {
       return Scaffold(
         appBar: plengoAppBar(context, title: widget.title),
         body: const EmptyState('لا بطاقات في هذه المجموعة'),
       );
     }
-    _index = _index.clamp(0, cards.length - 1);
-    final card = cards[_index];
-    final count = cards.length;
-    final face = _flipped ? card.back : card.front;
-    final added = _added.contains(card.key);
+    // A preview ends on the locked notice, one step after its last card.
+    final count = cards.length + (locked == null ? 0 : 1);
+    _index = _index.clamp(0, count - 1);
+    final card = _index >= cards.length ? null : cards[_index];
+    final face = card == null ? null : (_flipped && !card.singleFace ? card.back : card.front);
+    final added = card != null && _added.contains(card.key);
+    final single = card?.singleFace ?? false;
     ref.read(cardImagePrefetchProvider)(context, [for (final c in cards.skip(_index + 1).take(3)) ...c.images]);
     return Scaffold(
       appBar: AppBar(
@@ -153,13 +167,14 @@ class _CardBrowserState extends ConsumerState<CardBrowser> {
           ),
         ),
         actions: [
-          if (faceHasImage(face))
+          if (face != null && faceHasImage(face))
             PlengoIconButton(
               icon: Icons.zoom_in_rounded,
               tooltip: 'تكبير البطاقة',
               onPressed: () => showCardZoom(context, face),
             ),
-          if (widget.onReport != null) ...[
+          if (card != null) ...[const SizedBox(width: 6), StarButton(card: card)],
+          if (widget.onReport != null && card != null) ...[
             const SizedBox(width: 6),
             PlengoIconButton(
               icon: Icons.flag_outlined,
@@ -209,16 +224,20 @@ class _CardBrowserState extends ConsumerState<CardBrowser> {
                                 ),
                                 const SizedBox(height: 10),
                                 Center(
-                                  child: FlashcardView(
-                                    card: card,
-                                    flipped: _flipped,
-                                    onTap: _flip,
-                                    maxHeight: (box.maxHeight - 90).clamp(200, double.infinity),
-                                  ),
+                                  child: card == null
+                                      ? LockedEndCard(deck: locked!)
+                                      : FlashcardView(
+                                          card: card,
+                                          flipped: _flipped,
+                                          onTap: _flip,
+                                          maxHeight: (box.maxHeight - 90).clamp(200, double.infinity),
+                                        ),
                                 ),
                                 const SizedBox(height: 10),
                                 Text(
-                                  'اضغط على البطاقة أو اسحب يميناً ويساراً للتنقّل',
+                                  card == null || single
+                                      ? 'اسحب يميناً ويساراً للتنقّل'
+                                      : 'اضغط على البطاقة أو اسحب يميناً ويساراً للتنقّل',
                                   textAlign: TextAlign.center,
                                   style: PlengoType.caption.copyWith(color: s.mute),
                                 ),
@@ -243,11 +262,14 @@ class _CardBrowserState extends ConsumerState<CardBrowser> {
                             ),
                           ),
                           const SizedBox(width: 8),
-                          Expanded(
-                            flex: 13,
-                            child: PlengoButton(label: 'اقلب البطاقة', onPressed: _flip),
-                          ),
-                          const SizedBox(width: 8),
+                          // A single-face card (and the locked notice) has nothing to flip.
+                          if (card != null && !single) ...[
+                            Expanded(
+                              flex: 13,
+                              child: PlengoButton(label: 'اقلب البطاقة', onPressed: _flip),
+                            ),
+                            const SizedBox(width: 8),
+                          ],
                           Expanded(
                             flex: 10,
                             child: PlengoButton(
@@ -259,7 +281,7 @@ class _CardBrowserState extends ConsumerState<CardBrowser> {
                           ),
                         ],
                       ),
-                      if (widget.onAdd != null)
+                      if (widget.onAdd != null && card != null)
                         Semantics(
                           toggled: added,
                           child: PlengoButton(
@@ -280,6 +302,50 @@ class _CardBrowserState extends ConsumerState<CardBrowser> {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The last page of a locked deck's preview (v3 §6): a card-sized notice that the rest needs
+/// activation, with the code screen when COUPON_REDEMPTION is on ([LockedNotice]).
+class LockedEndCard extends StatelessWidget {
+  const LockedEndCard({super.key, required this.deck});
+
+  final StudentDeck deck;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = context.surface;
+    return ConstrainedBox(
+      key: const Key('browse.lockedEnd'),
+      constraints: const BoxConstraints(maxWidth: 420, minHeight: 260),
+      child: PlengoCard(
+        radius: PlengoRadius.flashcard,
+        padding: const EdgeInsetsDirectional.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Center(
+              child: StateIllustration(icon: Icons.lock_rounded, hue: PlengoColors.red, size: 96),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'انتهت البطاقات المتاحة للتجربة',
+              textAlign: TextAlign.center,
+              style: PlengoType.section.copyWith(color: s.ink),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'فعّل «${deck.titleAr}» لتتصفح كل البطاقات وتراجعها',
+              textAlign: TextAlign.center,
+              style: PlengoType.sub.copyWith(color: s.mute),
+            ),
+            const SizedBox(height: 14),
+            LockedNotice(subjectId: deck.subjectId, teacherTrackId: deck.teacherTrackId),
+          ],
         ),
       ),
     );

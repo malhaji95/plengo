@@ -84,6 +84,9 @@ class LocalDecks extends Table {
   TextColumn get name => text()();
   TextColumn get subjectId => text().nullable()();
   TextColumn get color => text().nullable()();
+
+  /// The card frame the deck's cards are drawn on (v3 §7), e.g. `grid`; null = no frame.
+  TextColumn get templateKey => text().nullable()();
   IntColumn get sortOrder => integer()();
   IntColumn get createdAt => integer()();
   IntColumn get updatedAt => integer()();
@@ -236,7 +239,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -265,6 +268,7 @@ class AppDatabase extends _$AppDatabase {
           await m.createTable(table);
         }
       }
+      if (from < 6) await m.addColumn(localDecks, localDecks.templateKey);
     },
   );
 

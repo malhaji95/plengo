@@ -20,7 +20,7 @@ class CardFaceView {
 /// A card in Browse or Study, official (images only, §13.1) or the student's own (§13.9). `key` is
 /// the SRS key ([SrsKey]).
 class StudyCard {
-  const StudyCard({required this.key, required this.front, required this.back, this.officialId});
+  const StudyCard({required this.key, required this.front, required this.back, this.officialId, this.templateKey});
 
   factory StudyCard.official(StudentCard c) => StudyCard(
     key: c.id,
@@ -29,9 +29,11 @@ class StudyCard {
     back: CardFaceView(image: c.back),
   );
 
-  factory StudyCard.own(LocalCardRow r) => StudyCard(
+  /// [templateKey]: the frame of the card's deck (v3 §7).
+  factory StudyCard.own(LocalCardRow r, {String? templateKey}) => StudyCard(
     key: SrsKey.userCard(r.id),
     officialId: r.officialFlashcardId,
+    templateKey: r.officialFlashcardId == null ? templateKey : null,
     front: CardFaceView(text: r.frontText, image: imageFromJson(r.frontImageJson), localImage: r.frontLocalImage),
     back: CardFaceView(text: r.backText, image: imageFromJson(r.backImageJson), localImage: r.backLocalImage),
   );
@@ -42,6 +44,12 @@ class StudyCard {
 
   /// The official card this shows (official cards and "أضف إلى بطاقاتي" references).
   final String? officialId;
+
+  /// The frame a student's card is drawn on (v3 §7); null for official cards.
+  final String? templateKey;
+
+  /// A card with only a front (v3 §6: a ready-made card): it shows without flipping.
+  bool get singleFace => back.isEmpty;
 
   Iterable<CardImage> get images => [?front.image, ?back.image];
 

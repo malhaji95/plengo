@@ -2313,6 +2313,17 @@ class $LocalDecksTable extends LocalDecks
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _templateKeyMeta = const VerificationMeta(
+    'templateKey',
+  );
+  @override
+  late final GeneratedColumn<String> templateKey = GeneratedColumn<String>(
+    'template_key',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _sortOrderMeta = const VerificationMeta(
     'sortOrder',
   );
@@ -2376,6 +2387,7 @@ class $LocalDecksTable extends LocalDecks
     name,
     subjectId,
     color,
+    templateKey,
     sortOrder,
     createdAt,
     updatedAt,
@@ -2417,6 +2429,15 @@ class $LocalDecksTable extends LocalDecks
       context.handle(
         _colorMeta,
         color.isAcceptableOrUnknown(data['color']!, _colorMeta),
+      );
+    }
+    if (data.containsKey('template_key')) {
+      context.handle(
+        _templateKeyMeta,
+        templateKey.isAcceptableOrUnknown(
+          data['template_key']!,
+          _templateKeyMeta,
+        ),
       );
     }
     if (data.containsKey('sort_order')) {
@@ -2480,6 +2501,10 @@ class $LocalDecksTable extends LocalDecks
         DriftSqlType.string,
         data['${effectivePrefix}color'],
       ),
+      templateKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}template_key'],
+      ),
       sortOrder: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}sort_order'],
@@ -2514,6 +2539,9 @@ class LocalDeckRow extends DataClass implements Insertable<LocalDeckRow> {
   final String name;
   final String? subjectId;
   final String? color;
+
+  /// The card frame the deck's cards are drawn on (v3 §7), e.g. `grid`; null = no frame.
+  final String? templateKey;
   final int sortOrder;
   final int createdAt;
   final int updatedAt;
@@ -2524,6 +2552,7 @@ class LocalDeckRow extends DataClass implements Insertable<LocalDeckRow> {
     required this.name,
     this.subjectId,
     this.color,
+    this.templateKey,
     required this.sortOrder,
     required this.createdAt,
     required this.updatedAt,
@@ -2540,6 +2569,9 @@ class LocalDeckRow extends DataClass implements Insertable<LocalDeckRow> {
     }
     if (!nullToAbsent || color != null) {
       map['color'] = Variable<String>(color);
+    }
+    if (!nullToAbsent || templateKey != null) {
+      map['template_key'] = Variable<String>(templateKey);
     }
     map['sort_order'] = Variable<int>(sortOrder);
     map['created_at'] = Variable<int>(createdAt);
@@ -2561,6 +2593,9 @@ class LocalDeckRow extends DataClass implements Insertable<LocalDeckRow> {
       color: color == null && nullToAbsent
           ? const Value.absent()
           : Value(color),
+      templateKey: templateKey == null && nullToAbsent
+          ? const Value.absent()
+          : Value(templateKey),
       sortOrder: Value(sortOrder),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
@@ -2581,6 +2616,7 @@ class LocalDeckRow extends DataClass implements Insertable<LocalDeckRow> {
       name: serializer.fromJson<String>(json['name']),
       subjectId: serializer.fromJson<String?>(json['subjectId']),
       color: serializer.fromJson<String?>(json['color']),
+      templateKey: serializer.fromJson<String?>(json['templateKey']),
       sortOrder: serializer.fromJson<int>(json['sortOrder']),
       createdAt: serializer.fromJson<int>(json['createdAt']),
       updatedAt: serializer.fromJson<int>(json['updatedAt']),
@@ -2596,6 +2632,7 @@ class LocalDeckRow extends DataClass implements Insertable<LocalDeckRow> {
       'name': serializer.toJson<String>(name),
       'subjectId': serializer.toJson<String?>(subjectId),
       'color': serializer.toJson<String?>(color),
+      'templateKey': serializer.toJson<String?>(templateKey),
       'sortOrder': serializer.toJson<int>(sortOrder),
       'createdAt': serializer.toJson<int>(createdAt),
       'updatedAt': serializer.toJson<int>(updatedAt),
@@ -2609,6 +2646,7 @@ class LocalDeckRow extends DataClass implements Insertable<LocalDeckRow> {
     String? name,
     Value<String?> subjectId = const Value.absent(),
     Value<String?> color = const Value.absent(),
+    Value<String?> templateKey = const Value.absent(),
     int? sortOrder,
     int? createdAt,
     int? updatedAt,
@@ -2619,6 +2657,7 @@ class LocalDeckRow extends DataClass implements Insertable<LocalDeckRow> {
     name: name ?? this.name,
     subjectId: subjectId.present ? subjectId.value : this.subjectId,
     color: color.present ? color.value : this.color,
+    templateKey: templateKey.present ? templateKey.value : this.templateKey,
     sortOrder: sortOrder ?? this.sortOrder,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
@@ -2631,6 +2670,9 @@ class LocalDeckRow extends DataClass implements Insertable<LocalDeckRow> {
       name: data.name.present ? data.name.value : this.name,
       subjectId: data.subjectId.present ? data.subjectId.value : this.subjectId,
       color: data.color.present ? data.color.value : this.color,
+      templateKey: data.templateKey.present
+          ? data.templateKey.value
+          : this.templateKey,
       sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
@@ -2646,6 +2688,7 @@ class LocalDeckRow extends DataClass implements Insertable<LocalDeckRow> {
           ..write('name: $name, ')
           ..write('subjectId: $subjectId, ')
           ..write('color: $color, ')
+          ..write('templateKey: $templateKey, ')
           ..write('sortOrder: $sortOrder, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
@@ -2661,6 +2704,7 @@ class LocalDeckRow extends DataClass implements Insertable<LocalDeckRow> {
     name,
     subjectId,
     color,
+    templateKey,
     sortOrder,
     createdAt,
     updatedAt,
@@ -2675,6 +2719,7 @@ class LocalDeckRow extends DataClass implements Insertable<LocalDeckRow> {
           other.name == this.name &&
           other.subjectId == this.subjectId &&
           other.color == this.color &&
+          other.templateKey == this.templateKey &&
           other.sortOrder == this.sortOrder &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
@@ -2687,6 +2732,7 @@ class LocalDecksCompanion extends UpdateCompanion<LocalDeckRow> {
   final Value<String> name;
   final Value<String?> subjectId;
   final Value<String?> color;
+  final Value<String?> templateKey;
   final Value<int> sortOrder;
   final Value<int> createdAt;
   final Value<int> updatedAt;
@@ -2698,6 +2744,7 @@ class LocalDecksCompanion extends UpdateCompanion<LocalDeckRow> {
     this.name = const Value.absent(),
     this.subjectId = const Value.absent(),
     this.color = const Value.absent(),
+    this.templateKey = const Value.absent(),
     this.sortOrder = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -2710,6 +2757,7 @@ class LocalDecksCompanion extends UpdateCompanion<LocalDeckRow> {
     required String name,
     this.subjectId = const Value.absent(),
     this.color = const Value.absent(),
+    this.templateKey = const Value.absent(),
     required int sortOrder,
     required int createdAt,
     required int updatedAt,
@@ -2726,6 +2774,7 @@ class LocalDecksCompanion extends UpdateCompanion<LocalDeckRow> {
     Expression<String>? name,
     Expression<String>? subjectId,
     Expression<String>? color,
+    Expression<String>? templateKey,
     Expression<int>? sortOrder,
     Expression<int>? createdAt,
     Expression<int>? updatedAt,
@@ -2738,6 +2787,7 @@ class LocalDecksCompanion extends UpdateCompanion<LocalDeckRow> {
       if (name != null) 'name': name,
       if (subjectId != null) 'subject_id': subjectId,
       if (color != null) 'color': color,
+      if (templateKey != null) 'template_key': templateKey,
       if (sortOrder != null) 'sort_order': sortOrder,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
@@ -2752,6 +2802,7 @@ class LocalDecksCompanion extends UpdateCompanion<LocalDeckRow> {
     Value<String>? name,
     Value<String?>? subjectId,
     Value<String?>? color,
+    Value<String?>? templateKey,
     Value<int>? sortOrder,
     Value<int>? createdAt,
     Value<int>? updatedAt,
@@ -2764,6 +2815,7 @@ class LocalDecksCompanion extends UpdateCompanion<LocalDeckRow> {
       name: name ?? this.name,
       subjectId: subjectId ?? this.subjectId,
       color: color ?? this.color,
+      templateKey: templateKey ?? this.templateKey,
       sortOrder: sortOrder ?? this.sortOrder,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -2787,6 +2839,9 @@ class LocalDecksCompanion extends UpdateCompanion<LocalDeckRow> {
     }
     if (color.present) {
       map['color'] = Variable<String>(color.value);
+    }
+    if (templateKey.present) {
+      map['template_key'] = Variable<String>(templateKey.value);
     }
     if (sortOrder.present) {
       map['sort_order'] = Variable<int>(sortOrder.value);
@@ -2816,6 +2871,7 @@ class LocalDecksCompanion extends UpdateCompanion<LocalDeckRow> {
           ..write('name: $name, ')
           ..write('subjectId: $subjectId, ')
           ..write('color: $color, ')
+          ..write('templateKey: $templateKey, ')
           ..write('sortOrder: $sortOrder, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
@@ -7859,6 +7915,7 @@ typedef $$LocalDecksTableCreateCompanionBuilder =
       required String name,
       Value<String?> subjectId,
       Value<String?> color,
+      Value<String?> templateKey,
       required int sortOrder,
       required int createdAt,
       required int updatedAt,
@@ -7872,6 +7929,7 @@ typedef $$LocalDecksTableUpdateCompanionBuilder =
       Value<String> name,
       Value<String?> subjectId,
       Value<String?> color,
+      Value<String?> templateKey,
       Value<int> sortOrder,
       Value<int> createdAt,
       Value<int> updatedAt,
@@ -7906,6 +7964,11 @@ class $$LocalDecksTableFilterComposer
 
   ColumnFilters<String> get color => $composableBuilder(
     column: $table.color,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get templateKey => $composableBuilder(
+    column: $table.templateKey,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -7964,6 +8027,11 @@ class $$LocalDecksTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get templateKey => $composableBuilder(
+    column: $table.templateKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get sortOrder => $composableBuilder(
     column: $table.sortOrder,
     builder: (column) => ColumnOrderings(column),
@@ -8010,6 +8078,11 @@ class $$LocalDecksTableAnnotationComposer
 
   GeneratedColumn<String> get color =>
       $composableBuilder(column: $table.color, builder: (column) => column);
+
+  GeneratedColumn<String> get templateKey => $composableBuilder(
+    column: $table.templateKey,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<int> get sortOrder =>
       $composableBuilder(column: $table.sortOrder, builder: (column) => column);
@@ -8062,6 +8135,7 @@ class $$LocalDecksTableTableManager
                 Value<String> name = const Value.absent(),
                 Value<String?> subjectId = const Value.absent(),
                 Value<String?> color = const Value.absent(),
+                Value<String?> templateKey = const Value.absent(),
                 Value<int> sortOrder = const Value.absent(),
                 Value<int> createdAt = const Value.absent(),
                 Value<int> updatedAt = const Value.absent(),
@@ -8073,6 +8147,7 @@ class $$LocalDecksTableTableManager
                 name: name,
                 subjectId: subjectId,
                 color: color,
+                templateKey: templateKey,
                 sortOrder: sortOrder,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
@@ -8086,6 +8161,7 @@ class $$LocalDecksTableTableManager
                 required String name,
                 Value<String?> subjectId = const Value.absent(),
                 Value<String?> color = const Value.absent(),
+                Value<String?> templateKey = const Value.absent(),
                 required int sortOrder,
                 required int createdAt,
                 required int updatedAt,
@@ -8097,6 +8173,7 @@ class $$LocalDecksTableTableManager
                 name: name,
                 subjectId: subjectId,
                 color: color,
+                templateKey: templateKey,
                 sortOrder: sortOrder,
                 createdAt: createdAt,
                 updatedAt: updatedAt,

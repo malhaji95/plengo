@@ -26,6 +26,8 @@ import '../features/home/streak_screen.dart';
 import '../features/learning/mistakes_screen.dart';
 import '../features/legal/legal_screen.dart';
 import '../features/learning/stats_screen.dart';
+import '../features/make_cards/create_group_screen.dart';
+import '../features/make_cards/group_screens.dart';
 import '../features/make_cards/make_cards_screen.dart';
 import '../features/my_subjects/my_subjects_screen.dart';
 import '../features/plengo_cards/plengo_cards_screen.dart';
@@ -97,6 +99,9 @@ abstract final class Routes {
   /// `?subjectId=` narrows the Plengo decks to one subject.
   static const plengoCards = '/plengo-cards';
   static const makeCards = '/make-cards';
+
+  /// The creation flow: `?subjectId=&template=`.
+  static const makeCardsNew = '/make-cards/new';
 
   /// The student's own groups; `?subjectId=` narrows them to one subject.
   static const makeCardsGroups = '/make-cards/groups';
@@ -375,6 +380,12 @@ GoRouter buildRouter(Ref ref, {required bool couponRedemption}) {
               GoRoute(
                 path: Routes.plengoCards,
                 builder: (_, state) => PlengoCardsScreen(subjectId: state.uri.queryParameters['subjectId']),
+                routes: [
+                  GoRoute(
+                    path: 'decks/:id',
+                    builder: (_, state) => DeckScreen(deckId: state.pathParameters['id']!),
+                  ),
+                ],
               ),
             ],
           ),
@@ -382,11 +393,51 @@ GoRouter buildRouter(Ref ref, {required bool couponRedemption}) {
             routes: [
               GoRoute(
                 path: Routes.makeCards,
-                builder: (_, _) => const MakeCardsScreen(),
+                builder: (_, state) => MakeCardsScreen(subjectId: state.uri.queryParameters['subjectId']),
                 routes: [
+                  GoRoute(
+                    path: 'new',
+                    builder: (_, state) => CreateGroupScreen(
+                      subjectId: state.uri.queryParameters['subjectId'],
+                      templateKey: state.uri.queryParameters['template'],
+                    ),
+                  ),
                   GoRoute(
                     path: 'groups',
                     builder: (_, state) => MyGroupsScreen(subjectId: state.uri.queryParameters['subjectId']),
+                    routes: [
+                      GoRoute(
+                        path: ':id',
+                        builder: (_, state) => GroupScreen(deckId: state.pathParameters['id']!),
+                        routes: [
+                          GoRoute(
+                            path: 'edit',
+                            builder: (_, state) => EditGroupScreen(deckId: state.pathParameters['id']!),
+                          ),
+                          GoRoute(
+                            path: 'add',
+                            builder: (_, state) => CreateGroupScreen(deckId: state.pathParameters['id']!),
+                          ),
+                          GoRoute(
+                            path: 'settings',
+                            builder: (_, state) => GroupSettingsScreen(deckId: state.pathParameters['id']!),
+                          ),
+                          GoRoute(
+                            path: 'cards',
+                            builder: (_, state) => GroupCardsScreen(deckId: state.pathParameters['id']!),
+                            routes: [
+                              GoRoute(
+                                path: ':cardId',
+                                builder: (_, state) => CardEditorScreen(
+                                  deckId: state.pathParameters['id']!,
+                                  cardId: state.pathParameters['cardId'],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ],
               ),

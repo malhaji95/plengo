@@ -29,6 +29,7 @@ class MyDecksRepository {
     name: d.name,
     subjectId: d.subjectId,
     color: d.color,
+    templateKey: d.templateKey,
     sortOrder: d.sortOrder,
     createdAt: _utc(d.createdAt),
     updatedAt: _utc(d.updatedAt),

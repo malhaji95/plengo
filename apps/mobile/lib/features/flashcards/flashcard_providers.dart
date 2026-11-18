@@ -49,16 +49,20 @@ final deckProvider = FutureProvider.autoDispose.family<StudentDeck, String>(
 );
 
 /// A deck's cards for Browse: from the device when the deck is downloaded (§22.11), otherwise from
-/// the server with signed image URLs.
-final browseCardsProvider = FutureProvider.autoDispose.family<({String title, List<StudyCard> cards}), String>((
-  ref,
-  deckId,
-) async {
+/// the server with signed image URLs. A locked deck comes back as a preview (v3 §6: its first cards):
+/// [BrowseCards.lockedDeck] is then the deck, so Browse ends on the locked notice.
+typedef BrowseCards = ({String title, List<StudyCard> cards, StudentDeck? lockedDeck});
+
+final browseCardsProvider = FutureProvider.autoDispose.family<BrowseCards, String>((ref, deckId) async {
   final repo = ref.watch(flashcardRepositoryProvider);
   final local = repo is OfflineFlashcardRepository ? await repo.localStudyCards(deckId) : null;
-  if (local != null) return (title: (await repo.deck(deckId)).titleAr, cards: local);
+  if (local != null) return (title: (await repo.deck(deckId)).titleAr, cards: local, lockedDeck: null);
   final d = await repo.deckCards(deckId);
-  return (title: d.deck.titleAr, cards: [for (final c in d.cards) StudyCard.official(c)]);
+  return (
+    title: d.deck.titleAr,
+    cards: [for (final c in d.cards) StudyCard.official(c)],
+    lockedDeck: d.previewOnly || d.deck.locked ? d.deck : null,
+  );
 });
 
 /// The official card behind a Browse card (for "أضف إلى بطاقاتي").
@@ -131,7 +135,11 @@ class StudyState {
     required this.queue,
     required this.flipped,
     required this.undoCount,
+    this.lockedDeck,
   });
+
+  /// A locked deck cannot be studied (v3 §6): the session shows the locked notice instead.
+  final StudentDeck? lockedDeck;
 
   final Map<String, StudyCard> cards;
   final List<String> order;
@@ -150,6 +158,7 @@ class StudyState {
         queue: queue ?? this.queue,
         flipped: flipped ?? this.flipped,
         undoCount: undoCount ?? this.undoCount,
+        lockedDeck: lockedDeck,
       );
 }
 
@@ -174,16 +183,34 @@ class StudyController extends AsyncNotifier<StudyState> {
     if (source.myDeckId != null) {
       // The student's own deck works fully offline (§13.9); sync in the background.
       unawaited(ref.read(srsSyncProvider).syncNow());
-      final rows = await ref.read(myDecksStoreProvider).cards(source.myDeckId!);
+      final store = ref.read(myDecksStoreProvider);
+      final rows = await store.cards(source.myDeckId!);
+      final template = (await store.deck(source.myDeckId!))?.templateKey;
       cards = [
         for (final r in rows)
-          if (!r.locked) StudyCard.own(r),
+          if (!r.locked) StudyCard.own(r, templateKey: template),
       ];
     } else if (source.deckId != null) {
       await ref.read(srsSyncProvider).syncNow();
       // A downloaded deck is studied from the device (§22.11).
       final local = repo is OfflineFlashcardRepository ? await repo.localStudyCards(source.deckId!) : null;
-      cards = local ?? [for (final c in (await repo.deckCards(source.deckId!)).cards) StudyCard.official(c)];
+      if (local != null) {
+        cards = local;
+      } else {
+        final d = await repo.deckCards(source.deckId!);
+        if (d.previewOnly || d.deck.locked) {
+          return StudyState(
+            cards: const {},
+            order: const [],
+            states: const {},
+            queue: const QueueSnapshot(next: null, newCount: 0, learningCount: 0, reviewCount: 0, nextDueAt: null),
+            flipped: false,
+            undoCount: 0,
+            lockedDeck: d.deck,
+          );
+        }
+        cards = [for (final c in d.cards) StudyCard.official(c)];
+      }
     } else {
       await ref.read(srsSyncProvider).syncNow();
       final DueCards due;
@@ -209,10 +236,11 @@ class StudyController extends AsyncNotifier<StudyState> {
       final own = {
         for (final r in await ref.read(myDecksStoreProvider).cardsByIds(due.userCards.map((d) => d.card.id))) r.id: r,
       };
+      final templates = await _templates();
       cards = [
         for (final d in due.cards) StudyCard.official(d.card),
         for (final d in due.userCards)
-          if (own[d.card.id] != null) StudyCard.own(own[d.card.id]!),
+          if (own[d.card.id] case final r?) StudyCard.own(r, templateKey: templates[r.deckId]),
       ];
       for (final d in due.cards) {
         serverStates[d.card.id] = FlashcardRepository.cardStateOf(d.state);
@@ -247,11 +275,12 @@ class StudyController extends AsyncNotifier<StudyState> {
           in await ref.read(myDecksStoreProvider).cardsByIds(due.keys.where(SrsKey.isUserCard).map(SrsKey.idOf)))
         r.id: r,
     };
+    final templates = await _templates();
     final out = <StudyCard>[];
     for (final key in due.keys) {
       if (SrsKey.isUserCard(key)) {
         final r = own[SrsKey.idOf(key)];
-        if (r != null && !r.locked) out.add(StudyCard.own(r));
+        if (r != null && !r.locked) out.add(StudyCard.own(r, templateKey: templates[r.deckId]));
         continue;
       }
       final c = await content.card(key);
@@ -262,6 +291,11 @@ class StudyController extends AsyncNotifier<StudyState> {
     }
     return out;
   }
+
+  /// Each of the student's decks' card frame, by deck id.
+  Future<Map<String, String?>> _templates() async => {
+    for (final d in await ref.read(myDecksStoreProvider).decks()) d.deck.id: d.deck.templateKey,
+  };
 
   Future<QueueSnapshot> _queue(List<String> order, Map<String, CardState> states) async {
     final now = _now();
